@@ -31,6 +31,7 @@ class ParallelRun
     boolean testBytecode = true
     boolean testJavaScript = true
     boolean testPython = true
+    boolean testMatrixOnPython = false
     number startTime = 0
     number endTime = 0
     number stopTime = 0
@@ -53,11 +54,12 @@ class ParallelRun
         Clears Results/, splits the chosen testers over at most the given
         number of processes, and starts the preparing step.
     */
-    action Start(Array<text> chosenTesters, boolean bytecode, boolean javaScript, boolean python, integer processes)
+    action Start(Array<text> chosenTesters, boolean bytecode, boolean javaScript, boolean python, boolean matrixOnPython, integer processes)
         chosen = chosenTesters
         testBytecode = bytecode
         testJavaScript = javaScript
         testPython = python
+        testMatrixOnPython = matrixOnPython
         DateTime clock
         startTime = clock:GetEpochTime()
         runID = "" + cast(integer, startTime / 1000)
@@ -246,8 +248,9 @@ class ParallelRun
             i = i + 1
         end
 
-        //a tester that always gets its own process (Matrix) takes one now,
-        //as long as at least one process is left for the rest
+        //a tester that gets its own process (Matrix, but only when it runs on
+        //Python, where it takes as long as all the others) takes one now, as
+        //long as at least one process is left for the rest
         HashTable<text, integer> placeOf
         HashTable<integer, number> weightOf
         HashTable<integer, integer> reserved
@@ -259,7 +262,7 @@ class ParallelRun
         i = 0
         repeat while i < order:GetSize()
             integer place = order:Get(i)
-            if catalog:GetsOwnProcess(place) and reserved:GetSize() < count - 1
+            if testMatrixOnPython and catalog:GetsOwnProcess(place) and reserved:GetSize() < count - 1
                 integer own = reserved:GetSize()
                 reserved:Add(own, own)
                 placeOf:Add(catalog:GetKey(place), own)
@@ -346,7 +349,7 @@ class ParallelRun
         integer i = 0
         repeat while i < shards:GetSize()
             Shard shard = shards:Get(i)
-            shard:Start(java, runID, GetBackEndsText(), pinnedJava, node, snapshot)
+            shard:Start(java, runID, GetBackEndsText(), testMatrixOnPython, pinnedJava, node, snapshot)
             i = i + 1
         end
         state = "Running"

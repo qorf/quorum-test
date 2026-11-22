@@ -85,7 +85,7 @@ class Shard
         console.txt in its results folder. Empty paths are left out, and the
         process then finds the tools itself.
     */
-    action Start(text java, text runID, text backEnds, text testJava, text node, text snapshot)
+    action Start(text java, text runID, text backEnds, boolean matrixOnPython, text testJava, text node, text snapshot)
         Array<text> flags
         flags:Add("-jar")
         flags:Add("Run/Default.jar")
@@ -97,6 +97,9 @@ class Shard
         flags:Add(JoinTesters())
         flags:Add("-backends")
         flags:Add(backEnds)
+        if matrixOnPython
+            flags:Add("-matrixpython")
+        end
         if testJava not= ""
             flags:Add("-java")
             flags:Add(testJava)

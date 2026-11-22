@@ -35,7 +35,8 @@ use Libraries.Testing.JsonWriter
         -prepare    gets the pinned JDK and Node.js and builds the shared
                     JavaScript snapshot, for a parallel run
         -shard N    one process of a parallel run, with -run, -testers,
-                    -backends, and optionally -java, -node and -snapshot
+                    -backends, and optionally -matrixpython (Matrix runs on
+                    Python too), -java, -node and -snapshot
 */
 class Main is Form
     TesterCatalog catalog
@@ -49,6 +50,7 @@ class Main is Form
     Checkbox bytecodeBox = undefined
     Checkbox javaScriptBox = undefined
     Checkbox pythonBox = undefined
+    Checkbox matrixPythonBox = undefined
     /* One checkbox per tester, in the catalog's order. */
     Array<Checkbox> testerBoxes
     Slider processSlider = undefined
@@ -129,6 +131,14 @@ class Main is Form
         javaScriptBox:SetToggleState(true)
         pythonBox = backEndRow:AddCheckbox("Python")
         pythonBox:SetToggleState(true)
+
+        //off by default: with Python each Matrix test compiles most of the
+        //library, so it takes as long as every other tester together
+        Grouping matrixRow = backEnds:AddGrouping("Matrix on Python")
+        matrixPythonBox = matrixRow:AddCheckbox("Matrix tests on Python (slow)")
+        matrixPythonBox:SetToggleState(false)
+        matrixRow:AddLabel("")
+        matrixRow:AddLabel("")
 
         //one Testers card: the quick choices (buttons at their own widths),
         //then a subsection per group (a titled grouping inside a card)
@@ -377,7 +387,7 @@ class Main is Form
 
         ParallelRun newRun
         run = newRun
-        run:Start(chosen, bytecode, javaScript, python, cast(integer, processSlider:GetValue()))
+        run:Start(chosen, bytecode, javaScript, python, matrixPythonBox:GetToggleState(), cast(integer, processSlider:GetValue()))
         running = true
         sincePoll = 0
         progress:SetMaximum(chosen:GetSize())
@@ -552,6 +562,7 @@ class Main is Form
 
         text backEnds = GetFlag(flags, "-backends")
         suite:SetBackEnds(backEnds:Contains("bytecode"), backEnds:Contains("javascript"), backEnds:Contains("python"))
+        suite:SetMatrixOnPython(flags:HasKey("-matrixpython"))
         if GetFlag(flags, "-java") not= ""
             suite:SetJavaLocation(GetFlag(flags, "-java"))
         end

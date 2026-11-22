@@ -37,6 +37,14 @@ class QuorumTest is ProcessListener
     boolean testBytecode = true
     boolean testJavaScript = true
     boolean testPython = true
+    /*
+        Whether the Matrix tester runs on Python. With Python, each Matrix test
+        compiles most of the library (Matrix keeps its numbers in a DataFrame,
+        which reaches the game engine), so it takes as long as everything
+        else together. On by default here; the runner window turns it off
+        unless its checkbox is checked.
+    */
+    boolean testMatrixOnPython = true
     Library library
     /*
         The standard library the scripts are compiled against. quorum-test sits
@@ -305,6 +313,11 @@ class QuorumTest is ProcessListener
         testBytecode = bytecode
         testJavaScript = javaScript
         testPython = python
+    end
+
+    /* Whether the Matrix tester runs on Python too. */
+    action SetMatrixOnPython(boolean value)
+        testMatrixOnPython = value
     end
 
     /* Makes this a process of a parallel run, which writes progress.json and result.json. */
@@ -833,6 +846,9 @@ class QuorumTest is ProcessListener
         if testPython = false
             return now
         end
+        if not testMatrixOnPython and currentTester = "Matrix"
+            return now
+        end
         CompilerTestResult result
         check
             result = RunPythonTestFile(files)
@@ -1203,6 +1219,9 @@ Start();
             return now
         end
         if testPython = false
+            return now
+        end
+        if not testMatrixOnPython and currentTester = "Matrix"
             return now
         end
         Compiler compiler = GetDefaultCompiler()
