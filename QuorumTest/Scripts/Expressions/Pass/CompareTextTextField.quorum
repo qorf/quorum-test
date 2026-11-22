@@ -1,0 +1,13 @@
+
+class Main
+    public text test1 = "dog"
+    public text test2 = "cat"
+
+    action Main
+        text a = test1
+        text b = test2
+
+        integer result = a:Compare(b)
+        output result //should be 1
+    end
+end
