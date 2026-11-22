@@ -1,0 +1,126 @@
+package Libraries.Testing
+
+use Libraries.Containers.Array
+
+/*
+    The testers, in the order QuorumTest runs them, with the group each
+    belongs to in the runner window and a weight for splitting a run into
+    processes. The weight is the tester's test count with all three back
+    ends, from the full run of 2026-11-21 (6286 tests); measured times can
+    replace it later.
+
+    The keys must match the names QuorumTest:Main checks with StartTester.
+*/
+class TesterCatalog
+    public constant text LANGUAGE = "Language"
+    public constant text LIBRARY = "Library"
+    public constant text FILES_AND_DATA = "Files and data"
+    public constant text SCIENCE = "Science"
+
+    Array<text> keys
+    Array<text> labels
+    Array<text> groups
+    Array<integer> weights
+
+    on create
+        Add("Expressions", "Expressions", LANGUAGE, 378)
+        Add("TypeCheck", "Type check", LANGUAGE, 863)
+        Add("TypeCheckGenerated", "Type check generated", LANGUAGE, 1091)
+        Add("Chaining", "Chaining", LANGUAGE, 540)
+        Add("IfStatement", "If statement", LANGUAGE, 282)
+        Add("Loops", "Loops", LANGUAGE, 126)
+        Add("Actions", "Actions", LANGUAGE, 405)
+        Add("Inheritance", "Inheritance", LANGUAGE, 125)
+        Add("Templating", "Templating", LANGUAGE, 135)
+        Add("TemplatingGenerated", "Templating generated", LANGUAGE, 684)
+        Add("Exception", "Exception", LANGUAGE, 269)
+        Add("Array", "Array", LIBRARY, 189)
+        Add("Stack", "Stack", LIBRARY, 72)
+        Add("Queue", "Queue", LIBRARY, 36)
+        Add("Math", "Math", LIBRARY, 383)
+        Add("List", "List", LIBRARY, 66)
+        Add("HashTable", "Hash table", LIBRARY, 45)
+        Add("SeparatedValue", "Separated value", FILES_AND_DATA, 5)
+        Add("Spreadsheet", "Spreadsheet", FILES_AND_DATA, 1)
+        Add("Decompresser", "Decompresser", FILES_AND_DATA, 6)
+        Add("ZipWriter", "Zip writer", FILES_AND_DATA, 4)
+        Add("UsePackage", "Use", LANGUAGE, 21)
+        Add("Random", "Random", LIBRARY, 24)
+        Add("Table", "Table", LIBRARY, 84)
+        Add("Bitwise", "Bitwise", LIBRARY, 21)
+        Add("Matrix", "Matrix", LIBRARY, 165)
+        Add("Json", "JSON", LIBRARY, 68)
+        Add("BigInteger", "Big integer", LIBRARY, 50)
+        Add("ByteArray", "Byte array", LIBRARY, 37)
+        Add("DataFormats", "Data formats", FILES_AND_DATA, 8)
+        Add("Fabrication", "Fabrication", FILES_AND_DATA, 23)
+        Add("Science", "Science", SCIENCE, 80)
+    end
+
+    private action Add(text key, text label, text group, integer weight)
+        keys:Add(key)
+        labels:Add(label)
+        groups:Add(group)
+        weights:Add(weight)
+    end
+
+    /* The number of testers. */
+    action GetSize returns integer
+        return keys:GetSize()
+    end
+
+    /* The tester's key at a place in the run order. */
+    action GetKey(integer index) returns text
+        return keys:Get(index)
+    end
+
+    /* The tester's name for people, such as "Type check", at a place in the run order. */
+    action GetLabel(integer index) returns text
+        return labels:Get(index)
+    end
+
+    /* The group of the tester at a place in the run order. */
+    action GetGroup(integer index) returns text
+        return groups:Get(index)
+    end
+
+    /* The weight of the tester at a place in the run order. */
+    action GetWeight(integer index) returns integer
+        return weights:Get(index)
+    end
+
+    /*
+        Whether the tester always gets a process of its own in a parallel run
+        (when there are at least two). Matrix does: with Python each of its
+        tests compiles about 63 MB of Python, so it takes about as long as
+        all the other testers together (run of 2026-11-21).
+    */
+    action GetsOwnProcess(integer index) returns boolean
+        return keys:Get(index) = "Matrix"
+    end
+
+    /* The place of a key in the run order, or -1. */
+    action GetIndex(text key) returns integer
+        integer i = 0
+        repeat while i < keys:GetSize()
+            if keys:Get(i) = key
+                return i
+            end
+            i = i + 1
+        end
+        return -1
+    end
+
+    /* How many testers are in a group. */
+    action GetGroupSize(text group) returns integer
+        integer count = 0
+        integer i = 0
+        repeat while i < groups:GetSize()
+            if groups:Get(i) = group
+                count = count + 1
+            end
+            i = i + 1
+        end
+        return count
+    end
+end

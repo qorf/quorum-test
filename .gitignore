@@ -36,3 +36,7 @@ Results/
 
 # Node.js the suite downloads for JavaScript tests
 Tools/
+
+
+# Each tester's time on this machine, used to split runs
+QuorumTest/Timings.json

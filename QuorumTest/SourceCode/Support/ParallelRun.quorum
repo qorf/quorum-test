@@ -1,0 +1,700 @@
+use Libraries.Containers.Array
+use Libraries.Containers.HashTable
+use Libraries.Containers.Iterator
+use Libraries.System.File
+use Libraries.System.Process
+use Libraries.System.Properties
+use Libraries.System.DateTime
+use Libraries.Data.Formats.JavaScriptObjectNotation
+use Libraries.Language.Support.TextBuilder
+use Libraries.Testing.TesterCatalog
+use Libraries.Testing.JsonWriter
+
+/*
+    One run from the runner window, split over several processes. Nothing
+    here waits: Start begins a preparing step without waiting (it gets the
+    pinned JDK and Node.js and builds the shared JavaScript snapshot), and
+    Poll, called every few seconds, moves things along: once prepare.json
+    appears it starts the shards, and once every shard is done it merges
+    their results into Results/Result.txt, Fail.txt and result.json.
+*/
+class ParallelRun
+    TesterCatalog catalog
+    JsonWriter json
+    Array<Shard> shards
+    Array<text> chosen
+    Process prepare
+    text runID = ""
+    /* Preparing, Running, Stopping, Finished, Cancelled, or Failed. */
+    text state = "Idle"
+    text message = ""
+    boolean testBytecode = true
+    boolean testJavaScript = true
+    boolean testPython = true
+    number startTime = 0
+    number endTime = 0
+    number stopTime = 0
+    boolean stopping = false
+    boolean cancelledShards = false
+    text pinnedJava = ""
+    text node = ""
+    text snapshot = ""
+    constant text SHARED_FOLDER = "Results/Shared"
+    /*
+        Each tester's time from the last runs, in seconds, kept outside
+        Results/ (which each run clears) and used to split the next run.
+    */
+    constant text TIMINGS_FILE = "Timings.json"
+    HashTable<text, number> timings
+    /* How long processes get to notice the stop file before they are ended. */
+    constant number STOP_GRACE_MILLISECONDS = 10000
+
+    /*
+        Clears Results/, splits the chosen testers over at most the given
+        number of processes, and starts the preparing step.
+    */
+    action Start(Array<text> chosenTesters, boolean bytecode, boolean javaScript, boolean python, integer processes)
+        chosen = chosenTesters
+        testBytecode = bytecode
+        testJavaScript = javaScript
+        testPython = python
+        DateTime clock
+        startTime = clock:GetEpochTime()
+        runID = "" + cast(integer, startTime / 1000)
+
+        ReadTimings()
+
+        File results
+        results:SetPath("Results")
+        if results:Exists()
+            results:Delete(true)
+        end
+
+        Split(processes)
+
+        Array<text> flags
+        flags:Add("-jar")
+        flags:Add("Run/Default.jar")
+        flags:Add("-prepare")
+        flags:Add("-run")
+        flags:Add(runID)
+        flags:Add("-backends")
+        flags:Add(GetBackEndsText())
+        File console
+        console:SetPath(SHARED_FOLDER + "/console.txt")
+        prepare:SetName(GetWindowJava())
+        prepare:SetParameters(flags)
+        prepare:SetOutputFile(console)
+        prepare:SetErrorFile(console)
+        prepare:RunWithoutWaiting()
+        state = "Preparing"
+        message = "Getting the JDK and Node.js, and building the JavaScript snapshot"
+    end
+
+    /* The java running this window, used until the pinned JDK is known. */
+    private action GetWindowJava returns text
+        Properties prop
+        text home = prop:GetProperty("java.home")
+        if home = ""
+            return "java"
+        end
+        if prop:IsWindows()
+            return home + "/bin/java.exe"
+        end
+        return home + "/bin/java"
+    end
+
+    private action GetBackEndsText returns text
+        text value = ""
+        if testBytecode
+            value = "bytecode"
+        end
+        if testJavaScript
+            if value not= ""
+                value = value + ","
+            end
+            value = value + "javascript"
+        end
+        if testPython
+            if value not= ""
+                value = value + ","
+            end
+            value = value + "python"
+        end
+        return value
+    end
+
+    /* Reads Timings.json, if a run has written it, into timings. */
+    private action ReadTimings
+        File file
+        file:SetPath(TIMINGS_FILE)
+        if not file:Exists()
+            return now
+        end
+        JavaScriptObjectNotation values
+        values:Read(file)
+        integer i = 0
+        repeat while i < catalog:GetSize()
+            text key = catalog:GetKey(i)
+            if values:HasValue(key)
+                timings:Add(key, values:GetNumber(key))
+            end
+            i = i + 1
+        end
+    end
+
+    /*
+        How heavy a tester is, for splitting: its measured seconds when
+        every chosen tester has been timed, otherwise its test count from
+        TesterCatalog (the two can't be mixed).
+    */
+    private action GetCost(integer catalogIndex) returns number
+        if AllChosenTimed()
+            return timings:GetValue(catalog:GetKey(catalogIndex))
+        end
+        return catalog:GetWeight(catalogIndex)
+    end
+
+    private action AllChosenTimed returns boolean
+        integer i = 0
+        repeat while i < chosen:GetSize()
+            if not timings:HasKey(chosen:Get(i))
+                return false
+            end
+            i = i + 1
+        end
+        return true
+    end
+
+    /*
+        Records each finished tester's seconds in Timings.json, keeping the
+        times of testers this run didn't include.
+    */
+    private action WriteTimings(HashTable<text, JavaScriptObjectNotation> testers)
+        integer i = 0
+        repeat while i < catalog:GetSize()
+            text key = catalog:GetKey(i)
+            if testers:HasKey(key)
+                JavaScriptObjectNotation tester = testers:GetValue(key)
+                timings:Add(key, tester:GetNumber("seconds"))
+            end
+            i = i + 1
+        end
+        TextBuilder builder
+        builder:Append("{")
+        integer written = 0
+        i = 0
+        repeat while i < catalog:GetSize()
+            text key = catalog:GetKey(i)
+            if timings:HasKey(key)
+                if written > 0
+                    builder:Append(", ")
+                end
+                builder:Append(json:Pair(key, "" + timings:GetValue(key)))
+                written = written + 1
+            end
+            i = i + 1
+        end
+        builder:Append("}")
+        json:WriteSafely(TIMINGS_FILE, builder:ToText())
+    end
+
+    /*
+        Splits the chosen testers into processes: the heaviest first, each
+        to the lightest process so far, by measured time once there is one
+        (see GetCost). A tester marked in TesterCatalog as getting its own
+        process (Matrix, which takes about as long as all the others put
+        together with Python) gets one first, when there are at least two.
+        Within a process the testers keep the usual order.
+    */
+    private action Split(integer processes)
+        integer count = processes
+        if count > chosen:GetSize()
+            count = chosen:GetSize()
+        end
+        if count < 1
+            count = 1
+        end
+        integer i = 0
+        repeat while i < count
+            Shard shard
+            shard:SetNumber(i + 1)
+            shards:Add(shard)
+            i = i + 1
+        end
+
+        //the chosen testers' places in the catalog, heaviest first
+        Array<integer> order
+        i = 0
+        repeat while i < chosen:GetSize()
+            order:Add(catalog:GetIndex(chosen:Get(i)))
+            i = i + 1
+        end
+        i = 0
+        repeat while i < order:GetSize()
+            integer heaviest = i
+            integer j = i + 1
+            repeat while j < order:GetSize()
+                if GetCost(order:Get(j)) > GetCost(order:Get(heaviest))
+                    heaviest = j
+                end
+                j = j + 1
+            end
+            integer swap = order:Get(i)
+            order:Set(i, order:Get(heaviest))
+            order:Set(heaviest, swap)
+            i = i + 1
+        end
+
+        //a tester that always gets its own process (Matrix) takes one now,
+        //as long as at least one process is left for the rest
+        HashTable<text, integer> placeOf
+        HashTable<integer, number> weightOf
+        HashTable<integer, integer> reserved
+        i = 0
+        repeat while i < count
+            weightOf:Add(i, 0.0)
+            i = i + 1
+        end
+        i = 0
+        repeat while i < order:GetSize()
+            integer place = order:Get(i)
+            if catalog:GetsOwnProcess(place) and reserved:GetSize() < count - 1
+                integer own = reserved:GetSize()
+                reserved:Add(own, own)
+                placeOf:Add(catalog:GetKey(place), own)
+                weightOf:Add(own, GetCost(place))
+            end
+            i = i + 1
+        end
+
+        //the rest, each to the lightest process so far that isn't reserved
+        i = 0
+        repeat while i < order:GetSize()
+            integer nextPlace = order:Get(i)
+            if not placeOf:HasKey(catalog:GetKey(nextPlace))
+                integer lightest = -1
+                integer k = 0
+                repeat while k < count
+                    if not reserved:HasKey(k)
+                        if lightest = -1
+                            lightest = k
+                        elseif weightOf:GetValue(k) < weightOf:GetValue(lightest)
+                            lightest = k
+                        end
+                    end
+                    k = k + 1
+                end
+                placeOf:Add(catalog:GetKey(nextPlace), lightest)
+                weightOf:Add(lightest, weightOf:GetValue(lightest) + GetCost(nextPlace))
+            end
+            i = i + 1
+        end
+
+        //added in the catalog's order, so each process runs its testers in the usual order
+        i = 0
+        repeat while i < catalog:GetSize()
+            text key = catalog:GetKey(i)
+            if placeOf:HasKey(key)
+                Shard shard = shards:Get(placeOf:GetValue(key))
+                shard:AddTester(key, catalog:GetWeight(i))
+            end
+            i = i + 1
+        end
+    end
+
+    /* Moves the run along. Called by the window every few seconds. */
+    action Poll
+        if state = "Preparing"
+            PollPreparing()
+        elseif state = "Running" or state = "Stopping"
+            PollShards()
+        end
+    end
+
+    private action PollPreparing
+        boolean alive = prepare:IsAlive()
+        File prepared
+        prepared:SetPath(SHARED_FOLDER + "/prepare.json")
+        if prepared:Exists()
+            JavaScriptObjectNotation values
+            values:Read(prepared)
+            if values:GetValue("run") = runID
+                pinnedJava = values:GetValue("java")
+                node = values:GetValue("node")
+                snapshot = values:GetValue("snapshot")
+                StartShards()
+                return now
+            end
+        end
+        if stopping
+            state = "Cancelled"
+            message = "Stopped before the tests started"
+            Finish()
+        elseif not alive
+            state = "Failed"
+            message = "The preparing step stopped without finishing; see " + SHARED_FOLDER + "/console.txt"
+            Finish()
+        end
+    end
+
+    private action StartShards
+        text java = pinnedJava
+        if java = ""
+            java = GetWindowJava()
+        end
+        integer i = 0
+        repeat while i < shards:GetSize()
+            Shard shard = shards:Get(i)
+            shard:Start(java, runID, GetBackEndsText(), pinnedJava, node, snapshot)
+            i = i + 1
+        end
+        state = "Running"
+        message = ""
+        if stopping
+            state = "Stopping"
+        end
+    end
+
+    private action PollShards
+        boolean allDone = true
+        integer i = 0
+        repeat while i < shards:GetSize()
+            Shard shard = shards:Get(i)
+            shard:Poll(runID)
+            if not shard:IsDone()
+                allDone = false
+            end
+            i = i + 1
+        end
+
+        if stopping and not allDone and not cancelledShards
+            DateTime clock
+            if clock:GetEpochTime() - stopTime > STOP_GRACE_MILLISECONDS
+                cancelledShards = true
+                i = 0
+                repeat while i < shards:GetSize()
+                    Shard shard = shards:Get(i)
+                    shard:Cancel()
+                    i = i + 1
+                end
+            end
+        end
+
+        if allDone
+            Merge()
+            if stopping
+                state = "Cancelled"
+            else
+                state = "Finished"
+            end
+            Finish()
+        end
+    end
+
+    private action Finish
+        DateTime clock
+        endTime = clock:GetEpochTime()
+    end
+
+    /*
+        Asks every process to stop by writing Results/stop. Each one checks
+        between tests and writes result.json as cancelled. Any still running
+        after a grace period are ended.
+    */
+    action Stop
+        if state not= "Preparing" and state not= "Running"
+            return now
+        end
+        stopping = true
+        DateTime clock
+        stopTime = clock:GetEpochTime()
+        File stopFile
+        stopFile:SetPath("Results/stop")
+        stopFile:Write("stop")
+        if state = "Preparing"
+            prepare:Cancel()
+        else
+            state = "Stopping"
+        end
+        message = "Stopping after the current tests"
+    end
+
+    action IsDone returns boolean
+        return state = "Finished" or state = "Cancelled" or state = "Failed"
+    end
+
+    action GetState returns text
+        return state
+    end
+
+    action GetMessage returns text
+        return message
+    end
+
+    action GetSeconds returns integer
+        DateTime clock
+        number last = clock:GetEpochTime()
+        if IsDone()
+            last = endTime
+        end
+        return cast(integer, (last - startTime) / 1000)
+    end
+
+    action GetChosenCount returns integer
+        return chosen:GetSize()
+    end
+
+    action GetProcessCount returns integer
+        return shards:GetSize()
+    end
+
+    action GetPassed returns integer
+        integer value = 0
+        integer i = 0
+        repeat while i < shards:GetSize()
+            Shard shard = shards:Get(i)
+            value = value + shard:GetPassed()
+            i = i + 1
+        end
+        return value
+    end
+
+    action GetTotal returns integer
+        integer value = 0
+        integer i = 0
+        repeat while i < shards:GetSize()
+            Shard shard = shards:Get(i)
+            value = value + shard:GetTotal()
+            i = i + 1
+        end
+        return value
+    end
+
+    action GetTestersFinished returns integer
+        integer value = 0
+        integer i = 0
+        repeat while i < shards:GetSize()
+            Shard shard = shards:Get(i)
+            value = value + shard:GetTestersFinished()
+            i = i + 1
+        end
+        return value
+    end
+
+    /* One line per process, for the window. */
+    action GetProcessLines returns Array<text>
+        Array<text> lines
+        integer i = 0
+        repeat while i < shards:GetSize()
+            Shard shard = shards:Get(i)
+            lines:Add(shard:GetLine())
+            i = i + 1
+        end
+        return lines
+    end
+
+    /*
+        One line per finished tester, in the usual order, from the shards'
+        result.json files. Only known once a shard has finished.
+    */
+    action GetTesterLines returns Array<text>
+        Array<text> lines
+        HashTable<text, JavaScriptObjectNotation> testers = GetFinishedTesters()
+        integer i = 0
+        repeat while i < catalog:GetSize()
+            text key = catalog:GetKey(i)
+            if testers:HasKey(key)
+                JavaScriptObjectNotation tester = testers:GetValue(key)
+                integer testerPassed = tester:GetInteger("passed")
+                integer testerTotal = tester:GetInteger("total")
+                text line = tester:GetValue("label") + ": " + testerPassed + " of " + testerTotal
+                if testerPassed = testerTotal
+                    line = line + ", passed"
+                else
+                    line = line + ", " + (testerTotal - testerPassed) + " failed"
+                end
+                lines:Add(line)
+            end
+            i = i + 1
+        end
+        return lines
+    end
+
+    /* One line per failed test: the file, the back end and the first line of the reason. */
+    action GetFailureLines returns Array<text>
+        Array<text> lines
+        text lineFeed = ""
+        lineFeed = lineFeed:GetLineFeed()
+        HashTable<text, JavaScriptObjectNotation> testers = GetFinishedTesters()
+        integer i = 0
+        repeat while i < catalog:GetSize()
+            text key = catalog:GetKey(i)
+            if testers:HasKey(key)
+                JavaScriptObjectNotation tester = testers:GetValue(key)
+                JavaScriptObjectNotation failures = GetList(tester, "failures")
+                if failures not= undefined
+                    integer f = 0
+                    repeat while f < failures:GetSize()
+                        JavaScriptObjectNotation failure = failures:Get(f)
+                        Array<text> reasonLines = failure:GetValue("reason"):Split(lineFeed)
+                        text reason = ""
+                        if not reasonLines:IsEmpty()
+                            reason = reasonLines:Get(0)
+                        end
+                        lines:Add(failure:GetValue("file") + " (" + failure:GetValue("backEnd") + "): " + reason)
+                        f = f + 1
+                    end
+                end
+            end
+            i = i + 1
+        end
+        return lines
+    end
+
+    /*
+        The items of an array in a JSON object, or undefined. The reader
+        keeps a keyed array as a node holding the array, so GetArray is
+        needed to reach the items.
+    */
+    private action GetList(JavaScriptObjectNotation parentObject, text key) returns JavaScriptObjectNotation
+        JavaScriptObjectNotation node = parentObject:GetObject(key)
+        if node = undefined
+            return undefined
+        end
+        if node:IsArrayObject()
+            return node:GetArray()
+        end
+        return node
+    end
+
+    /* The finished testers from every shard's result.json, by key. */
+    private action GetFinishedTesters returns HashTable<text, JavaScriptObjectNotation>
+        HashTable<text, JavaScriptObjectNotation> testers
+        integer i = 0
+        repeat while i < shards:GetSize()
+            Shard shard = shards:Get(i)
+            JavaScriptObjectNotation shardResult = shard:GetResult()
+            if shardResult not= undefined
+                JavaScriptObjectNotation list = GetList(shardResult, "testers")
+                if list not= undefined
+                    integer t = 0
+                    repeat while t < list:GetSize()
+                        JavaScriptObjectNotation tester = list:Get(t)
+                        testers:Add(tester:GetValue("name"), tester)
+                        t = t + 1
+                    end
+                end
+            end
+            i = i + 1
+        end
+        return testers
+    end
+
+    /*
+        Combines the shards into Results/Result.txt (each process's log,
+        one after another), Results/Fail.txt (every failure, in the usual
+        tester order) and Results/result.json (the totals and the testers).
+    */
+    private action Merge
+        text lineFeed = ""
+        lineFeed = lineFeed:GetLineFeed()
+        DateTime runTime
+        integer runPassed = GetPassed()
+        integer runTotal = GetTotal()
+        text summary = runPassed + " of " + runTotal + " passed, with " + shards:GetSize() + " processes, in " + GetSeconds() + " seconds."
+
+        TextBuilder log
+        log:Append("Quorum test results, " + runTime:ToText() + lineFeed)
+        log:Append(summary + lineFeed + lineFeed)
+        integer i = 0
+        repeat while i < shards:GetSize()
+            Shard shard = shards:Get(i)
+            log:Append("Process " + shard:GetNumber() + ": " + shard:GetStatus() + lineFeed)
+            File shardLog
+            shardLog:SetPath(shard:GetResultsFolder() + "/Result.txt")
+            if shardLog:Exists()
+                log:Append(shardLog:Read() + lineFeed)
+            else
+                File console
+                console:SetPath(shard:GetResultsFolder() + "/console.txt")
+                if console:Exists()
+                    log:Append(console:Read() + lineFeed)
+                end
+            end
+            i = i + 1
+        end
+        File resultText
+        resultText:SetPath("Results/Result.txt")
+        resultText:Write(log:ToText())
+
+        TextBuilder failures
+        failures:Append("Quorum test results, " + runTime:ToText() + lineFeed + lineFeed)
+        HashTable<text, JavaScriptObjectNotation> testers = GetFinishedTesters()
+        integer failedCount = runTotal - runPassed
+        if failedCount = 0
+            failures:Append("All tests pass." + lineFeed)
+        else
+            failures:Append(failedCount + " failed." + lineFeed + lineFeed)
+        end
+        TextBuilder testerJson
+        integer written = 0
+        i = 0
+        repeat while i < catalog:GetSize()
+            text key = catalog:GetKey(i)
+            if testers:HasKey(key)
+                JavaScriptObjectNotation tester = testers:GetValue(key)
+                if written > 0
+                    testerJson:Append(", ")
+                end
+                testerJson:Append(tester:ToText())
+                written = written + 1
+                JavaScriptObjectNotation list = GetList(tester, "failures")
+                if list not= undefined
+                    integer f = 0
+                    repeat while f < list:GetSize()
+                        JavaScriptObjectNotation failure = list:Get(f)
+                        failures:Append(failure:GetValue("file") + " (" + failure:GetValue("backEnd") + ")" + lineFeed)
+                        Array<text> reasonLines = failure:GetValue("reason"):Split(lineFeed)
+                        integer r = 0
+                        repeat while r < reasonLines:GetSize()
+                            failures:Append("    " + reasonLines:Get(r) + lineFeed)
+                            r = r + 1
+                        end
+                        failures:Append(lineFeed)
+                        f = f + 1
+                    end
+                end
+            end
+            i = i + 1
+        end
+        //a process that stopped without finishing has no result.json
+        i = 0
+        repeat while i < shards:GetSize()
+            Shard shard = shards:Get(i)
+            if shard:GetResult() = undefined
+                failures:Append("Process " + shard:GetNumber() + ": " + shard:GetStatus() + "; see " + shard:GetResultsFolder() + "/console.txt" + lineFeed)
+            end
+            i = i + 1
+        end
+        File failText
+        failText:SetPath("Results/Fail.txt")
+        failText:Write(failures:ToText())
+
+        text status = "finished"
+        if stopping
+            status = "cancelled"
+        end
+        text value = "{" + json:Pair("run", json:Quote(runID)) + ", " +
+            json:Pair("status", json:Quote(status)) + ", " +
+            json:Pair("processes", "" + shards:GetSize()) + ", " +
+            json:Pair("passed", "" + runPassed) + ", " +
+            json:Pair("total", "" + runTotal) + ", " +
+            json:Pair("seconds", "" + GetSeconds()) + ", " +
+            json:Pair("testers", "[" + testerJson:ToText() + "]") + "}"
+        json:WriteSafely("Results/result.json", value)
+        if not stopping
+            WriteTimings(testers)
+        end
+    end
+end

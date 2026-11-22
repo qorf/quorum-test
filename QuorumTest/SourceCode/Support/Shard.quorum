@@ -1,0 +1,209 @@
+use Libraries.Containers.Array
+use Libraries.System.File
+use Libraries.System.Process
+use Libraries.Data.Formats.JavaScriptObjectNotation
+
+/*
+    One process of a parallel run: a copy of the tests, started without
+    waiting, that runs some of the testers in its own output folder
+    (OutputN) and writes its progress and result into Results/ShardN. The
+    runner window never waits on it: ParallelRun calls Poll every few
+    seconds, which reads progress.json, then result.json once it appears.
+*/
+class Shard
+    integer shardNumber = 0
+    Array<text> testers
+    integer weight = 0
+    Process process
+    /* Starting, Running, Finished, Cancelled, or Stopped without finishing. */
+    text status = "Waiting"
+    text current = ""
+    integer currentPassed = 0
+    integer currentTotal = 0
+    integer passed = 0
+    integer total = 0
+    integer testersFinished = 0
+    boolean done = false
+    /* result.json, once it has been read. */
+    JavaScriptObjectNotation result = undefined
+
+    action SetNumber(integer value)
+        shardNumber = value
+    end
+
+    action GetNumber returns integer
+        return shardNumber
+    end
+
+    action AddTester(text key, integer testerWeight)
+        testers:Add(key)
+        weight = weight + testerWeight
+    end
+
+    action GetTesters returns Array<text>
+        return testers
+    end
+
+    action GetWeight returns integer
+        return weight
+    end
+
+    action GetResultsFolder returns text
+        return "Results/Shard" + shardNumber
+    end
+
+    action GetOutputFolder returns text
+        return "Output/Process" + shardNumber
+    end
+
+    action GetStatus returns text
+        return status
+    end
+
+    action IsDone returns boolean
+        return done
+    end
+
+    action GetPassed returns integer
+        return passed
+    end
+
+    action GetTotal returns integer
+        return total
+    end
+
+    action GetTestersFinished returns integer
+        return testersFinished
+    end
+
+    action GetResult returns JavaScriptObjectNotation
+        return result
+    end
+
+    /*
+        Starts the process without waiting. Its console output goes to
+        console.txt in its results folder. Empty paths are left out, and the
+        process then finds the tools itself.
+    */
+    action Start(text java, text runID, text backEnds, text testJava, text node, text snapshot)
+        Array<text> flags
+        flags:Add("-jar")
+        flags:Add("Run/Default.jar")
+        flags:Add("-shard")
+        flags:Add("" + shardNumber)
+        flags:Add("-run")
+        flags:Add(runID)
+        flags:Add("-testers")
+        flags:Add(JoinTesters())
+        flags:Add("-backends")
+        flags:Add(backEnds)
+        if testJava not= ""
+            flags:Add("-java")
+            flags:Add(testJava)
+        end
+        if node not= ""
+            flags:Add("-node")
+            flags:Add(node)
+        end
+        if snapshot not= ""
+            flags:Add("-snapshot")
+            flags:Add(snapshot)
+        end
+
+        File console
+        console:SetPath(GetResultsFolder() + "/console.txt")
+        process:SetName(java)
+        process:SetParameters(flags)
+        process:SetOutputFile(console)
+        process:SetErrorFile(console)
+        process:RunWithoutWaiting()
+        status = "Starting"
+    end
+
+    private action JoinTesters returns text
+        text joined = ""
+        integer i = 0
+        repeat while i < testers:GetSize()
+            if i > 0
+                joined = joined + ","
+            end
+            joined = joined + testers:Get(i)
+            i = i + 1
+        end
+        return joined
+    end
+
+    /*
+        Reads the shard's files and notes what changed. Done once
+        result.json for this run appears, or once the process has ended
+        without writing it.
+    */
+    action Poll(text runID)
+        if done
+            return now
+        end
+        //asked before reading, so a process that writes result.json and
+        //ends between the two reads isn't taken for one that died
+        boolean alive = process:IsAlive()
+
+        File resultFile
+        resultFile:SetPath(GetResultsFolder() + "/result.json")
+        if resultFile:Exists()
+            JavaScriptObjectNotation json
+            json:Read(resultFile)
+            if json:GetValue("run") = runID
+                Apply(json)
+                result = json
+                done = true
+                current = ""
+                if json:GetValue("status") = "cancelled"
+                    status = "Cancelled"
+                else
+                    status = "Finished"
+                end
+                return now
+            end
+        end
+
+        File progressFile
+        progressFile:SetPath(GetResultsFolder() + "/progress.json")
+        if progressFile:Exists()
+            JavaScriptObjectNotation progress
+            progress:Read(progressFile)
+            if progress:GetValue("run") = runID
+                Apply(progress)
+                current = progress:GetValue("current")
+                currentPassed = progress:GetInteger("currentPassed")
+                currentTotal = progress:GetInteger("currentTotal")
+                status = "Running"
+            end
+        end
+
+        if not alive
+            done = true
+            status = "Stopped without finishing, exit code " + process:GetExitCode()
+        end
+    end
+
+    private action Apply(JavaScriptObjectNotation json)
+        passed = json:GetInteger("passed")
+        total = json:GetInteger("total")
+        testersFinished = json:GetInteger("testersFinished")
+    end
+
+    /* Asks the process to end now, after the stop file was given time to work. */
+    action Cancel
+        if process:IsAlive()
+            process:Cancel()
+        end
+    end
+
+    /* One line for the window's list of processes. */
+    action GetLine returns text
+        text line = "Process " + shardNumber + ": " + testers:GetSize() + " testers. " + passed + " of " + total + " passed. " + status
+        if status = "Running" and current not= ""
+            line = line + ": " + current + ", " + currentPassed + " of " + currentTotal + " passed so far"
+        end
+        return line
+    end
+end

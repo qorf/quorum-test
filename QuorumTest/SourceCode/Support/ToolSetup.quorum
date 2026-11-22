@@ -1,0 +1,274 @@
+package Libraries.Testing
+
+use Libraries.System.File
+use Libraries.System.Process
+use Libraries.System.Properties
+use Libraries.Containers.Array
+use Libraries.Network.NetworkRequest
+use Libraries.Network.NetworkConnection
+use Libraries.Data.Compression.Decompresser
+use Libraries.Data.Formats.JavaScriptObjectNotation
+use Libraries.Language.Support.TextBuilder
+
+/*
+    Gets the pinned tools the tests use, named in Tools.json: a JDK (the
+    same release Quorum Studio bundles, so every machine runs the tests on
+    the same Java) and Node.js. Each is downloaded into Tools/ the first
+    time and reused after that, the way AutoBuild gets what it needs. It
+    also builds the V8 startup snapshot of the JavaScript standard library.
+
+    Messages for the log collect in GetMessages, since QuorumTest and the
+    runner each keep their own log.
+*/
+class ToolSetup
+    constant text TOOLS_FOLDER = "Tools"
+    constant text SETTINGS_FILE = "Tools.json"
+    constant text SNAPSHOT_ENTRY = "SnapshotEntry.js"
+    constant text SNAPSHOT_BLOB = "QuorumStandardLibrary.blob"
+    JavaScriptObjectNotation settings = undefined
+    Array<text> messages
+
+    /* The messages since the last call to EmptyMessages, in order. */
+    action GetMessages returns Array<text>
+        return messages
+    end
+
+    action EmptyMessages
+        messages:Empty()
+    end
+
+    private action Say(text message)
+        messages:Add(message)
+    end
+
+    /* Returns a value from Tools.json, or "" if it or the file is missing. */
+    action GetSetting(text key) returns text
+        if settings = undefined
+            File file
+            file:SetPath(SETTINGS_FILE)
+            if not file:Exists()
+                Say("Cannot find " + SETTINGS_FILE + ".")
+                return ""
+            end
+            JavaScriptObjectNotation json
+            json:Read(file)
+            settings = json
+        end
+        if settings:HasValue(key)
+            return settings:GetValue(key)
+        end
+        return ""
+    end
+
+    /* aarch64 or x64, as Java reports it (aarch64 on 64-bit ARM). */
+    private action GetProcessor returns text
+        Properties prop
+        text architecture = prop:GetArchitecture()
+        if architecture = "aarch64" or architecture = "arm64"
+            return "aarch64"
+        end
+        return "x64"
+    end
+
+    /*
+        Returns the path of the pinned JDK's java, downloading the JDK into
+        Tools/ first if it isn't there. Returns undefined if that fails, for
+        example with no network.
+    */
+    action GetJava returns text
+        Properties prop
+        text platform = "linux"
+        if prop:IsWindows()
+            platform = "windows"
+        elseif prop:IsMac()
+            platform = "mac"
+        end
+        text archive = GetSetting("jdk-" + platform + "-" + GetProcessor())
+        text folder = GetSetting("jdk-folder")
+        if archive = "" or folder = ""
+            Say(SETTINGS_FILE + " has no JDK for " + platform + "-" + GetProcessor() + ".")
+            return undefined
+        end
+
+        File java
+        if prop:IsMac()
+            java:SetPath(TOOLS_FOLDER + "/" + folder + "/Contents/Home/bin/java")
+        elseif prop:IsWindows()
+            java:SetPath(TOOLS_FOLDER + "/" + folder + "/bin/java.exe")
+        else
+            java:SetPath(TOOLS_FOLDER + "/" + folder + "/bin/java")
+        end
+        if java:Exists()
+            return java:GetAbsolutePath()
+        end
+
+        Say("Downloading JDK " + GetSetting("jdk-release") + " (" + archive + ")")
+        if DownloadAndUnpack(GetSetting("jdk-url") + archive, archive) and java:Exists()
+            return java:GetAbsolutePath()
+        end
+        Say("Could not get the JDK into " + TOOLS_FOLDER + "/" + folder)
+        return undefined
+    end
+
+    /*
+        The Node.js download name for this computer, such as darwin-arm64,
+        win-x64 or linux-x64.
+    */
+    private action GetNodePlatform returns text
+        Properties prop
+        text processor = "x64"
+        if GetProcessor() = "aarch64"
+            processor = "arm64"
+        end
+        if prop:IsWindows()
+            return "win-" + processor
+        elseif prop:IsMac()
+            return "darwin-" + processor
+        end
+        return "linux-" + processor
+    end
+
+    /*
+        Returns the path of the pinned Node.js, downloading it into Tools/
+        first if it isn't there. Returns undefined if that fails.
+    */
+    action GetNode returns text
+        text version = GetSetting("node-version")
+        if version = ""
+            Say(SETTINGS_FILE + " has no node-version.")
+            return undefined
+        end
+        Properties prop
+        text folderName = "node-v" + version + "-" + GetNodePlatform()
+        text archive = folderName + ".tar.gz"
+        File node
+        if prop:IsWindows()
+            archive = folderName + ".zip"
+            node:SetPath(TOOLS_FOLDER + "/" + folderName + "/node.exe")
+        else
+            node:SetPath(TOOLS_FOLDER + "/" + folderName + "/bin/node")
+        end
+        if node:Exists()
+            return node:GetAbsolutePath()
+        end
+
+        Say("Downloading Node.js " + version + " (" + archive + ")")
+        if DownloadAndUnpack("https://nodejs.org/dist/v" + version + "/" + archive, archive) and node:Exists()
+            return node:GetAbsolutePath()
+        end
+        Say("Could not get Node.js into " + TOOLS_FOLDER + "/" + folderName)
+        return undefined
+    end
+
+    /*
+        Downloads an archive into Tools/, unpacks it there (tar on Mac and
+        Linux, Decompresser for a zip on Windows) and deletes the archive.
+        Returns false if the download failed.
+    */
+    private action DownloadAndUnpack(text address, text archive) returns boolean
+        File tools
+        tools:SetPath(TOOLS_FOLDER)
+        if not tools:Exists()
+            tools:CreateDirectories()
+        end
+        File download
+        download:SetPath(TOOLS_FOLDER + "/" + archive)
+
+        check
+            NetworkRequest request
+            request:SetRequestTypeToGet()
+            request:AddHeader("Accept", "*/*")
+            request:SetWebAddress(address)
+            request:SetDownloadFile(download)
+            NetworkConnection http
+            http:SendRequest(request)
+        detect e
+            Say("Could not download " + address + ": " + e:GetErrorMessage())
+            return false
+        end
+
+        Say("Unpacking " + archive)
+        Properties prop
+        if prop:IsWindows()
+            Decompresser decompresser
+            decompresser:DecompressZip(download)
+        else
+            Process tar
+            tar:SetName("tar")
+            File toolsDirectory
+            toolsDirectory:SetAbsolutePath(tools:GetAbsolutePath())
+            tar:SetDirectory(toolsDirectory)
+            Array<text> parameters
+            parameters:Add("-xzf")
+            parameters:Add(archive)
+            tar:SetParameters(parameters)
+            tar:Run()
+        end
+        if download:Exists()
+            download:Delete()
+        end
+        return true
+    end
+
+    /*
+        Builds a V8 startup snapshot with the JavaScript standard library
+        already loaded, as QuorumStandardLibrary.blob in the folder. Each
+        JavaScript test then starts Node.js from it and runs only its own
+        script. Returns the blob's path, or undefined if it could not be
+        built (for example with an old Node.js).
+    */
+    action BuildSnapshot(text node, File library, text folder) returns text
+        File run
+        run:SetPath(folder)
+        if not run:Exists()
+            run:CreateDirectories()
+        end
+
+        text lineFeed = ""
+        lineFeed = lineFeed:GetLineFeed()
+        //JavaScript accepts forward slashes on every system
+        text libraryPath = library:GetAbsolutePath()
+        libraryPath = libraryPath:Replace("\", "/")
+        libraryPath = libraryPath:Replace("'", "\'")
+
+        //the library is loaded with vm: node runs the entry as a module, so
+        //text put straight into it would keep the library's globals local
+        TextBuilder entry
+        entry:Append("const fs = require('fs'), vm = require('vm'), v8 = require('v8');" + lineFeed)
+        entry:Append("vm.runInThisContext(fs.readFileSync('" + libraryPath + "', 'utf8'));" + lineFeed)
+        entry:Append("v8.startupSnapshot.setDeserializeMainFunction(() => {" + lineFeed)
+        entry:Append("    const fs = require('fs'), vm = require('vm');" + lineFeed)
+        entry:Append("    vm.runInThisContext(fs.readFileSync(process.argv[1], 'utf8'));" + lineFeed)
+        entry:Append("});" + lineFeed)
+
+        File entryFile
+        entryFile:SetPath(folder + "/" + SNAPSHOT_ENTRY)
+        entryFile:Write(entry:ToText())
+
+        File blob
+        blob:SetPath(folder + "/" + SNAPSHOT_BLOB)
+        if blob:Exists()
+            blob:Delete()
+        end
+
+        //Node.js warns on the error stream that vm isn't fully verified in
+        //snapshot scripts, so success is judged by the blob, not the stream
+        Process process
+        process:SetName(node)
+        File processDirectory
+        processDirectory:SetAbsolutePath(run:GetAbsolutePath())
+        process:SetDirectory(processDirectory)
+        Array<text> parameters
+        parameters:Add("--snapshot-blob")
+        parameters:Add(SNAPSHOT_BLOB)
+        parameters:Add("--build-snapshot")
+        parameters:Add(SNAPSHOT_ENTRY)
+        process:SetParameters(parameters)
+        process:Run()
+
+        if blob:Exists()
+            return blob:GetAbsolutePath()
+        end
+        return undefined
+    end
+end

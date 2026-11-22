@@ -12,7 +12,7 @@
     "IOS_SIGNATURE" : "",
     "ImageSheetEnabled" : false,
     "ImageSheetRebuildOnCompile" : false,
-    "Main" : "/SourceCode/Console.quorum",
+    "Main" : "/SourceCode/Main.quorum",
     "Project Version" : "1.0",
     "ProjectName" : "QuorumTest",
     "ProjectType" : "JavaType",

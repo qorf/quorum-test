@@ -1,0 +1,11 @@
+{
+    "jdk-release": "21.0.12.1+1",
+    "jdk-folder": "jdk-21.0.12.1+1",
+    "jdk-url": "https://github.com/adoptium/temurin21-binaries/releases/download/jdk-21.0.12.1%2B1/",
+    "jdk-mac-aarch64": "OpenJDK21U-jdk_aarch64_mac_hotspot_21.0.12.1_1.tar.gz",
+    "jdk-mac-x64": "OpenJDK21U-jdk_x64_mac_hotspot_21.0.12.1_1.tar.gz",
+    "jdk-windows-x64": "OpenJDK21U-jdk_x64_windows_hotspot_21.0.12.1_1.zip",
+    "jdk-linux-x64": "OpenJDK21U-jdk_x64_linux_hotspot_21.0.12.1_1.tar.gz",
+    "jdk-linux-aarch64": "OpenJDK21U-jdk_aarch64_linux_hotspot_21.0.12.1_1.tar.gz",
+    "node-version": "22.16.0"
+}

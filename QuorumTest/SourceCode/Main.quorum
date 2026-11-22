@@ -1,6 +1,566 @@
+use Libraries.Interface.Forms.Form
+use Libraries.Interface.Forms.Page
+use Libraries.Interface.Forms.Grouping
+use Libraries.Game.DesktopConfiguration
+use Libraries.Game.Layer2D
+use Libraries.Game.InputSet
+use Libraries.Game.InputTable
+use Libraries.Interface.Events.KeyboardEvent
+use Libraries.System.Properties
+use Libraries.Interface.Controls.Button
+use Libraries.Interface.Controls.Checkbox
+use Libraries.Interface.Controls.Slider
+use Libraries.Interface.Controls.ProgressBar
+use Libraries.Interface.Item
+use Libraries.Game.Graphics.Label
+use Libraries.Containers.Array
+use Libraries.Containers.HashTable
+use Libraries.System.File
+use Libraries.System.SystemHelper
+use Libraries.Language.Support.TextBuilder
+use Libraries.Testing.QuorumTest
+use Libraries.Testing.ToolSetup
+use Libraries.Testing.TesterCatalog
+use Libraries.Testing.JsonWriter
+
 /*
-    Temporary: runs the test suite in the console. This will become the
-    user interface that runs all of the tests.
+    The Quorum tests. Started with no flags (from Quorum Studio, run.sh or
+    run.bat), this opens the runner window: choose back ends, testers and
+    how many processes to use, then Run. The window starts the processes
+    without waiting and checks their files every two seconds, so it never
+    freezes.
+
+    Started with flags, it runs without a window:
+        -console    the whole run, linearly, in this one process (Console)
+        -prepare    gets the pinned JDK and Node.js and builds the shared
+                    JavaScript snapshot, for a parallel run
+        -shard N    one process of a parallel run, with -run, -testers,
+                    -backends, and optionally -java, -node and -snapshot
 */
-Console console
-console:Main()
+class Main is Form
+    TesterCatalog catalog
+    ParallelRun run = undefined
+    RunnerBehavior behavior
+    Button runButton = undefined
+    Button stopButton = undefined
+    Button failButton = undefined
+    Button allButton = undefined
+    Button noneButton = undefined
+    Checkbox bytecodeBox = undefined
+    Checkbox javaScriptBox = undefined
+    Checkbox pythonBox = undefined
+    /* One checkbox per tester, in the catalog's order. */
+    Array<Checkbox> testerBoxes
+    Slider processSlider = undefined
+    Label processLabel = undefined
+    Label statusLabel = undefined
+    Label countsLabel = undefined
+    Label processText = undefined
+    Label failureText = undefined
+    ProgressBar progress = undefined
+    integer cores = 1
+    integer shownProcesses = -1
+    number sincePoll = 0
+    constant number POLL_SECONDS = 2.0
+    boolean running = false
+    ZoomBehavior zoomIn
+    ZoomBehavior zoomOut
+    /* The smallest and largest interface scale the zoom keys reach. */
+    constant number SMALLEST_SCALE = 0.6
+    constant number LARGEST_SCALE = 3.0
+
+    action Main
+        Libraries.System.Console systemConsole
+        Array<text> arguments = systemConsole:GetConsoleArguments()
+        if arguments:IsEmpty()
+            OpenWindow()
+        else
+            RunFromCommandLine(arguments)
+        end
+    end
+
+    /*
+        Builds the window. Only layouts Forms supports: a banner, rows of
+        buttons (untitled groupings), cards (titled groupings) with rows of
+        three checkboxes (untitled groupings inside them) and subsections
+        (titled groupings inside them), a label paired with the slider at
+        page level, and labels whose text changes. Nothing is hidden,
+        because a hidden control still takes its space.
+    */
+    private action OpenWindow
+        SystemHelper helper
+        cores = helper:GetAvailableProcessors()
+        if cores < 1
+            cores = 1
+        end
+        //60% of the cores, rounded, at least 1
+        integer defaultProcesses = cast(integer, cores * 0.6 + 0.5)
+        if defaultProcesses < 1
+            defaultProcesses = 1
+        end
+
+        //the window's own title, and it can be resized
+        DesktopConfiguration desktop = GetDesktopConfiguration()
+        desktop:title = "Quorum Tests"
+        desktop:resizable = true
+
+        Page page = GetMainPage()
+        page:AddBanner("Quorum Tests", "The compiler's tests on bytecode, JavaScript and Python")
+        behavior:SetWindow(me)
+
+        //an untitled grouping is one row: the buttons side by side
+        Grouping actions = page:AddGrouping("Actions")
+        runButton = actions:AddButton("Run")
+        runButton:SetBehavior(behavior)
+        stopButton = actions:AddButton("Stop")
+        stopButton:SetBehavior(behavior)
+        failButton = actions:AddButton("Open Fail.txt")
+        failButton:SetBehavior(behavior)
+
+        //a titled grouping is a card; an untitled grouping inside it is one
+        //row, whose checkboxes share the row evenly from the left, so rows
+        //of three line up as columns
+        Grouping backEnds = page:AddGrouping("Back ends")
+        backEnds:SetTitle("Back ends")
+        Grouping backEndRow = backEnds:AddGrouping("Back end choices")
+        bytecodeBox = backEndRow:AddCheckbox("Bytecode")
+        bytecodeBox:SetToggleState(true)
+        javaScriptBox = backEndRow:AddCheckbox("JavaScript")
+        javaScriptBox:SetToggleState(true)
+        pythonBox = backEndRow:AddCheckbox("Python")
+        pythonBox:SetToggleState(true)
+
+        //one Testers card: the quick choices (buttons at their own widths),
+        //then a subsection per group (a titled grouping inside a card)
+        Grouping testers = page:AddGrouping("Testers")
+        testers:SetTitle("Testers")
+        Grouping choices = testers:AddGrouping("Quick choices")
+        allButton = choices:AddButton("All testers")
+        allButton:SetBehavior(behavior)
+        noneButton = choices:AddButton("No testers")
+        noneButton:SetBehavior(behavior)
+
+        AddTesterGroup(testers, catalog:LANGUAGE)
+        AddTesterGroup(testers, catalog:LIBRARY)
+        AddTesterGroup(testers, catalog:FILES_AND_DATA)
+        AddTesterGroup(testers, catalog:SCIENCE)
+
+        //at page level a slider with a percentage width takes it, so this
+        //one spans the row (80%, as wide as the cards); its label comes
+        //after it, so the two aren't paired into half a row each
+        processSlider = page:AddSlider("Processes to run at once", 1, cores, 1)
+        processSlider:SetPercentageWidth(0.8)
+        processSlider:SetValue(defaultProcesses)
+        processLabel = page:AddLabel("Processes")
+        UpdateProcessLabel()
+
+        //the progress bar before the labels, so it isn't paired with one
+        Grouping status = page:AddGrouping("Status")
+        status:SetTitle("Status")
+        progress = status:AddProgressBar("Testers finished", 0, catalog:GetSize())
+        statusLabel = status:AddLabel("Not run yet.")
+        countsLabel = status:AddLabel("No tests run.")
+
+        //one label per card, a line per process or failure: a label splits
+        //its text at line feeds
+        Grouping processCard = page:AddGrouping("Processes running")
+        processCard:SetTitle("Processes")
+        processText = processCard:AddLabel("Each process is listed here once a run starts.")
+
+        Grouping failureCard = page:AddGrouping("Failures")
+        failureCard:SetTitle("Failures")
+        failureText = failureCard:AddLabel("No failures so far.")
+
+        Display(900, 1000)
+    end
+
+    /*
+        A subsection of the Testers card with a checkbox for each tester in
+        the group, in rows of three. A short last row is filled with empty
+        labels, so its checkboxes stay in the same columns as the rows above.
+    */
+    private action AddTesterGroup(Grouping card, text group)
+        Grouping section = card:AddGrouping(group)
+        section:SetTitle(group)
+        Grouping row = undefined
+        integer inRow = 3
+        integer rows = 0
+        integer i = 0
+        repeat while i < catalog:GetSize()
+            if catalog:GetGroup(i) = group
+                if inRow = 3
+                    rows = rows + 1
+                    row = section:AddGrouping(group + " row " + rows)
+                    inRow = 0
+                end
+                Checkbox box = row:AddCheckbox(catalog:GetLabel(i))
+                box:SetToggleState(true)
+                testerBoxes:Add(box)
+                inRow = inRow + 1
+            end
+            i = i + 1
+        end
+        if row not= undefined
+            repeat while inRow < 3
+                row:AddLabel("")
+                inRow = inRow + 1
+            end
+        end
+    end
+
+    /*
+        After Forms sets the window up: the layout follows the window when
+        it is resized, and the zoom keys are bound.
+    */
+    action CreateGame
+        parent:Form:CreateGame()
+        Layer2D layer = GetCurrentLayer2D()
+        layer:SetAutomaticResizing(true)
+
+        //Quorum Studio's keys: Command (Mac) or Control with = and -
+        Properties properties
+        InputSet modifierKind
+        integer modifier = modifierKind:CONTROL
+        if properties:IsMac()
+            modifier = modifierKind:META
+        end
+        KeyboardEvent keys
+        zoomIn:SetWindow(me)
+        zoomIn:SetAmount(0.2)
+        zoomOut:SetWindow(me)
+        zoomOut:SetAmount(-0.2)
+        InputSet bigger
+        bigger:SetKeyboardInput(keys:EQUALS)
+        bigger:AddModifier(modifier)
+        InputSet smaller
+        smaller:SetKeyboardInput(keys:MINUS)
+        smaller:AddModifier(modifier)
+        InputTable table = GetDefaultInputTable()
+        table:Add(bigger, zoomIn)
+        table:Add(smaller, zoomOut)
+    end
+
+    /* Changes the interface scale by the amount, within limits. Called by ZoomBehavior. */
+    action Zoom(number amount)
+        number scale = GetInterfaceScale() + amount
+        if scale >= SMALLEST_SCALE and scale <= LARGEST_SCALE
+            SetInterfaceScale(scale)
+        end
+    end
+
+    private action UpdateProcessLabel
+        shownProcesses = cast(integer, processSlider:GetValue())
+        text value = "Processes: " + shownProcesses + " of " + cores + " cores"
+        if running
+            value = value + ". Applies to the next run."
+        end
+        processLabel:SetText(value)
+    end
+
+    /* Keeps the processes label in step with the slider, and checks on a run every two seconds. */
+    action Update(number time)
+        if processSlider = undefined
+            return now
+        end
+        integer chosenProcesses = cast(integer, processSlider:GetValue())
+        if chosenProcesses not= shownProcesses
+            UpdateProcessLabel()
+        end
+        if not running
+            return now
+        end
+        sincePoll = sincePoll + time
+        if sincePoll >= POLL_SECONDS
+            sincePoll = 0
+            run:Poll()
+            if run:IsDone()
+                running = false
+                UpdateProcessLabel()
+            end
+            ShowRun()
+        end
+    end
+
+    /* Called by RunnerBehavior when a button is pressed. */
+    action ButtonPressed(Item item)
+        //the buttons as Items, since an Item can't be compared with a Button
+        Item runItem = runButton
+        Item stopItem = stopButton
+        Item failItem = failButton
+        Item allItem = allButton
+        Item noneItem = noneButton
+        if item = runItem
+            StartRun()
+        elseif item = stopItem
+            if running
+                run:Stop()
+                ShowRun()
+            end
+        elseif item = failItem
+            File failFile
+            failFile:SetPath("Results/Fail.txt")
+            if failFile:Exists()
+                SystemHelper helper
+                helper:OpenInDefaultTextEditor(failFile)
+            else
+                statusLabel:SetText("There is no Fail.txt yet. Run the tests first.")
+            end
+        elseif item = allItem
+            ChooseTesters("all")
+        elseif item = noneItem
+            ChooseTesters("none")
+        end
+    end
+
+    /* Checks all testers ("all") or none. */
+    private action ChooseTesters(text which)
+        integer i = 0
+        repeat while i < testerBoxes:GetSize()
+            Checkbox box = testerBoxes:Get(i)
+            box:SetToggleState(which = "all")
+            i = i + 1
+        end
+    end
+
+    /*
+        The catalog place of the i-th checkbox. The boxes are added group by
+        group, so they follow the groups' order, not the catalog's.
+    */
+    private action GetCatalogIndex(integer boxIndex) returns integer
+        integer count = 0
+        Array<text> groups
+        groups:Add(catalog:LANGUAGE)
+        groups:Add(catalog:LIBRARY)
+        groups:Add(catalog:FILES_AND_DATA)
+        groups:Add(catalog:SCIENCE)
+        integer g = 0
+        repeat while g < groups:GetSize()
+            integer i = 0
+            repeat while i < catalog:GetSize()
+                if catalog:GetGroup(i) = groups:Get(g)
+                    if count = boxIndex
+                        return i
+                    end
+                    count = count + 1
+                end
+                i = i + 1
+            end
+            g = g + 1
+        end
+        return -1
+    end
+
+    private action StartRun
+        if running
+            return now
+        end
+        Array<text> chosen
+        integer i = 0
+        repeat while i < testerBoxes:GetSize()
+            Checkbox box = testerBoxes:Get(i)
+            if box:GetToggleState()
+                chosen:Add(catalog:GetKey(GetCatalogIndex(i)))
+            end
+            i = i + 1
+        end
+        if chosen:IsEmpty()
+            statusLabel:SetText("Choose at least one tester.")
+            return now
+        end
+        boolean bytecode = bytecodeBox:GetToggleState()
+        boolean javaScript = javaScriptBox:GetToggleState()
+        boolean python = pythonBox:GetToggleState()
+        if not bytecode and not javaScript and not python
+            statusLabel:SetText("Choose at least one back end.")
+            return now
+        end
+
+        ParallelRun newRun
+        run = newRun
+        run:Start(chosen, bytecode, javaScript, python, cast(integer, processSlider:GetValue()))
+        running = true
+        sincePoll = 0
+        progress:SetMaximum(chosen:GetSize())
+        UpdateProcessLabel()
+        ShowRun()
+    end
+
+    /* Shows the run's state: the status, the counts, the progress, the processes and the failures. */
+    private action ShowRun
+        if run = undefined
+            return now
+        end
+        text state = run:GetState()
+        text status = ""
+        if state = "Preparing"
+            status = "Preparing: " + run:GetMessage() + "."
+        elseif state = "Running"
+            status = "Running " + run:GetProcessCount() + " processes for " + run:GetSeconds() + " seconds."
+        elseif state = "Stopping"
+            status = "Stopping after the current tests."
+        elseif state = "Finished"
+            status = "Finished in " + run:GetSeconds() + " seconds with " + run:GetProcessCount() + " processes."
+        elseif state = "Cancelled"
+            status = "Stopped after " + run:GetSeconds() + " seconds."
+        elseif state = "Failed"
+            status = "The run could not start. " + run:GetMessage() + "."
+        end
+        statusLabel:SetText(status)
+
+        integer passedCount = run:GetPassed()
+        integer totalCount = run:GetTotal()
+        integer finishedTesters = run:GetTestersFinished()
+        countsLabel:SetText(passedCount + " of " + totalCount + " passed, " + (totalCount - passedCount) + " failed. Testers finished: " + finishedTesters + " of " + run:GetChosenCount() + ".")
+        progress:SetValue(finishedTesters)
+
+        SetLines(processText, run:GetProcessLines(), "Each process is listed here once a run starts.")
+        SetLines(failureText, run:GetFailureLines(), "No failures so far.")
+    end
+
+    /* Puts the lines into the label, one per line, or the empty text if there are none. Only changes it if it differs. */
+    private action SetLines(Label label, Array<text> lines, text empty)
+        text value = empty
+        if not lines:IsEmpty()
+            text lineFeed = ""
+            lineFeed = lineFeed:GetLineFeed()
+            TextBuilder builder
+            integer i = 0
+            repeat while i < lines:GetSize()
+                if i > 0
+                    builder:Append(lineFeed)
+                end
+                builder:Append(lines:Get(i))
+                i = i + 1
+            end
+            value = builder:ToText()
+        end
+        if label:GetText() not= value
+            label:SetText(value)
+        end
+    end
+
+    /* The modes without a window. */
+    private action RunFromCommandLine(Array<text> arguments)
+        HashTable<text, text> flags = ReadFlags(arguments)
+        if flags:HasKey("-console")
+            Console console
+            console:Main()
+        elseif flags:HasKey("-prepare")
+            Prepare(flags)
+        elseif flags:HasKey("-shard")
+            RunShard(flags)
+        else
+            output "Run with no flags to open the runner window, or with -console to run every test in this one process."
+        end
+    end
+
+    /* Each -flag, with the value after it if there is one. */
+    private action ReadFlags(Array<text> arguments) returns HashTable<text, text>
+        HashTable<text, text> flags
+        integer i = 0
+        repeat while i < arguments:GetSize()
+            text key = arguments:Get(i)
+            text value = ""
+            if i + 1 < arguments:GetSize()
+                text next = arguments:Get(i + 1)
+                if not next:StartsWith("-")
+                    value = next
+                    i = i + 1
+                end
+            end
+            flags:Add(key, value)
+            i = i + 1
+        end
+        return flags
+    end
+
+    private action GetFlag(HashTable<text, text> flags, text key) returns text
+        if flags:HasKey(key)
+            return flags:GetValue(key)
+        end
+        return ""
+    end
+
+    /*
+        The preparing step of a parallel run: gets the pinned JDK and, if
+        JavaScript is tested, Node.js and the shared snapshot, then writes
+        Results/Shared/prepare.json for the window.
+    */
+    private action Prepare(HashTable<text, text> flags)
+        text folder = "Results/Shared"
+        ToolSetup tools
+        text java = tools:GetJava()
+        if java = undefined
+            java = ""
+        end
+        text node = ""
+        text snapshot = ""
+        text backEnds = GetFlag(flags, "-backends")
+        if backEnds:Contains("javascript")
+            text found = tools:GetNode()
+            if found not= undefined
+                node = found
+                File library
+                library:SetPath("Run/QuorumStandardLibrary.js")
+                if library:Exists()
+                    text built = tools:BuildSnapshot(node, library, folder)
+                    if built not= undefined
+                        snapshot = built
+                    end
+                end
+            end
+        end
+
+        JsonWriter json
+        TextBuilder messages
+        Array<text> said = tools:GetMessages()
+        integer i = 0
+        repeat while i < said:GetSize()
+            output said:Get(i)
+            if i > 0
+                messages:Append(", ")
+            end
+            messages:Append(json:Quote(said:Get(i)))
+            i = i + 1
+        end
+        text value = "{" + json:Pair("run", json:Quote(GetFlag(flags, "-run"))) + ", " +
+            json:Pair("java", json:Quote(java)) + ", " +
+            json:Pair("node", json:Quote(node)) + ", " +
+            json:Pair("snapshot", json:Quote(snapshot)) + ", " +
+            json:Pair("messages", "[" + messages:ToText() + "]") + "}"
+        json:WriteSafely(folder + "/prepare.json", value)
+    end
+
+    /* One process of a parallel run. */
+    private action RunShard(HashTable<text, text> flags)
+        integer shardNumber = GetFlag(flags, "-shard"):ParseInteger()
+        QuorumTest suite
+        suite:SetRunID(GetFlag(flags, "-run"))
+        suite:SetShard(shardNumber)
+        //inside Output, two levels below the project, so the test
+        //programs' ../../Scripts paths still work when run from there
+        suite:SetOutputFolder("Output/Process" + shardNumber)
+        suite:SetProgramFolder("Output/Process" + shardNumber)
+        suite:SetResultsFolder("Results/Shard" + shardNumber)
+
+        Array<text> testers = GetFlag(flags, "-testers"):Split(",")
+        integer i = 0
+        repeat while i < testers:GetSize()
+            suite:ChooseTester(testers:Get(i))
+            i = i + 1
+        end
+
+        text backEnds = GetFlag(flags, "-backends")
+        suite:SetBackEnds(backEnds:Contains("bytecode"), backEnds:Contains("javascript"), backEnds:Contains("python"))
+        if GetFlag(flags, "-java") not= ""
+            suite:SetJavaLocation(GetFlag(flags, "-java"))
+        end
+        if GetFlag(flags, "-node") not= ""
+            suite:SetNodeLocation(GetFlag(flags, "-node"))
+        end
+        if GetFlag(flags, "-snapshot") not= ""
+            suite:SetSnapshotPath(GetFlag(flags, "-snapshot"))
+        end
+        suite:Main()
+    end
+end

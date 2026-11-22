@@ -1,0 +1,49 @@
+package Libraries.Testing
+
+use Libraries.System.File
+
+/*
+    Small helpers for writing JSON as text: quoting a value, and writing a
+    file safely, so a reader never sees half of one. The runner window
+    reads these files every few seconds while the tests are still writing.
+*/
+class JsonWriter
+    /* Returns the text as a JSON string, in quotes, with its special characters escaped. */
+    action Quote(text value) returns text
+        if value = undefined
+            return "null"
+        end
+        text quote = ""
+        quote = quote:GetDoubleQuote()
+        text result = value:Replace("\", "\\")
+        result = result:Replace(quote, "\" + quote)
+        result = result:Replace(quote:GetCarriageReturn(), "\r")
+        result = result:Replace(quote:GetLineFeed(), "\n")
+        result = result:Replace(quote:GetTab(), "\t")
+        return quote + result + quote
+    end
+
+    /* Returns "key": value, with the key quoted and the value as given. */
+    action Pair(text key, text value) returns text
+        return Quote(key) + ": " + value
+    end
+
+    /*
+        Writes the text to a .tmp file next to the path, then moves it into
+        place, so the file is either the old one or the whole new one.
+    */
+    action WriteSafely(text path, text value)
+        File target
+        target:SetPath(path)
+        if not target:GetParentDirectory():Exists()
+            target:GetParentDirectory():CreateDirectories()
+        end
+        File temporary
+        temporary:SetPath(path + ".tmp")
+        temporary:Write(value)
+        if target:Exists()
+            target:Delete()
+        end
+        boolean moved = temporary:Move(target:GetAbsolutePath())
+    end
+end

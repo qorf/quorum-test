@@ -1,0 +1,26 @@
+use Libraries.Interface.Behaviors.Behavior
+use Libraries.Interface.Events.BehaviorEvent
+
+/*
+    Zooms the runner window in or out by a step, with the same keys and
+    step as Quorum Studio (Command or Control with = and -, by 0.2).
+*/
+class ZoomBehavior is Behavior
+    Main window = undefined
+    number amount = 0.2
+
+    action SetWindow(Main runnerWindow)
+        window = runnerWindow
+    end
+
+    /* How much one key press changes the interface scale: positive zooms in. */
+    action SetAmount(number change)
+        amount = change
+    end
+
+    action Run(BehaviorEvent event)
+        if window not= undefined
+            window:Zoom(amount)
+        end
+    end
+end

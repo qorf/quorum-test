@@ -19,9 +19,6 @@ use Libraries.System.ProcessListener
 use Libraries.System.Properties
 use Libraries.Language.Compile.Translate.TranslateConstants
 use Libraries.Language.Support.TextBuilder
-use Libraries.Network.NetworkRequest
-use Libraries.Network.NetworkConnection
-use Libraries.Data.Compression.Decompresser
 
 class QuorumTest is ProcessListener
     integer total = 0
@@ -47,27 +44,58 @@ class QuorumTest is ProcessListener
     */
     constant text STANDARD_LIBRARY_LOCATION = "../../quorum-language/Quorum/Library/Standard"
     constant text STANDARD_LIBRARY_OUTPUT = "../../quorum-language/Quorum/Library/Compiled"
-    /* Each run overwrites Result.txt and Fail.txt in this folder. */
-    constant text RESULTS_FOLDER = "Results"
+    /*
+        Where the test programs are written and run, and where Result.txt and
+        Fail.txt go. A process of a parallel run gets its own of each. The
+        output folder must stay one level below the project, because the
+        test programs read ../../Scripts from its Run folder.
+    */
+    text outputFolder = "Output"
+    text resultsFolder = "Results"
+    /*
+        The folder test programs run in. Empty means the compiler's Run
+        folder (Output/Run). A process of a parallel run compiles into
+        Output/ProcessN, whose Run folder is one level too deep for the
+        programs' ../../Scripts paths, so its programs run in Output/ProcessN.
+    */
+    text programFolder = ""
+    /* The runner window writes this file to ask every process of a run to stop. */
+    constant text STOP_FILE = "Results/stop"
+    /* What a process of a parallel run writes while it runs, and last of all. */
+    constant text PROGRESS_FILE = "progress.json"
+    constant text RESULT_FILE = "result.json"
     /* A copy of everything written to the console, saved to Result.txt. */
     TextBuilder log
     Tester tester
     text javascriptStandardLibraryText = ""
-    text javaLocation = "java"
+    /* The java that runs each bytecode test program: the pinned JDK when it can be had. */
+    text javaLocation = undefined
     constant text NODE_MAC = "/usr/local/bin/node"
     constant text NODE_WINDOWS = "C:\Program Files\nodejs\node.exe"
     text nodeLocation = undefined
     /*
-        The suite downloads this version of Node.js into Tools/ the first
-        time JavaScript tests run, whatever node the computer has. It then
-        builds a V8 startup snapshot with the JavaScript standard library
-        already loaded, so each test only loads its own small script.
+        The V8 snapshot of the JavaScript standard library. Empty means this
+        run builds its own; a process of a parallel run is given a shared one.
     */
-    constant text NODE_VERSION = "22.16.0"
-    constant text TOOLS_FOLDER = "Tools"
-    constant text SNAPSHOT_ENTRY = "SnapshotEntry.js"
-    constant text SNAPSHOT_BLOB = "QuorumStandardLibrary.blob"
+    text snapshotPath = ""
     boolean useSnapshot = false
+    ToolSetup tools
+    JsonWriter json
+    /* The testers to run, by TesterCatalog key. Empty means all of them. */
+    HashTable<text, text> chosenTesters
+    /* Set only for a process of a parallel run, which then writes progress.json and result.json. */
+    text runID = ""
+    integer shard = 0
+    boolean isSetUp = false
+    boolean stopRequested = false
+    text currentTester = ""
+    number testerStart = 0
+    number runStart = 0
+    integer testerFailedBefore = 0
+    integer testsSinceProgress = 0
+    number lastProgress = 0
+    integer testersFinished = 0
+    TextBuilder testersJson
     boolean javascriptError = false
     text javascriptOutput = ""
     text javascriptErrorOutput = ""
@@ -143,10 +171,19 @@ class QuorumTest is ProcessListener
         dataFormatsChecks:SetCompilerTestSuite(me)
         fabricationChecks:SetCompilerTestSuite(me)
         scienceChecks:SetTester(tester)
+    end
 
+    /*
+        Gets everything ready before the first test: clears the output
+        folder, scans the standard library, and gets the pinned JDK, Node.js
+        and the JavaScript snapshot. Main calls it, after any settings below
+        have been made, so a linear run (Console) is the same as before.
+    */
+    private action SetUp
+        isSetUp = true
         //delete the output folder to start the testing fresh
         File rootTestFolder
-        rootTestFolder:SetPath("Output")
+        rootTestFolder:SetPath(outputFolder)
         if rootTestFolder:Exists()
             rootTestFolder:Delete(true)
         end
@@ -163,18 +200,44 @@ class QuorumTest is ProcessListener
         Log("Scanning Standard Library")
         library:Scan()
 
-        if testJavaScript
-            nodeLocation = GetDownloadedNode()
+        if testBytecode and javaLocation = undefined
+            javaLocation = tools:GetJava()
+            LogToolMessages()
+            if javaLocation = undefined
+                Log("Using java from the PATH, not the pinned JDK.")
+                javaLocation = "java"
+            end
+        end
+
+        if testJavaScript and nodeLocation = undefined
+            nodeLocation = tools:GetNode()
+            LogToolMessages()
             if nodeLocation = undefined
                 nodeLocation = FindNode()
             end
         end
+
+        if testJavaScript and snapshotPath not= ""
+            File blob
+            blob:SetAbsolutePath(snapshotPath)
+            if blob:Exists()
+                useSnapshot = true
+            else
+                snapshotPath = ""
+            end
+        end
+
         File jsStandardLibrary
         jsStandardLibrary:SetPath("Run/QuorumStandardLibrary.js")
         if not testJavaScript
             Log("JavaScript testing is off.")
+        elseif useSnapshot
+            Log("Using the shared JavaScript standard library snapshot")
         elseif nodeLocation not= undefined and jsStandardLibrary:Exists()
-            if BuildSnapshot(jsStandardLibrary)
+            text built = tools:BuildSnapshot(nodeLocation, jsStandardLibrary, outputFolder + "/Run")
+            LogToolMessages()
+            if built not= undefined
+                snapshotPath = built
                 useSnapshot = true
                 Log("Built the JavaScript standard library snapshot")
             else
@@ -191,6 +254,81 @@ class QuorumTest is ProcessListener
         end
         Log("Loading Complete")
         Log("")
+    end
+
+    /* Logs what ToolSetup reported, then clears it. */
+    private action LogToolMessages
+        Array<text> messages = tools:GetMessages()
+        integer i = 0
+        repeat while i < messages:GetSize()
+            Log(messages:Get(i))
+            i = i + 1
+        end
+        tools:EmptyMessages()
+    end
+
+    /* The folder the test programs are written to and run from, such as Output2. */
+    action SetOutputFolder(text folder)
+        outputFolder = folder
+    end
+
+    /* The folder test programs run in, two levels below the project. */
+    action SetProgramFolder(text folder)
+        programFolder = folder
+    end
+
+    /* The folder a test program runs in: the program folder if set, otherwise its own Run folder. */
+    private action GetProgramDirectory(File runFolder) returns File
+        File directory
+        if programFolder = ""
+            directory:SetAbsolutePath(runFolder:GetAbsolutePath())
+        else
+            File folder
+            folder:SetPath(programFolder)
+            directory:SetAbsolutePath(folder:GetAbsolutePath())
+        end
+        return directory
+    end
+
+    /* The folder Result.txt, Fail.txt, progress.json and result.json go to. */
+    action SetResultsFolder(text folder)
+        resultsFolder = folder
+    end
+
+    /* Adds a tester to run, by its TesterCatalog key. With none added, all run. */
+    action ChooseTester(text key)
+        chosenTesters:Add(key, key)
+    end
+
+    /* Which back ends to test on. */
+    action SetBackEnds(boolean bytecode, boolean javaScript, boolean python)
+        testBytecode = bytecode
+        testJavaScript = javaScript
+        testPython = python
+    end
+
+    /* Makes this a process of a parallel run, which writes progress.json and result.json. */
+    action SetRunID(text identifier)
+        runID = identifier
+    end
+
+    action SetShard(integer shardNumber)
+        shard = shardNumber
+    end
+
+    /* The java for bytecode test programs, already found (by the runner's preparing step). */
+    action SetJavaLocation(text location)
+        javaLocation = location
+    end
+
+    /* The Node.js for JavaScript tests, already found. */
+    action SetNodeLocation(text location)
+        nodeLocation = location
+    end
+
+    /* A snapshot already built, shared by every process of a run. */
+    action SetSnapshotPath(text path)
+        snapshotPath = path
     end
 
     private action GetCurrentTestPassText returns text
@@ -226,249 +364,143 @@ class QuorumTest is ProcessListener
         return location
     end
 
-    /*
-        The Node.js download name for this computer, such as darwin-arm64,
-        win-x64 or linux-x64. Java reports aarch64 on 64-bit ARM.
-    */
-    private action GetNodePlatform returns text
-        Properties prop
-        text architecture = prop:GetArchitecture()
-        text processor = "x64"
-        if architecture = "aarch64" or architecture = "arm64"
-            processor = "arm64"
-        end
-        if prop:IsWindows()
-            return "win-" + processor
-        elseif prop:IsMac()
-            return "darwin-" + processor
-        end
-        return "linux-" + processor
-    end
-
-    /*
-        Returns the path of the Node.js in Tools/, downloading and unpacking
-        it from nodejs.org first if it isn't there. Returns undefined if
-        that fails, for example with no network.
-    */
-    private action GetDownloadedNode returns text
-        Properties prop
-        text folderName = "node-v" + NODE_VERSION + "-" + GetNodePlatform()
-        text archive = folderName + ".tar.gz"
-        File node
-        if prop:IsWindows()
-            archive = folderName + ".zip"
-            node:SetPath(TOOLS_FOLDER + "/" + folderName + "/node.exe")
-        else
-            node:SetPath(TOOLS_FOLDER + "/" + folderName + "/bin/node")
-        end
-        if node:Exists()
-            return node:GetAbsolutePath()
-        end
-
-        File tools
-        tools:SetPath(TOOLS_FOLDER)
-        if not tools:Exists()
-            tools:CreateDirectories()
-        end
-        File download
-        download:SetPath(TOOLS_FOLDER + "/" + archive)
-
-        Log("Downloading Node.js " + NODE_VERSION + " (" + archive + ")")
-        check
-            NetworkRequest request
-            request:SetRequestTypeToGet()
-            request:AddHeader("Accept", "*/*")
-            request:SetWebAddress("https://nodejs.org/dist/v" + NODE_VERSION + "/" + archive)
-            request:SetDownloadFile(download)
-            NetworkConnection http
-            http:SendRequest(request)
-        detect e
-            Log("Could not download Node.js: " + e:GetErrorMessage())
-            return undefined
-        end
-
-        Log("Unpacking Node.js")
-        if prop:IsWindows()
-            Decompresser decompresser
-            decompresser:DecompressZip(download)
-        else
-            Process tar
-            tar:SetName("tar")
-            File toolsDirectory
-            toolsDirectory:SetAbsolutePath(tools:GetAbsolutePath())
-            tar:SetDirectory(toolsDirectory)
-            Array<text> parameters
-            parameters:Add("-xzf")
-            parameters:Add(archive)
-            tar:SetParameters(parameters)
-            tar:Run()
-        end
-        if download:Exists()
-            download:Delete()
-        end
-
-        if node:Exists()
-            return node:GetAbsolutePath()
-        end
-        Log("Could not unpack Node.js into " + tools:GetAbsolutePath())
-        return undefined
-    end
-
-    /*
-        Builds Output/Run/QuorumStandardLibrary.blob, a V8 startup snapshot
-        with the JavaScript standard library already loaded. Each test then
-        starts Node.js from it and runs only its own script. Returns false if
-        the snapshot could not be built, for example with an old Node.js.
-    */
-    private action BuildSnapshot(File library) returns boolean
-        File run
-        run:SetPath("Output/Run")
-        if not run:Exists()
-            run:CreateDirectories()
-        end
-
-        text lineFeed = ""
-        lineFeed = lineFeed:GetLineFeed()
-        //JavaScript accepts forward slashes on every system
-        text libraryPath = library:GetAbsolutePath()
-        libraryPath = libraryPath:Replace("\", "/")
-        libraryPath = libraryPath:Replace("'", "\'")
-
-        TextBuilder entry
-        entry:Append("const fs = require('fs'), vm = require('vm'), v8 = require('v8');" + lineFeed)
-        entry:Append("vm.runInThisContext(fs.readFileSync('" + libraryPath + "', 'utf8'));" + lineFeed)
-        entry:Append("v8.startupSnapshot.setDeserializeMainFunction(() => {" + lineFeed)
-        entry:Append("    const fs = require('fs'), vm = require('vm');" + lineFeed)
-        entry:Append("    vm.runInThisContext(fs.readFileSync(process.argv[1], 'utf8'));" + lineFeed)
-        entry:Append("});" + lineFeed)
-
-        File entryFile
-        entryFile:SetPath("Output/Run/" + SNAPSHOT_ENTRY)
-        entryFile:Write(entry:ToText())
-
-        File blob
-        blob:SetPath("Output/Run/" + SNAPSHOT_BLOB)
-        if blob:Exists()
-            blob:Delete()
-        end
-
-        //Node.js warns on the error stream that vm isn't fully verified in
-        //snapshot scripts, so success is judged by the blob, not the stream
-        Process process
-        process:SetName(nodeLocation)
-        File processDirectory
-        processDirectory:SetAbsolutePath(run:GetAbsolutePath())
-        process:SetDirectory(processDirectory)
-        Array<text> parameters
-        parameters:Add("--snapshot-blob")
-        parameters:Add(SNAPSHOT_BLOB)
-        parameters:Add("--build-snapshot")
-        parameters:Add(SNAPSHOT_ENTRY)
-        process:SetParameters(parameters)
-        process:Run()
-
-        return blob:Exists()
-    end
-
     action Main
+        if not isSetUp
+            SetUp()
+        end
         Log("Testing")
         DateTime date
         start = date:GetEpochTime()
-        expressions:Test()
-        Log(expressions:GetName() + GetCurrentTestPassText())
+        runStart = start
 
-        typeChecks:Test()
-        Log(typeChecks:GetName() + GetCurrentTestPassText())
-
-        typeChecksGenerated:Test()
-        Log(typeChecksGenerated:GetName() + GetCurrentTestPassText())
-
-        chainingChecks:Test()
-        Log(chainingChecks:GetName() + GetCurrentTestPassText())
-
-        ifStatementChecks:Test()
-        Log(ifStatementChecks:GetName() + GetCurrentTestPassText())
-
-        loopsChecks:Test()
-        Log(loopsChecks:GetName() + GetCurrentTestPassText())
-
-        actionsChecks:Test()
-        Log(actionsChecks:GetName() + GetCurrentTestPassText())
-
-        inheritanceChecks:Test()
-        Log(inheritanceChecks:GetName() + GetCurrentTestPassText())
-
-        templatingChecks:Test()
-        Log(templatingChecks:GetName() + GetCurrentTestPassText())
-
-        templatingChecksGenerated:Test()
-        Log(templatingChecksGenerated:GetName() + GetCurrentTestPassText())
-
-        exceptionChecks:Test()
-        Log(exceptionChecks:GetName() + GetCurrentTestPassText())
-
-        arrayChecks:Test()
-        Log(arrayChecks:GetName() + GetCurrentTestPassText())
-
-        stackChecks:Test()
-        Log(stackChecks:GetName() + GetCurrentTestPassText())
-
-        queueChecks:Test()
-        Log(queueChecks:GetName() + GetCurrentTestPassText())
-
-        mathChecks:Test()
-        Log(mathChecks:GetName() + GetCurrentTestPassText())
-
-        listChecks:Test()
-        Log(listChecks:GetName() + GetCurrentTestPassText())
-
-        hashChecks:Test()
-        Log(hashChecks:GetName() + GetCurrentTestPassText())
-
-        svChecks:Test()
-        Log(svChecks:GetName() + GetCurrentTestPassText())
-
-        spreadsheetChecks:Test()
-        Log(spreadsheetChecks:GetName() + GetCurrentTestPassText())
-
-        decompresserChecks:Test()
-        Log(decompresserChecks:GetName() + GetCurrentTestPassText())
-
-        zipWriterChecks:Test()
-        Log(zipWriterChecks:GetName() + GetCurrentTestPassText())
-
-        useChecks:Test()
-        Log(useChecks:GetName() + GetCurrentTestPassText())
-
-        randomChecks:Test()
-        Log(randomChecks:GetName() + GetCurrentTestPassText())
-
-        tableChecks:Test()
-        Log(tableChecks:GetName() + GetCurrentTestPassText())
-
-        bitwiseChecks:Test()
-        Log(bitwiseChecks:GetName() + GetCurrentTestPassText())
-
-        matrixChecks:Test()
-        Log(matrixChecks:GetName() + GetCurrentTestPassText())
-
-        jsonChecks:Test()
-        Log(jsonChecks:GetName() + GetCurrentTestPassText())
-
-        bigIntegerChecks:Test()
-        Log(bigIntegerChecks:GetName() + GetCurrentTestPassText())
-
-        byteArrayChecks:Test()
-        Log(byteArrayChecks:GetName() + GetCurrentTestPassText())
-
-        dataFormatsChecks:Test()
-        Log(dataFormatsChecks:GetName() + GetCurrentTestPassText())
-
-        fabricationChecks:Test()
-        Log(fabricationChecks:GetName() + GetCurrentTestPassText())
-
-        scienceChecks:Test()
-        Log(scienceChecks:GetName() + GetCurrentTestPassText())
+        if StartTester("Expressions")
+            expressions:Test()
+            FinishTester(expressions:GetName())
+        end
+        if StartTester("TypeCheck")
+            typeChecks:Test()
+            FinishTester(typeChecks:GetName())
+        end
+        if StartTester("TypeCheckGenerated")
+            typeChecksGenerated:Test()
+            FinishTester(typeChecksGenerated:GetName())
+        end
+        if StartTester("Chaining")
+            chainingChecks:Test()
+            FinishTester(chainingChecks:GetName())
+        end
+        if StartTester("IfStatement")
+            ifStatementChecks:Test()
+            FinishTester(ifStatementChecks:GetName())
+        end
+        if StartTester("Loops")
+            loopsChecks:Test()
+            FinishTester(loopsChecks:GetName())
+        end
+        if StartTester("Actions")
+            actionsChecks:Test()
+            FinishTester(actionsChecks:GetName())
+        end
+        if StartTester("Inheritance")
+            inheritanceChecks:Test()
+            FinishTester(inheritanceChecks:GetName())
+        end
+        if StartTester("Templating")
+            templatingChecks:Test()
+            FinishTester(templatingChecks:GetName())
+        end
+        if StartTester("TemplatingGenerated")
+            templatingChecksGenerated:Test()
+            FinishTester(templatingChecksGenerated:GetName())
+        end
+        if StartTester("Exception")
+            exceptionChecks:Test()
+            FinishTester(exceptionChecks:GetName())
+        end
+        if StartTester("Array")
+            arrayChecks:Test()
+            FinishTester(arrayChecks:GetName())
+        end
+        if StartTester("Stack")
+            stackChecks:Test()
+            FinishTester(stackChecks:GetName())
+        end
+        if StartTester("Queue")
+            queueChecks:Test()
+            FinishTester(queueChecks:GetName())
+        end
+        if StartTester("Math")
+            mathChecks:Test()
+            FinishTester(mathChecks:GetName())
+        end
+        if StartTester("List")
+            listChecks:Test()
+            FinishTester(listChecks:GetName())
+        end
+        if StartTester("HashTable")
+            hashChecks:Test()
+            FinishTester(hashChecks:GetName())
+        end
+        if StartTester("SeparatedValue")
+            svChecks:Test()
+            FinishTester(svChecks:GetName())
+        end
+        if StartTester("Spreadsheet")
+            spreadsheetChecks:Test()
+            FinishTester(spreadsheetChecks:GetName())
+        end
+        if StartTester("Decompresser")
+            decompresserChecks:Test()
+            FinishTester(decompresserChecks:GetName())
+        end
+        if StartTester("ZipWriter")
+            zipWriterChecks:Test()
+            FinishTester(zipWriterChecks:GetName())
+        end
+        if StartTester("UsePackage")
+            useChecks:Test()
+            FinishTester(useChecks:GetName())
+        end
+        if StartTester("Random")
+            randomChecks:Test()
+            FinishTester(randomChecks:GetName())
+        end
+        if StartTester("Table")
+            tableChecks:Test()
+            FinishTester(tableChecks:GetName())
+        end
+        if StartTester("Bitwise")
+            bitwiseChecks:Test()
+            FinishTester(bitwiseChecks:GetName())
+        end
+        if StartTester("Matrix")
+            matrixChecks:Test()
+            FinishTester(matrixChecks:GetName())
+        end
+        if StartTester("Json")
+            jsonChecks:Test()
+            FinishTester(jsonChecks:GetName())
+        end
+        if StartTester("BigInteger")
+            bigIntegerChecks:Test()
+            FinishTester(bigIntegerChecks:GetName())
+        end
+        if StartTester("ByteArray")
+            byteArrayChecks:Test()
+            FinishTester(byteArrayChecks:GetName())
+        end
+        if StartTester("DataFormats")
+            dataFormatsChecks:Test()
+            FinishTester(dataFormatsChecks:GetName())
+        end
+        if StartTester("Fabrication")
+            fabricationChecks:Test()
+            FinishTester(fabricationChecks:GetName())
+        end
+        if StartTester("Science")
+            scienceChecks:Test()
+            FinishTester(scienceChecks:GetName())
+        end
 
         text EOL = ""
         EOL = EOL:GetCarriageReturn() + EOL:GetLineFeed()
@@ -501,6 +533,129 @@ class QuorumTest is ProcessListener
             Log("All Tests Pass")
         end
         WriteResults()
+
+        text status = "finished"
+        if stopRequested
+            status = "cancelled"
+        end
+        WriteState(status, RESULT_FILE)
+    end
+
+    /*
+        Returns true if the tester should run: it was chosen (or none were),
+        and no stop was asked for. Then it is noted as the current tester.
+    */
+    private action StartTester(text key) returns boolean
+        if not chosenTesters:IsEmpty() and not chosenTesters:HasKey(key)
+            return false
+        end
+        if IsStopRequested()
+            return false
+        end
+        currentTester = key
+        DateTime clock
+        testerStart = clock:GetEpochTime()
+        testerFailedBefore = tester:GetFailingSize()
+        WriteState("running", PROGRESS_FILE)
+        return true
+    end
+
+    /* Logs the tester's count and records it, with its time and failures, for progress.json and result.json. */
+    private action FinishTester(text label)
+        integer testerPassed = tester:GetPassingSize() - previousPass
+        integer testerTotal = tester:GetSize() - previousTotal
+        DateTime clock
+        number seconds = (clock:GetEpochTime() - testerStart) / 1000.0
+        Log(label + GetCurrentTestPassText())
+
+        if testersFinished > 0
+            testersJson:Append(", ")
+        end
+        testersJson:Append("{" + json:Pair("name", json:Quote(currentTester)) + ", " +
+            json:Pair("label", json:Quote(label)) + ", " +
+            json:Pair("passed", "" + testerPassed) + ", " +
+            json:Pair("total", "" + testerTotal) + ", " +
+            json:Pair("seconds", "" + seconds) + ", " +
+            json:Pair("failures", GetFailuresJson(testerFailedBefore)) + "}")
+        testersFinished = testersFinished + 1
+        currentTester = ""
+        WriteState("running", PROGRESS_FILE)
+    end
+
+    /* The failed tests after the first skip ones, as a JSON array. */
+    private action GetFailuresJson(integer skip) returns text
+        TextBuilder builder
+        builder:Append("[")
+        Iterator<Test> iterator = tester:GetFailedTestsIterator()
+        integer index = 0
+        integer written = 0
+        repeat while iterator:HasNext()
+            Test test = iterator:Next()
+            if index >= skip
+                if written > 0
+                    builder:Append(", ")
+                end
+                builder:Append("{" + json:Pair("file", json:Quote(test:GetName())) + ", " +
+                    json:Pair("backEnd", json:Quote(GetBackEndOf(test))) + ", " +
+                    json:Pair("reason", json:Quote(GetReason(test))) + "}")
+                written = written + 1
+            end
+            index = index + 1
+        end
+        builder:Append("]")
+        return builder:ToText()
+    end
+
+    /*
+        For a process of a parallel run only: writes progress.json (while it
+        runs) or result.json (last of all) into its results folder, safely,
+        so the runner window never reads half a file.
+    */
+    private action WriteState(text status, text fileName)
+        if runID = ""
+            return now
+        end
+        DateTime clock
+        number seconds = (clock:GetEpochTime() - runStart) / 1000.0
+        integer currentPassed = 0
+        integer currentTotal = 0
+        if currentTester not= ""
+            currentPassed = tester:GetPassingSize() - previousPass
+            currentTotal = tester:GetSize() - previousTotal
+        end
+        text value = "{" + json:Pair("run", json:Quote(runID)) + ", " +
+            json:Pair("shard", "" + shard) + ", " +
+            json:Pair("status", json:Quote(status)) + ", " +
+            json:Pair("current", json:Quote(currentTester)) + ", " +
+            json:Pair("currentPassed", "" + currentPassed) + ", " +
+            json:Pair("currentTotal", "" + currentTotal) + ", " +
+            json:Pair("testersFinished", "" + testersFinished) + ", " +
+            json:Pair("passed", "" + tester:GetPassingSize()) + ", " +
+            json:Pair("total", "" + tester:GetSize()) + ", " +
+            json:Pair("seconds", "" + seconds) + ", " +
+            json:Pair("testers", "[" + testersJson:ToText() + "]") + "}"
+        lastProgress = clock:GetEpochTime()
+        json:WriteSafely(resultsFolder + "/" + fileName, value)
+    end
+
+    /*
+        True once the runner window has written Results/stop. Only a process
+        of a parallel run checks; the remaining tests are then skipped.
+    */
+    private action IsStopRequested returns boolean
+        if stopRequested
+            return true
+        end
+        if runID = ""
+            return false
+        end
+        File stop
+        stop:SetPath(STOP_FILE)
+        if stop:Exists()
+            stopRequested = true
+            Log("Stopped: " + STOP_FILE + " was found.")
+        end
+        return stopRequested
     end
 
     /* Writes a line to the console and keeps a copy of it for Result.txt. */
@@ -532,10 +687,37 @@ class QuorumTest is ProcessListener
         return "Unknown"
     end
 
+    /* The back end of any failed test; science tests run inside this process. */
+    private action GetBackEndOf(Test test) returns text
+        if test is CompilerTestResult
+            CompilerTestResult result = cast(CompilerTestResult, test)
+            return GetBackEnd(result)
+        end
+        return "Science"
+    end
+
+    /* Why a test failed, for Fail.txt and result.json. */
+    private action GetReason(Test test) returns text
+        text reason = ""
+        if test is CompilerTestResult
+            CompilerTestResult result = cast(CompilerTestResult, test)
+            reason = result:errorMessage
+        else
+            reason = test:GetErrorMessage()
+            if reason = ""
+                reason = "A check failed or the test stopped with an error. Run it alone for details."
+            end
+        end
+        if reason = ""
+            reason = "No details were recorded."
+        end
+        return reason
+    end
+
     /*
-        Writes Results/Result.txt (everything the console showed) and
-        Results/Fail.txt (each failed test and why). Both are overwritten
-        on each run.
+        Writes Result.txt (everything the console showed) and Fail.txt (each
+        failed test and why) in the results folder. Both are overwritten on
+        each run.
     */
     private action WriteResults
         text lineFeed = ""
@@ -544,7 +726,7 @@ class QuorumTest is ProcessListener
         text header = "Quorum test results, " + runTime:ToText() + lineFeed + lineFeed
 
         File resultFile
-        resultFile:SetPath(RESULTS_FOLDER + "/Result.txt")
+        resultFile:SetPath(resultsFolder + "/Result.txt")
         resultFile:GetParentDirectory():CreateDirectories()
         resultFile:Write(header + log:ToText())
 
@@ -558,22 +740,8 @@ class QuorumTest is ProcessListener
             Iterator<Test> iterator = tester:GetFailedTestsIterator()
             repeat while iterator:HasNext()
                 Test test = iterator:Next()
-                text reason = ""
-                if test is CompilerTestResult
-                    CompilerTestResult result = cast(CompilerTestResult, test)
-                    failures:Append(test:GetName() + " (" + GetBackEnd(result) + ")" + lineFeed)
-                    reason = result:errorMessage
-                else
-                    failures:Append(test:GetName() + " (Science)" + lineFeed)
-                    reason = test:GetErrorMessage()
-                    if reason = ""
-                        reason = "A check failed or the test stopped with an error. Run it alone for details."
-                    end
-                end
-                if reason = ""
-                    reason = "No details were recorded."
-                end
-                Array<text> reasonLines = reason:Split(lineFeed)
+                failures:Append(test:GetName() + " (" + GetBackEndOf(test) + ")" + lineFeed)
+                Array<text> reasonLines = GetReason(test):Split(lineFeed)
                 Iterator<text> reasonIterator = reasonLines:GetIterator()
                 repeat while reasonIterator:HasNext()
                     failures:Append("    " + reasonIterator:Next() + lineFeed)
@@ -583,12 +751,15 @@ class QuorumTest is ProcessListener
         end
 
         File failFile
-        failFile:SetPath(RESULTS_FOLDER + "/Fail.txt")
+        failFile:SetPath(resultsFolder + "/Fail.txt")
         failFile:Write(failures:ToText())
     end
 
 
     action Test(Array<File> files, Array<text> reply)
+        if IsStopRequested()
+            return now
+        end
         if testBytecode = false
             return now
         end
@@ -656,6 +827,9 @@ class QuorumTest is ProcessListener
     end
 
     action TestPython(Array<File> files, Array<text> reply)
+        if IsStopRequested()
+            return now
+        end
         if testPython = false
             return now
         end
@@ -712,6 +886,9 @@ class QuorumTest is ProcessListener
     end
 
     action TestJavaScript(Array<File> files, Array<text> reply)
+        if IsStopRequested()
+            return now
+        end
         if testJavaScript = false
             return now
         end
@@ -734,7 +911,7 @@ class QuorumTest is ProcessListener
     private action GetDefaultCompiler returns Compiler
         Compiler defaultCompiler
         File root
-        root:SetPath("Output")
+        root:SetPath(outputFolder)
         defaultCompiler:SetOutputFolder(root)
         File standardLibrary
         standardLibrary:SetPath(STANDARD_LIBRARY_LOCATION)
@@ -813,13 +990,11 @@ class QuorumTest is ProcessListener
         Process process
         process:SetName(javaLocation)
 
-        File processDirectory
-        processDirectory:SetAbsolutePath(file:GetParentDirectory():GetAbsolutePath())
-        process:SetDirectory(processDirectory)
+        process:SetDirectory(GetProgramDirectory(file:GetParentDirectory()))
 
         Array<text> flags
         flags:Add("-jar")
-        flags:Add("Default.jar")
+        flags:Add(file:GetAbsolutePath())
 
         process:SetParameters(flags)
         process:AddListener(me)
@@ -847,7 +1022,7 @@ class QuorumTest is ProcessListener
 
         //First merge the script with the standard library
         File root
-        root:SetPath("Output")
+        root:SetPath(outputFolder)
 
         File outFile
         outFile:SetWorkingDirectory(root:GetAbsolutePath())
@@ -865,12 +1040,10 @@ class QuorumTest is ProcessListener
         Process process
         process:SetName("python3")
 
-        File processDirectory
-        processDirectory:SetAbsolutePath(outFile:GetParentDirectory():GetAbsolutePath())
-        process:SetDirectory(processDirectory)
+        process:SetDirectory(GetProgramDirectory(outFile:GetParentDirectory()))
 
         Array<text> flags
-        flags:Add("Result.py")
+        flags:Add(outFile:GetAbsolutePath())
 
         process:SetParameters(flags)
         process:AddListener(me)
@@ -898,7 +1071,7 @@ class QuorumTest is ProcessListener
 
         //First merge the script with the standard library
         File root
-        root:SetPath("Output")
+        root:SetPath(outputFolder)
 
         File outFile
         outFile:SetWorkingDirectory(root:GetAbsolutePath())
@@ -932,16 +1105,14 @@ Start();
         Process process
         process:SetName(nodeLocation)
 
-        File processDirectory
-        processDirectory:SetAbsolutePath(outFile:GetParentDirectory():GetAbsolutePath())
-        process:SetDirectory(processDirectory)
+        process:SetDirectory(GetProgramDirectory(outFile:GetParentDirectory()))
 
         Array<text> flags
         if useSnapshot
             flags:Add("--snapshot-blob")
-            flags:Add(SNAPSHOT_BLOB)
+            flags:Add(snapshotPath)
         end
-        flags:Add("Result.js")
+        flags:Add(outFile:GetAbsolutePath())
 
         process:SetParameters(flags)
         process:AddListener(me)
@@ -985,6 +1156,9 @@ Start();
     end
 
     action TestFail(Array<File> files)
+        if IsStopRequested()
+            return now
+        end
         if testBytecode = false
             return now
         end
@@ -1025,6 +1199,9 @@ Start();
         you would expect if it passes one it passes the other, but tis is a test of such a hypothesis.
     */
     action TestPythonFail(Array<File> files)
+        if IsStopRequested()
+            return now
+        end
         if testPython = false
             return now
         end
@@ -1060,6 +1237,9 @@ Start();
     end
 
     action TestJavaScriptFail(Array<File> files)
+        if IsStopRequested()
+            return now
+        end
         if testJavaScript = false
             return now
         end
@@ -1103,6 +1283,14 @@ Start();
             failed = failed + 1
         end
         total = total + 1
+        //a process of a parallel run reports its progress every 25 tests or 2 seconds
+        testsSinceProgress = testsSinceProgress + 1
+        DateTime clock
+        number nowMilliseconds = clock:GetEpochTime()
+        if testsSinceProgress >= 25 or nowMilliseconds - lastProgress >= 2000
+            testsSinceProgress = 0
+            WriteState("running", PROGRESS_FILE)
+        end
         text value = ""
         value = result:GetName()
 

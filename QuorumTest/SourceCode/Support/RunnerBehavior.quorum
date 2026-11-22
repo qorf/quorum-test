@@ -1,0 +1,20 @@
+use Libraries.Interface.Forms.FormBehavior
+use Libraries.Interface.Events.BehaviorEvent
+
+/*
+    Passes a press of one of the runner window's buttons (Run, Stop, Open
+    Fail.txt) to the window, which decides what to do with it.
+*/
+class RunnerBehavior is FormBehavior
+    Main window = undefined
+
+    action SetWindow(Main runnerWindow)
+        window = runnerWindow
+    end
+
+    action Run(BehaviorEvent event)
+        if window not= undefined
+            window:ButtonPressed(event:GetItem())
+        end
+    end
+end
