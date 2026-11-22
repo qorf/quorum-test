@@ -1,0 +1,13 @@
+use Libraries.Testing.QuorumTest
+
+/*
+    Runs the test suite with no user interface. Results go to the console.
+    This is the same run the user interface starts, so it can also be used
+    from a terminal, or from a thread later.
+*/
+class Console
+    action Main
+        QuorumTest suite
+        suite:Main()
+    end
+end

@@ -1,0 +1,6 @@
+/*
+    Temporary: runs the test suite in the console. This will become the
+    user interface that runs all of the tests.
+*/
+Console console
+console:Main()

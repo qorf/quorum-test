@@ -24,3 +24,15 @@ Run/
 # virtual machine crash logs, see http://www.java.com/en/download/help/error_hotspot.xml
 hs_err_pid*
 replay_pid*
+
+# Test suite scratch output
+Output/
+
+# Test resources the Decompresser tests read
+!QuorumTest/Scripts/**/*.zip
+
+# Result.txt and Fail.txt from the last run
+Results/
+
+# Node.js the suite downloads for JavaScript tests
+Tools/
