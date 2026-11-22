@@ -1,5 +1,7 @@
 # Compiled class file
 *.class
+Build/
+Run/
 
 # Log file
 *.log

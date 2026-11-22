@@ -1,0 +1,21 @@
+{
+    "AndroidAssets" : "/media",
+    "AppIcon" : "",
+    "AppName" : "",
+    "DevelopmentEnvironmentVersion" : "Quorum Studio 8.5.0 (Vulkan Beta)",
+    "ExecutableName" : "Default",
+    "GitShowWholeRepository" : true,
+    "IOSAssets" : "/media",
+    "IOS_BUNDLE" : "org.quorumlanguage",
+    "IOS_DEVICE" : "",
+    "IOS_PROVISIONING" : "",
+    "IOS_SIGNATURE" : "",
+    "ImageSheetEnabled" : false,
+    "ImageSheetRebuildOnCompile" : false,
+    "Main" : "/SourceCode/Main.quorum",
+    "Project Version" : "1.0",
+    "ProjectName" : "QuorumTest",
+    "ProjectType" : "JavaType",
+    "PythonSpikeProgramSlot" : "0",
+    "iosVersion" : "15.0"
+}
