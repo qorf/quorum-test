@@ -1,10 +1,9 @@
 use Libraries.Compute.Math
 
 /*
-Math:RoundToNearestInteger. Its documentation says a midpoint rounds up,
-the same as Round, so 2.5 gives 3 and -2.5 gives -2. (The Java plugin
-rounds midpoints to the even neighbor instead, which disagrees with the
-documentation for 2.5 and -3.5.)
+Math:RoundToNearestInteger. A midpoint rounds to the even integer, as
+Java's Math.rint and the documentation say: 2.5 gives 2, 3.5 gives 4, -2.5
+gives -2 and -3.5 gives -4. (Round rounds midpoints up instead.)
 */
 class Main
     Math math

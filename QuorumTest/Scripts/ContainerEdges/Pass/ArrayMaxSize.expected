@@ -1,7 +1,7 @@
 Array[a,b,c] SetMaxSize(20): GetMaxSize() = 20, items [a,b,c]
-Array[a,b,c] max 20 SetMaxSize(5): GetMaxSize() = 20, items [a,b,c]
-Array[a,b,c] max 20 SetMaxSize(2): GetMaxSize() = 20, items [a,b,c]
-Array[a,b,c] max 20 SetMaxSize(0): GetMaxSize() = 20, items [a,b,c]
-Array auto-resize off, default max 10, SetMaxSize(3): GetMaxSize() = 10
+Array[a,b,c] max 20 SetMaxSize(5): GetMaxSize() = 5, items [a,b,c]
+Array[a,b,c] max 20 SetMaxSize(2): GetMaxSize() = 2, items [a,b]
+Array[a,b,c] max 20 SetMaxSize(0): GetMaxSize() = 0, items []
+Array auto-resize off, default max 10, SetMaxSize(3): GetMaxSize() = 3
 Array auto-resize off SetMaxSize(12) then 12 x Add: size 12
 Array auto-resize off, 12 of 12, Add(extra) fails, as it should

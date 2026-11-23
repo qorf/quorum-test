@@ -80,14 +80,14 @@ class TesterCatalog
         // count. The speed tests take longer than their count suggests.
         Add("Text", "Text", LIBRARY_EDGES, 60)
         Add("Numbers", "Numbers", LIBRARY_EDGES, 60)
-        Add("ContainerEdges", "Container edges", LIBRARY_EDGES, 117)
+        Add("ContainerEdges", "Container edges", LIBRARY_EDGES, 120)
         Add("MathEdges", "Math edges", LIBRARY_EDGES, 91)
         Add("Geometry", "Geometry", LIBRARY_EDGES, 9)
         Add("TextSupport", "Text support", LIBRARY_EDGES, 8)
         Add("File", "File", SYSTEM, 15)
         Add("DateTime", "Date and time", SYSTEM, 54)
         Add("SystemClasses", "System classes", SYSTEM, 10)
-        Add("Xml", "XML", FILES_AND_DATA, 52)
+        Add("Xml", "XML", FILES_AND_DATA, 60)
         Add("DataEdges", "Data edges", FILES_AND_DATA, 45)
         Add("Web", "Web", FILES_AND_DATA, 41)
         Add("Printers", "Printers", FILES_AND_DATA, 52)
@@ -95,8 +95,9 @@ class TesterCatalog
         Add("Physics", "Physics", GAME, 93)
         Add("RenderTrees", "Render trees", GAME, 22)
         Add("Worlds", "Worlds", GAME, 22)
+        Add("ObjReader", "OBJ reader", GAME, 5)
         Add("Compute", "Compute", COMPUTE, 5)
-        Add("Statistics", "Statistics", SCIENCE, 21)
+        Add("Statistics", "Statistics", SCIENCE, 31)
     end
 
     /* How many groups the runner window shows. */

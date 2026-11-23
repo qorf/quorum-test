@@ -44,3 +44,4 @@ QuorumTest/Timings.json
 # The back ends and testers chosen for the last run
 QuorumTest/Selections.json
 QuorumTest/Selections.json.tmp
+/.DS_Store

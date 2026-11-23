@@ -9,28 +9,59 @@ use Libraries.Language.Support.TextBuilder
     reads these files every few seconds while the tests are still writing.
 */
 class JsonWriter
-    /* Returns the text as a JSON string, in quotes, with its special characters escaped. */
+    /*
+        Returns the text as a JSON string, in quotes, with its special
+        characters escaped: backslash, line feed, carriage return and tab as
+        \, \n, \r and \t, and the double quote and every other control
+        character (below 32, such as the NULs a test's output can hold) as
+        \u and four hexadecimal digits. The standard library's reader ends
+        a text at any double quote, even an escaped one, so a quote is
+        written as its Unicode escape too.
+    */
     action Quote(text value) returns text
         if value = undefined
             return "null"
         end
         text quote = ""
         quote = quote:GetDoubleQuote()
-        text result = value:Replace("\", "\\")
-        //the standard library's reader ends a text at any double quote, even
-        //an escaped one, so a quote is written as its Unicode escape
-        result = result:Replace(quote, "\" + "u0022")
-        result = result:Replace(quote:GetCarriageReturn(), "\r")
-        result = result:Replace(quote:GetLineFeed(), "\n")
-        result = result:Replace(quote:GetTab(), "\t")
-        return quote + result + quote
+        text backslash = "\"
+        TextBuilder result
+        result:Append(quote)
+        integer i = 0
+        repeat while i < value:GetSize()
+            text character = value:GetCharacter(i)
+            integer code = value:GetUnicodeInteger(i)
+            if character = backslash
+                result:Append(backslash + backslash)
+            elseif code = 10
+                result:Append(backslash + "n")
+            elseif code = 13
+                result:Append(backslash + "r")
+            elseif code = 9
+                result:Append(backslash + "t")
+            elseif code < 32 or character = quote
+                result:Append(GetUnicodeEscape(code))
+            else
+                result:Append(character)
+            end
+            i = i + 1
+        end
+        result:Append(quote)
+        return result:ToText()
+    end
+
+    /* \u and the code as four hexadecimal digits, for codes below 256. */
+    private action GetUnicodeEscape(integer code) returns text
+        text digits = "0123456789abcdef"
+        return "\" + "u00" + digits:GetCharacter(code / 16) + digits:GetCharacter(code mod 16)
     end
 
     /*
         Undoes Quote's escapes in a text read back with the standard
-        library's reader, which keeps escapes as written: \n, \r, \t, \\ and
-        \u0022 become their characters, and anything else stays as it is.
-        One character at a time, so \\n stays a backslash and an n.
+        library's reader, which keeps escapes as written: \n, \r, \t, \\
+        and \u with four hexadecimal digits become their characters, and
+        anything else stays as it is. One character at a time, so \\n stays
+        a backslash and an n.
     */
     action Decode(text value) returns text
         if value = undefined
@@ -44,6 +75,10 @@ class JsonWriter
             text character = value:GetCharacter(i)
             if character = "\" and i + 1 < value:GetSize()
                 text next = value:GetCharacter(i + 1)
+                integer code = -1
+                if next = "u" and i + 6 <= value:GetSize()
+                    code = ParseHexadecimal(value:GetSubtext(i + 2, i + 6))
+                end
                 if next = "n"
                     result:Append(quote:GetLineFeed())
                     i = i + 2
@@ -56,8 +91,8 @@ class JsonWriter
                 elseif next = "\"
                     result:Append("\")
                     i = i + 2
-                elseif i + 6 <= value:GetSize() and value:GetSubtext(i, i + 6) = "\" + "u0022"
-                    result:Append(quote)
+                elseif code >= 0
+                    result:Append(quote:GetUnicodeValue(code))
                     i = i + 6
                 else
                     result:Append(character)
@@ -69,6 +104,23 @@ class JsonWriter
             end
         end
         return result:ToText()
+    end
+
+    /* The value of four hexadecimal digits, or -1 if they aren't. */
+    private action ParseHexadecimal(text digits) returns integer
+        text lower = digits:ToLowerCase()
+        text known = "0123456789abcdef"
+        integer result = 0
+        integer i = 0
+        repeat while i < lower:GetSize()
+            integer digit = known:IndexOf(lower:GetCharacter(i))
+            if digit < 0
+                return -1
+            end
+            result = result * 16 + digit
+            i = i + 1
+        end
+        return result
     end
 
     /* Returns "key": value, with the key quoted and the value as given. */

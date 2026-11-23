@@ -1,14 +1,12 @@
 use Libraries.Compute.Math
 
 /*
-Math:InverseTangent(x, y) and Math:InverseTangent2(x, y), the angle of the
-point (x, y) measured from the positive x axis, in radians from -pi to pi.
-InverseTangent(x, y) is documented as the inverse tangent of the cartesian
-point (x, y). InverseTangent2 has no documentation, but takes parameters
-named x and y in the same order, so it is expected to give the same angle
-for the same point. The point (0, 0) has no angle; InverseTangent2 raises
-an error for it on purpose, so that failure is the expected result.
-Answers are rounded to 10 places.
+Math:InverseTangent(x, y), the angle of the point (x, y) measured from the
+positive x axis, in radians from -pi to pi, as Java's Math.atan2(y, x). The
+point (0, 0) gives 0. The sign of a zero counts, as in Java: (-1, 0.0) is
+pi and (-1, -0.0) is -pi. (InverseTangent2, the same angle with the values
+in the other order, was removed in favor of this action.) Answers are
+rounded to 10 places.
 */
 class Main
     Math math
@@ -23,12 +21,10 @@ class Main
         Show(1, -1)
         Show(-1, 1)
         Show(2, 3)
-        check
-            number result = math:InverseTangent2(0, 0)
-            output "InverseTangent2(0, 0) should fail but returned " + result
-        detect e
-            output "InverseTangent2(0, 0) fails, as it should"
-        end
+        Show(0, 0)
+        number negativeZero = -0.0
+        Show(-1, negativeZero)
+        Show(-1, 0.0)
     end
 
     action Show(number x, number y)
@@ -36,11 +32,6 @@ class Main
             output "InverseTangent(" + x + ", " + y + ") = " + math:Round(math:InverseTangent(x, y), 10)
         detect e
             output "InverseTangent(" + x + ", " + y + ") unexpected error: " + e:GetErrorMessage()
-        end
-        check
-            output "InverseTangent2(" + x + ", " + y + ") = " + math:Round(math:InverseTangent2(x, y), 10)
-        detect e
-            output "InverseTangent2(" + x + ", " + y + ") unexpected error: " + e:GetErrorMessage()
         end
     end
 end

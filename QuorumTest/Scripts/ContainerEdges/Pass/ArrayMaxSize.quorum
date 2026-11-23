@@ -1,9 +1,9 @@
 use Libraries.Containers.Array
 
 /*
-    SetMaxSize documents: "The max size can only be increased, any value that
-    is lower will leave the array with the same max size it had." So a lower
-    value changes neither the max size nor the items.
+    SetMaxSize sets the max size, lower or higher. A lower one makes the
+    array smaller: items past the new max size are removed (code such as
+    the collision points relies on making small arrays this way).
 */
 class Main
     action Show(text value) returns text

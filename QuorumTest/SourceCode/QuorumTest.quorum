@@ -152,6 +152,7 @@ class QuorumTest is ProcessListener
     GeometryTester geometryChecks
     TextSupportTester textSupportChecks
     FileTester fileChecks
+    ObjReaderTester objReaderChecks
     DateTimeTester dateTimeChecks
     SystemClassesTester systemClassesChecks
     XmlTester xmlChecks
@@ -206,6 +207,7 @@ class QuorumTest is ProcessListener
         geometryChecks:SetCompilerTestSuite(me)
         textSupportChecks:SetCompilerTestSuite(me)
         fileChecks:SetCompilerTestSuite(me)
+        objReaderChecks:SetCompilerTestSuite(me)
         dateTimeChecks:SetCompilerTestSuite(me)
         systemClassesChecks:SetCompilerTestSuite(me)
         xmlChecks:SetCompilerTestSuite(me)
@@ -621,6 +623,10 @@ class QuorumTest is ProcessListener
         if StartTester("Worlds")
             worldsChecks:Test()
             FinishTester(worldsChecks:GetName())
+        end
+        if StartTester("ObjReader")
+            objReaderChecks:Test()
+            FinishTester(objReaderChecks:GetName())
         end
         if StartTester("Compute")
             computeChecks:Test()

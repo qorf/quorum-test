@@ -14,7 +14,10 @@ Back ends: bytecode and JavaScript. Not Python: the reader holds a
 DocumentTypeDefinition, which holds a File, and there is no Python File
 plugin, so the classes can't be created there. XmlElementClasses uses no
 File and runs everywhere. XmlFiles reads and writes real files, so it runs
-on bytecode only.
+on bytecode only. The XmlPalette scripts read block palettes, the only
+XML these classes read in the library and on the website: the website's
+ten palette files (their contents built in the script), every element the
+palette listener reads, edge cases and malformed palettes.
 */
 class XmlTester
     QuorumTest suite = undefined
@@ -47,6 +50,10 @@ class XmlTester
         scripts:Check(path + "XmlReaderActions", true, false)
         scripts:Check(path + "DtdReadText", true, false)
         scripts:Check(path + "DtdClasses", true, false)
+        scripts:Check(path + "XmlPaletteFiles", true, false)
+        scripts:Check(path + "XmlPaletteElements", true, false)
+        scripts:Check(path + "XmlPaletteEdges", true, false)
+        scripts:Check(path + "XmlPaletteMalformed", true, false)
         scripts:CheckEverywhere(path + "XmlElementClasses")
         scripts:Check(path + "XmlFiles", false, false)
     end

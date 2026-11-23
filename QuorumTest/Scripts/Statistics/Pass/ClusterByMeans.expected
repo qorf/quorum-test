@@ -2,7 +2,9 @@ ClusterByMeans default GetClustersSize() = 3
 ClusterByMeans SetClustersSize(2) GetClustersSize() = 2
 Cluster(frame, 42) labels: rows 0-2 together = true, rows 3-5 together = true, the groups apart = true, label count = 6
 Cluster(frame, 42) clusters = 2, sizes = 3 and 3, centers = (1.0, 2.0) and (10.0, 20.0)
-Cluster with 6 clusters for 6 rows fails, as it should
+Cluster with 6 clusters for 6 rows gives 6 clusters
+Cluster with 7 clusters for 6 rows fails, as it should
+Cluster with -1 clusters fails, as it should
 Cluster with 0 clusters fails, as it should
 Cluster on a text column fails, as it should
 Cluster of (1, 4) and (3, 8) GetSize() and CalculateCentroid() = 2 (2.0, 6.0)

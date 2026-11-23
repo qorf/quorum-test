@@ -1,2 +1,0 @@
-Array[30,10,20,5,10] Sort(Compare = left - right) gives [5,10,10,20,30]
-Array[1,3] Sort(Compare = left - right, so Compare(1, 3) = -2) gives [1,3]

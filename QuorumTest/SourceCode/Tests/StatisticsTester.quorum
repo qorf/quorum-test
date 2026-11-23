@@ -30,7 +30,13 @@ class StatisticsTester
         scripts:Check(path + "CombineFilterRound", true, false)
         scripts:Check(path + "CommaSeparatedFiles", false, false)
         scripts:Check(path + "CovarianceCorrelation", true, false)
+        scripts:Check(path + "CovarianceEdges", true, false)
         scripts:Check(path + "CrossTab", true, false)
+        //PrincipalComponentAnalysis on data with hand-worked answers
+        scripts:Check(path + "PcaTwoVariables", true, false)
+        scripts:Check(path + "PcaEqualCorrelation", true, false)
+        scripts:Check(path + "PcaTwoPairs", true, false)
+        scripts:Check(path + "PcaEdgeCases", true, false)
         scripts:Check(path + "DateTimeParsers", true, false)
         scripts:Check(path + "SelectionAndInputs", true, false)
         scripts:Check(path + "TransformWiderLonger", true, false)

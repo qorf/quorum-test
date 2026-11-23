@@ -14,8 +14,9 @@ groups of three points, (1, 2), (1.2, 2.2), (0.8, 1.8) and (10, 20),
 (10.2, 20.2), (9.8, 19.8), with a set seed. Any correct k-means puts each
 group in its own cluster, with centers (1, 2) and (10, 20), whichever
 cluster number each group gets, so only those facts are printed. The
-documentation says the number of clusters must be above 0 and strictly
-less than the number of rows.
+documentation says the number of clusters must be above 0 and at most the
+number of rows: 6 clusters for 6 rows puts each row in its own cluster (as
+R's kmeans and scikit-learn allow), and 7 fails.
 */
 class Main
     action Main
@@ -67,9 +68,29 @@ class Main
             ClusterByMeans means
             means:SetClustersSize(6)
             ClusterResult result = means:Cluster(frame, 42)
-            output "Cluster with 6 clusters for 6 rows should fail but returned " + result:GetClusters():GetSize() + " clusters"
+            output "Cluster with 6 clusters for 6 rows gives " + result:GetClusters():GetSize() + " clusters"
         detect e
-            output "Cluster with 6 clusters for 6 rows fails, as it should"
+            output "Cluster with 6 clusters for 6 rows unexpected error: " + e:GetErrorMessage()
+        end
+        check
+            DataFrame frame = Frame(points)
+            frame:AddSelectedColumnRange(0, 1)
+            ClusterByMeans means
+            means:SetClustersSize(7)
+            ClusterResult result = means:Cluster(frame, 42)
+            output "Cluster with 7 clusters for 6 rows should fail but returned " + result:GetClusters():GetSize() + " clusters"
+        detect e
+            output "Cluster with 7 clusters for 6 rows fails, as it should"
+        end
+        check
+            DataFrame frame = Frame(points)
+            frame:AddSelectedColumnRange(0, 1)
+            ClusterByMeans means
+            means:SetClustersSize(-1)
+            ClusterResult result = means:Cluster(frame)
+            output "Cluster with -1 clusters should fail but returned a result"
+        detect e
+            output "Cluster with -1 clusters fails, as it should"
         end
         check
             DataFrame frame = Frame(points)
