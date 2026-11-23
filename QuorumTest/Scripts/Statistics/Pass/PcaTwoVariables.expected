@@ -1,0 +1,8 @@
+Two variables, r = 0.6: eigenvalues [1.6, 0.4]
+Two variables, r = 0.6, 1 component: loadings 0.894427 and 0.894427, communality [0.8, 0.8], uniqueness [0.2, 0.2]
+Two variables, r = 0.6, 1 component: variance accounted for [1.6], proportion [0.8]
+Two variables, r = 0.6: loadings have opposite signs = false
+Two variables, r = -0.6: eigenvalues [1.6, 0.4]
+Two variables, r = -0.6, 1 component: loadings 0.894427 and 0.894427, communality [0.8, 0.8], uniqueness [0.2, 0.2]
+Two variables, r = -0.6, 1 component: variance accounted for [1.6], proportion [0.8]
+Two variables, r = -0.6: loadings have opposite signs = true

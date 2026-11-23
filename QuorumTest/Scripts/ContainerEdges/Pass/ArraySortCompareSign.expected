@@ -1,0 +1,2 @@
+Array[30,10,2147483647,20,-2147483648,5,10,0] Sort(Compare returning -1, 0 or 1) gives [-2147483648,0,5,10,10,20,30,2147483647]
+Array[3,1] Sort(Compare returning -1, 0 or 1) gives [1,3]

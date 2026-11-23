@@ -1,0 +1,11 @@
+MaterialLexer: DISSOLVE and EMISSIVE_LIGHTING are different tokens: true
+MaterialLexer: a d line starts with DISSOLVE, not EMISSIVE_LIGHTING: true
+d 0.5 alone: dissolve set true (0.5), emissive set false, specular set false
+Ke 0.25 0.5 0.75 alone: dissolve set false, emissive set true (0.25 0.5 0.75), specular set false
+Ke, then d: dissolve set true (0.5), emissive set true (0.25 0.5 0.75), specular set false
+d, then Ke: dissolve set true (0.5), emissive set true (0.25 0.5 0.75), specular set false
+Ks, then Ke: specular 0.1 0.2 0.3, emissive 0.25 0.5 0.75
+Material:SetHasEmissiveColor(true) gives true, then (false) gives false
+WavefrontObjectLexer: FORWARD_SLASH and VERTEX_TEXTURE are different tokens: true
+WavefrontObjectLexer: vt starts with VERTEX_TEXTURE: true, a slash in a face is FORWARD_SLASH: true
+vt lines and f 1/2 2/3 3/1: texture coordinates 3, corners 3, texture indices 2 3 1

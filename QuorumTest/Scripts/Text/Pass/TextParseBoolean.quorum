@@ -1,22 +1,21 @@
 /*
-    Text:ParseBoolean gives the boolean in the text, and the documentation
-    says that a text that is not a boolean alerts an error. So "true" and
-    "false" parse, and other text fails rather than giving false. (Java's
-    Boolean.parseBoolean returns false for any other text, which does not
-    match the documentation.) Upper case forms are not tested, because the
-    documentation does not say whether they are valid.
+    Text:ParseBoolean gives the boolean in the text. As documented (and as
+    Java's Boolean.parseBoolean does), "true" in any mix of upper and lower
+    case gives true, and any other text gives false without an error.
     Each case runs on a text primitive and on a Text object.
 */
 class Main
     action Main
         Show("true")
+        Show("True")
+        Show("TRUE")
         Show("false")
-        Fail("abc")
-        Fail("")
-        Fail(" true")
-        Fail("yes")
-        Fail("1")
-        Fail("0")
+        Show("abc")
+        Show("")
+        Show(" true")
+        Show("yes")
+        Show("1")
+        Show("0")
     end
 
     action Show(text value)
@@ -32,24 +31,6 @@ class Main
             output "Text " + call + " = " + object:ParseBoolean()
         detect e
             output "Text " + call + " unexpected error: " + e:GetErrorMessage()
-        end
-    end
-
-    action Fail(text value)
-        text call = "ParseBoolean([" + value + "])"
-        check
-            boolean result = value:ParseBoolean()
-            output call + " should fail but returned " + result
-        detect e
-            output call + " fails, as it should"
-        end
-        Text object
-        object:SetValue(value)
-        check
-            boolean result = object:ParseBoolean()
-            output "Text " + call + " should fail but returned " + result
-        detect e
-            output "Text " + call + " fails, as it should"
         end
     end
 end

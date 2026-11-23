@@ -1,0 +1,4 @@
+A convex quad (unit square): points 4, triangles 2, parts [Default 2], area 1.0, every triangle inside = true
+A convex pentagon: points 5, triangles 3, parts [Default 3], area 8.0, every triangle inside = true
+A concave quad (an arrowhead) starting at a convex corner: points 4, triangles 2, parts [Default 2], area 6.0, every triangle inside = true
+A concave hexagon (an L shape) starting next to its inner corner: points 6, triangles 4, parts [Default 4], area 7.0, every triangle inside = true

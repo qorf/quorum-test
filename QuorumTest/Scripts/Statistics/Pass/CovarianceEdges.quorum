@@ -1,0 +1,273 @@
+use Libraries.Compute.Statistics.DataFrame
+use Libraries.Compute.Statistics.Transforms.CovarianceMatrixTransform
+use Libraries.Compute.Matrix
+use Libraries.Compute.Math
+
+/*
+CovarianceMatrixTransform and DataFrame:CovarianceMatrix at the edges. The
+sample covariance divides by n - 1 and the population covariance
+(UsePopulation(true)) by n, as R's cov, the NIST/SEMATECH e-Handbook of
+Statistical Methods (section 6.5.4.1), NumPy's cov (bias=True for n),
+pandas' DataFrame.cov (ddof=0 for n) and Python's statistics module
+(covariance, variance, pvariance) all define them. The last case is the
+e-Handbook's own worked example, with its published matrix: length, width,
+height for 5 observations, S = [0.025, 0.0075, 0.00175; 0.0075, 0.007,
+0.00135; 0.00175, 0.00135, 0.00043]. The other expected values were
+computed with Python's statistics module. With one row there is no sample
+covariance (R gives NA, Python an error), so it must fail. Matrices are
+printed by row, rounded to 6 places.
+*/
+class Main
+    action Main
+        check
+            DataFrame frame = Frame("x,y;1,2;3,6")
+            CovarianceMatrixTransform cov
+            integer i = 0
+            repeat while i < frame:GetSize()
+                cov:AddColumn(i)
+                i = i + 1
+            end
+            DataFrame result = frame:Transform(cov)
+            output "two rows (n - 1 = 1), sample: covariance matrix = " + Rows(cov:GetMatrix())
+        detect e
+            output "two rows (n - 1 = 1), sample unexpected error: " + e:GetErrorMessage()
+        end
+        check
+            DataFrame frame = Frame("x,y;1,2;3,6")
+            CovarianceMatrixTransform cov
+            integer i = 0
+            repeat while i < frame:GetSize()
+                cov:AddColumn(i)
+                i = i + 1
+            end
+            cov:UsePopulation(true)
+            DataFrame result = frame:Transform(cov)
+            output "two rows (n - 1 = 1), population: covariance matrix = " + Rows(cov:GetMatrix())
+        detect e
+            output "two rows (n - 1 = 1), population unexpected error: " + e:GetErrorMessage()
+        end
+        check
+            DataFrame frame = Frame("x,y;1,3;2,1;4,2")
+            CovarianceMatrixTransform cov
+            integer i = 0
+            repeat while i < frame:GetSize()
+                cov:AddColumn(i)
+                i = i + 1
+            end
+            DataFrame result = frame:Transform(cov)
+            output "three rows, sample: covariance matrix = " + Rows(cov:GetMatrix())
+        detect e
+            output "three rows, sample unexpected error: " + e:GetErrorMessage()
+        end
+        check
+            DataFrame frame = Frame("x,y;1,3;2,1;4,2")
+            CovarianceMatrixTransform cov
+            integer i = 0
+            repeat while i < frame:GetSize()
+                cov:AddColumn(i)
+                i = i + 1
+            end
+            cov:UsePopulation(true)
+            DataFrame result = frame:Transform(cov)
+            output "three rows, population: covariance matrix = " + Rows(cov:GetMatrix())
+        detect e
+            output "three rows, population unexpected error: " + e:GetErrorMessage()
+        end
+        check
+            DataFrame frame = Frame("x,y;1,3;2,2;3,1")
+            CovarianceMatrixTransform cov
+            integer i = 0
+            repeat while i < frame:GetSize()
+                cov:AddColumn(i)
+                i = i + 1
+            end
+            DataFrame result = frame:Transform(cov)
+            output "a negative covariance, sample: covariance matrix = " + Rows(cov:GetMatrix())
+        detect e
+            output "a negative covariance, sample unexpected error: " + e:GetErrorMessage()
+        end
+        check
+            DataFrame frame = Frame("x,y;1,3;2,2;3,1")
+            CovarianceMatrixTransform cov
+            integer i = 0
+            repeat while i < frame:GetSize()
+                cov:AddColumn(i)
+                i = i + 1
+            end
+            cov:UsePopulation(true)
+            DataFrame result = frame:Transform(cov)
+            output "a negative covariance, population: covariance matrix = " + Rows(cov:GetMatrix())
+        detect e
+            output "a negative covariance, population unexpected error: " + e:GetErrorMessage()
+        end
+        check
+            DataFrame frame = Frame("x,y;1,1;-1,1;1,-1;-1,-1")
+            CovarianceMatrixTransform cov
+            integer i = 0
+            repeat while i < frame:GetSize()
+                cov:AddColumn(i)
+                i = i + 1
+            end
+            DataFrame result = frame:Transform(cov)
+            output "no covariance, sample: covariance matrix = " + Rows(cov:GetMatrix())
+        detect e
+            output "no covariance, sample unexpected error: " + e:GetErrorMessage()
+        end
+        check
+            DataFrame frame = Frame("x,y;1,1;-1,1;1,-1;-1,-1")
+            CovarianceMatrixTransform cov
+            integer i = 0
+            repeat while i < frame:GetSize()
+                cov:AddColumn(i)
+                i = i + 1
+            end
+            cov:UsePopulation(true)
+            DataFrame result = frame:Transform(cov)
+            output "no covariance, population: covariance matrix = " + Rows(cov:GetMatrix())
+        detect e
+            output "no covariance, population unexpected error: " + e:GetErrorMessage()
+        end
+        check
+            DataFrame frame = Frame("x,y;5,1;5,2;5,3")
+            CovarianceMatrixTransform cov
+            integer i = 0
+            repeat while i < frame:GetSize()
+                cov:AddColumn(i)
+                i = i + 1
+            end
+            DataFrame result = frame:Transform(cov)
+            output "a constant column, sample: covariance matrix = " + Rows(cov:GetMatrix())
+        detect e
+            output "a constant column, sample unexpected error: " + e:GetErrorMessage()
+        end
+        check
+            DataFrame frame = Frame("x,y;5,1;5,2;5,3")
+            CovarianceMatrixTransform cov
+            integer i = 0
+            repeat while i < frame:GetSize()
+                cov:AddColumn(i)
+                i = i + 1
+            end
+            cov:UsePopulation(true)
+            DataFrame result = frame:Transform(cov)
+            output "a constant column, population: covariance matrix = " + Rows(cov:GetMatrix())
+        detect e
+            output "a constant column, population unexpected error: " + e:GetErrorMessage()
+        end
+        check
+            DataFrame frame = Frame("x,y;1000000001,1;1000000002,2;1000000003,3")
+            CovarianceMatrixTransform cov
+            integer i = 0
+            repeat while i < frame:GetSize()
+                cov:AddColumn(i)
+                i = i + 1
+            end
+            DataFrame result = frame:Transform(cov)
+            output "values near one billion, sample: covariance matrix = " + Rows(cov:GetMatrix())
+        detect e
+            output "values near one billion, sample unexpected error: " + e:GetErrorMessage()
+        end
+        check
+            DataFrame frame = Frame("x,y;1000000001,1;1000000002,2;1000000003,3")
+            CovarianceMatrixTransform cov
+            integer i = 0
+            repeat while i < frame:GetSize()
+                cov:AddColumn(i)
+                i = i + 1
+            end
+            cov:UsePopulation(true)
+            DataFrame result = frame:Transform(cov)
+            output "values near one billion, population: covariance matrix = " + Rows(cov:GetMatrix())
+        detect e
+            output "values near one billion, population unexpected error: " + e:GetErrorMessage()
+        end
+        check
+            DataFrame frame = Frame("length,width,height;4.0,2.0,0.60;4.2,2.1,0.59;3.9,2.0,0.58;4.3,2.1,0.62;4.1,2.2,0.63")
+            CovarianceMatrixTransform cov
+            integer i = 0
+            repeat while i < frame:GetSize()
+                cov:AddColumn(i)
+                i = i + 1
+            end
+            DataFrame result = frame:Transform(cov)
+            output "the NIST e-Handbook example (6.5.4.1), sample: covariance matrix = " + Rows(cov:GetMatrix())
+        detect e
+            output "the NIST e-Handbook example (6.5.4.1), sample unexpected error: " + e:GetErrorMessage()
+        end
+        check
+            DataFrame frame = Frame("length,width,height;4.0,2.0,0.60;4.2,2.1,0.59;3.9,2.0,0.58;4.3,2.1,0.62;4.1,2.2,0.63")
+            CovarianceMatrixTransform cov
+            integer i = 0
+            repeat while i < frame:GetSize()
+                cov:AddColumn(i)
+                i = i + 1
+            end
+            cov:UsePopulation(true)
+            DataFrame result = frame:Transform(cov)
+            output "the NIST e-Handbook example (6.5.4.1), population: covariance matrix = " + Rows(cov:GetMatrix())
+        detect e
+            output "the NIST e-Handbook example (6.5.4.1), population unexpected error: " + e:GetErrorMessage()
+        end
+        check
+            DataFrame frame = Frame("x,y;1,2;3,6")
+            frame:AddSelectedColumn(0)
+            frame:AddSelectedColumn(1)
+            output "DataFrame CovarianceMatrix() of two rows (sample) = " + Rows(frame:CovarianceMatrix())
+        detect e
+            output "DataFrame CovarianceMatrix() of two rows unexpected error: " + e:GetErrorMessage()
+        end
+        check
+            DataFrame frame = Frame("x,y;1,3;2,1;4,2")
+            CovarianceMatrixTransform cov
+            cov:AddColumn(0)
+            cov:AddColumn(1)
+            cov:UsePopulation(true)
+            cov:UseSample(true)
+            DataFrame result = frame:Transform(cov)
+            output "UsePopulation(true) then UseSample(true) gives the sample matrix = " + Rows(cov:GetMatrix())
+        detect e
+            output "UsePopulation then UseSample unexpected error: " + e:GetErrorMessage()
+        end
+        check
+            DataFrame frame = Frame("x,y;1,2")
+            CovarianceMatrixTransform cov
+            cov:AddColumn(0)
+            cov:AddColumn(1)
+            DataFrame result = frame:Transform(cov)
+            output "One row should fail but gave " + Rows(cov:GetMatrix())
+        detect e
+            output "One row (no sample covariance) fails, as it should"
+        end
+    end
+
+    /* A matrix by rows, each value rounded to 6 places: [a, b; c, d]. */
+    action Rows(Matrix matrix) returns text
+        Math math
+        text result = "["
+        integer row = 0
+        repeat while row < matrix:GetRows()
+            if row > 0
+                result = result + "; "
+            end
+            integer column = 0
+            repeat while column < matrix:GetColumns()
+                if column > 0
+                    result = result + ", "
+                end
+                result = result + math:Round(matrix:Get(row, column), 6)
+                column = column + 1
+            end
+            row = row + 1
+        end
+        return result + "]"
+    end
+
+    /* Makes a frame from comma separated text whose rows are separated by ; */
+    action Frame(text rows) returns DataFrame
+        text lf = ""
+        lf = lf:GetLineFeed()
+        DataFrame frame
+        frame:LoadFromCommaSeparatedValue(rows:Replace(";", lf))
+        return frame
+    end
+end

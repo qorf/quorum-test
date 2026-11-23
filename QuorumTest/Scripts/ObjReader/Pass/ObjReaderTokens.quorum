@@ -1,0 +1,198 @@
+use Libraries.Game.Graphics.ModelLoaders.WavefrontObject.WavefrontObjectLexer
+use Libraries.Game.Graphics.ModelLoaders.WavefrontObject.WavefrontObjectParser
+use Libraries.Game.Graphics.ModelLoaders.WavefrontObject.WavefrontConverterListener
+use Libraries.Game.Graphics.ModelLoaders.WavefrontObject.MaterialLexer
+use Libraries.Game.Graphics.ModelLoaders.WavefrontObject.MaterialParser
+use Libraries.Game.Graphics.ModelLoaders.WavefrontObject.MaterialConverterListener
+use Libraries.Game.Graphics.ModelLoaders.WavefrontObject.Material
+use Libraries.Game.Graphics.ModelLoaders.VertexFace
+use Libraries.Containers.Array
+use Libraries.Containers.Table
+use Libraries.Compute.Vector3
+
+/*
+Three bugs found in the OBJ reader on 2026-11-23, each tested on its own:
+- MaterialLexer gave DISSOLVE ("d") the same token number as
+  EMISSIVE_LIGHTING ("Ke"), 21, so MaterialParser read a "d" line as an
+  emissive color: the dissolve was never set, and "d" overwrote Ke's red.
+- Material:SetHasEmissiveColor named its parameter hasSpecularColor and
+  assigned the field to itself, so a material never had an emissive color,
+  and MaterialConverterListener marked Ke as a specular color.
+- WavefrontObjectLexer gave FORWARD_SLASH the same token number as
+  VERTEX_TEXTURE ("vt"), 19.
+The text goes straight to the lexers, one line at a time as ModelReader
+reads a file, so no files are written. Expected output is the correct
+behavior.
+*/
+class Main
+
+    /* Reads .mtl lines and returns the first material, as ModelReader does. */
+    action ReadMaterial(Array<text> lines) returns Material
+        MaterialConverterListener listener
+        integer i = 0
+        repeat while i < lines:GetSize()
+            MaterialLexer lexer
+            lexer:SetListener(listener)
+            lexer:Read(lines:Get(i))
+            MaterialParser parser
+            parser:SetListener(listener)
+            parser:Parse(lexer)
+            i = i + 1
+        end
+        return listener:GetMaterials():Get(0)
+    end
+
+    /* Reads OBJ lines into a listener, as ModelReader does. */
+    action ReadObj(Array<text> lines) returns WavefrontConverterListener
+        WavefrontConverterListener listener
+        integer i = 0
+        repeat while i < lines:GetSize()
+            WavefrontObjectLexer lexer
+            lexer:SetListener(listener)
+            lexer:Read(lines:Get(i))
+            WavefrontObjectParser parser
+            parser:SetListener(listener)
+            parser:Parse(lexer)
+            i = i + 1
+        end
+        return listener
+    end
+
+    action Show(Vector3 vector) returns text
+        return "" + vector:GetX() + " " + vector:GetY() + " " + vector:GetZ()
+    end
+
+    action YesNo(boolean value) returns text
+        if value
+            return "true"
+        end
+        return "false"
+    end
+
+    /* A material's dissolve, emissive and specular state as text. */
+    action Describe(Material material) returns text
+        text result = "dissolve set " + YesNo(material:HasDissolve())
+        if material:HasDissolve()
+            result = result + " (" + material:GetDissolve() + ")"
+        end
+        result = result + ", emissive set " + YesNo(material:HasEmissiveColor())
+        if material:HasEmissiveColor()
+            result = result + " (" + Show(material:GetEmissiveColor()) + ")"
+        end
+        result = result + ", specular set " + YesNo(material:HasSpecularColor())
+        return result
+    end
+
+    action Main
+        check
+            MaterialLexer lexer
+            output "MaterialLexer: DISSOLVE and EMISSIVE_LIGHTING are different tokens: " + YesNo(lexer:DISSOLVE not= lexer:EMISSIVE_LIGHTING)
+        detect e
+            output "MaterialLexer token numbers unexpected error: " + e:GetErrorMessage()
+        end
+
+        check
+            MaterialLexer lexer
+            lexer:Read("d 0.5")
+            output "MaterialLexer: a d line starts with DISSOLVE, not EMISSIVE_LIGHTING: " +
+                YesNo(lexer:GetToken(0):tokenID = lexer:DISSOLVE and lexer:GetToken(0):tokenID not= lexer:EMISSIVE_LIGHTING)
+        detect e
+            output "MaterialLexer d token unexpected error: " + e:GetErrorMessage()
+        end
+
+        check
+            Array<text> lines
+            lines:Add("newmtl m")
+            lines:Add("d 0.5")
+            output "d 0.5 alone: " + Describe(ReadMaterial(lines))
+        detect e
+            output "d 0.5 alone unexpected error: " + e:GetErrorMessage()
+        end
+
+        check
+            Array<text> lines
+            lines:Add("newmtl m")
+            lines:Add("Ke 0.25 0.5 0.75")
+            output "Ke 0.25 0.5 0.75 alone: " + Describe(ReadMaterial(lines))
+        detect e
+            output "Ke alone unexpected error: " + e:GetErrorMessage()
+        end
+
+        check
+            Array<text> lines
+            lines:Add("newmtl m")
+            lines:Add("Ke 0.25 0.5 0.75")
+            lines:Add("d 0.5")
+            output "Ke, then d: " + Describe(ReadMaterial(lines))
+        detect e
+            output "Ke, then d unexpected error: " + e:GetErrorMessage()
+        end
+
+        check
+            Array<text> lines
+            lines:Add("newmtl m")
+            lines:Add("d 0.5")
+            lines:Add("Ke 0.25 0.5 0.75")
+            output "d, then Ke: " + Describe(ReadMaterial(lines))
+        detect e
+            output "d, then Ke unexpected error: " + e:GetErrorMessage()
+        end
+
+        check
+            Array<text> lines
+            lines:Add("newmtl m")
+            lines:Add("Ks 0.1 0.2 0.3")
+            lines:Add("Ke 0.25 0.5 0.75")
+            Material material = ReadMaterial(lines)
+            output "Ks, then Ke: specular " + Show(material:GetSpecularColor()) + ", emissive " + Show(material:GetEmissiveColor())
+        detect e
+            output "Ks, then Ke unexpected error: " + e:GetErrorMessage()
+        end
+
+        check
+            Material material
+            material:SetHasEmissiveColor(true)
+            text first = YesNo(material:HasEmissiveColor())
+            material:SetHasEmissiveColor(false)
+            output "Material:SetHasEmissiveColor(true) gives " + first + ", then (false) gives " + YesNo(material:HasEmissiveColor())
+        detect e
+            output "Material:SetHasEmissiveColor unexpected error: " + e:GetErrorMessage()
+        end
+
+        check
+            WavefrontObjectLexer lexer
+            output "WavefrontObjectLexer: FORWARD_SLASH and VERTEX_TEXTURE are different tokens: " + YesNo(lexer:FORWARD_SLASH not= lexer:VERTEX_TEXTURE)
+        detect e
+            output "WavefrontObjectLexer token numbers unexpected error: " + e:GetErrorMessage()
+        end
+
+        check
+            WavefrontObjectLexer textureLexer
+            textureLexer:Read("vt 0.5 0.5")
+            WavefrontObjectLexer faceLexer
+            faceLexer:Read("f 1/2 2/3 3/1")
+            output "WavefrontObjectLexer: vt starts with VERTEX_TEXTURE: " + YesNo(textureLexer:GetToken(0):tokenID = textureLexer:VERTEX_TEXTURE and textureLexer:GetToken(0):tokenID not= textureLexer:FORWARD_SLASH) +
+                ", a slash in a face is FORWARD_SLASH: " + YesNo(faceLexer:GetToken(2):tokenID = faceLexer:FORWARD_SLASH and faceLexer:GetToken(2):tokenID not= faceLexer:VERTEX_TEXTURE)
+        detect e
+            output "WavefrontObjectLexer vt and slash tokens unexpected error: " + e:GetErrorMessage()
+        end
+
+        check
+            Array<text> lines
+            lines:Add("v 0 0 0")
+            lines:Add("v 1 0 0")
+            lines:Add("v 0 1 0")
+            lines:Add("vt 0 0")
+            lines:Add("vt 1 0")
+            lines:Add("vt 0 1")
+            lines:Add("f 1/2 2/3 3/1")
+            WavefrontConverterListener listener = ReadObj(lines)
+            Table<VertexFace> faces = listener:GetFaces()
+            Array<VertexFace> face = faces:GetRow(0)
+            output "vt lines and f 1/2 2/3 3/1: texture coordinates " + listener:GetTextures():GetSize() +
+                ", corners " + face:GetSize() + ", texture indices " + face:Get(0):GetTexture() + " " + face:Get(1):GetTexture() + " " + face:Get(2):GetTexture()
+        detect e
+            output "vt lines and f 1/2 2/3 3/1 unexpected error: " + e:GetErrorMessage()
+        end
+    end
+end

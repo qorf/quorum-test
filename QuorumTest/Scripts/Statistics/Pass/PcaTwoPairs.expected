@@ -1,0 +1,8 @@
+Two pairs: eigenvalues [1.6, 1.6, 0.4, 0.4]
+Two pairs, 2 components: communality [0.8, 0.8, 0.8, 0.8], total variance accounted for 3.2
+Two pairs, varimax: each variable's larger loading 0.894427, 0.894427, 0.894427, 0.894427, smaller 0.0, 0.0, 0.0, 0.0
+Two pairs, varimax: variables 1 and 2 share a component = true, 3 and 4 = true, 1 and 3 = false
+Two pairs, varimax: communality [0.8, 0.8, 0.8, 0.8]
+Two pairs, oblimin: each variable's larger loading 0.894427, 0.894427, 0.894427, 0.894427, smaller 0.0, 0.0, 0.0, 0.0
+Two pairs, oblimin: variables 1 and 2 share a component = true, 3 and 4 = true, 1 and 3 = false
+Two pairs, oblimin: communality [0.8, 0.8, 0.8, 0.8]

@@ -1,0 +1,18 @@
+Concatenate, no separators on either side: (ab) + (cd) = [abcd], GetLineCount() = 1, lines [abcd], same as Initialize = true
+Concatenate, the second has a separator: (ab) + (cd/ef) = [abcd/ef], GetLineCount() = 2, lines [abcd/][ef], same as Initialize = true
+Concatenate, the first ends with a separator: (ab/) + (cd) = [ab/cd], GetLineCount() = 2, lines [ab/][cd], same as Initialize = true
+Concatenate, the first ends with one, the second has one: (ab/) + (cd/ef) = [ab/cd/ef], GetLineCount() = 3, lines [ab/][cd/][ef], same as Initialize = true
+Concatenate, the second starts with a separator: (a/b) + (/c) = [a/b/c], GetLineCount() = 3, lines [a/][b/][c], same as Initialize = true
+Concatenate, the second is only a separator: (ab) + (/) = [ab/], GetLineCount() = 2, lines [ab/][], same as Initialize = true
+Concatenate, the second is empty: (a/b) + () = [a/b], GetLineCount() = 2, lines [a/][b], same as Initialize = true
+Concatenate, the second is empty, the first ends with a separator: (a/b/) + () = [a/b/], GetLineCount() = 3, lines [a/][b/][], same as Initialize = true
+Concatenate, the first is empty: () + (ab/cd) = [ab/cd], GetLineCount() = 2, lines [ab/][cd], same as Initialize = true
+Concatenate, both are empty: () + () = [], GetLineCount() = 1, lines [], same as Initialize = true
+Concatenate, the second ends with a separator: (ab) + (cd/) = [abcd/], GetLineCount() = 2, lines [abcd/][], same as Initialize = true
+Concatenate, three in a row: (a) + (b) + (c/d) = [abc/d], GetLineCount() = 2, lines [abc/][d], same as Initialize = true
+Concatenate, separators in a row: (a/) + (/) + (/b) = [a///b], GetLineCount() = 4, lines [a/][/][/][b], same as Initialize = true
+Concatenate, 21 lines and 21 lines, joined in the middle: (L0/L1/L2/...) + (head/M0/M...) = [L0/L1/L2/L3/L4/L5/L6/L7/L8/L9/L10/L11/L12/L13/L14/L15/L16/L17/L18/L19/tailhead/M0/M1/M2/M3/M4/M5/M6/M7/M8/M9/M10/M11/M12/M13/M14/M15/M16/M17/M18/M19], GetLineCount() = 41, same as Initialize = true
+Concatenate(cd/ef) then Concatenate(text gh/ij) on (ab) = [abcd/efgh/ij], GetLineCount() = 3, lines [abcd/][efgh/][ij], same as Initialize = true
+40 x Concatenate(x) then Concatenate(/y) on () = [xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx/y], GetLineCount() = 2, lines [xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx/][y], same as Initialize = true
+30 x Concatenate(w/) on () = [w/w/w/w/w/w/w/w/w/w/w/w/w/w/w/w/w/w/w/w/w/w/w/w/w/w/w/w/w/w/], GetLineCount() = 31, same as Initialize = true
+Concatenate leaves both trees as they were: first = [ab] with 1 line, second = [cd/ef] with 2 lines

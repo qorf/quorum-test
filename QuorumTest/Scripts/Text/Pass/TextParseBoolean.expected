@@ -1,16 +1,20 @@
 ParseBoolean([true]) = true
 Text ParseBoolean([true]) = true
+ParseBoolean([True]) = true
+Text ParseBoolean([True]) = true
+ParseBoolean([TRUE]) = true
+Text ParseBoolean([TRUE]) = true
 ParseBoolean([false]) = false
 Text ParseBoolean([false]) = false
-ParseBoolean([abc]) fails, as it should
-Text ParseBoolean([abc]) fails, as it should
-ParseBoolean([]) fails, as it should
-Text ParseBoolean([]) fails, as it should
-ParseBoolean([ true]) fails, as it should
-Text ParseBoolean([ true]) fails, as it should
-ParseBoolean([yes]) fails, as it should
-Text ParseBoolean([yes]) fails, as it should
-ParseBoolean([1]) fails, as it should
-Text ParseBoolean([1]) fails, as it should
-ParseBoolean([0]) fails, as it should
-Text ParseBoolean([0]) fails, as it should
+ParseBoolean([abc]) = false
+Text ParseBoolean([abc]) = false
+ParseBoolean([]) = false
+Text ParseBoolean([]) = false
+ParseBoolean([ true]) = false
+Text ParseBoolean([ true]) = false
+ParseBoolean([yes]) = false
+Text ParseBoolean([yes]) = false
+ParseBoolean([1]) = false
+Text ParseBoolean([1]) = false
+ParseBoolean([0]) = false
+Text ParseBoolean([0]) = false

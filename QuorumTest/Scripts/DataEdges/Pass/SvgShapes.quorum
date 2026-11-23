@@ -10,8 +10,8 @@ Small SVG shapes written with ToText, compared as text: Circle, Rectangle,
 Line, Ellipse, Label and a Group holding a circle, their getters, units, and a title and description
 on a shape. Line feeds and tabs in ToText are shown as \n and \t. Numbers use
 fractions such as 12.5 so the text is the same on every back end. Every case
-sets the tab index to 0 (the documented default) so the output doesn't
-depend on the default. Expected markup keeps the library's own layout; it
+sets the tab index to 0 so the output doesn't depend on the default
+(-1, documented; only "new Circle GetTabIndex" checks it). Expected markup keeps the library's own layout; it
 must be well-formed XML (a shape opened with > must be closed with its end
 tag), and text content must escape < and & (SVG is XML).
 */

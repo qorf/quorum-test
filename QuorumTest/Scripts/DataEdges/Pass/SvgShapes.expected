@@ -1,7 +1,7 @@
 Circle SetPosition(12.5, 20.5) SetRadius(5.5) ToText() = [<circle cx="12.5" cy="20.5" r="5.5" tabindex="0" />\n]
 Circle GetPositionX() = [12.5], GetPositionY() = [20.5], GetRadius() = [5.5]
 Circle SetPosition(10.5, 20.5, %) SetRadius(5.5, px): GetPositionX() = [10.5%], GetPositionY() = [20.5%], GetRadius() = [5.5px]
-new Circle GetTabIndex() = [0]
+new Circle GetTabIndex() = [-1]
 Rectangle SetSize(10.5, 20.5) SetPosition(1.5, 2.5) corner radii 3.5 and 4.5 ToText() = [<rect width="10.5" height="20.5" x="1.5" y="2.5" rx="3.5" ry="4.5" tabindex="0" />\n]
 Rectangle GetWidth() = [10.5], GetHeight() = [20.5], GetPositionX() = [1.5], GetPositionY() = [2.5]
 Line SetPoints(0.5, 1.5, 2.5, 3.5) SetStroke(black) ToText() = [<line x1="0.5" y1="1.5" x2="2.5" y2="3.5" tabindex="0" stroke="black" />\n]

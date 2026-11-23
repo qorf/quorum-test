@@ -1,0 +1,203 @@
+use Libraries.Containers.MultipleLineText
+
+/*
+    MultipleLineText:Concatenate(MultipleLineText) at the edges. When the first
+    text's last line has no line separator, it and the second text's first
+    line are one line. Each case concatenates trees made with Initialize and
+    must give the same text and the same lines as one tree made with
+    Initialize from the whole text (shown as "same as Initialize"). In the
+    output each line separator is shown as "/". Concatenating an empty tree
+    adds nothing, not an empty line.
+*/
+class Main
+    text separator = ""
+
+    action Show(text value) returns text
+        return "[" + value:Replace(separator, "/") + "]"
+    end
+
+    action ShowLines(MultipleLineText tree) returns text
+        text result = ""
+        integer i = 0
+        repeat while i < tree:GetLineCount()
+            MultipleLineText line = tree:GetLine(i)
+            result = result + Show(line:GetText())
+            i = i + 1
+        end
+        return result
+    end
+
+    action Make(text value) returns MultipleLineText
+        MultipleLineText tree
+        tree:Initialize(value:Replace("/", separator))
+        return tree
+    end
+
+    /* True if the tree has the same lines as a tree made with Initialize from its text. */
+    action SameAsInitialize(MultipleLineText tree) returns boolean
+        MultipleLineText direct
+        direct:Initialize(tree:GetText())
+        if direct:GetLineCount() not= tree:GetLineCount()
+            return false
+        end
+        integer i = 0
+        repeat while i < tree:GetLineCount()
+            MultipleLineText a = tree:GetLine(i)
+            MultipleLineText b = direct:GetLine(i)
+            if a:GetText() not= b:GetText()
+                return false
+            end
+            i = i + 1
+        end
+        return true
+    end
+
+    action Report(text label, MultipleLineText tree)
+        text lines = ""
+        if tree:GetLineCount() <= 6
+            lines = ", lines " + ShowLines(tree)
+        end
+        output label + " = " + Show(tree:GetText()) + ", GetLineCount() = " + tree:GetLineCount() + lines + ", same as Initialize = " + SameAsInitialize(tree)
+    end
+
+    action Main
+        MultipleLineText probe
+        separator = probe:GetLineSeparator()
+
+        check
+            MultipleLineText result = Make("ab")
+            result = result:Concatenate(Make("cd"))
+            Report("Concatenate, no separators on either side: (ab) + (cd)", result)
+        detect e
+            output "Concatenate, no separators on either side: (ab) + (cd) unexpected error: " + e:GetErrorMessage()
+        end
+        check
+            MultipleLineText result = Make("ab")
+            result = result:Concatenate(Make("cd/ef"))
+            Report("Concatenate, the second has a separator: (ab) + (cd/ef)", result)
+        detect e
+            output "Concatenate, the second has a separator: (ab) + (cd/ef) unexpected error: " + e:GetErrorMessage()
+        end
+        check
+            MultipleLineText result = Make("ab/")
+            result = result:Concatenate(Make("cd"))
+            Report("Concatenate, the first ends with a separator: (ab/) + (cd)", result)
+        detect e
+            output "Concatenate, the first ends with a separator: (ab/) + (cd) unexpected error: " + e:GetErrorMessage()
+        end
+        check
+            MultipleLineText result = Make("ab/")
+            result = result:Concatenate(Make("cd/ef"))
+            Report("Concatenate, the first ends with one, the second has one: (ab/) + (cd/ef)", result)
+        detect e
+            output "Concatenate, the first ends with one, the second has one: (ab/) + (cd/ef) unexpected error: " + e:GetErrorMessage()
+        end
+        check
+            MultipleLineText result = Make("a/b")
+            result = result:Concatenate(Make("/c"))
+            Report("Concatenate, the second starts with a separator: (a/b) + (/c)", result)
+        detect e
+            output "Concatenate, the second starts with a separator: (a/b) + (/c) unexpected error: " + e:GetErrorMessage()
+        end
+        check
+            MultipleLineText result = Make("ab")
+            result = result:Concatenate(Make("/"))
+            Report("Concatenate, the second is only a separator: (ab) + (/)", result)
+        detect e
+            output "Concatenate, the second is only a separator: (ab) + (/) unexpected error: " + e:GetErrorMessage()
+        end
+        check
+            MultipleLineText result = Make("a/b")
+            result = result:Concatenate(Make(""))
+            Report("Concatenate, the second is empty: (a/b) + ()", result)
+        detect e
+            output "Concatenate, the second is empty: (a/b) + () unexpected error: " + e:GetErrorMessage()
+        end
+        check
+            MultipleLineText result = Make("a/b/")
+            result = result:Concatenate(Make(""))
+            Report("Concatenate, the second is empty, the first ends with a separator: (a/b/) + ()", result)
+        detect e
+            output "Concatenate, the second is empty, the first ends with a separator: (a/b/) + () unexpected error: " + e:GetErrorMessage()
+        end
+        check
+            MultipleLineText result = Make("")
+            result = result:Concatenate(Make("ab/cd"))
+            Report("Concatenate, the first is empty: () + (ab/cd)", result)
+        detect e
+            output "Concatenate, the first is empty: () + (ab/cd) unexpected error: " + e:GetErrorMessage()
+        end
+        check
+            MultipleLineText result = Make("")
+            result = result:Concatenate(Make(""))
+            Report("Concatenate, both are empty: () + ()", result)
+        detect e
+            output "Concatenate, both are empty: () + () unexpected error: " + e:GetErrorMessage()
+        end
+        check
+            MultipleLineText result = Make("ab")
+            result = result:Concatenate(Make("cd/"))
+            Report("Concatenate, the second ends with a separator: (ab) + (cd/)", result)
+        detect e
+            output "Concatenate, the second ends with a separator: (ab) + (cd/) unexpected error: " + e:GetErrorMessage()
+        end
+        check
+            MultipleLineText result = Make("a")
+            result = result:Concatenate(Make("b"))
+            result = result:Concatenate(Make("c/d"))
+            Report("Concatenate, three in a row: (a) + (b) + (c/d)", result)
+        detect e
+            output "Concatenate, three in a row: (a) + (b) + (c/d) unexpected error: " + e:GetErrorMessage()
+        end
+        check
+            MultipleLineText result = Make("a/")
+            result = result:Concatenate(Make("/"))
+            result = result:Concatenate(Make("/b"))
+            Report("Concatenate, separators in a row: (a/) + (/) + (/b)", result)
+        detect e
+            output "Concatenate, separators in a row: (a/) + (/) + (/b) unexpected error: " + e:GetErrorMessage()
+        end
+        check
+            MultipleLineText result = Make("L0/L1/L2/L3/L4/L5/L6/L7/L8/L9/L10/L11/L12/L13/L14/L15/L16/L17/L18/L19/tail")
+            result = result:Concatenate(Make("head/M0/M1/M2/M3/M4/M5/M6/M7/M8/M9/M10/M11/M12/M13/M14/M15/M16/M17/M18/M19"))
+            Report("Concatenate, 21 lines and 21 lines, joined in the middle: (L0/L1/L2/...) + (head/M0/M...)", result)
+        detect e
+            output "Concatenate, 21 lines and 21 lines, joined in the middle: (L0/L1/L2/...) + (head/M0/M...) unexpected error: " + e:GetErrorMessage()
+        end
+        check
+            MultipleLineText result = Make("ab")
+            result = result:Concatenate(Make("cd/ef"))
+            result = result:Concatenate("gh" + separator + "ij")
+            Report("Concatenate(cd/ef) then Concatenate(text gh/ij) on (ab)", result)
+        detect e
+            output "Concatenate then Concatenate(text) unexpected error: " + e:GetErrorMessage()
+        end
+        check
+            MultipleLineText result = Make("")
+            repeat 40 times
+                result = result:Concatenate(Make("x"))
+            end
+            result = result:Concatenate(Make("/y"))
+            Report("40 x Concatenate(x) then Concatenate(/y) on ()", result)
+        detect e
+            output "40 x Concatenate(x) unexpected error: " + e:GetErrorMessage()
+        end
+        check
+            MultipleLineText result = Make("")
+            repeat 30 times
+                result = result:Concatenate(Make("w/"))
+            end
+            Report("30 x Concatenate(w/) on ()", result)
+        detect e
+            output "30 x Concatenate(w/) unexpected error: " + e:GetErrorMessage()
+        end
+        check
+            MultipleLineText first = Make("ab")
+            MultipleLineText second = Make("cd/ef")
+            MultipleLineText result = first:Concatenate(second)
+            output "Concatenate leaves both trees as they were: first = " + Show(first:GetText()) + " with " + first:GetLineCount() + " line, second = " + Show(second:GetText()) + " with " + second:GetLineCount() + " lines"
+        detect e
+            output "Concatenate leaves both trees unexpected error: " + e:GetErrorMessage()
+        end
+    end
+end

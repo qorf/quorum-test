@@ -11,8 +11,8 @@ SetContentEditable(true) GetContentEditable():Generate() = [contenteditable= 'tr
 SetDraggable(true) GetDraggable():Generate() = [draggable= 'true']
 SetDraggable(false) GetDraggable():Generate() = [draggable= 'false']
 SetSpellcheck(false) GetSpellcheck():Generate() = [spellcheck= 'false']
-SetHidden(true) Generate() = [<canvas hidden= 'true' ></canvas>]
-SetHidden(true) then SetHidden(false) Generate() = [<canvas ></canvas>]
+SetHidden(true) Generate() = [<canvas hidden= 'true'></canvas>]
+SetHidden(true) then SetHidden(false) Generate() = [<canvas></canvas>]
 new element GetNumberOfAttributes() = 0
 new element GetIdentifier() is undefined = true
 AddAttribute(data-x, 1) GetAttributeValue(data-x) = [1]
@@ -21,6 +21,6 @@ HasAttribute(data-y) when absent = false
 AddAttribute(data-x, 1) twice with 2 GetAttributeValue and count = [2 count 1]
 AddAttribute(data-x, 1) RemoveAttribute(data-x):GetValue() = [1 then count 0]
 RemoveAttribute(data-z) when absent is undefined = true
-AddAttribute(data-x, 1) GenerateAttributes() = [data-x= '1' ]
+AddAttribute(data-x, 1) GenerateAttributes() = [ data-x= '1']
 Attribute SetName(alt) SetValue(A cat) Generate() = [alt= 'A cat']
 Add(Attribute alt) GetAttributeValue(alt) = [A cat]

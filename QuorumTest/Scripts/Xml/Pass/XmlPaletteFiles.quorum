@@ -1,0 +1,244 @@
+use Libraries.Data.Formats.ExtensibleMarkupReader
+use Libraries.Data.Formats.MarkupListener
+use Libraries.Data.Formats.Element
+use Libraries.Data.Formats.AttributesImplementation
+
+/*
+The ten block palette files the Quorum website uses, read as text: the web
+block editor's palette.xml and html/palette's testPalette.xml, frontPage.xml
+and dataScience1.xml to dataScience7.xml. Each file's exact contents are
+built in the script (from quorum-server's quorum-website, as of 2026-11-23),
+so the test runs without reading files. Each line names the file and prints
+the events, as below.
+
+Each file is read with a new ExtensibleMarkupReader, and its line
+prints the events this listener received, in order: Start(name attr=[value]
+...), Value[text] and End(name). Line feeds, tabs and carriage
+returns in values are shown as \n, \t and \r.
+
+Choices where the reader's documentation is silent (from XML 1.0 and the
+usual SAX conventions): one Value event for each run of character data
+between two pieces of markup (tags, comments, processing instructions), with
+entity references and CDATA sections inside the run; whitespace-only runs
+are not reported (BlockPaletteMarkupListener treats text directly inside
+palette or page as a bad file, so reporting that whitespace would reject
+every palette); names are reported as written; a document that is not
+well-formed must cause an error.
+
+The expected events were worked out with Python's own XML parser (xml.sax)
+and these rules, not by running the reader.
+*/
+class Main is MarkupListener
+    text log = ""
+    text dq = ""
+    text lf = ""
+    text tab = ""
+
+    action Main
+        dq = dq:GetDoubleQuote()
+        lf = lf:GetLineFeed()
+        tab = tab:GetTab()
+        ParseFile("WebBlockEditor/palette.xml", WebBlockEditorPalette())
+        ParseFile("html/palette/testPalette.xml", TestPalette())
+        ParseFile("html/palette/frontPage.xml", FrontPage())
+        ParseFile("html/palette/dataScience1.xml", DataScience1())
+        ParseFile("html/palette/dataScience2.xml", DataScience2())
+        ParseFile("html/palette/dataScience3.xml", DataScience3())
+        ParseFile("html/palette/dataScience4.xml", DataScience4())
+        ParseFile("html/palette/dataScience5.xml", DataScience5())
+        ParseFile("html/palette/dataScience6.xml", DataScience6())
+        ParseFile("html/palette/dataScience7.xml", DataScience7())
+    end
+
+    action ParseFile(text label, text xml)
+        log = ""
+        check
+            ExtensibleMarkupReader reader
+            reader:SetMarkupListener(me)
+            reader:Read(xml)
+            if log = ""
+                log = " (none)"
+            end
+            output label + " events:" + log
+        detect e
+            output label + " unexpected error: " + e:GetErrorMessage()
+        end
+    end
+
+    /* The exact contents of WebBlockEditor/palette.xml. */
+    action WebBlockEditorPalette returns text
+        text xml = ""
+        xml = xml + "<palette selectedPage=" + dq + "HoC" + dq + ">" + lf
+        xml = xml + "    <page name=" + dq + "HoC" + dq + ">" + lf
+        xml = xml + "        <banner>" + lf
+        xml = xml + "            <title>Hour of Code</title>" + lf
+        xml = xml + "            <subtitle>This is a small subtitle</subtitle>" + lf
+        xml = xml + "        </banner>" + lf
+        xml = xml + "        <header>Examples</header>" + lf
+        xml = xml + "        <subheading>Example 1</subheading>" + lf
+        xml = xml + "        <text>Here is what you need to do the example</text>" + lf
+        xml = xml + "        <block>output " + dq + "Hello World" + dq + "</block>" + lf
+        xml = xml + "        <block>integer num = 5</block>" + lf
+        xml = xml + "    </page>" + lf
+        xml = xml + "</palette>"
+        return xml
+    end
+
+    /* The exact contents of html/palette/testPalette.xml. */
+    action TestPalette returns text
+        text xml = ""
+        xml = xml + "<palette selectedPage=" + dq + "HoC" + dq + ">" + lf
+        xml = xml + "    <page name=" + dq + "HoC" + dq + ">" + lf
+        xml = xml + "        <banner>" + lf
+        xml = xml + "            <title>Hour of Code</title>" + lf
+        xml = xml + "            <subtitle>This is a small subtitle</subtitle>" + lf
+        xml = xml + "        </banner>" + lf
+        xml = xml + "        <header>Examples</header>" + lf
+        xml = xml + "        <subheading>Example 1</subheading>" + lf
+        xml = xml + "        <text>Here is what you need to do the example</text>" + lf
+        xml = xml + "        <block>output " + dq + "Hello World" + dq + "</block>" + lf
+        xml = xml + "        <block>integer num = 5</block>" + lf
+        xml = xml + "    </page>" + lf
+        xml = xml + "</palette>"
+        return xml
+    end
+
+    /* The exact contents of html/palette/frontPage.xml. */
+    action FrontPage returns text
+        text xml = ""
+        xml = xml + "<palette showAction=" + dq + "false" + dq + " showControl=" + dq + "false" + dq + " showBasic=" + dq + "false" + dq + " selectedPage=" + dq + "Default" + dq + ">" + lf
+        xml = xml + "    <page name=" + dq + "data-science-2" + dq + ">" + lf
+        xml = xml + "        <header>Tinker Chart</header>" + lf
+        xml = xml + "        <block>frame:AddSelectedFactors(" + dq + "Breed Group" + dq + ")</block>" + lf
+        xml = xml + "        <block>frame:AddSelectedColumns(" + dq + "Maximum Life Span" + dq + ")</block>" + lf
+        xml = xml + "        <block>frame:AddSelectedColumns(" + dq + "Maximum Weight" + dq + ")</block>" + lf
+        xml = xml + "        <block>chart:ShowPatterns(true)</block>" + lf
+        xml = xml + "        <block>chart:SetColorPaletteToDisturbing()</block>" + lf
+        xml = xml + "        <block>chart:SetColorPaletteToMagma()</block>" + lf
+        xml = xml + "    </page>" + lf
+        xml = xml + "</palette>"
+        return xml
+    end
+
+    /* The exact contents of html/palette/dataScience1.xml. */
+    action DataScience1 returns text
+        text xml = ""
+        xml = xml + "<palette showAction=" + dq + "false" + dq + " showControl=" + dq + "false" + dq + " showBasic=" + dq + "false" + dq + " selectedPage=" + dq + "Data Science" + dq + ">" + lf
+        xml = xml + "    <page name=" + dq + "Data Science" + dq + ">" + lf
+        xml = xml + "        <header>Display a Chart</header>" + lf
+        xml = xml + "        <block>chart:Display()</block>" + lf
+        xml = xml + "    </page>" + lf
+        xml = xml + "</palette>"
+        return xml
+    end
+
+    /* The exact contents of html/palette/dataScience2.xml. */
+    action DataScience2 returns text
+        text xml = ""
+        xml = xml + "<palette showAction=" + dq + "false" + dq + " showControl=" + dq + "false" + dq + " showBasic=" + dq + "false" + dq + " selectedPage=" + dq + "Data Science" + dq + ">" + lf
+        xml = xml + "    <page name=" + dq + "Data Science" + dq + ">" + lf
+        xml = xml + "        <header>Label the Chart</header>" + lf
+        xml = xml + "        <block>chart:SetTitle(" + dq + "Penguins" + dq + ")</block>" + lf
+        xml = xml + tab + tab + "<block>chart:SetSubtitle(" + dq + "Bill Depth vs Bill Length" + dq + ")</block>" + lf
+        xml = xml + tab + tab + "<block>chart:SetXAxisTitle(" + dq + "Bill Depth" + dq + ")</block>" + lf
+        xml = xml + tab + tab + "<block>chart:SetYAxisTitle(" + dq + "Bill Length" + dq + ")</block>" + lf
+        xml = xml + "    </page>" + lf
+        xml = xml + "</palette>"
+        return xml
+    end
+
+    /* The exact contents of html/palette/dataScience3.xml. */
+    action DataScience3 returns text
+        text xml = ""
+        xml = xml + "<palette showAction=" + dq + "false" + dq + " showControl=" + dq + "false" + dq + " showBasic=" + dq + "false" + dq + " selectedPage=" + dq + "Data Science" + dq + ">" + lf
+        xml = xml + "    <page name=" + dq + "Data Science" + dq + ">" + lf
+        xml = xml + "        <header>Select Columns</header>" + lf
+        xml = xml + "        <block>frame:AddSelectedColumns(" + dq + "bill_depth,bill_length,flipper_length" + dq + ")</block>" + lf
+        xml = xml + "    </page>" + lf
+        xml = xml + "</palette>"
+        return xml
+    end
+
+    /* The exact contents of html/palette/dataScience4.xml. */
+    action DataScience4 returns text
+        text xml = ""
+        xml = xml + "<palette showAction=" + dq + "false" + dq + " showControl=" + dq + "false" + dq + " showBasic=" + dq + "false" + dq + " selectedPage=" + dq + "Data Science" + dq + ">" + lf
+        xml = xml + "    <page name=" + dq + "Data Science" + dq + ">" + lf
+        xml = xml + "        <header>Select a Factor</header>" + lf
+        xml = xml + "        <block>frame:AddSelectedFactors(" + dq + "species" + dq + ")</block>" + lf
+        xml = xml + "    </page>" + lf
+        xml = xml + "</palette>"
+        return xml
+    end
+
+    /* The exact contents of html/palette/dataScience5.xml. */
+    action DataScience5 returns text
+        text xml = ""
+        xml = xml + "<palette showAction=" + dq + "false" + dq + " showControl=" + dq + "false" + dq + " showBasic=" + dq + "false" + dq + " selectedPage=" + dq + "Data Science" + dq + ">" + lf
+        xml = xml + "    <page name=" + dq + "Data Science" + dq + ">" + lf
+        xml = xml + "        <header>Change the Colors</header>" + lf
+        xml = xml + "        <block>chart:SetColorPaletteToCalm()</block>" + lf
+        xml = xml + "        <block>chart:SetColorPaletteToDisturbing()</block>" + lf
+        xml = xml + "        <block>chart:SetColorPaletteToExciting()</block>" + lf
+        xml = xml + "        <block>chart:SetColorPaletteToMagma()</block>" + lf
+        xml = xml + "        <block>chart:SetColorPaletteToPlayful()</block>" + lf
+        xml = xml + "        <block>chart:SetColorPaletteToSerious()</block>" + lf
+        xml = xml + "    </page>" + lf
+        xml = xml + "</palette>"
+        return xml
+    end
+
+    /* The exact contents of html/palette/dataScience6.xml. */
+    action DataScience6 returns text
+        text xml = ""
+        xml = xml + "<palette showAction=" + dq + "false" + dq + " showControl=" + dq + "false" + dq + " showBasic=" + dq + "false" + dq + " selectedPage=" + dq + "Data Science" + dq + ">" + lf
+        xml = xml + "    <page name=" + dq + "Data Science" + dq + ">" + lf
+        xml = xml + "        <header>Separate into Sub-Charts</header>" + lf
+        xml = xml + "        <block>chart:SeparateByFactor()</block>" + lf
+        xml = xml + "    </page>" + lf
+        xml = xml + "</palette>"
+        return xml
+    end
+
+    /* The exact contents of html/palette/dataScience7.xml. */
+    action DataScience7 returns text
+        text xml = ""
+        xml = xml + "<palette showAction=" + dq + "false" + dq + " showControl=" + dq + "false" + dq + " showBasic=" + dq + "false" + dq + " selectedPage=" + dq + "Data Science" + dq + ">" + lf
+        xml = xml + "    <page name=" + dq + "Data Science" + dq + ">" + lf
+        xml = xml + "        <header>Trying Other Charts</header>" + lf
+        xml = xml + "        <block>BarChart chart = frame:BarChart()</block>" + lf
+        xml = xml + "        <block>BoxPlot chart = frame:BoxPlot()</block>" + lf
+        xml = xml + "        <block>Histogram chart = frame:Histogram()</block>" + lf
+        xml = xml + "        <block>PieChart chart = frame:PieChart()</block>" + lf
+        xml = xml + "        <block>ScatterPlot chart = frame:ScatterPlot()</block>" + lf
+        xml = xml + "    </page>" + lf
+        xml = xml + "</palette>"
+        return xml
+    end
+
+    action Show(text value) returns text
+        text result = value:Replace(value:GetCarriageReturn(), "\r")
+        result = result:Replace(value:GetLineFeed(), "\n")
+        result = result:Replace(value:GetTab(), "\t")
+        return result
+    end
+
+    action StartElement(Element element)
+        text result = " Start(" + element:GetName()
+        AttributesImplementation attributes = element:GetAttributes()
+        integer i = 0
+        repeat while i < attributes:GetSize()
+            result = result + " " + attributes:GetName(i) + "=[" + Show(attributes:GetValue(i)) + "]"
+            i = i + 1
+        end
+        log = log + result + ")"
+    end
+
+    action Value(text value)
+        log = log + " Value[" + Show(value) + "]"
+    end
+
+    action EndElement(Element element)
+        log = log + " End(" + element:GetName() + ")"
+    end
+end

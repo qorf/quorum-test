@@ -1,4 +1,4 @@
-Input SetType(text) Generate() = [<input type= 'text' />]
+Input SetType(text) Generate() = [<input type= 'text'/>]
 Input SetName(age) GetName():Generate() = [name= 'age']
 Input SetDefaultValue(4) GetDefaultValue():Generate() = [value= '4']
 Input SetPlaceHolder(Name) GetPlaceHolder():Generate() = [placeholder= 'Name']
@@ -17,12 +17,12 @@ Input SetAutocomplete(false) GetAutocomplete() and attribute = [false off]
 Input SetAutocomplete(true) GetAutocomplete() and attribute = [true on]
 new Input GetChecked() = false
 Option SetSelected(true) GetSelected() = true
-Option SetDefaultValue(r) and AddText(Red) Generate() = [<option value= 'r' >Red</option>]
+Option SetDefaultValue(r) and AddText(Red) Generate() = [<option value= 'r'>Red</option>]
 Option SetLabel(Red) GetLabel():Generate() = [label= 'Red']
 Option SetDisabled(true) GetDisabled() = true
-Select with two AddOption Generate() = [<select ><option >A</option><option >B</option></select>]
-Select AddOption twice then RemoveOption(first) Generate() = [<select ><option >B</option></select>]
+Select with two AddOption Generate() = [<select><option>A</option><option>B</option></select>]
+Select AddOption twice then RemoveOption(first) Generate() = [<select><option>B</option></select>]
 Select SetMultiple(true) GetMultiple() = true
 Select SetName(color) GetName():Generate() = [name= 'color']
-Select with an OptionGroup holding an Option Generate() = [<select ><optgroup label= 'Warm' ><option >Red</option></optgroup></select>]
+Select with an OptionGroup holding an Option Generate() = [<select><optgroup label= 'Warm'><option>Red</option></optgroup></select>]
 OptionGroup with two options GetNumberOfOptions() = 2

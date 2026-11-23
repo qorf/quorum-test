@@ -12,7 +12,7 @@ class Main
     end
 
     action CheckResult(text result)
-        text answer = "<table ><tbody ><tr ><td >1.1</td><td >1.1</td><td >1.1</td></tr><tr ><td >1.1</td><td >1.1</td><td >1.1</td></tr><tr ><td >1.1</td><td >1.1</td><td >1.1</td></tr></tbody></table>"
+        text answer = "<table><tbody><tr><td>1.1</td><td>1.1</td><td>1.1</td></tr><tr><td>1.1</td><td>1.1</td><td>1.1</td></tr><tr><td>1.1</td><td>1.1</td><td>1.1</td></tr></tbody></table>"
         text lf = answer:GetLineFeed()
         text cr = answer:GetCarriageReturn()
         answer = answer:Replace(cr, "")

@@ -1,0 +1,392 @@
+use Libraries.Game.Graphics.ModelLoaders.WavefrontObject.WavefrontObjectLexer
+use Libraries.Game.Graphics.ModelLoaders.WavefrontObject.WavefrontObjectParser
+use Libraries.Game.Graphics.ModelLoaders.WavefrontObject.WavefrontConverterListener
+use Libraries.Game.Graphics.ModelLoaders.WavefrontObject.MaterialLexer
+use Libraries.Game.Graphics.ModelLoaders.WavefrontObject.MaterialParser
+use Libraries.Game.Graphics.ModelLoaders.WavefrontObject.MaterialConverterListener
+use Libraries.Game.Graphics.ModelLoaders.WavefrontObject.Material
+use Libraries.Game.Graphics.ModelLoaders.VertexNumbers
+use Libraries.Game.Graphics.ModelLoaders.VertexFace
+use Libraries.Containers.Array
+use Libraries.Containers.Table
+use Libraries.Compute.Vector3
+use Libraries.Compute.Math
+use Libraries.System.File
+use Libraries.System.FileReader
+
+/*
+Materials, with Assimp's OBJ reader as the expected behavior: mtllib and
+usemtl give each face its material; faces before the first usemtl are kept
+with a default material; a usemtl naming a material the .mtl doesn't have
+gets a default material instead of stopping the read; material names may
+contain spaces (Assimp's space_in_material_name.mtl); the .mtl values Ka,
+Kd, Ks, Ke, Ns, Ni, d, illum, the maps map_Kd, map_Ks, map_Ke, map_bump,
+bump, norm, disp, refl, the PBR values Pr, Pm, Ps, Pc, Pcr, aniso and maps
+map_Pr, map_Pm are read; texture options (-bm, -o, -s, -clamp, -type) come
+before the file name, which is what the map gives; and a .mtl beside an
+OBJ in another folder is found (the reader looks in the working folder).
+Each case writes its files ("/n" is a line feed) and deletes them after.
+Values a reader doesn't keep show as "not read".
+*/
+class Main
+
+    // ---------------------------------------------------------------------
+    // Reader adapter: the only part of this test that knows the OBJ reader.
+    // ModelReader:Read finishes a model with GPU meshes, so it needs a
+    // graphics window. This runs the same steps without one:
+    // ModelReader:ReadWavefrontObject's loop (a FileReader line at a time
+    // through WavefrontObjectLexer, WavefrontObjectParser and
+    // WavefrontConverterListener), its .mtl reading (MaterialLexer,
+    // MaterialParser, MaterialConverterListener, the file found the way the
+    // reader finds it), and ConstructWavefrontObject and
+    // AddToWavefrontModel's rules for parts and triangles (a corner's point
+    // is positions:Get(index - 1); each face is split by the listener's
+    // Triangulate; with materials, a Default part for faces before the
+    // first usemtl, then one part per usemtl, a usemtl missing from the
+    // .mtl files getting the default material; without materials, one part
+    // named Default if there are faces). Positions are reported in the
+    // file's own coordinates (the listener flips z; this flips it back).
+    // Updated 2026-11-23 with the OBJ reader fixes in the library.
+    // To test another reader, replace only this block.
+    // ---------------------------------------------------------------------
+    text failure = ""
+    Array<Vector3> points
+    integer colorCount = 0
+    integer fileNormalCount = 0
+    Array<Vector3> corners
+    integer cornersWithNormals = 0
+    Array<text> partNames
+    Array<integer> partTriangles
+    Array<Material> materials
+
+    action ReadObj(text path) returns boolean
+        failure = ""
+        points:Empty()
+        colorCount = 0
+        fileNormalCount = 0
+        corners:Empty()
+        cornersWithNormals = 0
+        partNames:Empty()
+        partTriangles:Empty()
+        materials:Empty()
+        check
+            WavefrontConverterListener listener
+            File file
+            file:SetPath(path)
+            FileReader reader
+            reader:OpenForRead(file)
+            repeat while not reader:IsAtEndOfFile()
+                text value = reader:ReadLine()
+                WavefrontObjectLexer lexer
+                lexer:SetListener(listener)
+                lexer:Read(value)
+                WavefrontObjectParser parser
+                parser:SetListener(listener)
+                parser:Parse(lexer)
+            end
+            reader:Close()
+
+            Array<text> libraries = listener:GetMaterialLibraries()
+            integer i = 0
+            repeat while i < libraries:GetSize()
+                MaterialConverterListener materialListener
+                File materialFile
+                File parentDirectory = file:GetParentDirectory()
+                materialFile:SetWorkingDirectory(parentDirectory:GetWorkingDirectory())
+                materialFile:SetPath(libraries:Get(i))
+                FileReader materialReader
+                materialReader:OpenForRead(materialFile)
+                repeat while not materialReader:IsAtEndOfFile()
+                    text line = materialReader:ReadLine()
+                    MaterialLexer materialLexer
+                    materialLexer:SetListener(materialListener)
+                    materialLexer:Read(line)
+                    MaterialParser materialParser
+                    materialParser:SetListener(materialListener)
+                    materialParser:Parse(materialLexer)
+                end
+                materialReader:Close()
+                Array<Material> found = materialListener:GetMaterials()
+                integer k = 0
+                repeat while k < found:GetSize()
+                    materials:Add(found:Get(k))
+                    k = k + 1
+                end
+                i = i + 1
+            end
+
+            Array<VertexNumbers> positions = listener:GetPositions()
+            integer p = 0
+            repeat while p < positions:GetSize()
+                VertexNumbers position = positions:Get(p)
+                Vector3 vector = position:GetVector()
+                Vector3 point
+                point:Set(vector:GetX(), vector:GetY(), -vector:GetZ())
+                points:Add(point)
+                p = p + 1
+            end
+            fileNormalCount = listener:GetNormals():GetSize()
+            colorCount = listener:GetColors():GetSize()
+
+            Table<VertexFace> faces = listener:GetFaces()
+            Array<integer> materialIndices = listener:GetUseMaterialIndices()
+            Array<text> materialNames = listener:GetUseMaterialNames()
+            if materials:GetSize() > 0
+                integer firstUse = faces:GetNumberOfRows()
+                if materialIndices:GetSize() > 0
+                    firstUse = materialIndices:Get(0)
+                end
+                if firstUse > 0
+                    AddPart("Default", faces, 0, firstUse, listener)
+                end
+                integer counter = 0
+                repeat while counter < materialIndices:GetSize()
+                    integer startIndex = materialIndices:Get(counter)
+                    integer endIndex = faces:GetNumberOfRows()
+                    if counter + 1 not= materialIndices:GetSize()
+                        endIndex = materialIndices:Get(counter + 1)
+                    end
+                    AddPart(materialNames:Get(counter), faces, startIndex, endIndex, listener)
+                    counter = counter + 1
+                end
+            elseif faces:GetNumberOfRows() > 0
+                AddPart("Default", faces, 0, faces:GetNumberOfRows(), listener)
+            end
+            return true
+        detect e
+            failure = e:GetErrorMessage()
+            return false
+        end
+        return false
+    end
+
+    private action AddPart(text name, Table<VertexFace> faces, integer startIndex, integer endIndex, WavefrontConverterListener listener)
+        integer count = 0
+        integer row = startIndex
+        repeat while row < endIndex
+            Array<VertexFace> triangles = listener:Triangulate(faces:GetRow(row))
+            integer k = 0
+            repeat while k + 2 < triangles:GetSize()
+                AddCorner(triangles:Get(k))
+                AddCorner(triangles:Get(k + 1))
+                AddCorner(triangles:Get(k + 2))
+                count = count + 1
+                k = k + 3
+            end
+            row = row + 1
+        end
+        partNames:Add(name)
+        partTriangles:Add(count)
+    end
+
+    private action AddCorner(VertexFace corner)
+        corners:Add(points:Get(corner:GetPosition() - 1))
+        if corner:HasNormal()
+            cornersWithNormals = cornersWithNormals + 1
+        end
+    end
+
+    /* The material with the name, or undefined. */
+    action GetMaterial(text name) returns Material
+        integer i = 0
+        repeat while i < materials:GetSize()
+            Material material = materials:Get(i)
+            if material:GetName() = name
+                return material
+            end
+            i = i + 1
+        end
+        return undefined
+    end
+
+    /*
+        A material value by its .mtl keyword, as text ("not read" if the
+        reader keeps no such value): colors as "r g b", numbers as numbers,
+        texture maps as the file name.
+    */
+    action GetMaterialValue(text name, text key) returns text
+        Material material = GetMaterial(name)
+        if material = undefined
+            return "no material named " + name
+        end
+        if key = "Ka" and material:HasAmbientColor()
+            return Show(material:GetAmbientColor())
+        elseif key = "Kd" and material:HasDiffuseColor()
+            return Show(material:GetDiffuseColor())
+        elseif key = "Ks" and material:HasSpecularColor()
+            return Show(material:GetSpecularColor())
+        elseif key = "Ke" and material:HasEmissiveColor()
+            return Show(material:GetEmissiveColor())
+        elseif key = "Tf" and material:HasTransmissionFilter()
+            return Show(material:GetTransmissionFilter())
+        elseif key = "illum" and material:HasIllumination()
+            return "" + material:GetIllumination()
+        elseif key = "Ns" and material:HasShininess()
+            return "" + material:GetShininess()
+        elseif key = "Tr" and material:HasTransparency()
+            return "" + material:GetTransparency()
+        elseif key = "d" and material:HasDissolve()
+            return "" + material:GetDissolve()
+        elseif key = "Ni" and material:HasOpticalDensity()
+            return "" + material:GetOpticalDensity()
+        elseif key = "map_Ka" and material:HasTextureAmbient()
+            return material:GetTextureAmbient()
+        elseif key = "map_Kd" and material:HasTextureDiffuse()
+            return material:GetTextureDiffuse()
+        elseif key = "map_Ks" and material:HasTextureSpecular()
+            return material:GetTextureSpecular()
+        elseif key = "map_Ns" and material:HasTextureSpecularExponent()
+            return material:GetTextureSpecularExponent()
+        elseif key = "map_d" and material:HasTextureDissolve()
+            return material:GetTextureDissolve()
+        elseif material:HasValue(key)
+            return material:GetValue(key)
+        end
+        return "not read"
+    end
+    // ---- end of the reader adapter ----
+
+    action Show(Vector3 vector) returns text
+        return "" + vector:GetX() + " " + vector:GetY() + " " + vector:GetZ()
+    end
+
+    action Point(Vector3 vector) returns text
+        return "(" + vector:GetX() + ", " + vector:GetY() + ", " + vector:GetZ() + ")"
+    end
+
+    /* Writes the text to a file in the run folder, replacing "/n" with a line feed. */
+    action Write(text name, text content)
+        text lf = ""
+        lf = lf:GetLineFeed()
+        File file
+        file:SetPath(name)
+        file:Write(content:Replace("/n", lf))
+    end
+
+    action Remove(text name)
+        File file
+        file:SetPath(name)
+        if file:Exists()
+            boolean removed = file:Delete()
+        end
+    end
+
+    /* Points, triangles and parts after reading, or the error. */
+    action Summary returns text
+        if failure not= ""
+            return "read fails: " + failure
+        end
+        text parts = ""
+        integer i = 0
+        repeat while i < partNames:GetSize()
+            if i > 0
+                parts = parts + ", "
+            end
+            parts = parts + partNames:Get(i) + " " + partTriangles:Get(i)
+            i = i + 1
+        end
+        return "points " + points:GetSize() + ", triangles " + (corners:GetSize() / 3) + ", parts [" + parts + "]"
+    end
+
+    action Main
+        text dq = ""
+        dq = dq:GetDoubleQuote()
+        check
+            Write("ObjReaderMaterials-basic.obj", "mtllib ObjReaderMaterials-basic.mtl/nv 0 0 0/nv 1 0 0/nv 0 1 0/nusemtl red/nf 1 2 3/n")
+            Write("ObjReaderMaterials-basic.mtl", "newmtl red/nKd 1 0 0/n")
+            boolean ok = ReadObj("ObjReaderMaterials-basic.obj")
+            output "A material library and usemtl: " + Summary() + ", red Kd = " + GetMaterialValue("red", "Kd")
+        detect e
+            output "A material library and usemtl unexpected error: " + e:GetErrorMessage()
+        end
+        Remove("ObjReaderMaterials-basic.obj")
+        Remove("ObjReaderMaterials-basic.mtl")
+        check
+            Write("ObjReaderMaterials-before.obj", "mtllib ObjReaderMaterials-before.mtl/nv 0 0 0/nv 1 0 0/nv 0 1 0/nv 1 1 0/nf 1 2 3/nusemtl red/nf 2 4 3/n")
+            Write("ObjReaderMaterials-before.mtl", "newmtl red/nKd 1 0 0/n")
+            boolean ok = ReadObj("ObjReaderMaterials-before.obj")
+            output "Faces before the first usemtl are kept, with a default material: " + "triangles " + (corners:GetSize() / 3) + ", parts " + partNames:GetSize()
+        detect e
+            output "Faces before the first usemtl are kept, with a default material unexpected error: " + e:GetErrorMessage()
+        end
+        Remove("ObjReaderMaterials-before.obj")
+        Remove("ObjReaderMaterials-before.mtl")
+        check
+            Write("ObjReaderMaterials-unknown.obj", "mtllib ObjReaderMaterials-unknown.mtl/nv 0 0 0/nv 1 0 0/nv 0 1 0/nusemtl blue/nf 1 2 3/n")
+            Write("ObjReaderMaterials-unknown.mtl", "newmtl red/nKd 1 0 0/n")
+            boolean ok = ReadObj("ObjReaderMaterials-unknown.obj")
+            output "A usemtl naming a material that isn't in the .mtl gets a default material: " + "triangles " + (corners:GetSize() / 3) + ", parts " + partNames:GetSize()
+        detect e
+            output "A usemtl naming a material that isn't in the .mtl gets a default material unexpected error: " + e:GetErrorMessage()
+        end
+        Remove("ObjReaderMaterials-unknown.obj")
+        Remove("ObjReaderMaterials-unknown.mtl")
+        check
+            Write("ObjReaderMaterials-spaces.obj", "mtllib ObjReaderMaterials-spaces.mtl/nv 0 0 0/nv 1 0 0/nv 0 1 0/nusemtl my red paint/nf 1 2 3/n")
+            Write("ObjReaderMaterials-spaces.mtl", "newmtl my red paint/nKd 1 0 0/n")
+            boolean ok = ReadObj("ObjReaderMaterials-spaces.obj")
+            output "Material names with spaces: " + Summary() + ", Kd = " + GetMaterialValue("my red paint", "Kd")
+        detect e
+            output "Material names with spaces unexpected error: " + e:GetErrorMessage()
+        end
+        Remove("ObjReaderMaterials-spaces.obj")
+        Remove("ObjReaderMaterials-spaces.mtl")
+        check
+            Write("ObjReaderMaterials-full.obj", "mtllib ObjReaderMaterials-full.mtl/nv 0 0 0/nv 1 0 0/nv 0 1 0/nusemtl full/nf 1 2 3/n")
+            Write("ObjReaderMaterials-full.mtl", "newmtl full/nKa 0.1 0.2 0.3/nKd 0.4 0.5 0.6/nKs 0.7 0.8 0.9/nKe 0.25 0.5 0.75/nNs 96/nNi 1.5/nd 0.75/nillum 2/nmap_Kd diffuse.png/nmap_Ks specular.png/nmap_Ke emissive.png/nmap_bump bumpy.png/nbump bump.png/nnorm normal.png/ndisp displace.png/nrefl -type sphere reflect.png/nPr 0.25/nPm 0.5/nPs 0.125/nPc 0.75/nPcr 0.0625/naniso 0.375/nmap_Pr rough.png/nmap_Pm metal.png/n")
+            boolean ok = ReadObj("ObjReaderMaterials-full.obj")
+            output "Material value Ka = " + GetMaterialValue("full", "Ka")
+            output "Material value Kd = " + GetMaterialValue("full", "Kd")
+            output "Material value Ks = " + GetMaterialValue("full", "Ks")
+            output "Material value Ke = " + GetMaterialValue("full", "Ke")
+            output "Material value Ns = " + GetMaterialValue("full", "Ns")
+            output "Material value Ni = " + GetMaterialValue("full", "Ni")
+            output "Material value d = " + GetMaterialValue("full", "d")
+            output "Material value illum = " + GetMaterialValue("full", "illum")
+            output "Material value map_Kd = " + GetMaterialValue("full", "map_Kd")
+            output "Material value map_Ks = " + GetMaterialValue("full", "map_Ks")
+            output "Material value map_Ke = " + GetMaterialValue("full", "map_Ke")
+            output "Material value map_bump = " + GetMaterialValue("full", "map_bump")
+            output "Material value bump = " + GetMaterialValue("full", "bump")
+            output "Material value norm = " + GetMaterialValue("full", "norm")
+            output "Material value disp = " + GetMaterialValue("full", "disp")
+            output "Material value refl = " + GetMaterialValue("full", "refl")
+            output "Material value Pr = " + GetMaterialValue("full", "Pr")
+            output "Material value Pm = " + GetMaterialValue("full", "Pm")
+            output "Material value Ps = " + GetMaterialValue("full", "Ps")
+            output "Material value Pc = " + GetMaterialValue("full", "Pc")
+            output "Material value Pcr = " + GetMaterialValue("full", "Pcr")
+            output "Material value aniso = " + GetMaterialValue("full", "aniso")
+            output "Material value map_Pr = " + GetMaterialValue("full", "map_Pr")
+            output "Material value map_Pm = " + GetMaterialValue("full", "map_Pm")
+        detect e
+            output "Material values unexpected error: " + e:GetErrorMessage()
+        end
+        Remove("ObjReaderMaterials-full.obj")
+        Remove("ObjReaderMaterials-full.mtl")
+        check
+            Write("ObjReaderMaterials-options.obj", "mtllib ObjReaderMaterials-options.mtl/nv 0 0 0/nv 1 0 0/nv 0 1 0/nusemtl options/nf 1 2 3/n")
+            Write("ObjReaderMaterials-options.mtl", "newmtl options/nmap_Kd -bm 0.5 -o 1 2 3 -s 2 2 2 -clamp on texture.png/nmap_bump -bm 2 bumps.png/n")
+            boolean ok = ReadObj("ObjReaderMaterials-options.obj")
+            output "Texture options (-bm, -o, -s, -clamp) before the file name: map_Kd = " + GetMaterialValue("options", "map_Kd") + ", map_bump = " + GetMaterialValue("options", "map_bump")
+        detect e
+            output "Texture options unexpected error: " + e:GetErrorMessage()
+        end
+        Remove("ObjReaderMaterials-options.obj")
+        Remove("ObjReaderMaterials-options.mtl")
+        check
+            File folder
+            folder:SetPath("ObjReaderMaterialsFolder")
+            folder:CreateDirectories()
+            Write("ObjReaderMaterialsFolder/model.obj", "mtllib model.mtl/nv 0 0 0/nv 1 0 0/nv 0 1 0/nusemtl red/nf 1 2 3/n")
+            Write("ObjReaderMaterialsFolder/model.mtl", "newmtl red/nKd 1 0 0/n")
+            boolean ok = ReadObj("ObjReaderMaterialsFolder/model.obj")
+            output "A .mtl beside an OBJ in another folder is found: " + Summary() + ", red Kd = " + GetMaterialValue("red", "Kd")
+        detect e
+            output "A .mtl beside an OBJ in another folder unexpected error: " + e:GetErrorMessage()
+        end
+        File cleanup
+        cleanup:SetPath("ObjReaderMaterialsFolder")
+        cleanup:Delete(true)
+    end
+end

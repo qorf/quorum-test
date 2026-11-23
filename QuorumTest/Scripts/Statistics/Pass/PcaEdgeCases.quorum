@@ -1,0 +1,92 @@
+use Libraries.Compute.Math
+use Libraries.Compute.Vector
+use Libraries.Compute.Statistics.DataFrame
+use Libraries.Compute.Statistics.Tests.PrincipalComponentAnalysis
+use Libraries.Compute.Statistics.Reporting.PrincipalComponentAnalysisResult
+
+/*
+PrincipalComponentAnalysis at the edges: three uncorrelated variables
+(eigenvalues 1, 1, 1); a variable that is exactly twice another, so their
+correlation is 1 (eigenvalues 2 and 0, and one component explains both
+entirely, communality 1); and a constant variable, whose correlation with
+anything is undefined (0 / 0), which must be an error, not NaN results.
+
+The data columns are built from the 8-point Hadamard vectors (+1 and -1 in
+fixed patterns, each summing to 0 and orthogonal to the others), so their
+correlations are exact and the answers can be worked out by hand.
+PrincipalComponentAnalysis uses the correlation matrix. Only values that
+don't depend on arbitrary choices are printed: a loading's sign is a
+convention, so loadings are shown as absolute values, and where eigenvalues
+repeat only values that are the same for every choice of components are
+checked. Values are rounded to 6 places.
+*/
+class Main
+    Math math
+
+    action Clean(number value) returns number
+        return math:Round(value, 6)
+    end
+
+    action ShowVector(Vector values) returns text
+        text result = "["
+        integer i = 0
+        repeat while i < values:GetSize()
+            if i > 0
+                result = result + ", "
+            end
+            result = result + Clean(values:Get(i))
+            i = i + 1
+        end
+        return result + "]"
+    end
+
+    /* The absolute loading of a variable (row) on a component (column). */
+    action Loading(PrincipalComponentAnalysisResult result, integer row, integer component) returns number
+        DataFrame loadings = result:GetFactorLoadings()
+        return math:AbsoluteValue(loadings:GetColumn(component):GetAsNumber(row))
+    end
+
+    action Signed(PrincipalComponentAnalysisResult result, integer row, integer component) returns number
+        DataFrame loadings = result:GetFactorLoadings()
+        return loadings:GetColumn(component):GetAsNumber(row)
+    end
+
+    action Load(text csv) returns DataFrame
+        DataFrame frame
+        frame:LoadFromCommaSeparatedValue(csv)
+        frame:SelectAllColumns()
+        return frame
+    end
+
+    action Main
+        text lf = ""
+        lf = lf:GetLineFeed()
+        check
+            DataFrame frame = Load("v1,v2,v3" + lf + "1,1,1" + lf + "-1,1,-1" + lf + "1,-1,-1" + lf + "-1,-1,1" + lf + "1,1,1" + lf + "-1,1,-1" + lf + "1,-1,-1" + lf + "-1,-1,1")
+            PrincipalComponentAnalysis pca
+            pca:Calculate(frame, 1)
+            PrincipalComponentAnalysisResult result = pca:GetResult()
+            output "Three uncorrelated variables: eigenvalues " + ShowVector(result:GetEigenvalues())
+        detect e
+            output "Three uncorrelated variables unexpected error: " + e:GetErrorMessage()
+        end
+        check
+            DataFrame frame = Load("v1,v2" + lf + "1,2" + lf + "2,4" + lf + "3,6" + lf + "4,8" + lf + "5,10" + lf + "6,12" + lf + "7,14" + lf + "8,16")
+            PrincipalComponentAnalysis pca
+            pca:Calculate(frame, 1)
+            PrincipalComponentAnalysisResult result = pca:GetResult()
+            output "A variable that is twice another (r = 1): eigenvalues " + ShowVector(result:GetEigenvalues()) + ", communality " + ShowVector(result:GetCommunality())
+        detect e
+            output "A variable that is twice another (r = 1) unexpected error: " + e:GetErrorMessage()
+        end
+        check
+            DataFrame frame = Load("v1,v2" + lf + "1,5" + lf + "2,5" + lf + "3,5" + lf + "4,5" + lf + "5,5" + lf + "6,5" + lf + "7,5" + lf + "8,5")
+            PrincipalComponentAnalysis pca
+            pca:Calculate(frame, 1)
+            PrincipalComponentAnalysisResult result = pca:GetResult()
+            output "A constant variable should fail but gave eigenvalues " + ShowVector(result:GetEigenvalues())
+        detect e
+            output "A constant variable (no variance, so no correlation) fails, as it should"
+        end
+    end
+end

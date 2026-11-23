@@ -1,0 +1,140 @@
+use Libraries.Data.Formats.ExtensibleMarkupReader
+use Libraries.Data.Formats.MarkupListener
+use Libraries.Data.Formats.Element
+use Libraries.Data.Formats.AttributesImplementation
+
+/*
+Block palettes written in the different ways people write them: tab
+and space indentation, Windows line ends, no line ends at all; block code
+with double quotes, parentheses, colons and > written plainly, and < and &
+written as &lt; and &amp;; an apostrophe in a header; non-ASCII text (an
+accented letter and an emoji, written directly and as character
+references); single-quoted attributes, spaces around =, a page name with
+spaces, attributes on two lines; a comment between blocks, an XML
+declaration and a comment before the root; empty and self-closing blocks
+and pages; leading and trailing spaces inside a block (the listener trims
+them, so the reader must pass them on); a block spanning lines; code in a
+CDATA section.
+
+Each case reads one small document with a new ExtensibleMarkupReader and
+prints the events this listener received, in order: Start(name attr=[value]
+...), Value[text] and End(name). The document in each line is written with
+line feeds, tabs and carriage returns shown as \n, \t and \r.
+
+In the source, a document is written with ` for a double quote, ^ for a line
+feed, ~ for a tab and @ for a carriage return; Build turns those into the real
+characters, since Quorum text literals have no escapes.
+
+Choices where the reader's documentation is silent (from XML 1.0 and the
+usual SAX conventions): one Value event for each run of character data
+between two pieces of markup (tags, comments, processing instructions), with
+entity references and CDATA sections inside the run; whitespace-only runs
+are not reported (BlockPaletteMarkupListener treats text directly inside
+palette or page as a bad file, so reporting that whitespace would reject
+every palette); names are reported as written; a document that is not
+well-formed must cause an error.
+
+The expected events were worked out with Python's own XML parser (xml.sax)
+and these rules, not by running the reader.
+*/
+class Main is MarkupListener
+    text log = ""
+
+    action Main
+        Parse("<palette>^~<page name=`P`>^~~<header>Tabs</header>^~~<block>a = 1</block>^~</page>^</palette>")
+        Parse("<palette>^    <page name=`P`>^        <header>Spaces</header>^        <block>a = 1</block>^    </page>^</palette>")
+        Parse("<palette>@^  <page name=`P`>@^    <header>Windows</header>@^    <block>a = 1</block>@^  </page>@^</palette>@^")
+        Parse("<palette><page name=`P`><header>One line</header><block>a = 1</block></page></palette>")
+        Parse("<palette><page name=`P`><block>output `x: ` + (a + b) > 2</block></page></palette>")
+        Parse("<palette><page name=`P`><block>if a &lt; b and c &amp; d</block></page></palette>")
+        Parse("<palette><page name=`P`><block>a = b -> c &gt;= d</block></page></palette>")
+        Parse("<palette><page name=`P`><header>Let's start</header></page></palette>")
+        Parse("<palette><page name=`P`><block>output `it&apos;s &quot;q&quot;`</block></page></palette>")
+        Parse("<palette><page name=`P`><header>Café 😀</header><block>output `naïve 😀`</block></page></palette>")
+        Parse("<palette><page name=`P`><block>output `&#233;&#x1F600;`</block></page></palette>")
+        Parse("<palette selectedPage='P'><page name='P'><block>a</block></page></palette>")
+        Parse("<palette selectedPage = `P`><page name  =  `P`><block>a</block></page></palette>")
+        Parse("<palette selectedPage=`Data Science`><page name=`Data Science`><block>a</block></page></palette>")
+        Parse("<palette selectedPage=`P` showBasic=`false`^    showControl=`false`><page name=`P`/></palette>")
+        Parse("<palette><page name=`P`>^<block>a</block>^<!-- the second block -->^<block>b</block>^</page></palette>")
+        Parse("<?xml version=`1.0` encoding=`UTF-8`?>^<palette><page name=`P`><block>a</block></page></palette>^")
+        Parse("<!-- a palette -->^<palette><page name=`P`><block>a</block></page></palette>")
+        Parse("<palette><page name=`P`><block></block><block/></page></palette>")
+        Parse("<palette><page name=`x`/></palette>")
+        Parse("<palette/>")
+        Parse("<palette><page name=`P`><block>   output 1   </block></page></palette>")
+        Parse("<palette><page name=`P`><block>~output 1~</block></page></palette>")
+        Parse("<palette><page name=`P`><block>repeat 3 times^    output `hi`^end</block></page></palette>")
+        Parse("<palette><page name=`P`><block>a = 1@^b = 2</block></page></palette>")
+        Parse("<palette><page name=`P`><block><![CDATA[if a < b and c & d]]></block></page></palette>")
+    end
+
+    action Build(text raw) returns text
+        text dq = ""
+        dq = dq:GetDoubleQuote()
+        text result = raw:Replace("`", dq)
+        result = result:Replace("^", dq:GetLineFeed())
+        result = result:Replace("~", dq:GetTab())
+        result = result:Replace("@", dq:GetCarriageReturn())
+        return result
+    end
+
+    action Parse(text raw)
+        text xml = Build(raw)
+        log = ""
+        check
+            ExtensibleMarkupReader reader
+            reader:SetMarkupListener(me)
+            reader:Read(xml)
+            if log = ""
+                log = " (none)"
+            end
+            output "Read(" + Show(xml) + ") events:" + log
+        detect e
+            output "Read(" + Show(xml) + ") unexpected error: " + e:GetErrorMessage()
+        end
+    end
+
+    action ParseFail(text raw)
+        text xml = Build(raw)
+        log = ""
+        check
+            ExtensibleMarkupReader reader
+            reader:SetMarkupListener(me)
+            reader:Read(xml)
+            if log = ""
+                log = " (none)"
+            end
+            output "Read(" + Show(xml) + ") should fail but returned events:" + log
+        detect e
+            output "Read(" + Show(xml) + ") fails, as it should"
+        end
+    end
+
+
+    action Show(text value) returns text
+        text result = value:Replace(value:GetCarriageReturn(), "\r")
+        result = result:Replace(value:GetLineFeed(), "\n")
+        result = result:Replace(value:GetTab(), "\t")
+        return result
+    end
+
+    action StartElement(Element element)
+        text result = " Start(" + element:GetName()
+        AttributesImplementation attributes = element:GetAttributes()
+        integer i = 0
+        repeat while i < attributes:GetSize()
+            result = result + " " + attributes:GetName(i) + "=[" + Show(attributes:GetValue(i)) + "]"
+            i = i + 1
+        end
+        log = log + result + ")"
+    end
+
+    action Value(text value)
+        log = log + " Value[" + Show(value) + "]"
+    end
+
+    action EndElement(Element element)
+        log = log + " End(" + element:GetName() + ")"
+    end
+end

@@ -9,7 +9,8 @@ IsAtEndOfFile, Close) and File's OpenForRead and Close, inside a scratch
 folder (FileTestsWork/FileReaderActions), deleted at the end. The test file
 holds "alpha", "beta" and "gamma" on three lines, with no line feed after
 the last. As the documentation says: Read(integer) past the end returns only
-what is left; Read and Read(integer) at the end raise an EndOfFileError;
+what is left; Read at the end returns an empty text, and Read(integer)
+at the end raises an EndOfFileError;
 Read(0) raises an InvalidArgumentError; opening a missing file raises an
 error; File's OpenForRead on a missing file returns undefined.
 */
@@ -39,9 +40,9 @@ class Main
         end
         check
             text value = reader:Read()
-            output "Read() at the end of the file should fail but returned [" + value + "]"
+            output "Read() at the end of the file = [" + value + "]"
         detect e
-            output "Read() at the end of the file fails, as it should"
+            output "Read() at the end of the file unexpected error: " + e:GetErrorMessage()
         end
         check
             text value = reader:Read(2)

@@ -1,0 +1,66 @@
+use Libraries.Containers.Array
+use Libraries.Containers.Support.Comparison
+
+/*
+    A Comparison must return exactly -1 (the left item is smaller), 0
+    (equal) or 1 (larger), as the Comparison documentation says: Sort tests
+    for those values, which is faster than testing for any negative or
+    positive number, so a Compare that returns left - right isn't supported.
+    This Comparison compares the two values and returns the matching
+    constant, which also stays right where a difference would overflow
+    (2147483647 - -2147483648). Ascending, with a duplicate.
+*/
+class Main is Comparison
+    action Compare(Object left, Object right) returns integer
+        Integer l = cast(Integer, left)
+        Integer r = cast(Integer, right)
+        if l:GetValue() < r:GetValue()
+            return parent:Comparison:SMALLER
+        elseif l:GetValue() > r:GetValue()
+            return parent:Comparison:LARGER
+        end
+        return parent:Comparison:EQUAL
+    end
+
+    action DescribeNumbers(Array<integer> array) returns text
+        text result = "["
+        integer i = 0
+        repeat while i < array:GetSize()
+            if i > 0
+                result = result + ","
+            end
+            result = result + array:Get(i)
+            i = i + 1
+        end
+        return result + "]"
+    end
+
+    action Main
+        Array<integer> numbers
+        numbers:Add(30)
+        numbers:Add(10)
+        numbers:Add(2147483647)
+        numbers:Add(20)
+        //the smallest integer, which can't be written as one literal
+        numbers:Add(-2147483647 - 1)
+        numbers:Add(5)
+        numbers:Add(10)
+        numbers:Add(0)
+        check
+            numbers:Sort(me)
+            output "Array[30,10,2147483647,20,-2147483648,5,10,0] Sort(Compare returning -1, 0 or 1) gives " + DescribeNumbers(numbers)
+        detect e
+            output "Array[30,10,2147483647,20,-2147483648,5,10,0] Sort unexpected error: " + e:GetErrorMessage()
+        end
+
+        Array<integer> pair
+        pair:Add(3)
+        pair:Add(1)
+        check
+            pair:Sort(me)
+            output "Array[3,1] Sort(Compare returning -1, 0 or 1) gives " + DescribeNumbers(pair)
+        detect e
+            output "Array[3,1] Sort unexpected error: " + e:GetErrorMessage()
+        end
+    end
+end

@@ -95,7 +95,7 @@ class TesterCatalog
         Add("Physics", "Physics", GAME, 93)
         Add("RenderTrees", "Render trees", GAME, 22)
         Add("Worlds", "Worlds", GAME, 22)
-        Add("ObjReader", "OBJ reader", GAME, 5)
+        Add("ObjReader", "OBJ reader", GAME, 6)
         Add("Compute", "Compute", COMPUTE, 5)
         Add("Statistics", "Statistics", SCIENCE, 31)
     end

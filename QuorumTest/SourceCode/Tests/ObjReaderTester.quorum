@@ -1,0 +1,46 @@
+package Libraries.Language.Compile.Test
+use Libraries.Testing.QuorumTest
+use Libraries.Testing.ScriptCheck
+
+/*
+Tests the Wavefront OBJ reader (ModelReader's ReadWavefrontObject and the
+WavefrontObject classes) against Assimp's OBJ reader as the expected
+behavior: lines it must accept, face indices (relative ones too),
+triangulating polygons (concave ones too), materials and .mtl values, and
+normals. Each script reaches the reader through one marked "reader adapter"
+block, the only code that knows the reader: ModelReader:Read needs a
+graphics window, so the adapter runs the reader's parsing and its rules for
+parts and triangles without one. To test a new reader, change only that
+block in each script. Many cases fail with today's reader on purpose.
+Bytecode only: the scripts write their OBJ and .mtl files (no File on
+Python; JavaScript's File treats paths as web addresses), and the model
+loaders are Game code.
+*/
+class ObjReaderTester
+    QuorumTest suite = undefined
+    ScriptCheck scripts
+    text path = "Scripts/ObjReader/Pass/"
+
+    action Test
+        scripts:SetSuite(suite)
+        scripts:Check(path + "ObjReaderLines", false, false)
+        scripts:Check(path + "ObjReaderIndices", false, false)
+        scripts:Check(path + "ObjReaderPolygons", false, false)
+        scripts:Check(path + "ObjReaderMaterials", false, false)
+        scripts:Check(path + "ObjReaderNormals", false, false)
+        // The three token and setter bugs fixed on 2026-11-23 (no files written).
+        scripts:Check(path + "ObjReaderTokens", false, false)
+    end
+
+    action GetName returns text
+        return "OBJ Reader Tests"
+    end
+
+    action GetCompilerTestSuite returns QuorumTest
+        return suite
+    end
+
+    action SetCompilerTestSuite(QuorumTest suite)
+        me:suite = suite
+    end
+end

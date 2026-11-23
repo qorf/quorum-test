@@ -1,0 +1,75 @@
+use Libraries.Compute.Math
+use Libraries.Compute.Vector
+use Libraries.Compute.Statistics.DataFrame
+use Libraries.Compute.Statistics.Tests.PrincipalComponentAnalysis
+use Libraries.Compute.Statistics.Reporting.PrincipalComponentAnalysisResult
+
+/*
+PrincipalComponentAnalysis on three variables that all correlate 0.5: the
+eigenvalues are 1 + 2r and 1 - r twice (2, 0.5, 0.5); the first
+component's loadings are the square root of (1 + 2r) / 3 (0.816497), its
+communality 2/3 and its proportion of variance 2/3.
+
+The data columns are built from the 8-point Hadamard vectors (+1 and -1 in
+fixed patterns, each summing to 0 and orthogonal to the others), so their
+correlations are exact and the answers can be worked out by hand.
+PrincipalComponentAnalysis uses the correlation matrix. Only values that
+don't depend on arbitrary choices are printed: a loading's sign is a
+convention, so loadings are shown as absolute values, and where eigenvalues
+repeat only values that are the same for every choice of components are
+checked. Values are rounded to 6 places.
+*/
+class Main
+    Math math
+
+    action Clean(number value) returns number
+        return math:Round(value, 6)
+    end
+
+    action ShowVector(Vector values) returns text
+        text result = "["
+        integer i = 0
+        repeat while i < values:GetSize()
+            if i > 0
+                result = result + ", "
+            end
+            result = result + Clean(values:Get(i))
+            i = i + 1
+        end
+        return result + "]"
+    end
+
+    /* The absolute loading of a variable (row) on a component (column). */
+    action Loading(PrincipalComponentAnalysisResult result, integer row, integer component) returns number
+        DataFrame loadings = result:GetFactorLoadings()
+        return math:AbsoluteValue(loadings:GetColumn(component):GetAsNumber(row))
+    end
+
+    action Signed(PrincipalComponentAnalysisResult result, integer row, integer component) returns number
+        DataFrame loadings = result:GetFactorLoadings()
+        return loadings:GetColumn(component):GetAsNumber(row)
+    end
+
+    action Load(text csv) returns DataFrame
+        DataFrame frame
+        frame:LoadFromCommaSeparatedValue(csv)
+        frame:SelectAllColumns()
+        return frame
+    end
+
+    action Main
+        text lf = ""
+        lf = lf:GetLineFeed()
+        check
+            DataFrame frame = Load("v1,v2,v3" + lf + "2,2,2" + lf + "0,-2,0" + lf + "0,0,2" + lf + "-2,0,0" + lf + "2,2,0" + lf + "0,-2,-2" + lf + "0,0,0" + lf + "-2,0,-2")
+            PrincipalComponentAnalysis pca
+            pca:Calculate(frame, 1)
+            PrincipalComponentAnalysisResult result = pca:GetResult()
+            output "Three variables, r = 0.5: eigenvalues " + ShowVector(result:GetEigenvalues())
+            output "Three variables, r = 0.5, 1 component: loadings " + Clean(Loading(result, 0, 0)) + ", " + Clean(Loading(result, 1, 0)) + ", " + Clean(Loading(result, 2, 0)) + ", communality " + ShowVector(result:GetCommunality())
+            output "Three variables, r = 0.5, 1 component: variance accounted for " + ShowVector(result:GetVarianceAccountedFor()) + ", proportion " + ShowVector(result:GetProportionVariance())
+        detect e
+            output "Three variables, r = 0.5 unexpected error: " + e:GetErrorMessage()
+        end
+    end
+end

@@ -1,0 +1,30 @@
+A material library and usemtl: points 3, triangles 1, parts [red 1], red Kd = 1.0 0.0 0.0
+Faces before the first usemtl are kept, with a default material: triangles 2, parts 2
+A usemtl naming a material that isn't in the .mtl gets a default material: triangles 1, parts 1
+Material names with spaces: points 3, triangles 1, parts [my red paint 1], Kd = 1.0 0.0 0.0
+Material value Ka = 0.1 0.2 0.3
+Material value Kd = 0.4 0.5 0.6
+Material value Ks = 0.7 0.8 0.9
+Material value Ke = 0.25 0.5 0.75
+Material value Ns = 96.0
+Material value Ni = 1.5
+Material value d = 0.75
+Material value illum = 2
+Material value map_Kd = diffuse.png
+Material value map_Ks = specular.png
+Material value map_Ke = emissive.png
+Material value map_bump = bumpy.png
+Material value bump = bump.png
+Material value norm = normal.png
+Material value disp = displace.png
+Material value refl = reflect.png
+Material value Pr = 0.25
+Material value Pm = 0.5
+Material value Ps = 0.125
+Material value Pc = 0.75
+Material value Pcr = 0.0625
+Material value aniso = 0.375
+Material value map_Pr = rough.png
+Material value map_Pm = metal.png
+Texture options (-bm, -o, -s, -clamp) before the file name: map_Kd = texture.png, map_bump = bumps.png
+A .mtl beside an OBJ in another folder is found: points 3, triangles 1, parts [red 1], red Kd = 1.0 0.0 0.0

@@ -1,0 +1,390 @@
+use Libraries.Game.Graphics.ModelLoaders.WavefrontObject.WavefrontObjectLexer
+use Libraries.Game.Graphics.ModelLoaders.WavefrontObject.WavefrontObjectParser
+use Libraries.Game.Graphics.ModelLoaders.WavefrontObject.WavefrontConverterListener
+use Libraries.Game.Graphics.ModelLoaders.WavefrontObject.MaterialLexer
+use Libraries.Game.Graphics.ModelLoaders.WavefrontObject.MaterialParser
+use Libraries.Game.Graphics.ModelLoaders.WavefrontObject.MaterialConverterListener
+use Libraries.Game.Graphics.ModelLoaders.WavefrontObject.Material
+use Libraries.Game.Graphics.ModelLoaders.VertexNumbers
+use Libraries.Game.Graphics.ModelLoaders.VertexFace
+use Libraries.Containers.Array
+use Libraries.Containers.Table
+use Libraries.Compute.Vector3
+use Libraries.Compute.Math
+use Libraries.System.File
+use Libraries.System.FileReader
+
+/*
+Faces with more than three corners must be split into triangles that cover
+the polygon exactly, as Assimp's reader does (its test model
+concave_polygon.obj): n corners give n - 2 triangles whose areas add up to
+the polygon's area, and every triangle lies inside the polygon (checked at
+its center). A fan from the first corner does this only for convex
+polygons; for the concave arrowhead and L shape here, a fan from the first
+corner covers area outside the shape. All points are in the z = 0 plane.
+Areas: unit square 1, pentagon 8, arrowhead 6, L shape 7 (shoelace
+formula). Each case writes its OBJ text to the run folder ("/n" is a line
+feed) and deletes it after.
+*/
+class Main
+
+    // ---------------------------------------------------------------------
+    // Reader adapter: the only part of this test that knows the OBJ reader.
+    // ModelReader:Read finishes a model with GPU meshes, so it needs a
+    // graphics window. This runs the same steps without one:
+    // ModelReader:ReadWavefrontObject's loop (a FileReader line at a time
+    // through WavefrontObjectLexer, WavefrontObjectParser and
+    // WavefrontConverterListener), its .mtl reading (MaterialLexer,
+    // MaterialParser, MaterialConverterListener, the file found the way the
+    // reader finds it), and ConstructWavefrontObject and
+    // AddToWavefrontModel's rules for parts and triangles (a corner's point
+    // is positions:Get(index - 1); each face is split by the listener's
+    // Triangulate; with materials, a Default part for faces before the
+    // first usemtl, then one part per usemtl, a usemtl missing from the
+    // .mtl files getting the default material; without materials, one part
+    // named Default if there are faces). Positions are reported in the
+    // file's own coordinates (the listener flips z; this flips it back).
+    // Updated 2026-11-23 with the OBJ reader fixes in the library.
+    // To test another reader, replace only this block.
+    // ---------------------------------------------------------------------
+    text failure = ""
+    Array<Vector3> points
+    integer colorCount = 0
+    integer fileNormalCount = 0
+    Array<Vector3> corners
+    integer cornersWithNormals = 0
+    Array<text> partNames
+    Array<integer> partTriangles
+    Array<Material> materials
+
+    action ReadObj(text path) returns boolean
+        failure = ""
+        points:Empty()
+        colorCount = 0
+        fileNormalCount = 0
+        corners:Empty()
+        cornersWithNormals = 0
+        partNames:Empty()
+        partTriangles:Empty()
+        materials:Empty()
+        check
+            WavefrontConverterListener listener
+            File file
+            file:SetPath(path)
+            FileReader reader
+            reader:OpenForRead(file)
+            repeat while not reader:IsAtEndOfFile()
+                text value = reader:ReadLine()
+                WavefrontObjectLexer lexer
+                lexer:SetListener(listener)
+                lexer:Read(value)
+                WavefrontObjectParser parser
+                parser:SetListener(listener)
+                parser:Parse(lexer)
+            end
+            reader:Close()
+
+            Array<text> libraries = listener:GetMaterialLibraries()
+            integer i = 0
+            repeat while i < libraries:GetSize()
+                MaterialConverterListener materialListener
+                File materialFile
+                File parentDirectory = file:GetParentDirectory()
+                materialFile:SetWorkingDirectory(parentDirectory:GetWorkingDirectory())
+                materialFile:SetPath(libraries:Get(i))
+                FileReader materialReader
+                materialReader:OpenForRead(materialFile)
+                repeat while not materialReader:IsAtEndOfFile()
+                    text line = materialReader:ReadLine()
+                    MaterialLexer materialLexer
+                    materialLexer:SetListener(materialListener)
+                    materialLexer:Read(line)
+                    MaterialParser materialParser
+                    materialParser:SetListener(materialListener)
+                    materialParser:Parse(materialLexer)
+                end
+                materialReader:Close()
+                Array<Material> found = materialListener:GetMaterials()
+                integer k = 0
+                repeat while k < found:GetSize()
+                    materials:Add(found:Get(k))
+                    k = k + 1
+                end
+                i = i + 1
+            end
+
+            Array<VertexNumbers> positions = listener:GetPositions()
+            integer p = 0
+            repeat while p < positions:GetSize()
+                VertexNumbers position = positions:Get(p)
+                Vector3 vector = position:GetVector()
+                Vector3 point
+                point:Set(vector:GetX(), vector:GetY(), -vector:GetZ())
+                points:Add(point)
+                p = p + 1
+            end
+            fileNormalCount = listener:GetNormals():GetSize()
+            colorCount = listener:GetColors():GetSize()
+
+            Table<VertexFace> faces = listener:GetFaces()
+            Array<integer> materialIndices = listener:GetUseMaterialIndices()
+            Array<text> materialNames = listener:GetUseMaterialNames()
+            if materials:GetSize() > 0
+                integer firstUse = faces:GetNumberOfRows()
+                if materialIndices:GetSize() > 0
+                    firstUse = materialIndices:Get(0)
+                end
+                if firstUse > 0
+                    AddPart("Default", faces, 0, firstUse, listener)
+                end
+                integer counter = 0
+                repeat while counter < materialIndices:GetSize()
+                    integer startIndex = materialIndices:Get(counter)
+                    integer endIndex = faces:GetNumberOfRows()
+                    if counter + 1 not= materialIndices:GetSize()
+                        endIndex = materialIndices:Get(counter + 1)
+                    end
+                    AddPart(materialNames:Get(counter), faces, startIndex, endIndex, listener)
+                    counter = counter + 1
+                end
+            elseif faces:GetNumberOfRows() > 0
+                AddPart("Default", faces, 0, faces:GetNumberOfRows(), listener)
+            end
+            return true
+        detect e
+            failure = e:GetErrorMessage()
+            return false
+        end
+        return false
+    end
+
+    private action AddPart(text name, Table<VertexFace> faces, integer startIndex, integer endIndex, WavefrontConverterListener listener)
+        integer count = 0
+        integer row = startIndex
+        repeat while row < endIndex
+            Array<VertexFace> triangles = listener:Triangulate(faces:GetRow(row))
+            integer k = 0
+            repeat while k + 2 < triangles:GetSize()
+                AddCorner(triangles:Get(k))
+                AddCorner(triangles:Get(k + 1))
+                AddCorner(triangles:Get(k + 2))
+                count = count + 1
+                k = k + 3
+            end
+            row = row + 1
+        end
+        partNames:Add(name)
+        partTriangles:Add(count)
+    end
+
+    private action AddCorner(VertexFace corner)
+        corners:Add(points:Get(corner:GetPosition() - 1))
+        if corner:HasNormal()
+            cornersWithNormals = cornersWithNormals + 1
+        end
+    end
+
+    /* The material with the name, or undefined. */
+    action GetMaterial(text name) returns Material
+        integer i = 0
+        repeat while i < materials:GetSize()
+            Material material = materials:Get(i)
+            if material:GetName() = name
+                return material
+            end
+            i = i + 1
+        end
+        return undefined
+    end
+
+    /*
+        A material value by its .mtl keyword, as text ("not read" if the
+        reader keeps no such value): colors as "r g b", numbers as numbers,
+        texture maps as the file name.
+    */
+    action GetMaterialValue(text name, text key) returns text
+        Material material = GetMaterial(name)
+        if material = undefined
+            return "no material named " + name
+        end
+        if key = "Ka" and material:HasAmbientColor()
+            return Show(material:GetAmbientColor())
+        elseif key = "Kd" and material:HasDiffuseColor()
+            return Show(material:GetDiffuseColor())
+        elseif key = "Ks" and material:HasSpecularColor()
+            return Show(material:GetSpecularColor())
+        elseif key = "Ke" and material:HasEmissiveColor()
+            return Show(material:GetEmissiveColor())
+        elseif key = "Tf" and material:HasTransmissionFilter()
+            return Show(material:GetTransmissionFilter())
+        elseif key = "illum" and material:HasIllumination()
+            return "" + material:GetIllumination()
+        elseif key = "Ns" and material:HasShininess()
+            return "" + material:GetShininess()
+        elseif key = "Tr" and material:HasTransparency()
+            return "" + material:GetTransparency()
+        elseif key = "d" and material:HasDissolve()
+            return "" + material:GetDissolve()
+        elseif key = "Ni" and material:HasOpticalDensity()
+            return "" + material:GetOpticalDensity()
+        elseif key = "map_Ka" and material:HasTextureAmbient()
+            return material:GetTextureAmbient()
+        elseif key = "map_Kd" and material:HasTextureDiffuse()
+            return material:GetTextureDiffuse()
+        elseif key = "map_Ks" and material:HasTextureSpecular()
+            return material:GetTextureSpecular()
+        elseif key = "map_Ns" and material:HasTextureSpecularExponent()
+            return material:GetTextureSpecularExponent()
+        elseif key = "map_d" and material:HasTextureDissolve()
+            return material:GetTextureDissolve()
+        elseif material:HasValue(key)
+            return material:GetValue(key)
+        end
+        return "not read"
+    end
+    // ---- end of the reader adapter ----
+
+    action Show(Vector3 vector) returns text
+        return "" + vector:GetX() + " " + vector:GetY() + " " + vector:GetZ()
+    end
+
+    action Point(Vector3 vector) returns text
+        return "(" + vector:GetX() + ", " + vector:GetY() + ", " + vector:GetZ() + ")"
+    end
+
+    /* Writes the text to a file in the run folder, replacing "/n" with a line feed. */
+    action Write(text name, text content)
+        text lf = ""
+        lf = lf:GetLineFeed()
+        File file
+        file:SetPath(name)
+        file:Write(content:Replace("/n", lf))
+    end
+
+    action Remove(text name)
+        File file
+        file:SetPath(name)
+        if file:Exists()
+            boolean removed = file:Delete()
+        end
+    end
+
+    /* Points, triangles and parts after reading, or the error. */
+    action Summary returns text
+        if failure not= ""
+            return "read fails: " + failure
+        end
+        text parts = ""
+        integer i = 0
+        repeat while i < partNames:GetSize()
+            if i > 0
+                parts = parts + ", "
+            end
+            parts = parts + partNames:Get(i) + " " + partTriangles:Get(i)
+            i = i + 1
+        end
+        return "points " + points:GetSize() + ", triangles " + (corners:GetSize() / 3) + ", parts [" + parts + "]"
+    end
+
+    /* The total area of the triangles, in the x, y plane (z is 0). */
+    action TotalArea returns number
+        Math math
+        number total = 0
+        integer i = 0
+        repeat while i + 2 < corners:GetSize()
+            Vector3 a = corners:Get(i)
+            Vector3 b = corners:Get(i + 1)
+            Vector3 c = corners:Get(i + 2)
+            number cross = (b:GetX() - a:GetX()) * (c:GetY() - a:GetY()) - (c:GetX() - a:GetX()) * (b:GetY() - a:GetY())
+            total = total + math:AbsoluteValue(cross) / 2
+            i = i + 3
+        end
+        return math:Round(total, 6)
+    end
+
+    /* Whether every triangle's center lies inside the polygon (x, y pairs), by ray casting. */
+    action AllInside(Array<number> polygon) returns boolean
+        integer i = 0
+        repeat while i + 2 < corners:GetSize()
+            Vector3 a = corners:Get(i)
+            Vector3 b = corners:Get(i + 1)
+            Vector3 c = corners:Get(i + 2)
+            number x = (a:GetX() + b:GetX() + c:GetX()) / 3
+            number y = (a:GetY() + b:GetY() + c:GetY()) / 3
+            if not Inside(polygon, x, y)
+                return false
+            end
+            i = i + 3
+        end
+        return true
+    end
+
+    action Inside(Array<number> polygon, number x, number y) returns boolean
+        boolean inside = false
+        integer count = polygon:GetSize() / 2
+        integer i = 0
+        integer j = count - 1
+        repeat while i < count
+            number xi = polygon:Get(2 * i)
+            number yi = polygon:Get(2 * i + 1)
+            number xj = polygon:Get(2 * j)
+            number yj = polygon:Get(2 * j + 1)
+            if (yi > y) not= (yj > y)
+                if x < (xj - xi) * (y - yi) / (yj - yi) + xi
+                    inside = not inside
+                end
+            end
+            j = i
+            i = i + 1
+        end
+        return inside
+    end
+
+    action Polygon(text coordinates) returns Array<number>
+        Array<number> values
+        Array<text> parts = coordinates:Split(" ")
+        integer i = 0
+        repeat while i < parts:GetSize()
+            values:Add(cast(number, parts:Get(i)))
+            i = i + 1
+        end
+        return values
+    end
+
+    action Main
+        text dq = ""
+        dq = dq:GetDoubleQuote()
+        check
+            Write("ObjReaderPolygons-square.obj", "v 0 0 0/nv 1 0 0/nv 1 1 0/nv 0 1 0/nf 1 2 3 4/n")
+            boolean ok = ReadObj("ObjReaderPolygons-square.obj")
+            output "A convex quad (unit square): " + Summary() + ", area " + TotalArea() + ", every triangle inside = " + AllInside(Polygon("0 0 1 0 1 1 0 1"))
+        detect e
+            output "A convex quad (unit square) unexpected error: " + e:GetErrorMessage()
+        end
+        Remove("ObjReaderPolygons-square.obj")
+        check
+            Write("ObjReaderPolygons-pentagon.obj", "v 0 0 0/nv 2 0 0/nv 3 2 0/nv 1 3 0/nv -1 2 0/nf 1 2 3 4 5/n")
+            boolean ok = ReadObj("ObjReaderPolygons-pentagon.obj")
+            output "A convex pentagon: " + Summary() + ", area " + TotalArea() + ", every triangle inside = " + AllInside(Polygon("0 0 2 0 3 2 1 3 -1 2"))
+        detect e
+            output "A convex pentagon unexpected error: " + e:GetErrorMessage()
+        end
+        Remove("ObjReaderPolygons-pentagon.obj")
+        check
+            Write("ObjReaderPolygons-arrow.obj", "v 0 0 0/nv 2 1 0/nv 4 0 0/nv 2 4 0/nf 1 2 3 4/n")
+            boolean ok = ReadObj("ObjReaderPolygons-arrow.obj")
+            output "A concave quad (an arrowhead) starting at a convex corner: " + Summary() + ", area " + TotalArea() + ", every triangle inside = " + AllInside(Polygon("0 0 2 1 4 0 2 4"))
+        detect e
+            output "A concave quad (an arrowhead) starting at a convex corner unexpected error: " + e:GetErrorMessage()
+        end
+        Remove("ObjReaderPolygons-arrow.obj")
+        check
+            Write("ObjReaderPolygons-ell.obj", "v 2 3 0/nv 0 3 0/nv 0 0 0/nv 3 0 0/nv 3 1 0/nv 2 1 0/nf 1 2 3 4 5 6/n")
+            boolean ok = ReadObj("ObjReaderPolygons-ell.obj")
+            output "A concave hexagon (an L shape) starting next to its inner corner: " + Summary() + ", area " + TotalArea() + ", every triangle inside = " + AllInside(Polygon("2 3 0 3 0 0 3 0 3 1 2 1"))
+        detect e
+            output "A concave hexagon (an L shape) starting next to its inner corner unexpected error: " + e:GetErrorMessage()
+        end
+        Remove("ObjReaderPolygons-ell.obj")
+    end
+end

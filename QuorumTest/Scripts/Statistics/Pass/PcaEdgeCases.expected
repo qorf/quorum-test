@@ -1,0 +1,3 @@
+Three uncorrelated variables: eigenvalues [1.0, 1.0, 1.0]
+A variable that is twice another (r = 1): eigenvalues [2.0, 0.0], communality [1.0, 1.0]
+A constant variable (no variance, so no correlation) fails, as it should

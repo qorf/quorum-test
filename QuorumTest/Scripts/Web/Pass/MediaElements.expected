@@ -1,20 +1,20 @@
 Image SetAddress(cat.png) GetAddress():Generate() = [src= 'cat.png']
-Image SetAlternate(A cat) Generate() = [<img alt= 'A cat' >]
+Image SetAlternate(A cat) Generate() = [<img alt= 'A cat'>]
 Image SetWidth(20) GetWidth():Generate() = [width= '20']
 Image SetHeight(10) GetHeight():Generate() = [height= '10']
 Image SetUseMap(#m) GetUseMap():Generate() = [usemap= '#m']
 Image SetIsMap(true) GetIsMap() = true
 Image SetIsMap(true) then SetIsMap(false) GetIsMap() = false
-Audio SetAutoPlay(true) GetAutoPlay() and Generate() = [true <audio autoplay= 'autoplay' ></audio>]
+Audio SetAutoPlay(true) GetAutoPlay() and Generate() = [true <audio autoplay= 'autoplay'></audio>]
 Audio SetControls(true) GetControls() = true
 Audio SetLoop(true) then SetLoop(false) GetLoop() = false
 Audio SetPreload(none) GetPreload():Generate() = [preload= 'none']
 Audio SetAddress(a.mp3) GetAddress():Generate() = [src= 'a.mp3']
-Video SetControlsVisible(true) Generate() = [<video controls= 'controls' ></video>]
+Video SetControlsVisible(true) Generate() = [<video controls= 'controls'></video>]
 Video SetMuted(true) GetMuted() = true
 Video SetPoster(p.png) GetPoster():Generate() = [poster= 'p.png']
 Video SetAddress(v.mp4) GetAddress():Generate() = [src= 'v.mp4']
-Video with Source(v.webm) and Track(captions) Generate() = [<video ><source src= 'v.webm' ><track kind= 'captions' ></video>]
+Video with Source(v.webm) and Track(captions) Generate() = [<video><source src= 'v.webm'><track kind= 'captions'></video>]
 Source SetType(video/webm) GetType():Generate() = [type= 'video/webm']
 Source SetMedia(print) GetMedia():Generate() = [media= 'print']
 Track SetDefault(true) GetDefault() = true
@@ -24,7 +24,7 @@ Area SetShape(rect) GetShape():Generate() = [shape= 'rect']
 Area SetCoordinates(0,0,10,10) GetCoordinates():Generate() = [coords= '0,0,10,10']
 Area SetAddress(a.html) GetAddress():Generate() = [href= 'a.html']
 Area SetAlternativeText(Door) GetAlternativeText():Generate() = [alt= 'Door']
-ImageMap with an Area Generate() = [<map ><area shape= 'rect' ></map>]
+ImageMap with an Area Generate() = [<map><area shape= 'rect'></map>]
 Canvas SetWidth(300) GetWidth():Generate() = [width= '300']
 InlineFrame SetAddress(f.html) GetAddress():Generate() = [src= 'f.html']
 InlineFrame SetSandbox(allow-scripts) GetSandbox():Generate() = [sandbox= 'allow-scripts']

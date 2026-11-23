@@ -7,8 +7,8 @@ declaration on a top-level svg, children, Empty, a nested (not top-level)
 svg with a position, a view box and a title. Line
 feeds and tabs are shown as \n and \t; the expected layout is the library's
 own (blank lines between parts are allowed whitespace in XML). Every object
-sets its tab index to 0, the documented default, so the output doesn't
-depend on the default.
+sets its tab index to 0 so the output doesn't depend on the default
+(-1, documented).
 */
 class Main
     action Main

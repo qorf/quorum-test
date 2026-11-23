@@ -1,0 +1,12 @@
+Read(<palette><page name="P"><block>if a < b</block></page></palette>) fails, as it should
+Read(<palette><page name="P"><block>a & b</block></page></palette>) fails, as it should
+Read(<palette><page name="P"><block>a</block></palette>) fails, as it should
+Read(<palette><page name="P"><block>a</block></page>) fails, as it should
+Read(<palette><page name="P"><block>a</page></block></palette>) fails, as it should
+Read(<palette><page name="P"><block>a</Block></page></palette>) fails, as it should
+Read(<palette></palette><palette></palette>) fails, as it should
+Read(<palette><page name=P><block>a</block></page></palette>) fails, as it should
+Read(<palette><page name="P" name="Q"><block>a</block></page></palette>) fails, as it should
+Read(<palette><page name="P"><block>output "&nbsp;"</block></page></palette>) fails, as it should
+Read(<palette><page name="P"><block>a</block></page></palette>trailing) fails, as it should
+Read(<palette><page name="P"><block>a</block>) fails, as it should

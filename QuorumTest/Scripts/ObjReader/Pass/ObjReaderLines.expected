@@ -1,0 +1,12 @@
+A triangle: points 3, triangles 1, parts [Default 1]
+Smoothing groups (s off, s 1) are skipped: points 3, triangles 1, parts [Default 1]
+Lines (l), points (p) and parameter points (vp) are skipped: points 3, triangles 1, parts [Default 1]
+Unknown statements and comments are skipped: points 3, triangles 1, parts [Default 1]
+A backslash continues a line: points 3, triangles 1, parts [Default 1]
+No line ending after the last line: points 3, triangles 1, parts [Default 1]
+Blank lines and spaces around values: points 3, triangles 1, parts [Default 1]
+Number formats 1e-3, -.5, +2, 1.5E2, -2e+1, .25: (0.001, -0.5, 2.0) and (150.0, -20.0, 0.25)
+Vertex colors (v x y z r g b): points 3, triangles 1, parts [Default 1], colors 3, first point (0.0, 0.0, 0.0)
+An empty file: points 0, triangles 0, parts []
+A UTF-16 (big endian, with a byte order mark) file: points 3, triangles 1, parts [Default 1]
+A file that doesn't exist fails, as it should

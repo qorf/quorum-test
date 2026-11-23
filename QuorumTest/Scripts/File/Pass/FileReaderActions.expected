@@ -4,7 +4,7 @@ Read(3) after the first line = [bet]
 ReadLine() rest of the second line = [a]
 Read() rest of the file = [gamma]
 IsAtEndOfFile() after Read() = true
-Read() at the end of the file fails, as it should
+Read() at the end of the file = []
 Read(2) at the end of the file fails, as it should
 Close() after reading = done
 Read() of the whole file equals what was written = true

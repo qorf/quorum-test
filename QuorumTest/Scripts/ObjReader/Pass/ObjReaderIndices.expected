@@ -1,0 +1,8 @@
+Indices 1 2 3: (0.0, 0.0, 0.0) (1.0, 0.0, 0.0) (0.0, 1.0, 0.0)
+Relative indices -3 -2 -1 after 3 points: (0.0, 0.0, 0.0) (1.0, 0.0, 0.0) (0.0, 1.0, 0.0)
+Relative indices count back from the last point read so far: (0.0, 0.0, 0.0) (1.0, 0.0, 0.0) (1.0, 1.0, 0.0), points 4
+Relative position, texture and normal indices (-1/-1/-1): (0.0, 0.0, 0.0) (1.0, 0.0, 0.0) (0.0, 1.0, 0.0), corners with normals 3
+Position and normal without texture (1//1): points 3, triangles 1, parts [Default 1], corners with normals 3
+A quad 1 2 3 4: points 4, triangles 2, parts [Default 2]
+An index past the last point fails, as it should
+Index 0 (indices start at 1) fails, as it should
