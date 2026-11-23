@@ -37,6 +37,7 @@ class TextTester
         scripts:CheckEverywhere(path + "TextSplit")
         scripts:CheckEverywhere(path + "TextSplitInclude")
         scripts:CheckEverywhere(path + "TextSplitIntoLines")
+        scripts:CheckEverywhere(path + "TextChainHelpers")
         scripts:CheckEverywhere(path + "TextValue")
     end
 

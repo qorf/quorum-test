@@ -1,87 +1,71 @@
 use Libraries.Containers.HashTable
 use Libraries.Containers.Array
-use Libraries.System.DateTime
+use Libraries.Containers.List
+use Libraries.Containers.Iterator
 
 /*
-    Speed of a table that stays small while many keys pass through it: each
-    step adds a new key and removes the key added 1,000 steps earlier, so the
-    table holds 1,000 keys throughout. 100,000 steps, then 400,000. A table
-    whose cost grows with the number of keys ever added (rather than the
-    number it holds) fails the scaling check. Limit: 400,000 steps within
-    2,000 ms (about 100 ms on bytecode).
+Adding and removing over and over with counted keys (see LookupKeys):
+    20 rounds, each adding 2,500 new keys and removing the 2,000 oldest, so
+    the table ends with 10,000 keys after 90,000 operations. Removed keys
+    must leave no trace: every remaining key is found, every removed one is
+    gone, the work per operation stays small, and the keys still spread
+    over the buckets. No timing.
 */
 class Main
-    DateTime clock
 
-    action Now returns number
-        return clock:GetEpochTime()
-    end
-
-    // Prints a fixed line when the time is within the limit, and the
-    // measured time only when it is not.
-    action Limit(text name, number milliseconds, integer limit)
-        if milliseconds <= limit
-            output name + ": within " + limit + " ms"
-        else
-            output name + ": too slow, " + cast(integer, milliseconds) + " ms (limit " + limit + " ms)"
-        end
-    end
-
-    // Four times the work may take at most eight times as long. A smaller
-    // time under 20 ms is too short to measure a ratio reliably (timer
-    // granularity, JIT warm-up), so it counts as linear.
-    action Scaling(text name, text unit, integer smallCount, number smallTime, integer bigCount, number bigTime)
-        if smallTime < 20 or bigTime <= smallTime * 8
-            output name + " scales linearly (4x " + unit + ", at most 8x time)"
-        else
-            number ratio = cast(integer, bigTime / smallTime * 10) / 10.0
-            output name + " grows faster than linear: " + smallCount + " in " + cast(integer, smallTime) + " ms, " + bigCount + " in " + cast(integer, bigTime) + " ms (" + ratio + "x)"
-        end
-    end
-
-    action Keys(text prefix, integer count) returns Array<text>
-        Array<text> keys
-        integer i = 0
-        repeat count times
-            keys:Add(prefix + i)
-            i = i + 1
-        end
-        return keys
-    end
-
-    action Fill(Array<text> keys) returns HashTable<text, integer>
-        HashTable<text, integer> table
-        integer i = 0
-        repeat keys:GetSize() times
-            table:Add(keys:Get(i), i)
-            i = i + 1
-        end
-        return table
-    end
-
-    action TimeChurn(Array<text> keys) returns number
-        HashTable<text, integer> table
-        number start = Now()
-        integer i = 0
-        repeat keys:GetSize() times
-            table:Add(keys:Get(i), i)
-            if i >= 1000
-                table:RemoveKey(keys:Get(i - 1000))
-            end
-            i = i + 1
-        end
-        number time = Now() - start
-        integer last = keys:GetSize() - 1
-        output "Churn of " + keys:GetSize() + " keys through a table of 1000: size " + table:GetSize() + ", HasKey(newest) = " + table:HasKey(keys:Get(last)) + ", HasKey(the one 1000 back) = " + table:HasKey(keys:Get(last - 1000))
-        return time
+    // Spread: with well spread hash codes the items fill many buckets. A
+    // table that resizes at three items per four buckets uses about 0.75
+    // to 0.85 buckets per item; keys that all hash alike would use one.
+    action Spread(text name, integer items, integer bucketsInUse, integer buckets)
+        output name + ": buckets in use at least half the items = " + (bucketsInUse * 2 >= items)
+        output name + ": at most three items for every four buckets = " + (items * 4 <= buckets * 3)
     end
 
     action Main
-        Array<text> small = Keys("key", 100000)
-        Array<text> big = Keys("key", 400000)
-        number smallTime = TimeChurn(small)
-        number bigTime = TimeChurn(big)
-        Limit("Churn of 400000 keys", bigTime, 2000)
-        Scaling("Churn", "steps", 100000, smallTime, 400000, bigTime)
+        integer count = 50000
+        KeyCounter counter
+        Array<CountedKey> keys
+        integer i = 0
+        repeat count times
+            CountedKey key
+            key:Setup("item" + i, counter)
+            keys:Add(key)
+            i = i + 1
+        end
+        HashTable<CountedKey, integer> table
+        integer added = 0
+        integer oldest = 0
+        repeat 20 times
+            repeat 2500 times
+                table:Add(keys:Get(added), added)
+                added = added + 1
+            end
+            repeat 2000 times
+                integer value = table:RemoveKey(keys:Get(oldest))
+                oldest = oldest + 1
+            end
+        end
+        integer operations = 90000
+        output "After 20 rounds: GetSize() = " + table:GetSize()
+        output "Churn: at most 4 hash codes per operation = " + (counter:GetHashCodes() <= operations * 4)
+        output "Churn: at most 2 comparisons per operation on average = " + (counter:GetComparisons() <= operations * 2)
+        integer found = 0
+        i = oldest
+        repeat while i < added
+            if table:GetValue(keys:Get(i)) = i
+                found = found + 1
+            end
+            i = i + 1
+        end
+        integer gone = 0
+        i = 0
+        repeat while i < oldest
+            if not table:HasKey(keys:Get(i))
+                gone = gone + 1
+            end
+            i = i + 1
+        end
+        output "Every remaining key is found = " + (found = added - oldest) + ", every removed key is gone = " + (gone = oldest)
+        Spread("after churn", table:GetSize(), table:GetBucketsInUse(), table:GetBucketCount())
     end
 end

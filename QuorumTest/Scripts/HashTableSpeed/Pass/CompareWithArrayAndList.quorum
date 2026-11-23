@@ -2,134 +2,70 @@ use Libraries.Containers.HashTable
 use Libraries.Containers.Array
 use Libraries.Containers.List
 use Libraries.Containers.Iterator
-use Libraries.System.DateTime
 
 /*
-    HashTable against an Array and a List doing similar work on the same
-    400,000 text keys: adding every key, then finding every key (HashTable
-    GetValue against Array Get by location, the fastest possible lookup).
-    Hashing costs more than appending, so the HashTable may take up to 15
-    times as long, plus 100 ms for timer and warm-up noise. This verdict is
-    relative, so it holds on slow and fast machines alike. Measured on bytecode:
-    Add about 7x the Array, finding about 4x. Absolute limits, as in the
-    other speed tests: each step within 2,000 ms.
+HashTable against an Array and a List holding the same 50,000 counted
+    keys (see LookupKeys), by the comparisons each needs to find 100 keys
+    spread through the collection. Array and List Has search from the
+    front, so finding the key at position p takes p + 1 comparisons
+    (2,500,100 in all for these 100); the HashTable needs about one per
+    key. All three hold every key. No timing.
 */
 class Main
-    DateTime clock
 
-    action Now returns number
-        return clock:GetEpochTime()
-    end
-
-    // Prints a fixed line when the time is within the limit, and the
-    // measured time only when it is not.
-    action Limit(text name, number milliseconds, integer limit)
-        if milliseconds <= limit
-            output name + ": within " + limit + " ms"
-        else
-            output name + ": too slow, " + cast(integer, milliseconds) + " ms (limit " + limit + " ms)"
-        end
-    end
-
-    // Four times the work may take at most eight times as long. A smaller
-    // time under 20 ms is too short to measure a ratio reliably (timer
-    // granularity, JIT warm-up), so it counts as linear.
-    action Scaling(text name, text unit, integer smallCount, number smallTime, integer bigCount, number bigTime)
-        if smallTime < 20 or bigTime <= smallTime * 8
-            output name + " scales linearly (4x " + unit + ", at most 8x time)"
-        else
-            number ratio = cast(integer, bigTime / smallTime * 10) / 10.0
-            output name + " grows faster than linear: " + smallCount + " in " + cast(integer, smallTime) + " ms, " + bigCount + " in " + cast(integer, bigTime) + " ms (" + ratio + "x)"
-        end
-    end
-
-    action Relative(text name, number tableTime, text other, number otherTime)
-        if tableTime <= otherTime * 15 + 100
-            output name + ": HashTable within 15x " + other + " (plus 100 ms)"
-        else
-            output name + ": HashTable too slow, " + cast(integer, tableTime) + " ms against " + other + " " + cast(integer, otherTime) + " ms (limit 15x plus 100 ms)"
-        end
-    end
 
     action Main
-        integer count = 400000
-        Array<text> keys
+        integer count = 50000
+        KeyCounter counter
+        Array<CountedKey> keys
         integer i = 0
         repeat count times
-            keys:Add("key" + i)
+            CountedKey key
+            key:Setup("item" + i, counter)
+            keys:Add(key)
             i = i + 1
         end
-
-        number start = Now()
-        Array<text> array
-        i = 0
-        repeat count times
-            array:Add(keys:Get(i))
-            i = i + 1
-        end
-        number arrayAdd = Now() - start
-
-        start = Now()
-        List<text> list
+        List<CountedKey> list
+        HashTable<CountedKey, integer> table
         i = 0
         repeat count times
             list:Add(keys:Get(i))
-            i = i + 1
-        end
-        number listAdd = Now() - start
-
-        start = Now()
-        HashTable<text, integer> table
-        i = 0
-        repeat count times
             table:Add(keys:Get(i), i)
             i = i + 1
         end
-        number tableAdd = Now() - start
-        output "Add 400000 text keys: Array size " + array:GetSize() + ", List size " + list:GetSize() + ", HashTable size " + table:GetSize()
+        output "Array, List and HashTable sizes = " + keys:GetSize() + ", " + list:GetSize() + ", " + table:GetSize()
 
-        start = Now()
+        counter:Reset()
         integer arrayFound = 0
-        i = 0
-        repeat count times
-            if array:Get(i) = keys:Get(i)
+        integer j = 0
+        repeat 100 times
+            if keys:Has(keys:Get(j * 500 + 250))
                 arrayFound = arrayFound + 1
             end
-            i = i + 1
+            j = j + 1
         end
-        number arrayFind = Now() - start
+        output "Array Has finds " + arrayFound + " of 100 with " + counter:GetComparisons() + " comparisons"
 
-        start = Now()
+        counter:Reset()
         integer listFound = 0
-        i = 0
-        Iterator<text> it = list:GetIterator()
-        repeat while it:HasNext()
-            if it:Next() = keys:Get(i)
+        j = 0
+        repeat 100 times
+            if list:Has(keys:Get(j * 500 + 250))
                 listFound = listFound + 1
             end
-            i = i + 1
+            j = j + 1
         end
-        number listFind = Now() - start
+        output "List Has finds " + listFound + " of 100 with " + counter:GetComparisons() + " comparisons"
 
-        start = Now()
+        counter:Reset()
         integer tableFound = 0
-        i = 0
-        repeat count times
-            if table:GetValue(keys:Get(i)) = i
+        j = 0
+        repeat 100 times
+            if table:HasKey(keys:Get(j * 500 + 250))
                 tableFound = tableFound + 1
             end
-            i = i + 1
+            j = j + 1
         end
-        number tableFind = Now() - start
-        output "Find 400000 text keys: Array Get finds " + arrayFound + ", List iterator finds " + listFound + ", HashTable GetValue finds " + tableFound
-
-        Limit("Array Add 400000 text keys", arrayAdd, 2000)
-        Limit("List Add 400000 text keys", listAdd, 2000)
-        Limit("HashTable Add 400000 text keys", tableAdd, 2000)
-        Relative("Add 400000 text keys", tableAdd, "Array Add", arrayAdd)
-        Relative("Add 400000 text keys", tableAdd, "List Add", listAdd)
-        Limit("HashTable GetValue 400000 text keys", tableFind, 2000)
-        Relative("Find 400000 text keys", tableFind, "Array Get", arrayFind)
-        Relative("Find 400000 text keys", tableFind, "List iteration", listFind)
+        output "HashTable HasKey finds " + tableFound + " of 100 with at most 200 comparisons = " + (counter:GetComparisons() <= 200)
     end
 end

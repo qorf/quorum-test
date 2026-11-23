@@ -1,100 +1,81 @@
 use Libraries.Containers.HashTable
 use Libraries.Containers.Array
-use Libraries.System.DateTime
+use Libraries.Containers.List
+use Libraries.Containers.Iterator
 
 /*
-    Speed of HashTable GetValue and HasKey: every key of a table is looked up
-    once with GetValue and once with HasKey, plus the same number of keys that
-    are not there. Tables of 100,000 and 400,000 text keys.
-    Limit: the 1,600,000 lookups on the 400,000-key table within 3,000 ms
-    (about 100 ms on bytecode). Scaling: 4x the keys and lookups may take
-    at most 8x the time.
+HashTable lookups with 50,000 counted keys: keys that count how often
+    the table asks for their hash code and compares them. A well spread
+    table hashes each key looked up once and compares it with about one
+    stored key; keys that share a few buckets would need thousands of
+    comparisons. Checks GetValue and HasKey for keys that are there and
+    for keys that aren't, by those counts. No timing.
 */
 class Main
-    DateTime clock
 
-    action Now returns number
-        return clock:GetEpochTime()
-    end
 
-    // Prints a fixed line when the time is within the limit, and the
-    // measured time only when it is not.
-    action Limit(text name, number milliseconds, integer limit)
-        if milliseconds <= limit
-            output name + ": within " + limit + " ms"
-        else
-            output name + ": too slow, " + cast(integer, milliseconds) + " ms (limit " + limit + " ms)"
-        end
-    end
-
-    // Four times the work may take at most eight times as long. A smaller
-    // time under 20 ms is too short to measure a ratio reliably (timer
-    // granularity, JIT warm-up), so it counts as linear.
-    action Scaling(text name, text unit, integer smallCount, number smallTime, integer bigCount, number bigTime)
-        if smallTime < 20 or bigTime <= smallTime * 8
-            output name + " scales linearly (4x " + unit + ", at most 8x time)"
-        else
-            number ratio = cast(integer, bigTime / smallTime * 10) / 10.0
-            output name + " grows faster than linear: " + smallCount + " in " + cast(integer, smallTime) + " ms, " + bigCount + " in " + cast(integer, bigTime) + " ms (" + ratio + "x)"
-        end
-    end
-
-    action Keys(text prefix, integer count) returns Array<text>
-        Array<text> keys
+    action Main
+        integer count = 50000
+        KeyCounter counter
+        Array<CountedKey> keys
         integer i = 0
         repeat count times
-            keys:Add(prefix + i)
+            CountedKey key
+            key:Setup("item" + i, counter)
+            keys:Add(key)
             i = i + 1
         end
-        return keys
-    end
-
-    action Fill(Array<text> keys) returns HashTable<text, integer>
-        HashTable<text, integer> table
-        integer i = 0
-        repeat keys:GetSize() times
+        HashTable<CountedKey, integer> table
+        i = 0
+        repeat count times
             table:Add(keys:Get(i), i)
             i = i + 1
         end
-        return table
-    end
+        output "Add 50000 counted keys: GetSize() = " + table:GetSize()
+        output "Add: at most 4 hash codes per key = " + (counter:GetHashCodes() <= count * 4)
+        output "Add: at most 2 comparisons per key on average = " + (counter:GetComparisons() <= count * 2)
 
-    action TimeLookups(Array<text> keys, Array<text> missing, HashTable<text, integer> table) returns number
-        number start = Now()
-        integer right = 0
-        integer absent = 0
-        integer i = 0
-        repeat keys:GetSize() times
-            if table:GetValue(keys:Get(i)) = i
-                right = right + 1
-            end
-            if table:HasKey(keys:Get(i))
-                right = right + 1
-            end
-            if not table:HasKey(missing:Get(i))
-                absent = absent + 1
-            end
-            text missingKey = missing:Get(i)
-            if not table:HasKey(missingKey)
-                absent = absent + 1
+        counter:Reset()
+        integer found = 0
+        i = 0
+        repeat count times
+            CountedKey same
+            same:Setup("item" + i, counter)
+            if table:GetValue(same) = i
+                found = found + 1
             end
             i = i + 1
         end
-        number time = Now() - start
-        output "Look up in a table of " + keys:GetSize() + " text keys: " + right + " right answers for present keys, " + absent + " for absent keys"
-        return time
-    end
+        output "GetValue finds every key with its value = " + (found = count)
+        output "GetValue: one hash code per lookup = " + (counter:GetHashCodes() = count)
+        output "GetValue: at most 2 comparisons per lookup on average = " + (counter:GetComparisons() <= count * 2)
 
-    action Main
-        Array<text> small = Keys("key", 100000)
-        Array<text> smallMissing = Keys("missing", 100000)
-        Array<text> big = Keys("key", 400000)
-        Array<text> bigMissing = Keys("missing", 400000)
-        HashTable<text, integer> smallTable = Fill(small)
-        HashTable<text, integer> bigTable = Fill(big)
-        number smallTime = TimeLookups(small, smallMissing, smallTable)
-        number bigTime = TimeLookups(big, bigMissing, bigTable)
-        Limit("1600000 lookups in a table of 400000 text keys", bigTime, 3000)
-        Scaling("Lookup", "keys and lookups", 400000, smallTime, 1600000, bigTime)
+        counter:Reset()
+        integer present = 0
+        i = 0
+        repeat count times
+            CountedKey same
+            same:Setup("item" + i, counter)
+            if table:HasKey(same)
+                present = present + 1
+            end
+            i = i + 1
+        end
+        output "HasKey finds every key = " + (present = count)
+        output "HasKey: at most 2 comparisons per lookup on average = " + (counter:GetComparisons() <= count * 2)
+
+        counter:Reset()
+        integer missing = 0
+        i = 0
+        repeat count times
+            CountedKey absent
+            absent:Setup("other" + i, counter)
+            if not table:HasKey(absent)
+                missing = missing + 1
+            end
+            i = i + 1
+        end
+        output "HasKey of 50000 keys not in the table is false for all = " + (missing = count)
+        output "HasKey of missing keys: at most 2 comparisons per lookup on average = " + (counter:GetComparisons() <= count * 2)
     end
 end

@@ -2,18 +2,20 @@ package Libraries.Language.Compile.Test
 
 use Libraries.Testing.QuorumTest
 use Libraries.Testing.ScriptCheck
+use Libraries.Containers.Array
 
 /*
-    Speed of HashTable for common operations: Add with short text, long text
-    and integer keys, GetValue and HasKey, RemoveKey, add/remove churn,
-    walking keys and values, Copy, and a comparison with Array and List
-    doing similar work. Each operation prints a correctness line, an
-    absolute verdict (a generous limit for a decent hash table) and a
-    scaling verdict (4x the work in at most 8x the time); times appear in
-    the output only when a verdict fails. Runs on bytecode and JavaScript.
-    Not on Python: the Python back end is far slower for loops of hundreds
-    of thousands of steps, so these limits would measure the interpreter,
-    not the hash table.
+    How much work HashTable does, never how long it takes: a time limit
+    passes on one machine and fails on another. The scripts check what is
+    the same everywhere: how keys spread over the table's buckets
+    (GetBucketsInUse against the number of items, so keys that all land in
+    a few buckets fail), how full the table gets, and, with counted keys
+    (Support/CountedKey and KeyCounter), how many hash codes and key
+    comparisons each operation needs. Add, GetValue, HasKey, RemoveKey,
+    add/remove churn, walking keys and values, Copy, and a comparison with
+    Array and List searching. Runs on bytecode and JavaScript. Not on
+    Python: loops of 50,000 to 100,000 steps are slow there, though the
+    counts would be the same.
 */
 class HashTableSpeedTester
     QuorumTest suite = undefined
@@ -22,15 +24,18 @@ class HashTableSpeedTester
 
     action Test
         scripts:SetSuite(suite)
+        Array<text> counted
+        counted:Add("Scripts/HashTableSpeed/Support/KeyCounter.quorum")
+        counted:Add("Scripts/HashTableSpeed/Support/CountedKey.quorum")
         scripts:Check(path + "AddIntegerKeys", true, false)
         scripts:Check(path + "AddLongTextKeys", true, false)
-        scripts:Check(path + "AddRemoveChurn", true, false)
+        scripts:Check(path + "AddRemoveChurn", counted, true, false)
         scripts:Check(path + "AddTextKeys", true, false)
-        scripts:Check(path + "CompareWithArrayAndList", true, false)
-        scripts:Check(path + "CopyBigTable", true, false)
-        scripts:Check(path + "IterateKeysValues", true, false)
-        scripts:Check(path + "LookupKeys", true, false)
-        scripts:Check(path + "RemoveKeys", true, false)
+        scripts:Check(path + "CompareWithArrayAndList", counted, true, false)
+        scripts:Check(path + "CopyBigTable", counted, true, false)
+        scripts:Check(path + "IterateKeysValues", counted, true, false)
+        scripts:Check(path + "LookupKeys", counted, true, false)
+        scripts:Check(path + "RemoveKeys", counted, true, false)
     end
 
     action GetName returns text

@@ -1,4 +1,4 @@
-Add 100000 text keys: size 100000, GetValue(key99999) = 99999
-Add 400000 text keys: size 400000, GetValue(key399999) = 399999
-Add 400000 text keys: within 2000 ms
-Add scales linearly (4x keys, at most 8x time)
+Add 100000 text keys: GetSize() = 100000
+GetValue finds every key with its value = true
+100000 text keys: buckets in use at least half the items = true
+100000 text keys: at most three items for every four buckets = true

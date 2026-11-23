@@ -1,4 +1,10 @@
-Look up in a table of 100000 text keys: 200000 right answers for present keys, 200000 for absent keys
-Look up in a table of 400000 text keys: 800000 right answers for present keys, 800000 for absent keys
-1600000 lookups in a table of 400000 text keys: within 3000 ms
-Lookup scales linearly (4x keys and lookups, at most 8x time)
+Add 50000 counted keys: GetSize() = 50000
+Add: at most 4 hash codes per key = true
+Add: at most 2 comparisons per key on average = true
+GetValue finds every key with its value = true
+GetValue: one hash code per lookup = true
+GetValue: at most 2 comparisons per lookup on average = true
+HasKey finds every key = true
+HasKey: at most 2 comparisons per lookup on average = true
+HasKey of 50000 keys not in the table is false for all = true
+HasKey of missing keys: at most 2 comparisons per lookup on average = true

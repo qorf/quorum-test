@@ -1,4 +1,6 @@
-Churn of 100000 keys through a table of 1000: size 1000, HasKey(newest) = true, HasKey(the one 1000 back) = false
-Churn of 400000 keys through a table of 1000: size 1000, HasKey(newest) = true, HasKey(the one 1000 back) = false
-Churn of 400000 keys: within 2000 ms
-Churn scales linearly (4x steps, at most 8x time)
+After 20 rounds: GetSize() = 10000
+Churn: at most 4 hash codes per operation = true
+Churn: at most 2 comparisons per operation on average = true
+Every remaining key is found = true, every removed key is gone = true
+after churn: buckets in use at least half the items = true
+after churn: at most three items for every four buckets = true

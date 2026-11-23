@@ -1,10 +1,4 @@
-Add 400000 text keys: Array size 400000, List size 400000, HashTable size 400000
-Find 400000 text keys: Array Get finds 400000, List iterator finds 400000, HashTable GetValue finds 400000
-Array Add 400000 text keys: within 2000 ms
-List Add 400000 text keys: within 2000 ms
-HashTable Add 400000 text keys: within 2000 ms
-Add 400000 text keys: HashTable within 15x Array Add (plus 100 ms)
-Add 400000 text keys: HashTable within 15x List Add (plus 100 ms)
-HashTable GetValue 400000 text keys: within 2000 ms
-Find 400000 text keys: HashTable within 15x Array Get (plus 100 ms)
-Find 400000 text keys: HashTable within 15x List iteration (plus 100 ms)
+Array, List and HashTable sizes = 50000, 50000, 50000
+Array Has finds 100 of 100 with 2500100 comparisons
+List Has finds 100 of 100 with 2500100 comparisons
+HashTable HasKey finds 100 of 100 with at most 200 comparisons = true

@@ -1,99 +1,81 @@
 use Libraries.Containers.HashTable
 use Libraries.Containers.Array
-use Libraries.System.DateTime
+use Libraries.Containers.List
+use Libraries.Containers.Iterator
 
 /*
-    Speed of HashTable Add, GetValue and HasKey with long text keys
-    ("customer-account-number-0", 25 or more characters), the kind of key
-    real programs use. A text hash code must stay a 32-bit integer however
-    long the text is: if it is computed in floating point without wrapping
-    (31 * h + c), long texts lose their low bits and all hash to the same
-    bucket, and every operation turns into a linear search. Sizes are kept
-    small (5,000 then 20,000) so a broken hash still finishes.
-    Limits: 20,000 Adds within 500 ms and 20,000 lookups within 500 ms
-    (about 10 ms each on bytecode).
+HashTable with 20,000 long text keys: 1,000 identical characters, then
+    a number. Every character must count in the hash code, or these keys
+    would share a few buckets. Checks the size, the values, the spread, and
+    that text hash codes follow Java's String hash formula (31 times the
+    hash so far plus each character, kept to 32 bits) on every back end,
+    so a table built on one back end spreads keys the same way on another.
+    No timing.
 */
 class Main
-    DateTime clock
 
-    action Now returns number
-        return clock:GetEpochTime()
+    // Spread: with well spread hash codes the items fill many buckets. A
+    // table that resizes at three items per four buckets uses about 0.75
+    // to 0.85 buckets per item; keys that all hash alike would use one.
+    action Spread(text name, integer items, integer bucketsInUse, integer buckets)
+        output name + ": buckets in use at least half the items = " + (bucketsInUse * 2 >= items)
+        output name + ": at most three items for every four buckets = " + (items * 4 <= buckets * 3)
     end
 
-    // Prints a fixed line when the time is within the limit, and the
-    // measured time only when it is not.
-    action Limit(text name, number milliseconds, integer limit)
-        if milliseconds <= limit
-            output name + ": within " + limit + " ms"
-        else
-            output name + ": too slow, " + cast(integer, milliseconds) + " ms (limit " + limit + " ms)"
-        end
-    end
-
-    // Four times the work may take at most eight times as long. A smaller
-    // time under 20 ms is too short to measure a ratio reliably (timer
-    // granularity, JIT warm-up), so it counts as linear.
-    action Scaling(text name, text unit, integer smallCount, number smallTime, integer bigCount, number bigTime)
-        if smallTime < 20 or bigTime <= smallTime * 8
-            output name + " scales linearly (4x " + unit + ", at most 8x time)"
-        else
-            number ratio = cast(integer, bigTime / smallTime * 10) / 10.0
-            output name + " grows faster than linear: " + smallCount + " in " + cast(integer, smallTime) + " ms, " + bigCount + " in " + cast(integer, bigTime) + " ms (" + ratio + "x)"
-        end
-    end
-
-    action Keys(integer count) returns Array<text>
-        Array<text> keys
+    // Java's String hash code: 31 times the hash so far plus each
+    // character, kept to 32 bits (worked out with numbers, so it doesn't
+    // depend on how a back end handles integer overflow).
+    action JavaHash(text value) returns integer
+        number hash = 0
         integer i = 0
-        repeat count times
-            keys:Add("customer-account-number-" + i)
+        repeat while i < value:GetSize()
+            hash = (hash * 31 + value:GetUnicodeInteger(i)) mod 4294967296.0
             i = i + 1
         end
-        return keys
-    end
-
-    action TimeAdds(Array<text> keys, HashTable<text, integer> table) returns number
-        number start = Now()
-        integer i = 0
-        repeat keys:GetSize() times
-            table:Add(keys:Get(i), i)
-            i = i + 1
+        if hash >= 2147483648.0
+            hash = hash - 4294967296.0
         end
-        return Now() - start
-    end
-
-    action TimeLookups(Array<text> keys, HashTable<text, integer> table) returns number
-        number start = Now()
-        integer i = 0
-        integer found = 0
-        repeat keys:GetSize() times
-            if table:HasKey(keys:Get(i))
-                integer value = table:GetValue(keys:Get(i))
-                if value = i
-                    found = found + 1
-                end
-            end
-            i = i + 1
-        end
-        number time = Now() - start
-        output "Look up " + keys:GetSize() + " long text keys: found " + found
-        return time
+        return cast(integer, hash)
     end
 
     action Main
-        Array<text> small = Keys(5000)
-        Array<text> big = Keys(20000)
-        HashTable<text, integer> smallTable
-        HashTable<text, integer> bigTable
-        number smallAdd = TimeAdds(small, smallTable)
-        number bigAdd = TimeAdds(big, bigTable)
-        output "Add 5000 long text keys: size " + smallTable:GetSize()
-        output "Add 20000 long text keys: size " + bigTable:GetSize()
-        number smallLook = TimeLookups(small, smallTable)
-        number bigLook = TimeLookups(big, bigTable)
-        Limit("Add 20000 long text keys", bigAdd, 500)
-        Scaling("Add long text keys", "keys", 5000, smallAdd, 20000, bigAdd)
-        Limit("Look up 20000 long text keys", bigLook, 500)
-        Scaling("Look up long text keys", "keys", 5000, smallLook, 20000, bigLook)
+        text prefix = ""
+        integer i = 0
+        repeat 1000 times
+            prefix = prefix + "x"
+        end
+        integer count = 20000
+        HashTable<text, integer> table
+        i = 0
+        repeat count times
+            table:Add(prefix + i, i)
+            i = i + 1
+        end
+        output "Add 20000 long text keys: GetSize() = " + table:GetSize()
+        integer found = 0
+        i = 0
+        repeat count times
+            if table:GetValue(prefix + i) = i
+                found = found + 1
+            end
+            i = i + 1
+        end
+        output "GetValue finds every key with its value = " + (found = count)
+        Spread("20000 long text keys", table:GetSize(), table:GetBucketsInUse(), table:GetBucketCount())
+
+        text hello = "hello"
+        output "hello:GetHashCode() = " + hello:GetHashCode()
+        text empty = ""
+        output "empty text GetHashCode() = " + empty:GetHashCode()
+        integer matches = 0
+        i = 0
+        repeat 100 times
+            text key = prefix + i
+            if key:GetHashCode() = JavaHash(key)
+                matches = matches + 1
+            end
+            i = i + 1
+        end
+        output "100 long keys hash as Java's formula = " + (matches = 100)
     end
 end

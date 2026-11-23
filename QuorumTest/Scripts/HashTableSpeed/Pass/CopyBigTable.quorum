@@ -1,75 +1,54 @@
 use Libraries.Containers.HashTable
-use Libraries.System.DateTime
+use Libraries.Containers.Array
+use Libraries.Containers.List
+use Libraries.Containers.Iterator
 
 /*
-    Speed of HashTable Copy for tables of 100,000 and 400,000 integer keys,
-    then a spot check that the copy holds every key. Limit: copying the
-    400,000-key table within 1,000 ms (about 15 ms on bytecode). Scaling:
-    100,000 then 400,000. (Whether the copy is independent of the original
-    is tested in ContainerEdges/HashTableCopyIndependent.)
+HashTable Copy of a 50,000-key table with counted keys (see
+    LookupKeys). Copy duplicates the table's buckets as they are, so it
+    never asks a key for its hash code or compares keys, and the copy has
+    the same size, buckets and spread. Every key is found in the copy, and
+    removing keys from the copy leaves the original whole. No timing.
 */
 class Main
-    DateTime clock
 
-    action Now returns number
-        return clock:GetEpochTime()
-    end
 
-    // Prints a fixed line when the time is within the limit, and the
-    // measured time only when it is not.
-    action Limit(text name, number milliseconds, integer limit)
-        if milliseconds <= limit
-            output name + ": within " + limit + " ms"
-        else
-            output name + ": too slow, " + cast(integer, milliseconds) + " ms (limit " + limit + " ms)"
-        end
-    end
-
-    // Four times the work may take at most eight times as long. A smaller
-    // time under 20 ms is too short to measure a ratio reliably (timer
-    // granularity, JIT warm-up), so it counts as linear.
-    action Scaling(text name, text unit, integer smallCount, number smallTime, integer bigCount, number bigTime)
-        if smallTime < 20 or bigTime <= smallTime * 8
-            output name + " scales linearly (4x " + unit + ", at most 8x time)"
-        else
-            number ratio = cast(integer, bigTime / smallTime * 10) / 10.0
-            output name + " grows faster than linear: " + smallCount + " in " + cast(integer, smallTime) + " ms, " + bigCount + " in " + cast(integer, bigTime) + " ms (" + ratio + "x)"
-        end
-    end
-
-    action Fill(integer count) returns HashTable<integer, integer>
-        HashTable<integer, integer> table
+    action Main
+        integer count = 50000
+        KeyCounter counter
+        Array<CountedKey> keys
         integer i = 0
         repeat count times
-            table:Add(i, i * 2)
+            CountedKey key
+            key:Setup("item" + i, counter)
+            keys:Add(key)
             i = i + 1
         end
-        return table
-    end
-
-    action TimeCopy(HashTable<integer, integer> table) returns number
-        number start = Now()
-        Object copyObject = table:Copy()
-        number time = Now() - start
-        HashTable<integer, integer> copy = cast(HashTable<integer, integer>, copyObject)
+        HashTable<CountedKey, integer> table
+        i = 0
+        repeat count times
+            table:Add(keys:Get(i), i)
+            i = i + 1
+        end
+        counter:Reset()
+        HashTable<CountedKey, integer> copy = cast(HashTable<CountedKey, integer>, table:Copy())
+        output "Copy: hash codes = " + counter:GetHashCodes() + ", comparisons = " + counter:GetComparisons()
+        output "Copy: same size = " + (copy:GetSize() = table:GetSize()) + ", same buckets = " + (copy:GetBucketCount() = table:GetBucketCount()) + ", same buckets in use = " + (copy:GetBucketsInUse() = table:GetBucketsInUse())
         integer found = 0
-        integer i = 0
-        repeat table:GetSize() times
-            if copy:HasKey(i)
+        i = 0
+        repeat count times
+            if copy:GetValue(keys:Get(i)) = i
                 found = found + 1
             end
             i = i + 1
         end
-        output "Copy a table of " + table:GetSize() + " integer keys: copy size " + copy:GetSize() + ", copy has " + found + " of the keys"
-        return time
-    end
-
-    action Main
-        HashTable<integer, integer> small = Fill(100000)
-        HashTable<integer, integer> big = Fill(400000)
-        number smallTime = TimeCopy(small)
-        number bigTime = TimeCopy(big)
-        Limit("Copy a table of 400000 keys", bigTime, 1000)
-        Scaling("Copy", "keys", 100000, smallTime, 400000, bigTime)
+        output "GetValue on the copy finds every key with its value = " + (found = count)
+        i = 0
+        repeat 1000 times
+            CountedKey removed = keys:Get(i)
+            integer value = copy:RemoveKey(removed)
+            i = i + 1
+        end
+        output "After removing 1000 keys from the copy: copy GetSize() = " + copy:GetSize() + ", original GetSize() = " + table:GetSize()
     end
 end

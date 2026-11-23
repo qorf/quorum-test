@@ -1,0 +1,60 @@
+/*
+    Text:DoubleQuote, LineFeed and Tab each return the text they're called
+    on, then a pair of double quotes around the words given, a line feed
+    and the words, or a tab and the words. They return text, so calls
+    chain, and they never change the text they're called on. An undefined
+    value fails. Each case runs on a text primitive and on a Text object.
+    Results write a line feed as /n and a tab as /t.
+*/
+class Main
+    action Main
+        text dq = ""
+        dq = dq:GetDoubleQuote()
+        text lf = dq:GetLineFeed()
+        text a = "a"
+        Show("DoubleQuote(b)", a:DoubleQuote("b"))
+        Show("DoubleQuote(empty)", a:DoubleQuote(""))
+        Show("LineFeed(b)", a:LineFeed("b"))
+        Show("LineFeed(empty)", a:LineFeed(""))
+        Show("Tab(b)", a:Tab("b"))
+        Show("DoubleQuote(say " + dq + "hi" + dq + ")", a:DoubleQuote("say " + dq + "hi" + dq))
+        Show("Tab(x line feed y)", a:Tab("x" + lf + "y"))
+        Show("the text afterward", a)
+
+        text empty = ""
+        Show("empty text LineFeed(b)", empty:LineFeed("b"))
+        text message = "Studio says "
+        Show("chain DoubleQuote(Placed):LineFeed(empty):Tab(at (0, 0))", message:DoubleQuote("Placed"):LineFeed(""):Tab("at (0, 0)"))
+
+        Text object
+        object:SetValue("a")
+        Show("Text DoubleQuote(b)", object:DoubleQuote("b"))
+        Show("Text LineFeed(b)", object:LineFeed("b"))
+        Show("Text Tab(b)", object:Tab("b"))
+        Show("Text chain DoubleQuote(b):Tab(c)", object:DoubleQuote("b"):Tab("c"))
+        Show("Text afterward", object:GetValue())
+
+        text none = undefined
+        check
+            text result = a:Tab(none)
+            output "Tab(undefined) should fail but returned " + Visible(result)
+        detect e
+            output "Tab(undefined) fails, as it should"
+        end
+        check
+            text result = object:DoubleQuote(none)
+            output "Text DoubleQuote(undefined) should fail but returned " + Visible(result)
+        detect e
+            output "Text DoubleQuote(undefined) fails, as it should"
+        end
+    end
+
+    action Visible(text value) returns text
+        text result = value:Replace(value:GetLineFeed(), "/n")
+        return result:Replace(value:GetTab(), "/t")
+    end
+
+    action Show(text call, text result)
+        output call + " = [" + Visible(result) + "]"
+    end
+end

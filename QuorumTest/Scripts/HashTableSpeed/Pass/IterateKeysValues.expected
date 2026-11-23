@@ -1,4 +1,4 @@
-Walk a table of 100000 integer keys: key iterator visits 100000, key sum mod 1000000 = 950000, value sum mod 1000000 = 900000, CopyToKeyArray() size 100000, CopyToValueArray() size 100000
-Walk a table of 400000 integer keys: key iterator visits 400000, key sum mod 1000000 = 800000, value sum mod 1000000 = 600000, CopyToKeyArray() size 400000, CopyToValueArray() size 400000
-Walk a table of 400000 keys four ways: within 2000 ms
-Walking keys and values scales linearly (4x keys, at most 8x time)
+GetKeyIterator visits 50000 keys, numbers summing to 1249975000
+GetValueIterator visits 50000 values summing to 1249975000
+CopyToKeyArray GetSize() = 50000, CopyToValueArray GetSize() = 50000
+Walking: hash codes = 0, comparisons = 0

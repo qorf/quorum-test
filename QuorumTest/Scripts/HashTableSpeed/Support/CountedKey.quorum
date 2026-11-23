@@ -1,0 +1,30 @@
+/* A key that wraps a text, hashes as that text does, and counts its work. */
+class CountedKey
+    text name = ""
+    KeyCounter counter = undefined
+
+    action Setup(text name, KeyCounter counter)
+        me:name = name
+        me:counter = counter
+    end
+
+    action GetName returns text
+        return name
+    end
+
+    action GetHashCode returns integer
+        counter:CountHashCode()
+        return name:GetHashCode()
+    end
+
+    // Only comparisons with another key count: a check against undefined
+    // (key = undefined) also arrives here, and isn't work on the table.
+    action Equals(Object object) returns boolean
+        if not (object is CountedKey)
+            return false
+        end
+        counter:CountComparison()
+        CountedKey other = cast(CountedKey, object)
+        return name = other:GetName()
+    end
+end

@@ -1,8 +1,7 @@
-Add 5000 long text keys: size 5000
-Add 20000 long text keys: size 20000
-Look up 5000 long text keys: found 5000
-Look up 20000 long text keys: found 20000
-Add 20000 long text keys: within 500 ms
-Add long text keys scales linearly (4x keys, at most 8x time)
-Look up 20000 long text keys: within 500 ms
-Look up long text keys scales linearly (4x keys, at most 8x time)
+Add 20000 long text keys: GetSize() = 20000
+GetValue finds every key with its value = true
+20000 long text keys: buckets in use at least half the items = true
+20000 long text keys: at most three items for every four buckets = true
+hello:GetHashCode() = 99162322
+empty text GetHashCode() = 0
+100 long keys hash as Java's formula = true

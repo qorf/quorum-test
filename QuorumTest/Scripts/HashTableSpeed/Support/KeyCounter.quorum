@@ -1,0 +1,30 @@
+/*
+    Counts how often a hash table asks these keys for their hash code and
+    compares them, so a test can check how much work the table did. The
+    counts are the same on every machine and back end.
+*/
+class KeyCounter
+    integer hashCodes = 0
+    integer comparisons = 0
+
+    action CountHashCode
+        hashCodes = hashCodes + 1
+    end
+
+    action CountComparison
+        comparisons = comparisons + 1
+    end
+
+    action GetHashCodes returns integer
+        return hashCodes
+    end
+
+    action GetComparisons returns integer
+        return comparisons
+    end
+
+    action Reset
+        hashCodes = 0
+        comparisons = 0
+    end
+end

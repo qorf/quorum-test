@@ -1,0 +1,17 @@
+DoubleQuote(b) = [a"b"]
+DoubleQuote(empty) = [a""]
+LineFeed(b) = [a/nb]
+LineFeed(empty) = [a/n]
+Tab(b) = [a/tb]
+DoubleQuote(say "hi") = [a"say "hi""]
+Tab(x line feed y) = [a/tx/ny]
+the text afterward = [a]
+empty text LineFeed(b) = [/nb]
+chain DoubleQuote(Placed):LineFeed(empty):Tab(at (0, 0)) = [Studio says "Placed"/n/tat (0, 0)]
+Text DoubleQuote(b) = [a"b"]
+Text LineFeed(b) = [a/nb]
+Text Tab(b) = [a/tb]
+Text chain DoubleQuote(b):Tab(c) = [a"b"/tc]
+Text afterward = [a]
+Tab(undefined) fails, as it should
+Text DoubleQuote(undefined) fails, as it should

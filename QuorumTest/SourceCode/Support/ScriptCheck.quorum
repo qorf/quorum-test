@@ -47,6 +47,33 @@ class ScriptCheck
         end
     end
 
+    /*
+        The same, with helper files compiled along with the program (paths
+        with their extension), for classes several scripts share: Quorum
+        allows one class per file.
+    */
+    action Check(text script, Array<text> helpers, boolean onJavaScript, boolean onPython)
+        Array<File> files
+        File main
+        main:SetPath(script + ".quorum")
+        files:Add(main)
+        integer i = 0
+        repeat while i < helpers:GetSize()
+            File helper
+            helper:SetPath(helpers:Get(i))
+            files:Add(helper)
+            i = i + 1
+        end
+        Array<text> expected = ReadExpected(script + ".expected")
+        suite:Test(files, expected)
+        if onJavaScript
+            suite:TestJavaScript(files, expected)
+        end
+        if onPython
+            suite:TestPython(files, expected)
+        end
+    end
+
     /* Runs a program on all three back ends. */
     action CheckEverywhere(text script)
         Check(script, true, true)
