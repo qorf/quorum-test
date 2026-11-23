@@ -1,0 +1,232 @@
+use Libraries.Containers.Array
+use Libraries.Fabrication.Profiles.Profile
+use Libraries.Fabrication.Printers.AnycubicKobra2Neo
+use Libraries.Fabrication.Printers.BambuPrinter
+use Libraries.Fabrication.Printers.BowdenPrinter
+use Libraries.Fabrication.Printers.DirectDrivePrinter
+use Libraries.Fabrication.Printers.KlipperPrinter
+use Libraries.Fabrication.Printers.Printer
+
+/*
+Tests the AnycubicKobra2Neo printer class: its name, its settings and family, its
+validation, and its start and end G-code (line breaks shown as \n).
+*/
+class Main
+    action Main
+        AnycubicKobra2Neo printer
+        Array<text> problems = printer:Validate()
+        Printer asPrinter = printer
+        check
+            output "GetName() = [" + printer:GetName() + "]"
+        detect e
+            output "GetName() unexpected error: " + e:GetErrorMessage()
+        end
+        check
+            output "Describe() = [" + printer:Describe() + "]"
+        detect e
+            output "Describe() unexpected error: " + e:GetErrorMessage()
+        end
+        check
+            output "GetText(bedWidth) = [" + printer:GetText("bedWidth") + "]"
+        detect e
+            output "GetText(bedWidth) unexpected error: " + e:GetErrorMessage()
+        end
+        check
+            output "GetText(bedDepth) = [" + printer:GetText("bedDepth") + "]"
+        detect e
+            output "GetText(bedDepth) unexpected error: " + e:GetErrorMessage()
+        end
+        check
+            output "GetText(bedHeight) = [" + printer:GetText("bedHeight") + "]"
+        detect e
+            output "GetText(bedHeight) unexpected error: " + e:GetErrorMessage()
+        end
+        check
+            output "GetText(maxNozzleTemperature) = [" + printer:GetText("maxNozzleTemperature") + "]"
+        detect e
+            output "GetText(maxNozzleTemperature) unexpected error: " + e:GetErrorMessage()
+        end
+        check
+            output "GetText(maxBedTemperature) = [" + printer:GetText("maxBedTemperature") + "]"
+        detect e
+            output "GetText(maxBedTemperature) unexpected error: " + e:GetErrorMessage()
+        end
+        check
+            output "GetText(nozzleTemperature) = [" + printer:GetText("nozzleTemperature") + "]"
+        detect e
+            output "GetText(nozzleTemperature) unexpected error: " + e:GetErrorMessage()
+        end
+        check
+            output "GetText(bedTemperature) = [" + printer:GetText("bedTemperature") + "]"
+        detect e
+            output "GetText(bedTemperature) unexpected error: " + e:GetErrorMessage()
+        end
+        check
+            output "GetText(retractLength) = [" + printer:GetText("retractLength") + "]"
+        detect e
+            output "GetText(retractLength) unexpected error: " + e:GetErrorMessage()
+        end
+        check
+            output "GetText(retractSpeed) = [" + printer:GetText("retractSpeed") + "]"
+        detect e
+            output "GetText(retractSpeed) unexpected error: " + e:GetErrorMessage()
+        end
+        check
+            output "GetText(retractLimitCount) = [" + printer:GetText("retractLimitCount") + "]"
+        detect e
+            output "GetText(retractLimitCount) unexpected error: " + e:GetErrorMessage()
+        end
+        check
+            output "GetText(zHopMinTravel) = [" + printer:GetText("zHopMinTravel") + "]"
+        detect e
+            output "GetText(zHopMinTravel) unexpected error: " + e:GetErrorMessage()
+        end
+        check
+            output "GetText(maxFlow) = [" + printer:GetText("maxFlow") + "]"
+        detect e
+            output "GetText(maxFlow) unexpected error: " + e:GetErrorMessage()
+        end
+        check
+            output "GetText(outerWallSpeed) = [" + printer:GetText("outerWallSpeed") + "]"
+        detect e
+            output "GetText(outerWallSpeed) unexpected error: " + e:GetErrorMessage()
+        end
+        check
+            output "GetText(firstLayerSpeed) = [" + printer:GetText("firstLayerSpeed") + "]"
+        detect e
+            output "GetText(firstLayerSpeed) unexpected error: " + e:GetErrorMessage()
+        end
+        check
+            output "GetText(travelSpeed) = [" + printer:GetText("travelSpeed") + "]"
+        detect e
+            output "GetText(travelSpeed) unexpected error: " + e:GetErrorMessage()
+        end
+        check
+            output "GetText(accelTravel) = [" + printer:GetText("accelTravel") + "]"
+        detect e
+            output "GetText(accelTravel) unexpected error: " + e:GetErrorMessage()
+        end
+        check
+            output "GetText(filamentDiameter) = [" + printer:GetText("filamentDiameter") + "]"
+        detect e
+            output "GetText(filamentDiameter) unexpected error: " + e:GetErrorMessage()
+        end
+        check
+            output "GetText(lineWidth) = [" + printer:GetText("lineWidth") + "]"
+        detect e
+            output "GetText(lineWidth) unexpected error: " + e:GetErrorMessage()
+        end
+        check
+            output "GetText(zHop) = [" + printer:GetText("zHop") + "]"
+        detect e
+            output "GetText(zHop) unexpected error: " + e:GetErrorMessage()
+        end
+        check
+            output "GetText(minLayerTime) = [" + printer:GetText("minLayerTime") + "]"
+        detect e
+            output "GetText(minLayerTime) unexpected error: " + e:GetErrorMessage()
+        end
+        check
+            output "GetText(bambuExtras) = [" + printer:GetText("bambuExtras") + "]"
+        detect e
+            output "GetText(bambuExtras) unexpected error: " + e:GetErrorMessage()
+        end
+        check
+            output "GetText(write3mf) = [" + printer:GetText("write3mf") + "]"
+        detect e
+            output "GetText(write3mf) unexpected error: " + e:GetErrorMessage()
+        end
+        check
+            output "SetsOwn(startGcodeFile) = " + printer:SetsOwn("startGcodeFile")
+        detect e
+            output "SetsOwn(startGcodeFile) unexpected error: " + e:GetErrorMessage()
+        end
+        check
+            output "GetText(startGcodeFile) = [" + printer:GetText("startGcodeFile") + "]"
+        detect e
+            output "GetText(startGcodeFile) unexpected error: " + e:GetErrorMessage()
+        end
+        check
+            output "is BowdenPrinter = " + (asPrinter is BowdenPrinter)
+        detect e
+            output "is BowdenPrinter unexpected error: " + e:GetErrorMessage()
+        end
+        check
+            output "is DirectDrivePrinter = " + (asPrinter is DirectDrivePrinter)
+        detect e
+            output "is DirectDrivePrinter unexpected error: " + e:GetErrorMessage()
+        end
+        check
+            output "is KlipperPrinter = " + (asPrinter is KlipperPrinter)
+        detect e
+            output "is KlipperPrinter unexpected error: " + e:GetErrorMessage()
+        end
+        check
+            output "is BambuPrinter = " + (asPrinter is BambuPrinter)
+        detect e
+            output "is BambuPrinter unexpected error: " + e:GetErrorMessage()
+        end
+        check
+            output "Validate() problem count = " + problems:GetSize()
+        detect e
+            output "Validate() problem count unexpected error: " + e:GetErrorMessage()
+        end
+        check
+            output "GetHeatGcode() = [" + Flat(printer:GetHeatGcode()) + "]"
+        detect e
+            output "GetHeatGcode() unexpected error: " + e:GetErrorMessage()
+        end
+        check
+            output "GetHomeGcode() = [" + Flat(printer:GetHomeGcode()) + "]"
+        detect e
+            output "GetHomeGcode() unexpected error: " + e:GetErrorMessage()
+        end
+        check
+            output "GetPrimeGcode() = [" + Flat(printer:GetPrimeGcode()) + "]"
+        detect e
+            output "GetPrimeGcode() unexpected error: " + e:GetErrorMessage()
+        end
+        check
+            output "GetStartGcode() = [" + Flat(printer:GetStartGcode()) + "]"
+        detect e
+            output "GetStartGcode() unexpected error: " + e:GetErrorMessage()
+        end
+        check
+            output "GetEndGcode() = [" + Flat(printer:GetEndGcode()) + "]"
+        detect e
+            output "GetEndGcode() unexpected error: " + e:GetErrorMessage()
+        end
+        printer:SetBed(150.5, 160, 170)
+        check
+            output "Describe() after SetBed(150.5, 160, 170) = [" + printer:Describe() + "]"
+        detect e
+            output "Describe() after SetBed(150.5, 160, 170) unexpected error: " + e:GetErrorMessage()
+        end
+        check
+            output "Lines(A, B) = [" + Flat(printer:Lines("A", "B")) + "]"
+        detect e
+            output "Lines(A, B) unexpected error: " + e:GetErrorMessage()
+        end
+        Profile child
+        child:SetParent(printer)
+        check
+            output "child profile GetStartGcode() = printer's = " + (child:GetStartGcode() = printer:GetStartGcode())
+        detect e
+            output "child profile GetStartGcode() = printer's unexpected error: " + e:GetErrorMessage()
+        end
+        check
+            output "child profile GetText(maxNozzleTemperature) = [" + child:GetText("maxNozzleTemperature") + "]"
+        detect e
+            output "child profile GetText(maxNozzleTemperature) unexpected error: " + e:GetErrorMessage()
+        end
+    end
+
+    action Flat(text value) returns text
+        text lf = ""
+        lf = lf:GetLineFeed()
+        text cr = ""
+        cr = cr:GetCarriageReturn()
+        text result = value:Replace(cr, "")
+        return result:Replace(lf, "\n")
+    end
+end

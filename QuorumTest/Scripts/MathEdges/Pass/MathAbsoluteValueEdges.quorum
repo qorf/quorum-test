@@ -1,0 +1,73 @@
+use Libraries.Compute.Math
+
+/*
+Math:AbsoluteValue at edge values. The absolute value of the smallest
+integer, -2147483648, does not fit in a 32 bit integer and wraps back to
+itself, as Java's Math.abs does. The absolute value of negative zero is
+zero (Java's Math.abs(-0.0) is 0.0), of negative infinity is infinity, and
+of NaN is NaN.
+*/
+class Main
+    Math math
+
+    action Main
+        integer maximum = 2147483647
+        integer minimum = -2147483647 - 1
+        check
+            output "AbsoluteValue(integer -5) = " + math:AbsoluteValue(-5)
+        detect e
+            output "AbsoluteValue(integer -5) unexpected error: " + e:GetErrorMessage()
+        end
+        check
+            output "AbsoluteValue(integer 0) = " + math:AbsoluteValue(0)
+        detect e
+            output "AbsoluteValue(integer 0) unexpected error: " + e:GetErrorMessage()
+        end
+        check
+            output "AbsoluteValue(integer 2147483647) = " + math:AbsoluteValue(maximum)
+        detect e
+            output "AbsoluteValue(integer 2147483647) unexpected error: " + e:GetErrorMessage()
+        end
+        check
+            output "AbsoluteValue(integer -2147483647) = " + math:AbsoluteValue(-maximum)
+        detect e
+            output "AbsoluteValue(integer -2147483647) unexpected error: " + e:GetErrorMessage()
+        end
+        check
+            output "AbsoluteValue(integer -2147483648) = " + math:AbsoluteValue(minimum)
+        detect e
+            output "AbsoluteValue(integer -2147483648) unexpected error: " + e:GetErrorMessage()
+        end
+        check
+            output "AbsoluteValue(-2.5) = " + math:AbsoluteValue(-2.5)
+        detect e
+            output "AbsoluteValue(-2.5) unexpected error: " + e:GetErrorMessage()
+        end
+        check
+            number zero = 0.0
+            number negativeZero = -1 * zero
+            output "AbsoluteValue(-0.0) = " + math:AbsoluteValue(negativeZero)
+        detect e
+            output "AbsoluteValue(-0.0) unexpected error: " + e:GetErrorMessage()
+        end
+        check
+            number zero = 0.0
+            number negativeInfinity = -1.0 / zero
+            output "AbsoluteValue(-Infinity) = " + math:AbsoluteValue(negativeInfinity)
+        detect e
+            output "AbsoluteValue(-Infinity) unexpected error: " + e:GetErrorMessage()
+        end
+        check
+            number zero = 0.0
+            number notANumber = zero / zero
+            output "AbsoluteValue(NaN) = " + math:AbsoluteValue(notANumber)
+        detect e
+            output "AbsoluteValue(NaN) unexpected error: " + e:GetErrorMessage()
+        end
+        check
+            output "AbsoluteValue(-1.0E-300) = " + math:AbsoluteValue(-1.0e-300)
+        detect e
+            output "AbsoluteValue(-1.0E-300) unexpected error: " + e:GetErrorMessage()
+        end
+    end
+end

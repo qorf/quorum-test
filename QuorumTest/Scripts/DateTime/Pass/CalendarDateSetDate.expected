@@ -1,0 +1,14 @@
+New CalendarDate: GetYear() = 1970, GetMonth() = 1, GetDay() = 1, ToText() = [1970-01-01]
+SetDate(2026, 11, 12) = true, date is now 2026/11/12
+SetDate(2024, 2, 29) = true, date is now 2024/2/29
+SetDate(2023, 2, 29) = false, date is now 2024/2/29
+SetDate(2000, 2, 29) = true, date is now 2000/2/29
+SetDate(1900, 2, 29) = false, date is now 2000/2/29
+SetDate(2026, 2, 30) = false, date is now 2000/2/29
+SetDate(2026, 4, 31) = false, date is now 2000/2/29
+SetDate(2026, 13, 1) = false, date is now 2000/2/29
+SetDate(2026, 0, 10) = false, date is now 2000/2/29
+SetDate(2026, 5, 0) = false, date is now 2000/2/29
+SetDate(2026, 12, 31) = true, date is now 2026/12/31
+SetDate(1, 1, 1) = true, date is now 1/1/1
+SetDate(-44, 3, 15) = true, date is now -44/3/15

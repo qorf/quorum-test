@@ -1,0 +1,111 @@
+use Libraries.Compute.Frustum
+use Libraries.Compute.Plane
+use Libraries.Compute.Vector3
+use Libraries.Compute.Matrix4
+
+/*
+Every action of Frustum. Update takes an inverse combined projection and
+view matrix. The one used here is the inverse of an orthographic camera
+looking down -z that sees x from -2 to 2, y from -1 to 1 and z from -1
+(near) to -10 (far): it maps clip space x, y, z to 2x, y and -4.5z - 5.5.
+So the frustum is that box, its six planes face inward (near, far, left,
+right, top, bottom, in the order Update builds them), its corners are
+(+-2, +-1, -1) and (+-2, +-1, -10), and points and spheres can be checked
+against the box by hand. A point on the boundary counts as inside, since
+only the back of a plane is outside. The plane values are rounded to 4
+places.
+*/
+class Main
+    action Main
+        Matrix4 inverse
+        inverse:Set(2, 0, 0, 0, 0, 1, 0, 0, 0, 0, -4.5, -5.5, 0, 0, 0, 1)
+        Frustum frustum
+        check
+            frustum:Update(inverse)
+            output "number of planes = " + frustum:planes:GetSize() + ", number of corner points = " + frustum:planePoints:GetSize()
+            output "corner 0 = " + Text(frustum:planePoints:Get(0)) + ", corner 6 = " + Text(frustum:planePoints:Get(6))
+            integer i = 0
+            repeat while i < frustum:planes:GetSize()
+                Plane plane = frustum:planes:Get(i)
+                output "plane " + i + ": normal " + Text(plane:GetNormal()) + ", distance " + Round(plane:GetDistance())
+                i = i + 1
+            end
+        detect e
+            output "Update unexpected error: " + e:GetErrorMessage()
+        end
+        ShowPoint(frustum, 0, 0, -5)
+        ShowPoint(frustum, 0, 0, 0)
+        ShowPoint(frustum, 3, 0, -5)
+        ShowPoint(frustum, 0, -1.5, -5)
+        ShowPoint(frustum, 0, 0, -11)
+        ShowPoint(frustum, 2, 1, -1)
+        ShowPoint(frustum, -1.9, 0.9, -9.9)
+        check
+            output "PointInFrustum(vector (1, 0.5, -2)) = " + frustum:PointInFrustum(MakeVector(1, 0.5, -2))
+            output "PointInFrustum(vector (1, 0.5, 2)) = " + frustum:PointInFrustum(MakeVector(1, 0.5, 2))
+        detect e
+            output "PointInFrustum(vector) unexpected error: " + e:GetErrorMessage()
+        end
+        ShowSphere(frustum, 3, 0, -5, 1.5)
+        ShowSphere(frustum, 3, 0, -5, 0.5)
+        ShowSphere(frustum, 0, 0, 0, 0.5)
+        ShowSphere(frustum, 0, 0, 0, 2)
+        ShowSphere(frustum, 0, 0, -12, 1)
+        ShowSphere(frustum, 0, 0, -12, 3)
+        check
+            output "SphereInFrustum(vector (0, 3, -5), 1) = " + frustum:SphereInFrustum(MakeVector(0, 3, -5), 1)
+            output "SphereInFrustum(vector (0, 1.5, -5), 1) = " + frustum:SphereInFrustum(MakeVector(0, 1.5, -5), 1)
+        detect e
+            output "SphereInFrustum(vector) unexpected error: " + e:GetErrorMessage()
+        end
+        ShowSide(frustum, 0, 0, 0, 0.1)
+        ShowSide(frustum, 0, 0, 20, 0.1)
+        ShowSide(frustum, 5, 0, -5, 1)
+        ShowSide(frustum, 0, 1.5, -5, 1)
+        check
+            output "SphereInFrustumWithoutNearFar(vector (0, 0, -50), 1) = " + frustum:SphereInFrustumWithoutNearFar(MakeVector(0, 0, -50), 1)
+            output "SphereInFrustumWithoutNearFar(vector (-4, 0, -50), 1) = " + frustum:SphereInFrustumWithoutNearFar(MakeVector(-4, 0, -50), 1)
+        detect e
+            output "SphereInFrustumWithoutNearFar(vector) unexpected error: " + e:GetErrorMessage()
+        end
+    end
+
+    action ShowPoint(Frustum frustum, number x, number y, number z)
+        check
+            output "PointInFrustum(" + x + ", " + y + ", " + z + ") = " + frustum:PointInFrustum(x, y, z)
+        detect e
+            output "PointInFrustum(" + x + ", " + y + ", " + z + ") unexpected error: " + e:GetErrorMessage()
+        end
+    end
+
+    action ShowSphere(Frustum frustum, number x, number y, number z, number radius)
+        check
+            output "SphereInFrustum(" + x + ", " + y + ", " + z + ", " + radius + ") = " + frustum:SphereInFrustum(x, y, z, radius)
+        detect e
+            output "SphereInFrustum(" + x + ", " + y + ", " + z + ", " + radius + ") unexpected error: " + e:GetErrorMessage()
+        end
+    end
+
+    action ShowSide(Frustum frustum, number x, number y, number z, number radius)
+        check
+            output "SphereInFrustumWithoutNearFar(" + x + ", " + y + ", " + z + ", " + radius + ") = " + frustum:SphereInFrustumWithoutNearFar(x, y, z, radius)
+        detect e
+            output "SphereInFrustumWithoutNearFar(" + x + ", " + y + ", " + z + ", " + radius + ") unexpected error: " + e:GetErrorMessage()
+        end
+    end
+
+    action MakeVector(number x, number y, number z) returns Vector3
+        Vector3 vector
+        vector:Set(x, y, z)
+        return vector
+    end
+
+    action Round(number value) returns number
+        Libraries.Compute.Math math
+        return math:Round(value, 4)
+    end
+
+    action Text(Vector3 vector) returns text
+        return "(" + Round(vector:GetX()) + ", " + Round(vector:GetY()) + ", " + Round(vector:GetZ()) + ")"
+    end
+end

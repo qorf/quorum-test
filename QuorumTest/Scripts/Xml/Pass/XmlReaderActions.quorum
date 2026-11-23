@@ -1,0 +1,104 @@
+use Libraries.Data.Formats.ExtensibleMarkupReader
+use Libraries.Data.Formats.MarkupListener
+use Libraries.Data.Formats.Element
+
+/*
+The ExtensibleMarkupReader's own actions: SetMarkupListener and
+GetMarkupListener, Read with the default listener (nothing set), reading two
+documents in a row with one reader, and the base MarkupListener's actions,
+which do nothing. Each line names the call and its result.
+*/
+class Main is MarkupListener
+    text log = ""
+
+    action Main
+        check
+            ExtensibleMarkupReader reader
+            reader:SetMarkupListener(me)
+            MarkupListener got = reader:GetMarkupListener()
+            output "SetMarkupListener(me) then GetMarkupListener() returns the same listener = [" + got:Equals(me) + "]"
+        detect e
+            output "SetMarkupListener/GetMarkupListener unexpected error: " + e:GetErrorMessage()
+        end
+
+        check
+            ExtensibleMarkupReader reader
+            MarkupListener got = reader:GetMarkupListener()
+            output "GetMarkupListener() on a new reader is defined = [" + (got not= undefined) + "]"
+        detect e
+            output "GetMarkupListener() on a new reader unexpected error: " + e:GetErrorMessage()
+        end
+
+        check
+            ExtensibleMarkupReader reader
+            reader:Read("<a x='1'>hi<b/></a>")
+            output "Read(<a x='1'>hi<b/></a>) with the default listener completes"
+        detect e
+            output "Read(<a x='1'>hi<b/></a>) with the default listener unexpected error: " + e:GetErrorMessage()
+        end
+
+        check
+            ExtensibleMarkupReader reader
+            reader:SetMarkupListener(me)
+            log = ""
+            reader:Read("<a>x</a>")
+            text first = log
+            log = ""
+            reader:Read("<b>y</b>")
+            output "Read(<a>x</a>) then Read(<b>y</b>) on one reader: first events:" + first + ", second events:" + log
+        detect e
+            output "Read twice on one reader unexpected error: " + e:GetErrorMessage()
+        end
+
+        check
+            ExtensibleMarkupReader reader
+            reader:SetMarkupListener(me)
+            check
+                reader:Read("<a>unfinished ")
+            detect bad
+            end
+            log = ""
+            reader:Read("<b>y</b>")
+            output "Read(<b>y</b>) after an unfinished document on one reader events:" + log
+        detect e
+            output "Read(<b>y</b>) after an unfinished document on one reader fails: " + e:GetErrorMessage()
+        end
+
+        check
+            ExtensibleMarkupReader first
+            ExtensibleMarkupReader second
+            first:SetMarkupListener(me)
+            log = ""
+            first:Read("<!DOCTYPE a [<!ENTITY e 'one'>]><a>&e;</a>")
+            second:SetMarkupListener(me)
+            log = ""
+            second:Read("<a>&lt;</a>")
+            output "a second reader does not share the first reader's entities: Read(<a>&lt;</a>) events:" + log
+        detect e
+            output "second reader unexpected error: " + e:GetErrorMessage()
+        end
+
+        check
+            MarkupListener plain
+            Element element
+            plain:StartElement(element)
+            plain:Value("text")
+            plain:EndElement(element)
+            output "MarkupListener StartElement, Value and EndElement do nothing by default"
+        detect e
+            output "MarkupListener default actions unexpected error: " + e:GetErrorMessage()
+        end
+    end
+
+    action StartElement(Element element)
+        log = log + " Start(" + element:GetName() + ")"
+    end
+
+    action Value(text value)
+        log = log + " Value[" + value + "]"
+    end
+
+    action EndElement(Element element)
+        log = log + " End(" + element:GetName() + ")"
+    end
+end

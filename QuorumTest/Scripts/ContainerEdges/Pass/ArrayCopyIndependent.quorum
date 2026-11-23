@@ -1,0 +1,90 @@
+use Libraries.Containers.Array
+
+/*
+    Copy and CopyToArray make a new Array: changing the copy leaves the
+    original alone and the reverse. Copy documents that the elements
+    themselves are not copied, so an inner Array is shared by both.
+*/
+class Main
+    action Show(text value) returns text
+        if value = undefined
+            return "undefined"
+        end
+        return "[" + value + "]"
+    end
+
+    action Describe(Array<text> array) returns text
+        text result = "["
+        integer i = 0
+        repeat while i < array:GetSize()
+            if i > 0
+                result = result + ","
+            end
+            text value = array:Get(i)
+            if value = undefined
+                result = result + "undefined"
+            else
+                result = result + value
+            end
+            i = i + 1
+        end
+        return result + "]"
+    end
+    action Main
+        Array<text> original
+        original:Add("a")
+        original:Add("b")
+        original:Add("c")
+
+        Object copyObject = original:Copy()
+        Array<text> copy = cast(Array<text>, copyObject)
+        check
+            copy:Set(0, "x")
+            copy:Add("d")
+            copy:RemoveAt(1)
+            output "Array[a,b,c] Copy() then copy Set(0, x), Add(d), RemoveAt(1): copy " + Describe(copy) + ", original " + Describe(original)
+        detect e
+            output "Array[a,b,c] Copy() then changing the copy unexpected error: " + e:GetErrorMessage()
+        end
+        check
+            original:Set(2, "z")
+            original:AddToFront("w")
+            output "Then original Set(2, z), AddToFront(w): original " + Describe(original) + ", copy " + Describe(copy)
+        detect e
+            output "Then changing the original unexpected error: " + e:GetErrorMessage()
+        end
+
+        Array<text> second = original:CopyToArray()
+        check
+            second:Empty()
+            output "Array[w,a,b,z] CopyToArray() then copy Empty(): copy size " + second:GetSize() + ", original " + Describe(original)
+        detect e
+            output "Array CopyToArray() then copy Empty() unexpected error: " + e:GetErrorMessage()
+        end
+
+        Array<text> fixed
+        fixed:SetAutoResize(false)
+        fixed:Add("a")
+        check
+            Object fixedObject = fixed:Copy()
+            Array<text> fixedCopy = cast(Array<text>, fixedObject)
+            output "Array[a] auto-resize off Copy(): copy " + Describe(fixedCopy) + ", size " + fixedCopy:GetSize()
+        detect e
+            output "Array[a] auto-resize off Copy() unexpected error: " + e:GetErrorMessage()
+        end
+
+        Array<Array<text>> outer
+        Array<text> inner
+        inner:Add("i")
+        outer:Add(inner)
+        check
+            Object outerObject = outer:Copy()
+            Array<Array<text>> outerCopy = cast(Array<Array<text>>, outerObject)
+            Array<text> innerFromCopy = outerCopy:Get(0)
+            innerFromCopy:Add("j")
+            output "Array[[i]] Copy(), then adding j to the copy's inner Array: original inner " + Describe(inner) + " (elements are shared)"
+        detect e
+            output "Array[[i]] Copy() inner sharing unexpected error: " + e:GetErrorMessage()
+        end
+    end
+end

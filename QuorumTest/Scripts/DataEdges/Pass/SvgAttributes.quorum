@@ -1,0 +1,130 @@
+use Libraries.Data.Formats.ScalableVectorGraphics.Circle
+
+/*
+The global attributes every SVG shape shares, written by ToText: id, class,
+style, fill and fill-opacity, stroke, stroke-opacity and stroke-width,
+transforms, ARIA attributes and data-* attributes. Each case prints either
+the whole circle (line feeds shown as \n) or whether ToText contains the
+expected attribute. Attribute values are XML, so a double quote, &, < or '
+in a value must be escaped (&quot; &amp; &lt; &apos;). A stroke opacity is
+written as the stroke opacity that was set; SetSkewYTransform writes
+skewY(...).
+*/
+class Main
+    action Main
+        text dq = ""
+        dq = dq:GetDoubleQuote()
+
+        check
+            Circle circle
+            circle:SetPosition(1.5, 2.5)
+            circle:SetRadius(3.5)
+            circle:SetTabIndex(0)
+            circle:SetID("c1")
+            circle:SetStyleClass("dot")
+            circle:SetStyle("opacity:1")
+            output "Circle SetID(c1) SetStyleClass(dot) SetStyle(opacity:1) ToText() = [" + Show(circle:ToText()) + "]"
+            output "Circle GetID() = [" + circle:GetID() + "], GetStyleClass() = [" + circle:GetStyleClass() + "], GetStyle() = [" + circle:GetStyle() + "]"
+        detect e
+            output "Circle id, class and style unexpected error: " + e:GetErrorMessage()
+        end
+
+        check
+            Circle circle
+            circle:SetPosition(1.5, 2.5)
+            circle:SetRadius(3.5)
+            circle:SetTabIndex(0)
+            circle:SetFill("red")
+            circle:SetFillOpacity("0.5")
+            circle:SetStroke("blue")
+            circle:SetStrokeOpacity("0.25")
+            circle:SetStrokeWidth(2.5)
+            output "Circle SetFill(red) SetFillOpacity(0.5) SetStroke(blue) SetStrokeOpacity(0.25) SetStrokeWidth(2.5) ToText() = [" + Show(circle:ToText()) + "]"
+            output "Circle GetFill() = [" + circle:GetFill() + "], GetFillOpacity() = [" + circle:GetFillOpacity() + "], GetStroke() = [" + circle:GetStroke() + "], GetStrokeOpacity() = [" + circle:GetStrokeOpacity() + "], GetStrokeWidth() = [" + circle:GetStrokeWidth() + "]"
+        detect e
+            output "Circle paint attributes unexpected error: " + e:GetErrorMessage()
+        end
+
+        check
+            Circle circle
+            circle:SetStrokeWidth(5.5, "%")
+            output "Circle SetStrokeWidth(5.5, %) GetStrokeWidth() = [" + circle:GetStrokeWidth() + "]"
+        detect e
+            output "Circle SetStrokeWidth with a unit unexpected error: " + e:GetErrorMessage()
+        end
+
+        Contains("SetRotateTransform(45.5)", "rotate(45.5)", 1)
+        Contains("SetTranslateTransform(1.5, 2.5)", "translate(1.5 2.5)", 2)
+        Contains("SetSkewXTransform(30.5)", "skewX(30.5)", 3)
+        Contains("SetSkewYTransform(30.5)", "skewY(30.5)", 4)
+        Contains("SetScaleTransform(2.5)", "scale(2.5)", 5)
+        Contains("SetAriaLabel(Tom & Jerry's <" + dq + "show" + dq + ">)", "aria-label=" + dq + "Tom &amp; Jerry&apos;s &lt;&quot;show&quot;&gt;" + dq, 6)
+        Contains("SetRole(img)", "role=" + dq + "img" + dq, 7)
+        Contains("AddDataAttribute(value, 42)", "data-value=" + dq + "42" + dq, 8)
+        Contains("AddDataAttribute(note, a" + dq + "b)", "data-note=" + dq + "a&quot;b" + dq, 9)
+        Contains("SetSkewXTransform(10.5) then SetSkewYTransform(30.5)", "skewX(10.5)", 10)
+
+        check
+            Circle circle
+            circle:AddDataAttribute("value", "42")
+            output "Circle AddDataAttribute(value, 42): GetDataValue(value) = [" + circle:GetDataValue("value") + "], HasDataAttribute(value) = [" + circle:HasDataAttribute("value") + "], HasDataAttribute(other) = [" + circle:HasDataAttribute("other") + "]"
+            circle:SetDataAttribute("value", "43")
+            output "Circle SetDataAttribute(value, 43): GetDataValue(value) = [" + circle:GetDataValue("value") + "]"
+        detect e
+            output "Circle data attributes unexpected error: " + e:GetErrorMessage()
+        end
+
+        check
+            Circle circle
+            circle:SetAriaLabel("label")
+            circle:SetAriaDescription("description")
+            circle:SetAriaLabelledBy("t1")
+            circle:SetAriaDescribedBy("d1")
+            circle:SetAriaHidden("true")
+            circle:SetAriaRoleDescription("dot")
+            circle:SetRole("img")
+            output "Circle ARIA getters: GetAriaLabel() = [" + circle:GetAriaLabel() + "], GetAriaDescription() = [" + circle:GetAriaDescription() + "], GetAriaLabelledBy() = [" + circle:GetAriaLabelledBy() + "], GetAriaDescribedBy() = [" + circle:GetAriaDescribedBy() + "], GetAriaHidden() = [" + circle:GetAriaHidden() + "], GetAriaRoleDescription() = [" + circle:GetAriaRoleDescription() + "], GetRole() = [" + circle:GetRole() + "]"
+        detect e
+            output "Circle ARIA getters unexpected error: " + e:GetErrorMessage()
+        end
+    end
+
+    action Show(text value) returns text
+        return value:Replace(value:GetLineFeed(), "\n")
+    end
+
+    action Contains(text call, text expected, integer which)
+        check
+            text dq = ""
+            dq = dq:GetDoubleQuote()
+            Circle circle
+            circle:SetTabIndex(0)
+            if which = 1
+                circle:SetRotateTransform(45.5)
+            elseif which = 2
+                circle:SetTranslateTransform(1.5, 2.5)
+            elseif which = 3
+                circle:SetSkewXTransform(30.5)
+            elseif which = 4
+                circle:SetSkewYTransform(30.5)
+            elseif which = 5
+                circle:SetScaleTransform(2.5)
+            elseif which = 6
+                circle:SetAriaLabel("Tom & Jerry's <" + dq + "show" + dq + ">")
+            elseif which = 7
+                circle:SetRole("img")
+            elseif which = 8
+                circle:AddDataAttribute("value", "42")
+            elseif which = 9
+                circle:AddDataAttribute("note", "a" + dq + "b")
+            elseif which = 10
+                circle:SetSkewXTransform(10.5)
+                circle:SetSkewYTransform(30.5)
+            end
+            text result = circle:ToText()
+            output "Circle " + call + " ToText() contains " + expected + " = [" + result:Contains(expected) + "]"
+        detect e
+            output "Circle " + call + " unexpected error: " + e:GetErrorMessage()
+        end
+    end
+end

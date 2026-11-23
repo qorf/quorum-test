@@ -1,0 +1,56 @@
+/*
+    Text:Compare(Object) returns -1, 0 or 1. The documentation does not say
+    how letters are ordered; the expectation is Java's compareTo, which
+    orders by character code, so every upper case letter comes before every
+    lower case letter: Compare(a, B) = 1. CompareIgnoringCase(Object)
+    ignores case, so CompareIgnoringCase(a, B) = -1. Each case runs on a
+    text primitive and on a Text object; the other value is a Text object.
+*/
+class Main
+    action Main
+        Show("a", "b")
+        Show("b", "a")
+        Show("a", "a")
+        Show("a", "B")
+        Show("B", "a")
+        Show("A", "a")
+        Show("a", "A")
+        Show("", "a")
+        Show("a", "")
+        Show("", "")
+        Show("abc", "ab")
+        Show("apple", "banana")
+        Show("Zebra", "apple")
+        Show("10", "9")
+        Show(" ", "a")
+    end
+
+    action Show(text value, text other)
+        Text otherObject
+        otherObject:SetValue(other)
+        text compare = "Compare(" + value + ", " + other + ")"
+        text ignoring = "CompareIgnoringCase(" + value + ", " + other + ")"
+        check
+            output compare + " = " + value:Compare(otherObject)
+        detect e
+            output compare + " unexpected error: " + e:GetErrorMessage()
+        end
+        check
+            output ignoring + " = " + value:CompareIgnoringCase(otherObject)
+        detect e
+            output ignoring + " unexpected error: " + e:GetErrorMessage()
+        end
+        Text object
+        object:SetValue(value)
+        check
+            output "Text " + compare + " = " + object:Compare(otherObject)
+        detect e
+            output "Text " + compare + " unexpected error: " + e:GetErrorMessage()
+        end
+        check
+            output "Text " + ignoring + " = " + object:CompareIgnoringCase(otherObject)
+        detect e
+            output "Text " + ignoring + " unexpected error: " + e:GetErrorMessage()
+        end
+    end
+end

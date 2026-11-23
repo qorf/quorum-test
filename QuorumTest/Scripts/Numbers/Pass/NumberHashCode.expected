@@ -1,0 +1,15 @@
+GetHashCode(0.0) = 0
+Number GetHashCode(0.0) = 0
+GetHashCode(1.0) = 1072693248
+Number GetHashCode(1.0) = 1072693248
+GetHashCode(-1.0) = -1074790400
+Number GetHashCode(-1.0) = -1074790400
+GetHashCode(2.5) = 1074003968
+Number GetHashCode(2.5) = 1074003968
+GetHashCode(0.5) = 1071644672
+Number GetHashCode(0.5) = 1071644672
+GetHashCode(100.0) = 1079574528
+Number GetHashCode(100.0) = 1079574528
+GetHashCode(-0.0) = -2147483648
+Number GetHashCode(-0.0) = -2147483648
+GetHashCode(3.75) of two Number objects equal is true

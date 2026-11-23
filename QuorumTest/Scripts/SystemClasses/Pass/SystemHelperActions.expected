@@ -1,0 +1,9 @@
+Sleep(10) = done
+RequestGarbageCollection() = done
+GetFreeMemory() is more than 0 = true
+GetTotalMemory() is more than 0 = true
+GetMaximumMemory() is more than 0 = true
+GetFreeMemory() is at most GetTotalMemory() = true
+GetTotalMemory() is at most GetMaximumMemory() = true
+GetAvailableProcessors() is at least 1 = true
+GetThreadName() is not empty = true

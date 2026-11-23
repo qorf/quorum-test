@@ -1,0 +1,50 @@
+package Libraries.Language.Compile.Test
+
+use Libraries.Testing.QuorumTest
+use Libraries.Testing.ScriptCheck
+
+/*
+Tests Libraries.Web: the HTML that element classes write (tags, attributes,
+nesting, void elements), WebTextEscaper, StyleSheet, the text, box, list
+and table styles, the layouts and WebPageHeader. Each script prints one
+line per case, the HTML flattened onto one line with double quotes shown
+as '. HTML generation is pure Quorum, so these run on every back end,
+except PhrasingElements: its classes reach WebPage, which pulls in the
+statistics and interface libraries (about 2,000 classes), too slow on
+Python, so it runs on bytecode and JavaScript.
+*/
+class WebTester
+    QuorumTest suite = undefined
+    ScriptCheck scripts
+    text path = "Scripts/Web/Pass/"
+
+    action Test
+        scripts:SetSuite(suite)
+        scripts:CheckEverywhere(path + "BoxStylesAndLayouts")
+        scripts:CheckEverywhere(path + "ContainerElements")
+        scripts:CheckEverywhere(path + "FormElements")
+        scripts:CheckEverywhere(path + "GlobalAttributes")
+        scripts:CheckEverywhere(path + "HeadElements")
+        scripts:CheckEverywhere(path + "MediaElements")
+        scripts:CheckEverywhere(path + "NestedTags")
+        scripts:Check(path + "PhrasingElements", true, false)
+        scripts:CheckEverywhere(path + "StyleSheet")
+        scripts:CheckEverywhere(path + "VoidElements")
+        scripts:CheckEverywhere(path + "WebColor")
+        scripts:CheckEverywhere(path + "WebPageHeader")
+        scripts:CheckEverywhere(path + "WebTextEscaper")
+        scripts:CheckEverywhere(path + "WebTextStyle")
+    end
+
+    action GetName returns text
+        return "Web Tests"
+    end
+
+    action GetCompilerTestSuite returns QuorumTest
+        return suite
+    end
+
+    action SetCompilerTestSuite(QuorumTest suite)
+        me:suite = suite
+    end
+end

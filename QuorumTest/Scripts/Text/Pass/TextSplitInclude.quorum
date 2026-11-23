@@ -1,0 +1,74 @@
+use Libraries.Containers.Array
+
+/*
+    Text:Split(delimiter, include). The delimiter is plain text, not a
+    pattern. With include = true every trailing piece is kept, including
+    empty ones ("a,b,,," gives five pieces). The documentation does not say
+    exactly what include = false drops; the expectation follows the Java
+    plugin, which drops ALL trailing empty pieces ("a,b,,," gives a, b).
+
+    Note: this differs from Split(delimiter) with one parameter, which drops
+    only one trailing empty piece (see TextSplit). The last lines print both
+    for "a,b,,," side by side so the difference is easy to notice; whether
+    the two forms should agree is a question for the library's author.
+    Each case runs on a text primitive and on a Text object.
+*/
+class Main
+    action Main
+        Show("a,b,c", ",", true)
+        Show("a,b,c", ",", false)
+        Show("a,b,,,", ",", true)
+        Show("a,b,,,", ",", false)
+        Show("a,b,", ",", true)
+        Show("a,b,", ",", false)
+        Show(",a", ",", true)
+        Show(",a", ",", false)
+        Show("a,,b", ",", true)
+        Show("a,,b", ",", false)
+        Show(",", ",", true)
+        Show(",", ",", false)
+        Show("", ",", true)
+        Show("", ",", false)
+        Show("abc", ",", true)
+        Show("a.b.", ".", true)
+        Show("a.b.", ".", false)
+        Show("a--b--", "--", true)
+        Show("a--b--", "--", false)
+        text value = "a,b,,,"
+        check
+            Array<text> one = value:Split(",")
+            Array<text> two = value:Split(",", false)
+            output "Split([a,b,,,] on [,]) = " + Pieces(one) + " while include false = " + Pieces(two)
+        detect e
+            output "Split one and two parameters unexpected error: " + e:GetErrorMessage()
+        end
+    end
+
+    action Show(text value, text delimiter, boolean include)
+        text call = "Split([" + value + "] on [" + delimiter + "], include " + include + ")"
+        check
+            Array<text> pieces = value:Split(delimiter, include)
+            output call + " = " + Pieces(pieces)
+        detect e
+            output call + " unexpected error: " + e:GetErrorMessage()
+        end
+        Text object
+        object:SetValue(value)
+        check
+            Array<text> pieces = object:Split(delimiter, include)
+            output "Text " + call + " = " + Pieces(pieces)
+        detect e
+            output "Text " + call + " unexpected error: " + e:GetErrorMessage()
+        end
+    end
+
+    action Pieces(Array<text> pieces) returns text
+        text result = "" + pieces:GetSize() + " pieces "
+        integer i = 0
+        repeat while i < pieces:GetSize()
+            result = result + "[" + pieces:Get(i) + "]"
+            i = i + 1
+        end
+        return result
+    end
+end

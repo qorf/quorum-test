@@ -1,0 +1,54 @@
+use Libraries.Containers.Array
+
+/*
+    Text:SplitIntoLines splits on line feeds. It is written in Quorum as
+    Split(line feed), so it follows the same rules as TextSplit: empty
+    lines are kept, one empty piece after a final line feed is not added,
+    and an empty text gives one empty line. Carriage returns are not
+    tested, because the documentation does not say whether CR LF ends a
+    line. Labels write a line feed as /n. Each case runs on a text
+    primitive and on a Text object.
+*/
+class Main
+    action Main
+        text lf = ""
+        lf = lf:GetLineFeed()
+        Show("a" + lf + "b", "a/nb")
+        Show("a" + lf + "b" + lf, "a/nb/n")
+        Show("a" + lf + lf + "b", "a/n/nb")
+        Show(lf + "a", "/na")
+        Show(lf + lf, "/n/n")
+        Show(lf, "/n")
+        Show("abc", "abc")
+        Show("", "")
+        Show("one line" + lf + "two words" + lf + "  three  ", "one line/ntwo words/n  three  ")
+    end
+
+    action Show(text value, text label)
+        text call = "SplitIntoLines([" + label + "])"
+        check
+            Array<text> lines = value:SplitIntoLines()
+            output call + " = " + Pieces(lines)
+        detect e
+            output call + " unexpected error: " + e:GetErrorMessage()
+        end
+        Text object
+        object:SetValue(value)
+        check
+            Array<text> lines = object:SplitIntoLines()
+            output "Text " + call + " = " + Pieces(lines)
+        detect e
+            output "Text " + call + " unexpected error: " + e:GetErrorMessage()
+        end
+    end
+
+    action Pieces(Array<text> pieces) returns text
+        text result = "" + pieces:GetSize() + " lines "
+        integer i = 0
+        repeat while i < pieces:GetSize()
+            result = result + "[" + pieces:Get(i) + "]"
+            i = i + 1
+        end
+        return result
+    end
+end

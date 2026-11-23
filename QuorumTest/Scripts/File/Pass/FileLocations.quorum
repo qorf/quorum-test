@@ -1,0 +1,102 @@
+use Libraries.System.File
+
+/*
+Tests the actions about where a File points: GetWorkingDirectory,
+SetWorkingDirectory, SetWorkingDirectoryToStorage, GetAbsolutePath,
+SetAbsolutePath and GetParentDirectory, inside a scratch folder
+(FileTestsWork/FileLocations), deleted at the end. Absolute paths depend on
+the machine, so they are never printed: the program prints only whether they
+end with the expected relative part (with backslashes turned into slashes,
+so the check is the same on Windows). On desktop computers the storage
+folder is the program's usual working directory, as
+SetWorkingDirectoryToStorage's documentation says.
+*/
+class Main
+    action Main
+        File work
+        work:SetPath("FileTestsWork/FileLocations")
+        work:Delete(true)
+        boolean made = work:CreateDirectories()
+        File file
+        file:SetPath("FileTestsWork/FileLocations/inner.txt")
+        file:Write("inner")
+
+        File fresh
+        text start = fresh:GetWorkingDirectory()
+        check
+            output "GetAbsolutePath() of a new File equals GetWorkingDirectory() = " + (fresh:GetAbsolutePath() = start)
+        detect e
+            output "GetAbsolutePath() of a new File unexpected error: " + e:GetErrorMessage()
+        end
+        check
+            output "GetAbsolutePath(FileTestsWork/FileLocations/inner.txt) ends with it = " + EndsWith(file:GetAbsolutePath(), "/FileTestsWork/FileLocations/inner.txt")
+        detect e
+            output "GetAbsolutePath(inner.txt) unexpected error: " + e:GetErrorMessage()
+        end
+        text folder = work:GetAbsolutePath()
+
+        File relative
+        check
+            relative:SetWorkingDirectory(folder)
+            relative:SetPath("inner.txt")
+            output "SetWorkingDirectory(scratch folder), SetPath(inner.txt): GetPath() = [" + relative:GetPath() + "]"
+            output "SetWorkingDirectory(scratch folder): GetWorkingDirectory() is the folder = " + (relative:GetWorkingDirectory() = folder)
+            output "SetWorkingDirectory(scratch folder), SetPath(inner.txt): Read() = [" + relative:Read() + "]"
+        detect e
+            output "SetWorkingDirectory(scratch folder) unexpected error: " + e:GetErrorMessage()
+        end
+
+        File absolute
+        check
+            absolute:SetAbsolutePath(file:GetAbsolutePath())
+            output "SetAbsolutePath(.../inner.txt): GetPath() = [" + absolute:GetPath() + "]"
+            output "SetAbsolutePath(.../inner.txt): GetWorkingDirectory() ends with FileTestsWork/FileLocations = " + EndsWith(absolute:GetWorkingDirectory(), "/FileTestsWork/FileLocations")
+            output "SetAbsolutePath(.../inner.txt): Read() = [" + absolute:Read() + "]"
+        detect e
+            output "SetAbsolutePath(.../inner.txt) unexpected error: " + e:GetErrorMessage()
+        end
+        File invalid
+        check
+            invalid:SetAbsolutePath("noslashes")
+            output "SetAbsolutePath(noslashes) should fail but returned normally"
+        detect e
+            output "SetAbsolutePath(noslashes) fails, as it should"
+        end
+
+        check
+            File parentFile = file:GetParentDirectory()
+            output "GetParentDirectory(inner.txt): GetFileName() = [" + parentFile:GetFileName() + "]"
+            output "GetParentDirectory(inner.txt): IsDirectory() = " + parentFile:IsDirectory()
+            output "GetParentDirectory(inner.txt): GetAbsolutePath() ends with FileTestsWork/FileLocations = " + EndsWith(parentFile:GetAbsolutePath(), "/FileTestsWork/FileLocations")
+        detect e
+            output "GetParentDirectory(inner.txt) unexpected error: " + e:GetErrorMessage()
+        end
+        File root
+        check
+            root:SetWorkingDirectory("/")
+            File none = root:GetParentDirectory()
+            output "GetParentDirectory() of the root / is undefined = " + (none = undefined)
+        detect e
+            output "GetParentDirectory() of the root unexpected error: " + e:GetErrorMessage()
+        end
+
+        File storage
+        check
+            storage:SetWorkingDirectory(folder)
+            storage:SetWorkingDirectoryToStorage()
+            output "SetWorkingDirectoryToStorage(): GetWorkingDirectory() is the program's working directory = " + (storage:GetWorkingDirectory() = start)
+        detect e
+            output "SetWorkingDirectoryToStorage() unexpected error: " + e:GetErrorMessage()
+        end
+
+        work:Delete(true)
+        File top
+        top:SetPath("FileTestsWork")
+        boolean removed = top:Delete()
+    end
+
+    action EndsWith(text value, text ending) returns boolean
+        text fixed = value:Replace("\", "/")
+        return fixed:EndsWith(ending)
+    end
+end

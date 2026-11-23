@@ -1,0 +1,15 @@
+List[a,b,c,d] Remove(a) (the head) = true, gives [b,c,d], links ok, front b, end d
+List[b,c,d] Remove(d) (the tail) = true, gives [b,c], links ok, front b, end c
+List[b,c] Add(e), AddToFront(z) gives [z,b,c,e], links ok, front z, end e
+List[a,b,c,d] RemoveAt(2) (a middle node) = [c], gives [a,b,d], links ok, front a, end d
+List[a,b,d] RemoveAt(2) (the tail) = [d], gives [a,b], links ok, front a, end b
+List[a,b] Add(x) gives [a,b,x], links ok, front a, end x
+List[a,b,x] RemoveAt(0) (the head) = [a], gives [b,x], links ok, front b, end x
+List[only] Remove(only) = true, size 0, IsEmpty() = true, links ok, front none, end none
+List emptied by Remove then Add(again) gives [again], links ok, front again, end again
+List[x,x,y,x,x] RemoveAll(x) = true, gives [y], size 1, links ok, front y, end y
+List[y] Add(w), AddToFront(v) gives [v,y,w], links ok, front v, end w
+List[x,x,x] RemoveAll(x) = true, size 0, IsEmpty() = true, links ok, front none, end none
+List[a,b,c,d] RemoveFromFront() until empty removed abcd, then Add(n) gives [n], links ok, front n, end n
+List[a,b,c,d] RemoveFromEnd() until empty removed dcba, then AddToFront(n) gives [n], links ok, front n, end n
+List[a,b,c,d] Add(1, p), Remove(p), Add(3, q), Remove(b) gives [a,c,q,d], links ok, front a, end d

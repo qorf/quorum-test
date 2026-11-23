@@ -1,0 +1,184 @@
+use Libraries.Compute.Statistics.DataFrame
+use Libraries.Compute.Statistics.DataFrameColumn
+use Libraries.Compute.Statistics.Transforms.CombineFramesTransform
+use Libraries.Compute.Statistics.Transforms.ColumnFilterTransform
+use Libraries.Compute.Statistics.Transforms.ColumnRowFilterTransform
+use Libraries.Compute.Statistics.Transforms.ColumnRoundTransform
+
+/*
+Tests CombineFramesTransform (one frame's rows after another's),
+ColumnFilterTransform (copies chosen columns), ColumnRowFilterTransform's
+settings, ColumnRoundTransform and DataFrame:RoundSelectedColumns, and
+DataFrame:ReplaceUndefined. Frames are shown one per line: header=values,
+columns separated by |, NA for undefined. ColumnRowFilterTransform's own
+output isn't checked: DataFrame:Copy's documentation calls the end column
+and row the last ones copied, but its example copies five rows with an end
+of 5, so the documentation doesn't settle whether the end is included.
+*/
+class Main
+    action Main
+        check
+            DataFrame first = Frame("name,score;a,1.5;b,2.5")
+            DataFrame second = Frame("name,score;c,3.5")
+            CombineFramesTransform combine
+            combine:SetToCombine(second)
+            output "CombineFrames(a b, then c) = " + Show(first:Transform(combine))
+        detect e
+            output "CombineFrames unexpected error: " + e:GetErrorMessage()
+        end
+        check
+            DataFrame first = Frame("name,score;a,1.5;b,2.5")
+            DataFrame second = Frame("name,score;c,3.5")
+            CombineFramesTransform combine
+            combine:SetToCombine(second)
+            DataFrame combined = first:Transform(combine)
+            output "CombineFrames leaves both frames unchanged = " + Show(first) + " / " + Show(second)
+        detect e
+            output "CombineFrames originals unexpected error: " + e:GetErrorMessage()
+        end
+        check
+            DataFrame second = Frame("name,score;c,3.5")
+            CombineFramesTransform combine
+            combine:SetToCombine(second)
+            output "CombineFrames GetToCombine() = " + Show(combine:GetToCombine())
+        detect e
+            output "CombineFrames GetToCombine() unexpected error: " + e:GetErrorMessage()
+        end
+        check
+            DataFrame first = Frame("name,score;a,1.5")
+            DataFrame second = Frame("name;c")
+            CombineFramesTransform combine
+            combine:SetToCombine(second)
+            output "CombineFrames with different column counts should fail but returned " + Show(first:Transform(combine))
+        detect e
+            output "CombineFrames with different column counts fails, as it should"
+        end
+        check
+            DataFrame first = Frame("name,score;a,1.5")
+            CombineFramesTransform combine
+            output "CombineFrames with nothing to combine should fail but returned " + Show(first:Transform(combine))
+        detect e
+            output "CombineFrames with nothing to combine fails, as it should"
+        end
+
+        text three = "a,b,c;1.5,x,true;2.5,y,false"
+        check
+            DataFrame frame = Frame(three)
+            ColumnFilterTransform filter
+            filter:AddColumn(2)
+            filter:AddColumn(0)
+            output "ColumnFilterTransform AddColumn(2) AddColumn(0) = " + Show(frame:Transform(filter))
+        detect e
+            output "ColumnFilterTransform unexpected error: " + e:GetErrorMessage()
+        end
+        check
+            DataFrame frame = Frame(three)
+            ColumnFilterTransform filter
+            output "ColumnFilterTransform with no columns GetSize() = " + frame:Transform(filter):GetSize()
+        detect e
+            output "ColumnFilterTransform with no columns unexpected error: " + e:GetErrorMessage()
+        end
+        check
+            ColumnRowFilterTransform rows
+            rows:SetColumnStart(1)
+            rows:SetColumnEnd(2)
+            rows:SetRowStart(3)
+            rows:SetRowEnd(4)
+            output "ColumnRowFilterTransform settings read back = " + rows:GetColumnStart() + " " + rows:GetColumnEnd() + " " + rows:GetRowStart() + " " + rows:GetRowEnd()
+        detect e
+            output "ColumnRowFilterTransform settings unexpected error: " + e:GetErrorMessage()
+        end
+
+        text numbers = "x,y;1.23456,2.71828;9.87654,-0.55555"
+        check
+            DataFrame frame = Frame(numbers)
+            frame:AddSelectedColumn(0)
+            ColumnRoundTransform round
+            round:SetDecimalPlace(2)
+            output "ColumnRoundTransform SetDecimalPlace(2) on column x = " + Show(frame:Transform(round))
+        detect e
+            output "ColumnRoundTransform unexpected error: " + e:GetErrorMessage()
+        end
+        check
+            DataFrame frame = Frame(numbers)
+            frame:AddSelectedColumn(0)
+            frame:AddSelectedColumn(1)
+            output "RoundSelectedColumns(3) on x and y = " + Show(frame:RoundSelectedColumns(3))
+        detect e
+            output "RoundSelectedColumns(3) unexpected error: " + e:GetErrorMessage()
+        end
+        check
+            DataFrame frame = Frame(numbers)
+            frame:AddSelectedColumn(1)
+            DataFrame rounded = frame:RoundSelectedColumns(1)
+            output "RoundSelectedColumns(1) leaves the original frame unchanged = " + Show(frame)
+        detect e
+            output "RoundSelectedColumns original unexpected error: " + e:GetErrorMessage()
+        end
+        check
+            DataFrame frame = Frame("x,k;1.24,a;,b;3.76,c")
+            frame:AddSelectedColumn(0)
+            output "RoundSelectedColumns(1) with an undefined cell = " + Show(frame:RoundSelectedColumns(1))
+        detect e
+            output "RoundSelectedColumns(1) with an undefined cell unexpected error: " + e:GetErrorMessage()
+        end
+        check
+            ColumnRoundTransform round
+            round:SetDecimalPlace(0)
+            output "ColumnRoundTransform SetDecimalPlace(0) should fail but was accepted"
+        detect e
+            output "ColumnRoundTransform SetDecimalPlace(0) fails, as it should"
+        end
+        check
+            DataFrame frame = Frame("w,x;hi,1.5")
+            frame:AddSelectedColumn(0)
+            output "RoundSelectedColumns on a text column should fail but returned " + Show(frame:RoundSelectedColumns(1))
+        detect e
+            output "RoundSelectedColumns on a text column fails, as it should"
+        end
+
+        check
+            DataFrame frame = Frame("w,x;hi,1.5;,;yo,2.5")
+            frame:ReplaceUndefined("0")
+            output "ReplaceUndefined(0) = " + Show(frame)
+        detect e
+            output "ReplaceUndefined(0) unexpected error: " + e:GetErrorMessage()
+        end
+    end
+
+    /* A frame as one line: each column's header, then its values; NA for undefined. */
+    action Show(DataFrame frame) returns text
+        text result = ""
+        integer i = 0
+        repeat while i < frame:GetSize()
+            DataFrameColumn column = frame:GetColumn(i)
+            if i > 0
+                result = result + " | "
+            end
+            result = result + column:GetHeader() + "="
+            integer j = 0
+            repeat while j < column:GetSize()
+                if j > 0
+                    result = result + ","
+                end
+                if column:IsUndefined(j)
+                    result = result + "NA"
+                else
+                    result = result + column:GetAsText(j)
+                end
+                j = j + 1
+            end
+            i = i + 1
+        end
+        return result
+    end
+
+    /* Makes a frame from comma separated text whose rows are separated by ; */
+    action Frame(text rows) returns DataFrame
+        text lf = ""
+        lf = lf:GetLineFeed()
+        DataFrame frame
+        frame:LoadFromCommaSeparatedValue(rows:Replace(";", lf))
+        return frame
+    end
+end

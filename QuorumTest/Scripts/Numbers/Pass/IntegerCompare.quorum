@@ -1,0 +1,49 @@
+/*
+    Integer:Compare(Object) returns -1, 0 or 1 and Integer:Equals(Object)
+    compares values, including at the integer limits. The other value is
+    an Integer object. Each case runs on an integer primitive and on an
+    Integer object.
+*/
+class Main
+    action Main
+        integer minimum = -2147483647 - 1
+        Show(1, 2)
+        Show(2, 1)
+        Show(5, 5)
+        Show(-1, 1)
+        Show(0, 0)
+        Show(-5, -6)
+        Show(2147483647, minimum)
+        Show(minimum, 2147483647)
+        Show(minimum, minimum)
+    end
+
+    action Show(integer value, integer other)
+        Integer otherObject
+        otherObject:SetValue(other)
+        text compare = "Compare(" + value + ", " + other + ")"
+        text equals = "Equals(" + value + ", " + other + ")"
+        check
+            output compare + " = " + value:Compare(otherObject)
+        detect e
+            output compare + " unexpected error: " + e:GetErrorMessage()
+        end
+        check
+            output equals + " = " + value:Equals(otherObject)
+        detect e
+            output equals + " unexpected error: " + e:GetErrorMessage()
+        end
+        Integer object
+        object:SetValue(value)
+        check
+            output "Integer " + compare + " = " + object:Compare(otherObject)
+        detect e
+            output "Integer " + compare + " unexpected error: " + e:GetErrorMessage()
+        end
+        check
+            output "Integer " + equals + " = " + object:Equals(otherObject)
+        detect e
+            output "Integer " + equals + " unexpected error: " + e:GetErrorMessage()
+        end
+    end
+end

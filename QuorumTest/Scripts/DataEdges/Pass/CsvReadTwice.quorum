@@ -1,0 +1,51 @@
+use Libraries.Data.Formats.SeparatedValue
+
+/*
+Calling Read twice on one SeparatedValue. The documentation says Read puts
+the data it finds into the table, and Read(File) starts over its column
+count and consistency, so the expectation is that a second Read replaces the
+first one's rows, columns and consistency rather than adding to them.
+(Suspected: the rows add up and are never cleared.)
+*/
+class Main
+    action Main
+        text lf = ""
+        lf = lf:GetLineFeed()
+
+        check
+            SeparatedValue csv
+            csv:Read("a,b")
+            csv:Read("c,d,e")
+            output "Read(a,b) then Read(c,d,e): GetNumberOfRows() = " + csv:GetNumberOfRows() + ", GetNumberOfColumns() = " + csv:GetNumberOfColumns() + ", Get(0, 0) = [" + csv:Get(0, 0) + "]"
+        detect e
+            output "Read(a,b) then Read(c,d,e) unexpected error: " + e:GetErrorMessage()
+        end
+
+        check
+            SeparatedValue csv
+            csv:Read("a,b" + lf + "c")
+            csv:Read("x,y")
+            output "Read(a,b\nc) then Read(x,y): IsConsistent() = " + csv:IsConsistent() + ", GetNumberOfRows() = " + csv:GetNumberOfRows()
+        detect e
+            output "Read(a,b\nc) then Read(x,y) unexpected error: " + e:GetErrorMessage()
+        end
+
+        check
+            SeparatedValue csv
+            csv:Read("1,2" + lf + "3,4")
+            csv:Read("1,2" + lf + "3,4")
+            output "Read(1,2\n3,4) twice: GetNumberOfRows() = " + csv:GetNumberOfRows()
+        detect e
+            output "Read(1,2\n3,4) twice unexpected error: " + e:GetErrorMessage()
+        end
+
+        check
+            SeparatedValue csv
+            csv:Read("a,b")
+            csv:Read("")
+            output "Read(a,b) then Read(): GetNumberOfRows() = " + csv:GetNumberOfRows()
+        detect e
+            output "Read(a,b) then Read() unexpected error: " + e:GetErrorMessage()
+        end
+    end
+end

@@ -1,0 +1,12 @@
+Array[undefined,b,undefined,b] Has(b) = true
+Array[undefined,b,undefined,b] Has(z) = false
+Array[undefined,b,undefined,b] GetFirstLocation(b) = 1
+Array[undefined,b,undefined,b] GetLastLocation(b) = 3
+Array[undefined,b,undefined,b] GetFirstLocation(undefined) = -1
+Array[undefined,b,undefined,b] Has(undefined) = false
+Array[undefined,b,undefined,b] Remove(b) = true, leaving [undefined,undefined,b]
+Array[undefined,b,undefined,b] RemoveAll(b) = true, leaving [undefined,undefined]
+Array[undefined,b,undefined,b] Remove(undefined) = false, leaving [undefined,b,undefined,b]
+Array[undefined,b,undefined,b] RemoveAll(undefined) = false, leaving [undefined,b,undefined,b]
+Array Add(a), Add(undefined), Add(c) gives [a,undefined,c], size 3
+Array[a,undefined,c] Has(c) = true

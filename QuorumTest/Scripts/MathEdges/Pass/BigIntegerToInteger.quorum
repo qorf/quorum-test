@@ -1,0 +1,38 @@
+use Libraries.Compute.BigInteger
+
+/*
+BigInteger:ToInteger on values that don't fit in 32 bits. The documentation
+says it keeps only the low-order bits, which can change the value and the
+sign, so 2147483648 (2^31) becomes -2147483648 and 4294967297 (2^32 + 1)
+becomes 1, as Java's BigInteger.intValue does.
+*/
+class Main
+    action Main
+        Show("2147483647")
+        Show("-2147483648")
+        Show("2147483648")
+        Show("-2147483649")
+        Show("4294967296")
+        Show("4294967297")
+        Show("3000000000")
+        Show("-3000000000")
+        Show("12345678901234567890")
+        check
+            BigInteger a
+            a:SetValue("9007199254740993")
+            output "ToNumber(9007199254740993) = " + a:ToNumber()
+        detect e
+            output "ToNumber(9007199254740993) unexpected error: " + e:GetErrorMessage()
+        end
+    end
+
+    action Show(text value)
+        check
+            BigInteger a
+            a:SetValue(value)
+            output "ToInteger(" + value + ") = " + a:ToInteger()
+        detect e
+            output "ToInteger(" + value + ") unexpected error: " + e:GetErrorMessage()
+        end
+    end
+end

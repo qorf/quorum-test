@@ -1,0 +1,124 @@
+use Libraries.Compute.Matrix
+use Libraries.Compute.Math
+use Libraries.Compute.MatrixTransform.LowerUpperDecomposition
+
+/*
+LowerUpperDecomposition: GetDeterminant, GetInverse and Solve on small
+matrices whose answers can be checked by hand. The determinant's sign must
+be right whether or not rows were swapped while pivoting: |4, 3| |6, 3|
+needs a swap and has determinant -6; |2, 1| |1, 3| and |4, 7| |2, 6| need
+none and have determinants 5 and 10. A singular matrix has determinant 0
+and can't be solved, so Solve and GetInverse must fail for it. Reusing one
+decomposition for a second matrix must give that matrix's answers.
+Entries are rounded to 4 places.
+*/
+class Main
+    Math math
+
+    action Main
+        Matrix swapped = Make2(4, 3, 6, 3)
+        Matrix plain = Make2(2, 1, 1, 3)
+        Matrix second = Make2(4, 7, 2, 6)
+        Matrix singular = Make2(1, 2, 2, 4)
+
+        Matrix third
+        third:SetSize(3, 3)
+        third:Set(0, 0, 1)
+        third:Set(0, 1, 2)
+        third:Set(0, 2, 3)
+        third:Set(1, 0, 0)
+        third:Set(1, 1, 1)
+        third:Set(1, 2, 4)
+        third:Set(2, 0, 5)
+        third:Set(2, 1, 6)
+        third:Set(2, 2, 0)
+
+        check
+            LowerUpperDecomposition decomposition
+            decomposition:Calculate(swapped)
+            output "GetDeterminant of |4, 3| |6, 3| = " + math:Round(decomposition:GetDeterminant(), 4)
+            Show("GetInverse of |4, 3| |6, 3|", decomposition:GetInverse())
+        detect e
+            output "|4, 3| |6, 3| unexpected error: " + e:GetErrorMessage()
+        end
+        check
+            LowerUpperDecomposition decomposition
+            decomposition:Calculate(plain)
+            output "GetDeterminant of |2, 1| |1, 3| = " + math:Round(decomposition:GetDeterminant(), 4)
+        detect e
+            output "|2, 1| |1, 3| unexpected error: " + e:GetErrorMessage()
+        end
+        check
+            LowerUpperDecomposition decomposition
+            decomposition:Calculate(second)
+            output "GetDeterminant of |4, 7| |2, 6| = " + math:Round(decomposition:GetDeterminant(), 4)
+            Show("GetInverse of |4, 7| |2, 6|", decomposition:GetInverse())
+            Matrix right
+            right:SetSize(2, 1)
+            right:Set(0, 0, 18)
+            right:Set(1, 0, 14)
+            Show("Solve |4, 7| |2, 6| for the column 18, 14", decomposition:Solve(right))
+        detect e
+            output "|4, 7| |2, 6| unexpected error: " + e:GetErrorMessage()
+        end
+        check
+            LowerUpperDecomposition decomposition
+            decomposition:Calculate(third)
+            output "GetDeterminant of |1, 2, 3| |0, 1, 4| |5, 6, 0| = " + math:Round(decomposition:GetDeterminant(), 4)
+            Show("GetInverse of |1, 2, 3| |0, 1, 4| |5, 6, 0|", decomposition:GetInverse())
+        detect e
+            output "|1, 2, 3| |0, 1, 4| |5, 6, 0| unexpected error: " + e:GetErrorMessage()
+        end
+        check
+            LowerUpperDecomposition decomposition
+            decomposition:Calculate(singular)
+            output "GetDeterminant of |1, 2| |2, 4| = " + math:Round(decomposition:GetDeterminant(), 4)
+        detect e
+            output "GetDeterminant of |1, 2| |2, 4| unexpected error: " + e:GetErrorMessage()
+        end
+        check
+            LowerUpperDecomposition decomposition
+            decomposition:Calculate(singular)
+            Matrix inverse = decomposition:GetInverse()
+            output "GetInverse of |1, 2| |2, 4| should fail but returned a " + inverse:GetRows() + " by " + inverse:GetColumns() + " matrix"
+        detect e
+            output "GetInverse of |1, 2| |2, 4| fails, as it should"
+        end
+        check
+            LowerUpperDecomposition decomposition
+            decomposition:Calculate(singular)
+            decomposition:Calculate(second)
+            output "GetDeterminant of |4, 7| |2, 6| after first calculating |1, 2| |2, 4| = " + math:Round(decomposition:GetDeterminant(), 4)
+        detect e
+            output "reused decomposition unexpected error: " + e:GetErrorMessage()
+        end
+    end
+
+    action Make2(number a, number b, number c, number d) returns Matrix
+        Matrix result
+        result:SetSize(2, 2)
+        result:Set(0, 0, a)
+        result:Set(0, 1, b)
+        result:Set(1, 0, c)
+        result:Set(1, 1, d)
+        return result
+    end
+
+    action Show(text label, Matrix result)
+        output label + " gives a " + result:GetRows() + " by " + result:GetColumns() + " matrix:"
+        integer row = 0
+        repeat while row < result:GetRows()
+            text line = "|"
+            integer column = 0
+            repeat while column < result:GetColumns()
+                line = line + math:Round(result:Get(row, column), 4)
+                if column < result:GetColumns() - 1
+                    line = line + ", "
+                end
+                column = column + 1
+            end
+            output line + "|"
+            row = row + 1
+        end
+    end
+end

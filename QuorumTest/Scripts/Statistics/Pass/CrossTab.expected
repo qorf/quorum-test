@@ -1,0 +1,7 @@
+CrossTab(color x size) = color\size=blue,green,red | large=2,0,1 | small=0,1,2
+CrossTab(color x size) cell(red, small) = 2
+CrossTab transform with AddColumn(1), AddColumn(0) (size x color) = size\color=large,small | blue=2,0 | green=0,1 | red=1,2
+CrossTab FullRowsAndColumns(true) (a x b) = a\b=x,y,z | x=0,0,0 | y=1,0,0 | z=0,1,0
+CrossTab of a number column x a boolean column = n\flag=1.5,2.5 | false=0,1 | true=2,0
+CrossTab with one selected column fails, as it should
+CrossTab leaves the original frame unchanged = color=red,blue,red,red,blue,green | size=small,large,small,large,large,small

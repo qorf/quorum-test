@@ -1,0 +1,5 @@
+List[c,a,b] Copy() then copy Set(0, x), RemoveAt(1), Add(d): copy [x,b,d], original [c,a,b]
+Then original Sort(): original [a,b,c], copy [x,b,d]
+List[a,b,c] CopyToArray() then array Set(0, q), Add(r): array [q,b,c,r], list [a,b,c]
+List[a,b,c] Add(e), Add(d), RemoveAt(0), Remove(c), Sort() gives [b,d,e], GetFromEnd() = [e]
+List[only] Sort() gives [only]

@@ -1,0 +1,31 @@
+number of planes = 6, number of corner points = 8
+corner 0 = (-2.0, -1.0, -1.0), corner 6 = (2.0, 1.0, -10.0)
+plane 0: normal (0.0, 0.0, -1.0), distance -1.0
+plane 1: normal (0.0, 0.0, 1.0), distance 10.0
+plane 2: normal (1.0, 0.0, 0.0), distance 2.0
+plane 3: normal (-1.0, 0.0, 0.0), distance 2.0
+plane 4: normal (0.0, -1.0, 0.0), distance 1.0
+plane 5: normal (0.0, 1.0, 0.0), distance 1.0
+PointInFrustum(0.0, 0.0, -5.0) = true
+PointInFrustum(0.0, 0.0, 0.0) = false
+PointInFrustum(3.0, 0.0, -5.0) = false
+PointInFrustum(0.0, -1.5, -5.0) = false
+PointInFrustum(0.0, 0.0, -11.0) = false
+PointInFrustum(2.0, 1.0, -1.0) = true
+PointInFrustum(-1.9, 0.9, -9.9) = true
+PointInFrustum(vector (1, 0.5, -2)) = true
+PointInFrustum(vector (1, 0.5, 2)) = false
+SphereInFrustum(3.0, 0.0, -5.0, 1.5) = true
+SphereInFrustum(3.0, 0.0, -5.0, 0.5) = false
+SphereInFrustum(0.0, 0.0, 0.0, 0.5) = false
+SphereInFrustum(0.0, 0.0, 0.0, 2.0) = true
+SphereInFrustum(0.0, 0.0, -12.0, 1.0) = false
+SphereInFrustum(0.0, 0.0, -12.0, 3.0) = true
+SphereInFrustum(vector (0, 3, -5), 1) = false
+SphereInFrustum(vector (0, 1.5, -5), 1) = true
+SphereInFrustumWithoutNearFar(0.0, 0.0, 0.0, 0.1) = true
+SphereInFrustumWithoutNearFar(0.0, 0.0, 20.0, 0.1) = true
+SphereInFrustumWithoutNearFar(5.0, 0.0, -5.0, 1.0) = false
+SphereInFrustumWithoutNearFar(0.0, 1.5, -5.0, 1.0) = true
+SphereInFrustumWithoutNearFar(vector (0, 0, -50), 1) = true
+SphereInFrustumWithoutNearFar(vector (-4, 0, -50), 1) = false

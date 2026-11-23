@@ -1,0 +1,134 @@
+use Libraries.Containers.List
+use Libraries.Containers.Array
+use Libraries.Containers.Iterator
+
+/*
+    Every read and remove action on an empty List. Actions that take a
+    location fail. GetFromFront, GetFromEnd, RemoveFromFront and RemoveFromEnd
+    return undefined on an empty List (the List code does this on purpose).
+    The iterator's GetCurrent before any Next is undefined, as for Array.
+*/
+class Main
+    action Show(text value) returns text
+        if value = undefined
+            return "undefined"
+        end
+        return "[" + value + "]"
+    end
+
+    action Describe(List<text> list) returns text
+        text result = "["
+        integer i = 0
+        repeat while i < list:GetSize()
+            if i > 0
+                result = result + ","
+            end
+            text value = list:Get(i)
+            if value = undefined
+                result = result + "undefined"
+            else
+                result = result + value
+            end
+            i = i + 1
+        end
+        return result + "]"
+    end
+
+    action Main
+        List<text> list
+        check
+            output "List[] GetSize() = " + list:GetSize() + ", IsEmpty() = " + list:IsEmpty()
+        detect e
+            output "List[] GetSize() unexpected error: " + e:GetErrorMessage()
+        end
+        check
+            text value = list:Get(0)
+            output "List[] Get(0) should fail but returned " + Show(value)
+        detect e
+            output "List[] Get(0) fails, as it should"
+        end
+        check
+            text value = list:RemoveAt(0)
+            output "List[] RemoveAt(0) should fail but returned " + Show(value)
+        detect e
+            output "List[] RemoveAt(0) fails, as it should"
+        end
+        check
+            output "List[] GetFromFront() = " + Show(list:GetFromFront())
+        detect e
+            output "List[] GetFromFront() unexpected error: " + e:GetErrorMessage()
+        end
+        check
+            output "List[] GetFromEnd() = " + Show(list:GetFromEnd())
+        detect e
+            output "List[] GetFromEnd() unexpected error: " + e:GetErrorMessage()
+        end
+        check
+            output "List[] RemoveFromFront() = " + Show(list:RemoveFromFront())
+        detect e
+            output "List[] RemoveFromFront() unexpected error: " + e:GetErrorMessage()
+        end
+        check
+            output "List[] RemoveFromEnd() = " + Show(list:RemoveFromEnd())
+        detect e
+            output "List[] RemoveFromEnd() unexpected error: " + e:GetErrorMessage()
+        end
+        check
+            output "List[] GetFirstLocation(a) = " + list:GetFirstLocation("a") + ", GetLastLocation(a) = " + list:GetLastLocation("a")
+        detect e
+            output "List[] GetFirstLocation/GetLastLocation(a) unexpected error: " + e:GetErrorMessage()
+        end
+        check
+            output "List[] Has(a) = " + list:Has("a") + ", Remove(a) = " + list:Remove("a") + ", RemoveAll(a) = " + list:RemoveAll("a")
+        detect e
+            output "List[] Has/Remove/RemoveAll(a) unexpected error: " + e:GetErrorMessage()
+        end
+        check
+            list:Sort()
+            output "List[] Sort() leaves size " + list:GetSize()
+        detect e
+            output "List[] Sort() unexpected error: " + e:GetErrorMessage()
+        end
+        check
+            Object copyObject = list:Copy()
+            List<text> copy = cast(List<text>, copyObject)
+            Array<text> array = list:CopyToArray()
+            output "List[] Copy() has size " + copy:GetSize() + ", CopyToArray() has size " + array:GetSize()
+        detect e
+            output "List[] Copy()/CopyToArray() unexpected error: " + e:GetErrorMessage()
+        end
+        check
+            Iterator<text> it = list:GetIterator()
+            output "List[] GetIterator() HasNext() = " + it:HasNext()
+        detect e
+            output "List[] GetIterator() HasNext() unexpected error: " + e:GetErrorMessage()
+        end
+        check
+            Iterator<text> it = list:GetIterator()
+            output "List[] GetIterator() GetCurrent() = " + Show(it:GetCurrent())
+        detect e
+            output "List[] GetIterator() GetCurrent() unexpected error: " + e:GetErrorMessage()
+        end
+        check
+            list:Empty()
+            output "List[] Empty() leaves size " + list:GetSize()
+        detect e
+            output "List[] Empty() unexpected error: " + e:GetErrorMessage()
+        end
+        check
+            list:AddToFront("b")
+            list:AddToEnd("c")
+            list:Add(0, "a")
+            output "List[] AddToFront(b), AddToEnd(c), Add(0, a) gives " + Describe(list) + ", GetFromEnd() = " + Show(list:GetFromEnd())
+        detect e
+            output "List[] AddToFront/AddToEnd/Add unexpected error: " + e:GetErrorMessage()
+        end
+        check
+            list:Empty()
+            list:Add("x")
+            output "List[a,b,c] Empty() then Add(x) gives " + Describe(list) + ", GetFromFront() = " + Show(list:GetFromFront()) + ", GetFromEnd() = " + Show(list:GetFromEnd())
+        detect e
+            output "List Empty() then Add(x) unexpected error: " + e:GetErrorMessage()
+        end
+    end
+end

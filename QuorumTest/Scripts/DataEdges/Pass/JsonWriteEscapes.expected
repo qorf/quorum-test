@@ -1,0 +1,9 @@
+Add(plain value) ToText() = {"k": "plain"}
+Add(value with a double quote) ToText() = {"k": "a\"b"}
+Add(value with a backslash) ToText() = {"k": "a\\b"}
+Add(value with a line feed) ToText() = {"k": "a\nb"}
+Add(value with a tab) ToText() = {"k": "a\tb"}
+Add(value with a carriage return) ToText() = {"k": "a\rb"}
+Add(key with a double quote) ToText() = {"k\"ey": "v"}
+Add(key with a backslash) ToText() = {"k\\ey": "v"}
+Add(key with a line feed) ToText() = {"k\ney": "v"}

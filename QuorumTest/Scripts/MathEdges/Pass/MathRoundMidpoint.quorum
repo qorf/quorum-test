@@ -1,0 +1,38 @@
+use Libraries.Compute.Math
+
+/*
+Math:Round(value, roundUp). The documentation says it rounds to the nearest
+integer and only the midpoint depends on roundUp: true rounds a midpoint up,
+false rounds it down. Values that aren't midpoints round to the nearest
+integer either way, so Round(-2.7, false) is -3 and Round(-2.2, false) is -2.
+*/
+class Main
+    Math math
+
+    action Main
+        Show(2.5, true)
+        Show(2.5, false)
+        Show(-2.5, true)
+        Show(-2.5, false)
+        Show(2.7, true)
+        Show(2.7, false)
+        Show(2.2, true)
+        Show(2.2, false)
+        Show(-2.7, true)
+        Show(-2.7, false)
+        Show(-2.2, true)
+        Show(-2.2, false)
+        Show(3.0, false)
+        Show(-3.0, false)
+        Show(0.5, false)
+        Show(-0.5, true)
+    end
+
+    action Show(number value, boolean roundUp)
+        check
+            output "Round(" + value + ", " + roundUp + ") = " + math:Round(value, roundUp)
+        detect e
+            output "Round(" + value + ", " + roundUp + ") unexpected error: " + e:GetErrorMessage()
+        end
+    end
+end

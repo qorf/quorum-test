@@ -1,0 +1,10 @@
+DegreesToRadians(0) = 0.0
+DegreesToRadians(180) rounded to 10 places = 3.1415926536
+DegreesToRadians(90) rounded to 10 places = 1.5707963268
+DegreesToRadians(-45) rounded to 10 places = -0.7853981634
+DegreesToRadians(720) rounded to 10 places = 12.5663706144
+RadiansToDegrees(0) = 0.0
+RadiansToDegrees(pi) rounded to 10 places = 180.0
+RadiansToDegrees(-pi / 2) rounded to 10 places = -90.0
+RadiansToDegrees(1) rounded to 6 places = 57.29578
+RadiansToDegrees(DegreesToRadians(37.5)) rounded to 10 places = 37.5

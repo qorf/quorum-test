@@ -1,0 +1,50 @@
+/*
+    Text:StartsWith(prefix) and Text:EndsWith(suffix). The empty text is a
+    prefix and suffix of every text (Java agrees). Each case runs on a text
+    primitive and on a Text object.
+*/
+class Main
+    action Main
+        Show("hello", "h")
+        Show("hello", "he")
+        Show("hello", "hello")
+        Show("hello", "helloo")
+        Show("hello", "o")
+        Show("hello", "lo")
+        Show("hello", "l")
+        Show("hello", "H")
+        Show("hello", "")
+        Show("", "")
+        Show("", "a")
+        Show("a", "a")
+        Show("  ", " ")
+        Show("abcab", "ab")
+    end
+
+    action Show(text value, text part)
+        text starts = "StartsWith(" + value + ", " + part + ")"
+        text ends = "EndsWith(" + value + ", " + part + ")"
+        check
+            output starts + " = " + value:StartsWith(part)
+        detect e
+            output starts + " unexpected error: " + e:GetErrorMessage()
+        end
+        check
+            output ends + " = " + value:EndsWith(part)
+        detect e
+            output ends + " unexpected error: " + e:GetErrorMessage()
+        end
+        Text object
+        object:SetValue(value)
+        check
+            output "Text " + starts + " = " + object:StartsWith(part)
+        detect e
+            output "Text " + starts + " unexpected error: " + e:GetErrorMessage()
+        end
+        check
+            output "Text " + ends + " = " + object:EndsWith(part)
+        detect e
+            output "Text " + ends + " unexpected error: " + e:GetErrorMessage()
+        end
+    end
+end

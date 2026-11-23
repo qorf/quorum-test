@@ -1,0 +1,84 @@
+use Libraries.Language.Errors.DivideByZeroError
+
+/*
+Integer division and mod by zero. The DivideByZeroError documentation gives
+12 / 0 as the case that raises it, so integer division by zero must fail
+with a DivideByZeroError. Mod by zero is the same operation (Java raises the
+same ArithmeticException for both), so it is expected to raise the same error.
+Number (decimal) division by zero is not an error: it follows the IEEE rules
+and gives Infinity or NaN, as Java does.
+*/
+class Main
+    action Main
+        integer zero = 0
+        integer twelve = 12
+        check
+            integer result = twelve / zero
+            output "12 / 0 should fail but returned " + result
+        detect e is DivideByZeroError
+            output "12 / 0 fails with a DivideByZeroError, as it should"
+        detect other
+            output "12 / 0 fails, but not with a DivideByZeroError: " + other:GetErrorMessage()
+        end
+        check
+            integer result = twelve mod zero
+            output "12 mod 0 should fail but returned " + result
+        detect e is DivideByZeroError
+            output "12 mod 0 fails with a DivideByZeroError, as it should"
+        detect other
+            output "12 mod 0 fails, but not with a DivideByZeroError: " + other:GetErrorMessage()
+        end
+        check
+            integer result = zero / zero
+            output "0 / 0 should fail but returned " + result
+        detect e is DivideByZeroError
+            output "0 / 0 fails with a DivideByZeroError, as it should"
+        detect other
+            output "0 / 0 fails, but not with a DivideByZeroError: " + other:GetErrorMessage()
+        end
+        check
+            number result = twelve / 0.0
+            output "12 / 0.0 = " + result
+        detect e
+            output "12 / 0.0 unexpected error: " + e:GetErrorMessage()
+        end
+        check
+            number zeroNumber = 0.0
+            number result = zeroNumber / zeroNumber
+            output "0.0 / 0.0 = " + result
+        detect e
+            output "0.0 / 0.0 unexpected error: " + e:GetErrorMessage()
+        end
+        check
+            integer result = -7 / 2
+            output "-7 / 2 = " + result
+        detect e
+            output "-7 / 2 unexpected error: " + e:GetErrorMessage()
+        end
+        check
+            integer result = 7 / -2
+            output "7 / -2 = " + result
+        detect e
+            output "7 / -2 unexpected error: " + e:GetErrorMessage()
+        end
+        check
+            integer result = -7 mod 3
+            output "-7 mod 3 = " + result
+        detect e
+            output "-7 mod 3 unexpected error: " + e:GetErrorMessage()
+        end
+        check
+            integer result = 7 mod -3
+            output "7 mod -3 = " + result
+        detect e
+            output "7 mod -3 unexpected error: " + e:GetErrorMessage()
+        end
+        check
+            number a = -7.5
+            number result = a mod 2.0
+            output "-7.5 mod 2.0 = " + result
+        detect e
+            output "-7.5 mod 2.0 unexpected error: " + e:GetErrorMessage()
+        end
+    end
+end

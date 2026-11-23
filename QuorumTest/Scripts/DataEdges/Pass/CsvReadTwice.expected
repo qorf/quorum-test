@@ -1,0 +1,4 @@
+Read(a,b) then Read(c,d,e): GetNumberOfRows() = 1, GetNumberOfColumns() = 3, Get(0, 0) = [c]
+Read(a,b\nc) then Read(x,y): IsConsistent() = true, GetNumberOfRows() = 1
+Read(1,2\n3,4) twice: GetNumberOfRows() = 2
+Read(a,b) then Read(): GetNumberOfRows() = 0

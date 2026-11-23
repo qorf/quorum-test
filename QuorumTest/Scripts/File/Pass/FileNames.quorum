@@ -1,0 +1,53 @@
+use Libraries.System.File
+
+/*
+Tests the File actions that work on the name alone, without touching the disk:
+SetPath, GetPath, GetFileName, GetFileExtension and GetNameNoExtension.
+GetFileExtension's documentation says the extension is the text after the last
+'.' "in a path", but a dot in a folder name is not an extension: the Java
+plugin's own GetFileExtension uses only the file name, so "my.dir/readme" has
+no extension here. A name with no extension, such as "README", keeps all of
+its letters in GetNameNoExtension.
+*/
+class Main
+    action Main
+        File unset
+        check
+            output "GetPath() with no SetPath = [" + unset:GetPath() + "]"
+        detect e
+            output "GetPath() with no SetPath unexpected error: " + e:GetErrorMessage()
+        end
+        Show("notes.txt")
+        Show("README")
+        Show("archive.tar.gz")
+        Show("docs/report.pdf")
+        Show("my.dir/readme")
+        Show(".bashrc")
+        Show("folder/sub/image.PNG")
+    end
+
+    action Show(text name)
+        File file
+        file:SetPath(name)
+        check
+            output "GetPath(" + name + ") = [" + file:GetPath() + "]"
+        detect e
+            output "GetPath(" + name + ") unexpected error: " + e:GetErrorMessage()
+        end
+        check
+            output "GetFileName(" + name + ") = [" + file:GetFileName() + "]"
+        detect e
+            output "GetFileName(" + name + ") unexpected error: " + e:GetErrorMessage()
+        end
+        check
+            output "GetFileExtension(" + name + ") = [" + file:GetFileExtension() + "]"
+        detect e
+            output "GetFileExtension(" + name + ") unexpected error: " + e:GetErrorMessage()
+        end
+        check
+            output "GetNameNoExtension(" + name + ") = [" + file:GetNameNoExtension() + "]"
+        detect e
+            output "GetNameNoExtension(" + name + ") unexpected error: " + e:GetErrorMessage()
+        end
+    end
+end

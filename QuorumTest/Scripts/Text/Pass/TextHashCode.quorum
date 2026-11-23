@@ -1,0 +1,46 @@
+/*
+    Text:GetHashCode is the hash code of the text value. The documentation
+    does not give the formula; the expectation is Java's String hashCode
+    (h = 31 * h + character, kept in a 32-bit integer), which the JavaScript
+    and Python plugins also try to follow, so hash codes and hash table
+    order match on every back end. Long texts overflow 32 bits and wrap.
+    Each case runs on a text primitive and on a Text object, and equal
+    texts must give equal hash codes.
+*/
+class Main
+    action Main
+        Show("")
+        Show("a")
+        Show("A")
+        Show(" ")
+        Show("abc")
+        Show("hello")
+        Show("hello world")
+        Show("The quick brown fox jumps over the lazy dog")
+        Text first
+        first:SetValue("same")
+        text second = "sa"
+        second = second + "me"
+        check
+            output "GetHashCode(same) = GetHashCode(sa + me) is " + (first:GetHashCode() = second:GetHashCode())
+        detect e
+            output "GetHashCode(same) = GetHashCode(sa + me) unexpected error: " + e:GetErrorMessage()
+        end
+    end
+
+    action Show(text value)
+        text call = "GetHashCode(" + value + ")"
+        check
+            output call + " = " + value:GetHashCode()
+        detect e
+            output call + " unexpected error: " + e:GetErrorMessage()
+        end
+        Text object
+        object:SetValue(value)
+        check
+            output "Text " + call + " = " + object:GetHashCode()
+        detect e
+            output "Text " + call + " unexpected error: " + e:GetErrorMessage()
+        end
+    end
+end

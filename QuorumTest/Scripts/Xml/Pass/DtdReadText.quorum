@@ -1,0 +1,76 @@
+use Libraries.Data.Formats.DocumentTypeDefinition
+
+/*
+DocumentTypeDefinition:Read(text) with internal declarations, then the
+public getters: GetEntityValue, GetRootElement, HasExternalFile and
+GetExternalFileName. Each case uses a new DocumentTypeDefinition. In the
+source, ` stands for a double quote and ^ for a line feed, @ for a carriage
+return (Quorum text literals have no escapes); lines show line feeds as \n
+and carriage returns as \r. Character references in an entity value are
+replaced when the entity is declared (XML 1.0 section 4.5).
+*/
+class Main
+    action Main
+        output "new DocumentTypeDefinition GetRootElement() = [" + Root("") + "]"
+        Entity("<!DOCTYPE note [<!ENTITY language `Quorum`>]>", "language")
+        Entity("<!DOCTYPE note [<!ENTITY language 'Quorum'>]>", "language")
+        Entity("<!DOCTYPE note [<!ENTITY a 'first'><!ENTITY b 'second'>]>", "b")
+        Entity("<!DOCTYPE note [<!ENTITY a 'first'><!ENTITY b 'second'>]>", "a")
+        Entity("<!DOCTYPE note [<!ENTITY e 'two words'>]>", "e")
+        Entity("<!ENTITY a 'x'>", "a")
+        Entity("<!DOCTYPE note [<!ELEMENT note (#PCDATA)><!ATTLIST note x CDATA #IMPLIED><!ENTITY e 'v'>]>", "e")
+        Entity("<!DOCTYPE note [^  <!ENTITY a '1'>^  <!ENTITY b '2'>^]>", "b")
+        Entity("<!DOCTYPE note [@^  <!ENTITY a '1'>@^  <!ENTITY b '2'>@^]>", "b")
+        Entity("<!DOCTYPE note [<!ENTITY e '&#65;&#x42;'>]>", "e")
+        Entity("<!DOCTYPE note [<!ENTITY e 'a>b'>]>", "e")
+        Entity("<!DOCTYPE note [<!ENTITY e `it's`>]>", "e")
+        Names("<!DOCTYPE note [<!ENTITY e 'v'>]>")
+        Names("<!DOCTYPE book>")
+        Names("<!DOCTYPE note [^<!ELEMENT note (to,from)>^]>")
+    end
+
+    action Build(text raw) returns text
+        text dq = ""
+        dq = dq:GetDoubleQuote()
+        text result = raw:Replace("`", dq)
+        result = result:Replace("^", dq:GetLineFeed())
+        result = result:Replace("@", dq:GetCarriageReturn())
+        return result
+    end
+
+    action Show(text value) returns text
+        text result = value:Replace(value:GetCarriageReturn(), "\r")
+        result = result:Replace(value:GetLineFeed(), "\n")
+        return result
+    end
+
+    action Root(text raw) returns text
+        DocumentTypeDefinition dtd
+        if raw not= ""
+            dtd:Read(Build(raw))
+        end
+        return dtd:GetRootElement()
+    end
+
+    action Entity(text raw, text name)
+        text dtdText = Build(raw)
+        check
+            DocumentTypeDefinition dtd
+            dtd:Read(dtdText)
+            output "Read(" + Show(dtdText) + ") GetEntityValue(" + name + ") = [" + Show(dtd:GetEntityValue(name)) + "]"
+        detect e
+            output "Read(" + Show(dtdText) + ") GetEntityValue(" + name + ") unexpected error: " + e:GetErrorMessage()
+        end
+    end
+
+    action Names(text raw)
+        text dtdText = Build(raw)
+        check
+            DocumentTypeDefinition dtd
+            dtd:Read(dtdText)
+            output "Read(" + Show(dtdText) + ") GetRootElement() = [" + dtd:GetRootElement() + "], HasExternalFile() = [" + dtd:HasExternalFile() + "], GetExternalFileName() = [" + dtd:GetExternalFileName() + "]"
+        detect e
+            output "Read(" + Show(dtdText) + ") unexpected error: " + e:GetErrorMessage()
+        end
+    end
+end

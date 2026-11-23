@@ -1,0 +1,102 @@
+use Libraries.Containers.List
+
+/*
+    Searching a List that holds undefined items. Searches for a real item
+    skip the undefined ones; searching for undefined finds nothing (the same
+    rule as Array, where GetFirstLocation(undefined) is -1 on purpose).
+*/
+class Main
+    action Show(text value) returns text
+        if value = undefined
+            return "undefined"
+        end
+        return "[" + value + "]"
+    end
+
+    action Describe(List<text> list) returns text
+        text result = "["
+        integer i = 0
+        repeat while i < list:GetSize()
+            if i > 0
+                result = result + ","
+            end
+            text value = list:Get(i)
+            if value = undefined
+                result = result + "undefined"
+            else
+                result = result + value
+            end
+            i = i + 1
+        end
+        return result + "]"
+    end
+
+    action Make returns List<text>
+        List<text> list
+        list:Add(undefined)
+        list:Add("b")
+        list:Add(undefined)
+        list:Add("b")
+        return list
+    end
+
+    action Main
+        List<text> list = Make()
+        check
+            output "List Add(undefined), Add(b), Add(undefined), Add(b) gives " + Describe(list) + ", size " + list:GetSize()
+        detect e
+            output "List with undefined items unexpected error: " + e:GetErrorMessage()
+        end
+        check
+            output "List[undefined,b,undefined,b] Has(b) = " + list:Has("b")
+        detect e
+            output "List[undefined,b,undefined,b] Has(b) unexpected error: " + e:GetErrorMessage()
+        end
+        check
+            output "List[undefined,b,undefined,b] Has(z) = " + list:Has("z")
+        detect e
+            output "List[undefined,b,undefined,b] Has(z) unexpected error: " + e:GetErrorMessage()
+        end
+        check
+            output "List[undefined,b,undefined,b] GetFirstLocation(b) = " + list:GetFirstLocation("b")
+        detect e
+            output "List[undefined,b,undefined,b] GetFirstLocation(b) unexpected error: " + e:GetErrorMessage()
+        end
+        check
+            output "List[undefined,b,undefined,b] GetLastLocation(b) = " + list:GetLastLocation("b")
+        detect e
+            output "List[undefined,b,undefined,b] GetLastLocation(b) unexpected error: " + e:GetErrorMessage()
+        end
+        check
+            output "List[undefined,b,undefined,b] Has(undefined) = " + list:Has(undefined)
+        detect e
+            output "List[undefined,b,undefined,b] Has(undefined) unexpected error: " + e:GetErrorMessage()
+        end
+        check
+            boolean removed = list:Remove("b")
+            output "List[undefined,b,undefined,b] Remove(b) = " + removed + ", leaving " + Describe(list)
+        detect e
+            output "List[undefined,b,undefined,b] Remove(b) unexpected error: " + e:GetErrorMessage()
+        end
+        List<text> second = Make()
+        check
+            boolean removed = second:RemoveAll("b")
+            output "List[undefined,b,undefined,b] RemoveAll(b) = " + removed + ", leaving " + Describe(second)
+        detect e
+            output "List[undefined,b,undefined,b] RemoveAll(b) unexpected error: " + e:GetErrorMessage()
+        end
+        List<text> third = Make()
+        check
+            boolean removed = third:Remove(undefined)
+            output "List[undefined,b,undefined,b] Remove(undefined) = " + removed + ", leaving " + Describe(third)
+        detect e
+            output "List[undefined,b,undefined,b] Remove(undefined) unexpected error: " + e:GetErrorMessage()
+        end
+        check
+            text value = third:RemoveFromFront()
+            output "List[undefined,b,undefined,b] RemoveFromFront() = " + Show(value) + ", leaving " + Describe(third)
+        detect e
+            output "List RemoveFromFront() unexpected error: " + e:GetErrorMessage()
+        end
+    end
+end

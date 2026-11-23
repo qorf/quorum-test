@@ -1,0 +1,100 @@
+use Libraries.Containers.List
+use Libraries.Containers.Array
+
+/*
+    List Copy and CopyToArray make new containers: changing the copy leaves
+    the original alone and the reverse. Sort on a List after removals keeps
+    every item.
+*/
+class Main
+    action Show(text value) returns text
+        if value = undefined
+            return "undefined"
+        end
+        return "[" + value + "]"
+    end
+
+    action Describe(List<text> list) returns text
+        text result = "["
+        integer i = 0
+        repeat while i < list:GetSize()
+            if i > 0
+                result = result + ","
+            end
+            text value = list:Get(i)
+            if value = undefined
+                result = result + "undefined"
+            else
+                result = result + value
+            end
+            i = i + 1
+        end
+        return result + "]"
+    end
+
+    action Describe(Array<text> array) returns text
+        text result = "["
+        integer i = 0
+        repeat while i < array:GetSize()
+            if i > 0
+                result = result + ","
+            end
+            text value = array:Get(i)
+            if value = undefined
+                result = result + "undefined"
+            else
+                result = result + value
+            end
+            i = i + 1
+        end
+        return result + "]"
+    end
+    action Main
+        List<text> original
+        original:Add("c")
+        original:Add("a")
+        original:Add("b")
+        Object copyObject = original:Copy()
+        List<text> copy = cast(List<text>, copyObject)
+        check
+            copy:Set(0, "x")
+            copy:RemoveAt(1)
+            copy:Add("d")
+            output "List[c,a,b] Copy() then copy Set(0, x), RemoveAt(1), Add(d): copy " + Describe(copy) + ", original " + Describe(original)
+        detect e
+            output "List[c,a,b] Copy() then changing the copy unexpected error: " + e:GetErrorMessage()
+        end
+        check
+            original:Sort()
+            output "Then original Sort(): original " + Describe(original) + ", copy " + Describe(copy)
+        detect e
+            output "Then original Sort() unexpected error: " + e:GetErrorMessage()
+        end
+        check
+            Array<text> array = original:CopyToArray()
+            array:Set(0, "q")
+            array:Add("r")
+            output "List[a,b,c] CopyToArray() then array Set(0, q), Add(r): array " + Describe(array) + ", list " + Describe(original)
+        detect e
+            output "List[a,b,c] CopyToArray() unexpected error: " + e:GetErrorMessage()
+        end
+        check
+            original:Add("e")
+            original:Add("d")
+            original:RemoveAt(0)
+            original:Remove("c")
+            original:Sort()
+            output "List[a,b,c] Add(e), Add(d), RemoveAt(0), Remove(c), Sort() gives " + Describe(original) + ", GetFromEnd() = " + Show(original:GetFromEnd())
+        detect e
+            output "List Sort after removals unexpected error: " + e:GetErrorMessage()
+        end
+        check
+            List<text> one
+            one:Add("only")
+            one:Sort()
+            output "List[only] Sort() gives " + Describe(one)
+        detect e
+            output "List[only] Sort() unexpected error: " + e:GetErrorMessage()
+        end
+    end
+end

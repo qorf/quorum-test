@@ -1,0 +1,52 @@
+/*
+    Text:GetCharacter(index) gives the character at index and alerts an
+    error unless 0 <= index < size (the library checks this). Each case runs
+    on a text primitive and on a Text object.
+*/
+class Main
+    action Main
+        Show("abc", 0)
+        Show("abc", 1)
+        Show("abc", 2)
+        Show("a", 0)
+        Show(" x", 0)
+        Fail("abc", 3)
+        Fail("abc", -1)
+        Fail("abc", 100)
+        Fail("", 0)
+    end
+
+    action Show(text value, integer index)
+        text call = "GetCharacter(" + value + ", " + index + ")"
+        check
+            output call + " = [" + value:GetCharacter(index) + "]"
+        detect e
+            output call + " unexpected error: " + e:GetErrorMessage()
+        end
+        Text object
+        object:SetValue(value)
+        check
+            output "Text " + call + " = [" + object:GetCharacter(index) + "]"
+        detect e
+            output "Text " + call + " unexpected error: " + e:GetErrorMessage()
+        end
+    end
+
+    action Fail(text value, integer index)
+        text call = "GetCharacter(" + value + ", " + index + ")"
+        check
+            text result = value:GetCharacter(index)
+            output call + " should fail but returned [" + result + "]"
+        detect e
+            output call + " fails, as it should"
+        end
+        Text object
+        object:SetValue(value)
+        check
+            text result = object:GetCharacter(index)
+            output "Text " + call + " should fail but returned [" + result + "]"
+        detect e
+            output "Text " + call + " fails, as it should"
+        end
+    end
+end

@@ -1,0 +1,21 @@
+Array[] GetSize() = 0
+Array[] IsEmpty() = true
+Array[] Get(0) fails, as it should
+Array[] RemoveAt(0) fails, as it should
+Array[] Set(0, a) fails, as it should
+Array[] GetFromFront() fails, as it should
+Array[] GetFromEnd() fails, as it should
+Array[] RemoveFromFront() fails, as it should
+Array[] RemoveFromEnd() fails, as it should
+Array[] GetFirstLocation(a) = -1
+Array[] GetLastLocation(a) = -1
+Array[] Has(a) = false
+Array[] Remove(a) = false
+Array[] RemoveAll(a) = false
+Array[] Sort() leaves size 0
+Array[] Copy() has size 0
+Array[] CopyToArray() has size 0
+Array[] GetIterator() HasNext() = false
+Array[] GetIterator() GetCurrent() = undefined
+Array[] Empty() leaves size 0
+Array[] then Add(a): size 1, Get(0) = [a]

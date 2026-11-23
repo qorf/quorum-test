@@ -1,0 +1,9 @@
+RoundToNearestInteger(11.932356) = 12.0
+RoundToNearestInteger(2.4) = 2.0
+RoundToNearestInteger(2.6) = 3.0
+RoundToNearestInteger(2.5) = 3.0
+RoundToNearestInteger(3.5) = 4.0
+RoundToNearestInteger(-2.5) = -2.0
+RoundToNearestInteger(-3.5) = -3.0
+RoundToNearestInteger(-2.6) = -3.0
+RoundToNearestInteger(4.0) = 4.0

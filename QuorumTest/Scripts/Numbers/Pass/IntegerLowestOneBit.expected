@@ -1,0 +1,16 @@
+LowestOneBit(0) = 0, called again = 0, value after = 0
+Integer LowestOneBit(0) = 0, called again = 0
+LowestOneBit(1) = 1, called again = 1, value after = 1
+Integer LowestOneBit(1) = 1, called again = 1
+LowestOneBit(12) = 4, called again = 4, value after = 12
+Integer LowestOneBit(12) = 4, called again = 4
+LowestOneBit(7) = 1, called again = 1, value after = 7
+Integer LowestOneBit(7) = 1, called again = 1
+LowestOneBit(-8) = 8, called again = 8, value after = -8
+Integer LowestOneBit(-8) = 8, called again = 8
+LowestOneBit(-1) = 1, called again = 1, value after = -1
+Integer LowestOneBit(-1) = 1, called again = 1
+LowestOneBit(1073741824) = 1073741824, called again = 1073741824, value after = 1073741824
+Integer LowestOneBit(1073741824) = 1073741824, called again = 1073741824
+LowestOneBit(-2147483648) = -2147483648, called again = -2147483648, value after = -2147483648
+Integer LowestOneBit(-2147483648) = -2147483648, called again = -2147483648

@@ -1,0 +1,18 @@
+TextTree(Hello world!) GetText() = [Hello world!], GetLength() = 12, GetLeafSize() = 5
+TextTree(Hello world!) GetCharacter(0..11) = [Hello world!]
+TextTree(Hello world!) GetCharacter(12) fails, as it should
+TextTree(Hello world!) GetText(1, 10) = [ello worl], GetText(0, 12) = [Hello world!], GetText(4, 4) = [], GetText(11, 12) = [!]
+TextTree(Hello world!) GetText(-1, 3) fails, as it should
+TextTree(Hello world!) GetText(0, 13) fails, as it should
+TextTree(Hello world!) Insert(11, ' of tomorrow') = [Hello world of tomorrow!], Insert(0, '>> ') = [>> Hello world!], Insert(12, ' <<') = [Hello world! <<], original [Hello world!]
+TextTree(Hello world!) Insert(-1, x) fails, as it should
+TextTree(Hello world!) Insert(13, x) fails, as it should
+TextTree(Hello world!) Delete(5, 11) = [Hello!], Delete(0, 12) = [] length 0, Delete(3, 3) = [Hello world!], original [Hello world!]
+TextTree(Hello world!) Delete(-1, 2) fails, as it should
+TextTree(Hello world!) Delete(2, 13) fails, as it should
+TextTree(Hello world!) Concatenate(' Bye.') then Concatenate(TextTree( Again!)) = [Hello world! Bye. Again!] length 24, original [Hello world!], other [ Again!]
+TextTree(Hello world!) Balance(): [Hello world!], NeedsBalancing() = false
+TextTree() GetText() = [], GetLength() = 0
+TextTree() Insert(0, abc) = [abc], Concatenate(xyz) = [xyz]
+TextTree(abcdefghij, leaf size 2): GetLeafSize() = 2, GetText(3, 7) = [defg]
+TextTree SetLeafSize(3) then Initialize(abcdefgh): GetLeafSize() = 3, GetText() = [abcdefgh], GetCharacter(7) = [h]

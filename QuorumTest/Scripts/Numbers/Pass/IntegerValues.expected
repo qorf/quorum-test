@@ -1,0 +1,42 @@
+GetNumber(0) equals 0.0 is true
+GetText(0) = [0]
+GetHashCode(0) = 0
+Integer GetValue(0) = 0
+Integer GetNumber(0) equals 0.0 is true
+Integer GetText(0) = [0]
+Integer GetHashCode(0) = 0
+GetNumber(7) equals 7.0 is true
+GetText(7) = [7]
+GetHashCode(7) = 7
+Integer GetValue(7) = 7
+Integer GetNumber(7) equals 7.0 is true
+Integer GetText(7) = [7]
+Integer GetHashCode(7) = 7
+GetNumber(-7) equals -7.0 is true
+GetText(-7) = [-7]
+GetHashCode(-7) = -7
+Integer GetValue(-7) = -7
+Integer GetNumber(-7) equals -7.0 is true
+Integer GetText(-7) = [-7]
+Integer GetHashCode(-7) = -7
+GetNumber(2147483647) equals 2147483647.0 is true
+GetText(2147483647) = [2147483647]
+GetHashCode(2147483647) = 2147483647
+Integer GetValue(2147483647) = 2147483647
+Integer GetNumber(2147483647) equals 2147483647.0 is true
+Integer GetText(2147483647) = [2147483647]
+Integer GetHashCode(2147483647) = 2147483647
+GetNumber(-2147483648) equals -2147483648.0 is true
+GetText(-2147483648) = [-2147483648]
+GetHashCode(-2147483648) = -2147483648
+Integer GetValue(-2147483648) = -2147483648
+Integer GetNumber(-2147483648) equals -2147483648.0 is true
+Integer GetText(-2147483648) = [-2147483648]
+Integer GetHashCode(-2147483648) = -2147483648
+integer GetMaximumValue() = 2147483647
+integer GetMinimumValue() = -2147483648
+Integer GetMaximumValue() = 2147483647
+Integer GetMinimumValue() = -2147483648
+GetMaximumValue() + 1 = GetMinimumValue() is true
+new Integer GetValue() = 0
+SetValue(10) then SetValue(-20): GetValue() = -20, GetText() = [-20], BitCount() = 29

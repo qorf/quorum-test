@@ -1,0 +1,129 @@
+use Libraries.Containers.Array
+
+/*
+    Locations at and just past the edges of an Array of three items: the size
+    itself, one past it and -1. Only Add may use location = size (it appends).
+*/
+class Main
+    action Show(text value) returns text
+        if value = undefined
+            return "undefined"
+        end
+        return "[" + value + "]"
+    end
+
+    action Describe(Array<text> array) returns text
+        text result = "["
+        integer i = 0
+        repeat while i < array:GetSize()
+            if i > 0
+                result = result + ","
+            end
+            text value = array:Get(i)
+            if value = undefined
+                result = result + "undefined"
+            else
+                result = result + value
+            end
+            i = i + 1
+        end
+        return result + "]"
+    end
+
+    action Main
+        Array<text> array
+        array:Add("a")
+        array:Add("b")
+        array:Add("c")
+
+        check
+            text value = array:Get(3)
+            output "Array[a,b,c] Get(3) should fail but returned " + Show(value)
+        detect e
+            output "Array[a,b,c] Get(3) fails, as it should"
+        end
+        check
+            text value = array:Get(-1)
+            output "Array[a,b,c] Get(-1) should fail but returned " + Show(value)
+        detect e
+            output "Array[a,b,c] Get(-1) fails, as it should"
+        end
+        check
+            array:Set(3, "x")
+            output "Array[a,b,c] Set(3, x) should fail but gave " + Describe(array)
+        detect e
+            output "Array[a,b,c] Set(3, x) fails, as it should"
+        end
+        check
+            array:Set(-1, "x")
+            output "Array[a,b,c] Set(-1, x) should fail but gave " + Describe(array)
+        detect e
+            output "Array[a,b,c] Set(-1, x) fails, as it should"
+        end
+        check
+            text value = array:RemoveAt(3)
+            output "Array[a,b,c] RemoveAt(3) should fail but returned " + Show(value)
+        detect e
+            output "Array[a,b,c] RemoveAt(3) fails, as it should"
+        end
+        check
+            text value = array:RemoveAt(-1)
+            output "Array[a,b,c] RemoveAt(-1) should fail but returned " + Show(value)
+        detect e
+            output "Array[a,b,c] RemoveAt(-1) fails, as it should"
+        end
+        check
+            array:Add(4, "x")
+            output "Array[a,b,c] Add(4, x) should fail but gave " + Describe(array)
+        detect e
+            output "Array[a,b,c] Add(4, x) fails, as it should"
+        end
+        check
+            array:Add(-1, "x")
+            output "Array[a,b,c] Add(-1, x) should fail but gave " + Describe(array)
+        detect e
+            output "Array[a,b,c] Add(-1, x) fails, as it should"
+        end
+        check
+            output "Array[a,b,c] after the failed calls is " + Describe(array)
+        detect e
+            output "Array[a,b,c] after the failed calls unexpected error: " + e:GetErrorMessage()
+        end
+        check
+            array:Add(3, "d")
+            output "Array[a,b,c] Add(3, d) gives " + Describe(array)
+        detect e
+            output "Array[a,b,c] Add(3, d) unexpected error: " + e:GetErrorMessage()
+        end
+        check
+            array:Add(0, "z")
+            output "Array[a,b,c,d] Add(0, z) gives " + Describe(array)
+        detect e
+            output "Array[a,b,c,d] Add(0, z) unexpected error: " + e:GetErrorMessage()
+        end
+        check
+            array:Add(2, "m")
+            output "Array[z,a,b,c,d] Add(2, m) gives " + Describe(array)
+        detect e
+            output "Array[z,a,b,c,d] Add(2, m) unexpected error: " + e:GetErrorMessage()
+        end
+        check
+            text value = array:RemoveAt(5)
+            output "Array[z,a,m,b,c,d] RemoveAt(5) = " + Show(value) + ", leaving " + Describe(array)
+        detect e
+            output "Array[z,a,m,b,c,d] RemoveAt(5) unexpected error: " + e:GetErrorMessage()
+        end
+        check
+            text value = array:RemoveAt(0)
+            output "Array[z,a,m,b,c] RemoveAt(0) = " + Show(value) + ", leaving " + Describe(array)
+        detect e
+            output "Array[z,a,m,b,c] RemoveAt(0) unexpected error: " + e:GetErrorMessage()
+        end
+        check
+            text value = array:Get(3)
+            output "Array[a,m,b,c] Get(3) = " + Show(value)
+        detect e
+            output "Array[a,m,b,c] Get(3) unexpected error: " + e:GetErrorMessage()
+        end
+    end
+end

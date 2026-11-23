@@ -1,0 +1,33 @@
+/*
+    Integer:HighestOneBit on negative values: the sign bit is the highest
+    one bit, so every negative value gives the minimum integer (Java's
+    Integer.highestOneBit agrees). Kept in its own script because the
+    JavaScript plugin shifts with >>, which never reaches 0 for a negative
+    value, so this script can hang there without affecting other scripts.
+    Each case runs on an integer primitive and on an Integer object.
+*/
+class Main
+    action Main
+        ShowHighestOneBit(-1)
+        ShowHighestOneBit(-8)
+        ShowHighestOneBit(-2147483647 - 1)
+    end
+
+    action ShowHighestOneBit(integer value)
+        text call = "HighestOneBit(" + value + ")"
+        check
+            integer result = value:HighestOneBit()
+            output call + " = " + result
+        detect e
+            output call + " unexpected error: " + e:GetErrorMessage()
+        end
+        Integer object
+        object:SetValue(value)
+        check
+            integer result = object:HighestOneBit()
+            output "Integer " + call + " = " + result
+        detect e
+            output "Integer " + call + " unexpected error: " + e:GetErrorMessage()
+        end
+    end
+end

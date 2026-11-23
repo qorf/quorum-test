@@ -1,0 +1,49 @@
+use Libraries.Compute.Math
+
+/*
+Math:Logarithm (base 10) and Math:NaturalLogarithm at exact and edge values.
+These print the raw value on purpose: the base 10 logarithm of a power of
+ten is exactly that power, so Logarithm(1000) must be 3.0, not
+2.9999999999999996. The logarithm of 0 is negative infinity and the
+logarithm of a negative number is NaN, as with Java's Math.log10 and
+Math.log; neither is an error.
+*/
+class Main
+    Math math
+
+    action Main
+        ShowLog(1.0)
+        ShowLog(10.0)
+        ShowLog(100.0)
+        ShowLog(1000.0)
+        ShowLog(1000000.0)
+        ShowLog(0.001)
+        ShowLog(0.0)
+        ShowLog(-1.0)
+        ShowNatural(1.0)
+        ShowNatural(math:e)
+        ShowNatural(0.0)
+        ShowNatural(-1.0)
+        check
+            output "NaturalLogarithm(e^3) rounded to 10 places = " + math:Round(math:NaturalLogarithm(math:RaiseNaturalNumberToPower(3)), 10)
+        detect e
+            output "NaturalLogarithm(e^3) unexpected error: " + e:GetErrorMessage()
+        end
+    end
+
+    action ShowLog(number value)
+        check
+            output "Logarithm(" + value + ") = " + math:Logarithm(value)
+        detect e
+            output "Logarithm(" + value + ") unexpected error: " + e:GetErrorMessage()
+        end
+    end
+
+    action ShowNatural(number value)
+        check
+            output "NaturalLogarithm(" + value + ") = " + math:NaturalLogarithm(value)
+        detect e
+            output "NaturalLogarithm(" + value + ") unexpected error: " + e:GetErrorMessage()
+        end
+    end
+end

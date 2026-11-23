@@ -1,0 +1,34 @@
+package Libraries.Language.Compile.Test
+
+use Libraries.Testing.QuorumTest
+use Libraries.Testing.ScriptCheck
+
+/*
+Every action of Plane, Ray and Frustum, with hand-checkable values (an
+orthographic box for the frustum). They are written in Quorum on top of
+Vector3 and Matrix4, so they run on all three back ends.
+*/
+class GeometryTester
+    QuorumTest suite = undefined
+    ScriptCheck scripts
+    text path = "Scripts/Geometry/Pass/"
+
+    action Test
+        scripts:SetSuite(suite)
+        scripts:CheckEverywhere(path + "Plane")
+        scripts:CheckEverywhere(path + "Ray")
+        scripts:CheckEverywhere(path + "Frustum")
+    end
+
+    action GetName returns text
+        return "Geometry Tests"
+    end
+
+    action GetCompilerTestSuite returns QuorumTest
+        return suite
+    end
+
+    action SetCompilerTestSuite(QuorumTest suite)
+        me:suite = suite
+    end
+end

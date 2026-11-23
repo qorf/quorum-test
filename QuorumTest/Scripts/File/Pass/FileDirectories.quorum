@@ -1,0 +1,79 @@
+use Libraries.System.File
+
+/*
+Tests CreateDirectory and CreateDirectories inside a scratch folder
+(FileTestsWork/FileDirectories), deleted at the end. CreateDirectory makes
+one folder and fails (returns false) when its parent is missing or the
+folder already exists; CreateDirectories makes every missing folder in the
+path.
+*/
+class Main
+    action Main
+        File work
+        work:SetPath("FileTestsWork/FileDirectories")
+        work:Delete(true)
+        boolean made = work:CreateDirectories()
+
+        File single
+        single:SetPath("FileTestsWork/FileDirectories/single")
+        check
+            output "CreateDirectory(single) = " + single:CreateDirectory()
+        detect e
+            output "CreateDirectory(single) unexpected error: " + e:GetErrorMessage()
+        end
+        check
+            output "IsDirectory(single) after CreateDirectory = " + single:IsDirectory()
+        detect e
+            output "IsDirectory(single) unexpected error: " + e:GetErrorMessage()
+        end
+        check
+            output "CreateDirectory(single) again, when it exists = " + single:CreateDirectory()
+        detect e
+            output "CreateDirectory(single) again unexpected error: " + e:GetErrorMessage()
+        end
+
+        File deep
+        deep:SetPath("FileTestsWork/FileDirectories/a/b/c")
+        check
+            output "CreateDirectory(a/b/c) with a and b missing = " + deep:CreateDirectory()
+        detect e
+            output "CreateDirectory(a/b/c) unexpected error: " + e:GetErrorMessage()
+        end
+        check
+            output "Exists(a/b/c) after the failed CreateDirectory = " + deep:Exists()
+        detect e
+            output "Exists(a/b/c) unexpected error: " + e:GetErrorMessage()
+        end
+        check
+            output "CreateDirectories(a/b/c) = " + deep:CreateDirectories()
+        detect e
+            output "CreateDirectories(a/b/c) unexpected error: " + e:GetErrorMessage()
+        end
+        check
+            output "IsDirectory(a/b/c) after CreateDirectories = " + deep:IsDirectory()
+        detect e
+            output "IsDirectory(a/b/c) unexpected error: " + e:GetErrorMessage()
+        end
+        File middle
+        middle:SetPath("FileTestsWork/FileDirectories/a/b")
+        check
+            output "IsDirectory(a/b) after CreateDirectories(a/b/c) = " + middle:IsDirectory()
+        detect e
+            output "IsDirectory(a/b) unexpected error: " + e:GetErrorMessage()
+        end
+        check
+            output "CreateDirectories(a/b/c) again, when it exists = " + deep:CreateDirectories()
+        detect e
+            output "CreateDirectories(a/b/c) again unexpected error: " + e:GetErrorMessage()
+        end
+        work:Delete(true)
+        check
+            output "Exists(FileTestsWork/FileDirectories) after Delete(true) = " + work:Exists()
+        detect e
+            output "Exists after Delete(true) unexpected error: " + e:GetErrorMessage()
+        end
+        File top
+        top:SetPath("FileTestsWork")
+        boolean removed = top:Delete()
+    end
+end

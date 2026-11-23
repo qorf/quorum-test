@@ -1,0 +1,143 @@
+use Libraries.Containers.MultipleLineText
+use Libraries.Containers.Array
+
+/*
+    The line actions of MultipleLineText. The test text is "ab", a line
+    separator, "cde", a separator, "f" (the default separator is one line
+    feed). In the output each separator is shown as "/". A line includes its
+    separator, as the class's own Split keeps the delimiter, so line 1 is
+    "cde/" and starts at character 3. SetLine replaces a line's text and
+    keeps its separator. Lines are kept in step with Insert and Delete of
+    separators.
+*/
+class Main
+    text separator = ""
+
+    action Show(text value) returns text
+        return "[" + value:Replace(separator, "/") + "]"
+    end
+
+    action ShowLines(MultipleLineText tree) returns text
+        text result = ""
+        integer i = 0
+        repeat while i < tree:GetLineCount()
+            MultipleLineText line = tree:GetLine(i)
+            result = result + Show(line:GetText())
+            i = i + 1
+        end
+        return result
+    end
+
+    action Main
+        MultipleLineText tree
+        separator = tree:GetLineSeparator()
+        tree:Initialize("ab" + separator + "cde" + separator + "f")
+        check
+            output "MultipleLineText(ab/cde/f) GetText() = " + Show(tree:GetText()) + ", GetSize() = " + tree:GetSize() + ", GetLineCount() = " + tree:GetLineCount()
+        detect e
+            output "MultipleLineText(ab/cde/f) GetText() unexpected error: " + e:GetErrorMessage()
+        end
+        check
+            output "MultipleLineText(ab/cde/f) GetLine(0..2) = " + ShowLines(tree)
+        detect e
+            output "MultipleLineText(ab/cde/f) GetLine unexpected error: " + e:GetErrorMessage()
+        end
+        check
+            Array<MultipleLineText> lines = tree:GetLines()
+            text all = ""
+            integer i = 0
+            repeat while i < lines:GetSize()
+                MultipleLineText line = lines:Get(i)
+                all = all + Show(line:GetText())
+                i = i + 1
+            end
+            output "MultipleLineText(ab/cde/f) GetLines() has " + lines:GetSize() + ": " + all
+        detect e
+            output "MultipleLineText(ab/cde/f) GetLines() unexpected error: " + e:GetErrorMessage()
+        end
+        check
+            output "MultipleLineText(ab/cde/f) LineIndexFromCharacterIndex(0, 2, 3, 6, 7) = " + tree:LineIndexFromCharacterIndex(0) + " " + tree:LineIndexFromCharacterIndex(2) + " " + tree:LineIndexFromCharacterIndex(3) + " " + tree:LineIndexFromCharacterIndex(6) + " " + tree:LineIndexFromCharacterIndex(7)
+        detect e
+            output "MultipleLineText LineIndexFromCharacterIndex unexpected error: " + e:GetErrorMessage()
+        end
+        check
+            output "MultipleLineText(ab/cde/f) CharacterIndexFromLineIndex(0, 1, 2) = " + tree:CharacterIndexFromLineIndex(0) + " " + tree:CharacterIndexFromLineIndex(1) + " " + tree:CharacterIndexFromLineIndex(2)
+        detect e
+            output "MultipleLineText CharacterIndexFromLineIndex unexpected error: " + e:GetErrorMessage()
+        end
+        check
+            output "MultipleLineText(ab/cde/f) GetCharacter(2) = " + Show(tree:GetCharacter(2)) + ", GetCharacter(3) = " + Show(tree:GetCharacter(3)) + ", GetText(1, 5) = " + Show(tree:GetText(1, 5))
+        detect e
+            output "MultipleLineText GetCharacter/GetText across lines unexpected error: " + e:GetErrorMessage()
+        end
+        check
+            MultipleLineText changed = tree:SetLine(1, "XY")
+            output "MultipleLineText(ab/cde/f) SetLine(1, XY) = " + Show(changed:GetText()) + ", lines " + ShowLines(changed) + ", original " + Show(tree:GetText())
+        detect e
+            output "MultipleLineText SetLine(1, XY) unexpected error: " + e:GetErrorMessage()
+        end
+        check
+            MultipleLineText changed = tree:SetLine(2, "Z")
+            output "MultipleLineText(ab/cde/f) SetLine(2, Z) = " + Show(changed:GetText()) + ", lines " + ShowLines(changed)
+        detect e
+            output "MultipleLineText SetLine(2, Z) unexpected error: " + e:GetErrorMessage()
+        end
+        check
+            MultipleLineText changed = tree:SetLine(0, "")
+            output "MultipleLineText(ab/cde/f) SetLine(0, '') = " + Show(changed:GetText()) + ", GetLineCount() = " + changed:GetLineCount()
+        detect e
+            output "MultipleLineText SetLine(0, '') unexpected error: " + e:GetErrorMessage()
+        end
+        check
+            MultipleLineText changed = tree:Insert(1, separator)
+            output "MultipleLineText(ab/cde/f) Insert(1, separator) = " + Show(changed:GetText()) + ", GetLineCount() = " + changed:GetLineCount() + ", lines " + ShowLines(changed)
+        detect e
+            output "MultipleLineText Insert(1, separator) unexpected error: " + e:GetErrorMessage()
+        end
+        check
+            MultipleLineText changed = tree:Delete(2, 3)
+            output "MultipleLineText(ab/cde/f) Delete(2, 3) (a separator) = " + Show(changed:GetText()) + ", GetLineCount() = " + changed:GetLineCount() + ", lines " + ShowLines(changed)
+        detect e
+            output "MultipleLineText Delete(2, 3) unexpected error: " + e:GetErrorMessage()
+        end
+        check
+            MultipleLineText changed = tree:Delete(1, 7)
+            output "MultipleLineText(ab/cde/f) Delete(1, 7) = " + Show(changed:GetText()) + ", GetLineCount() = " + changed:GetLineCount()
+        detect e
+            output "MultipleLineText Delete(1, 7) unexpected error: " + e:GetErrorMessage()
+        end
+        check
+            MultipleLineText changed = tree:Concatenate(separator + "g")
+            MultipleLineText other
+            other:Initialize("h" + separator + "i")
+            MultipleLineText both = changed:Concatenate(other)
+            output "MultipleLineText(ab/cde/f) Concatenate(/g) then Concatenate(h/i) = " + Show(both:GetText()) + ", GetLineCount() = " + both:GetLineCount() + ", lines " + ShowLines(both)
+        detect e
+            output "MultipleLineText Concatenate across lines unexpected error: " + e:GetErrorMessage()
+        end
+        check
+            MultipleLineText balanced = tree:Balance()
+            output "MultipleLineText(ab/cde/f) Balance() = " + Show(balanced:GetText()) + ", GetLineCount() = " + balanced:GetLineCount() + ", NeedsBalancing() = " + balanced:NeedsBalancing()
+        detect e
+            output "MultipleLineText Balance unexpected error: " + e:GetErrorMessage()
+        end
+
+        MultipleLineText ending
+        check
+            ending:Initialize("ab" + separator)
+            MultipleLineText last = ending:GetLine(1)
+            output "MultipleLineText(ab/) GetLineCount() = " + ending:GetLineCount() + ", GetLine(1) = " + Show(last:GetText()) + ", GetSize() = " + ending:GetSize()
+        detect e
+            output "MultipleLineText(ab/) unexpected error: " + e:GetErrorMessage()
+        end
+
+        MultipleLineText renamed
+        check
+            renamed:Initialize("ab" + separator + "cde" + separator + "f")
+            renamed:SetLineSeparator("|")
+            output "MultipleLineText(ab/cde/f) SetLineSeparator(|): GetText() = [" + renamed:GetText() + "], GetLineSeparator() = [" + renamed:GetLineSeparator() + "], GetLineCount() = " + renamed:GetLineCount()
+        detect e
+            output "MultipleLineText SetLineSeparator(|) unexpected error: " + e:GetErrorMessage()
+        end
+    end
+end

@@ -1,0 +1,8 @@
+GetFreeDiskSpace() is more than 0 = true
+GetTotalDiskSpace() is more than 0 = true
+GetFreeDiskSpace() is at most GetTotalDiskSpace() = true
+GetLastModifiedDate(info.txt) is defined = true
+GetLastModifiedDate(info.txt): GetYear() is 2025 or later = true
+GetLastModifiedDate(missing.txt) is undefined = true
+SetExecutable(true) on info.txt, then Exists() = true
+SetExecutable(false) on info.txt, then Read() = [info]

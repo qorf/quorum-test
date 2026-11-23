@@ -1,0 +1,14 @@
+CreateDirectories(FileTestsWork/FileExists) = true
+Exists(folder) = true
+IsFile(folder) = false
+IsDirectory(folder) = true
+IsHidden(folder) = false
+Exists(plain.txt) = true
+IsFile(plain.txt) = true
+IsDirectory(plain.txt) = false
+IsHidden(plain.txt) = false
+Exists(missing.txt) = false
+IsFile(missing.txt) = false
+IsDirectory(missing.txt) = false
+IsHidden(missing.txt) = false
+Exists(folder) after Delete(true) = false

@@ -1,0 +1,164 @@
+package Libraries.Language.Compile.Test
+
+use Libraries.Testing.Tester
+use Worlds.Tests.TerrainRegionHeightTest
+use Worlds.Tests.TerrainRegionPixelTest
+use Worlds.Tests.TerrainDataRegionTest
+use Worlds.Tests.TerrainDataSampleTest
+use Worlds.Tests.TerrainDataWorldPositionTest
+use Worlds.Tests.TerrainDataEditedAreaTest
+use Worlds.Tests.TerrainDataNoiseTest
+use Worlds.Tests.TerrainDataPixelTest
+use Worlds.Tests.TerrainDataSurfaceTest
+use Worlds.Tests.TerrainDataSlopeTest
+use Worlds.Tests.TerrainDataRaiseTest
+use Worlds.Tests.TerrainCollisionCellsTest
+use Worlds.Tests.TerrainCollisionPieceTest
+use Worlds.Tests.TerrainDataSettingsTest
+use Worlds.Tests.TerrainStreamingTest
+use Worlds.Tests.TerrainSplatTest
+use Worlds.Tests.TerrainBrushTest
+use Worlds.Tests.TerrainStrokeSculptTest
+use Worlds.Tests.TerrainStrokePaintTest
+use Worlds.Tests.TerrainStrokeUndoTest
+use Worlds.Tests.TerrainDataRayCastTest
+use Worlds.Tests.TerrainGeneratorTest
+
+/*
+WorldsTester runs the terrain and world tests, in the same way PhysicsTester
+runs the physics tests. The test classes are in Tests/Worlds, one test to a
+file.
+
+Attribute: Example
+use Libraries.Testing.Tester
+use Libraries.Language.Compile.Test.WorldsTester
+
+Tester tester
+WorldsTester worlds
+worlds:SetTester(tester)
+worlds:Test()
+*/
+class WorldsTester
+    Tester tester = undefined
+
+    /*
+    This action returns the name of this group of tests.
+
+    Attribute: Returns The name.
+    */
+    action GetName returns text
+        return "Worlds Tests"
+    end
+
+    /*
+    This action sets the Tester that runs each test and keeps the results.
+
+    Attribute: Parameter tester The Tester to use.
+    */
+    action SetTester(Tester tester)
+        me:tester = tester
+    end
+
+    /*
+    This action runs every test in the group.
+    */
+    action Test
+        TestRegions()
+        TestData()
+        TestCollision()
+        TestStreaming()
+        TestEditing()
+    end
+
+    /*
+    This action runs the tests of the editing tools: brushes, strokes, and
+    undo and redo.
+    */
+    action TestEditing
+        TerrainBrushTest test1
+        tester:Run(test1)
+
+        TerrainStrokeSculptTest test2
+        tester:Run(test2)
+
+        TerrainStrokePaintTest test3
+        tester:Run(test3)
+
+        TerrainStrokeUndoTest test4
+        tester:Run(test4)
+
+        TerrainDataRayCastTest test5
+        tester:Run(test5)
+
+        TerrainGeneratorTest test6
+        tester:Run(test6)
+    end
+
+    /*
+    This action runs the tests of collision near a target.
+    */
+    action TestCollision
+        TerrainCollisionCellsTest test1
+        tester:Run(test1)
+
+        TerrainCollisionPieceTest test2
+        tester:Run(test2)
+    end
+
+    /*
+    This action runs the tests of saving settings and streaming regions.
+    */
+    action TestStreaming
+        TerrainDataSettingsTest test1
+        tester:Run(test1)
+
+        TerrainStreamingTest test2
+        tester:Run(test2)
+    end
+
+    /*
+    This action runs the tests of TerrainRegion.
+    */
+    action TestRegions
+        TerrainRegionHeightTest test1
+        tester:Run(test1)
+
+        TerrainRegionPixelTest test2
+        tester:Run(test2)
+    end
+
+    /*
+    This action runs the tests of TerrainData.
+    */
+    action TestData
+        TerrainDataRegionTest test1
+        tester:Run(test1)
+
+        TerrainDataSampleTest test2
+        tester:Run(test2)
+
+        TerrainDataWorldPositionTest test3
+        tester:Run(test3)
+
+        TerrainDataEditedAreaTest test4
+        tester:Run(test4)
+
+        TerrainDataNoiseTest test5
+        tester:Run(test5)
+
+        TerrainDataPixelTest test6
+        tester:Run(test6)
+
+        TerrainDataSurfaceTest test7
+        tester:Run(test7)
+
+        TerrainDataSlopeTest test8
+        tester:Run(test8)
+
+        TerrainDataRaiseTest test9
+        tester:Run(test9)
+
+        TerrainSplatTest test10
+        tester:Run(test10)
+    end
+end

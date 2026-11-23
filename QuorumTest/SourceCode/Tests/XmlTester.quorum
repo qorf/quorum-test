@@ -1,0 +1,65 @@
+package Libraries.Language.Compile.Test
+
+use Libraries.Testing.QuorumTest
+use Libraries.Testing.ScriptCheck
+
+/*
+Tests the XML reader (Libraries.Data.Formats.ExtensibleMarkupReader), the
+classes it hands to a MarkupListener (Element, ElementImplementation,
+Attribute, AttributesImplementation) and the document type definition
+classes, one concern per script in Scripts/Xml/Pass, with the expected
+output in a .expected file beside each.
+
+Back ends: bytecode and JavaScript. Not Python: the reader holds a
+DocumentTypeDefinition, which holds a File, and there is no Python File
+plugin, so the classes can't be created there. XmlElementClasses uses no
+File and runs everywhere. XmlFiles reads and writes real files, so it runs
+on bytecode only.
+*/
+class XmlTester
+    QuorumTest suite = undefined
+    ScriptCheck scripts
+    text path = "Scripts/Xml/Pass/"
+
+    action Test
+        scripts:SetSuite(suite)
+        scripts:Check(path + "XmlBasics", true, false)
+        scripts:Check(path + "XmlNested", true, false)
+        scripts:Check(path + "XmlAttributesDouble", true, false)
+        scripts:Check(path + "XmlAttributesSingle", true, false)
+        scripts:Check(path + "XmlAttributeNormalization", true, false)
+        scripts:Check(path + "XmlAttributeEntities", true, false)
+        scripts:Check(path + "XmlTextEntities", true, false)
+        scripts:Check(path + "XmlNumericEntities", true, false)
+        scripts:Check(path + "XmlCharacterData", true, false)
+        scripts:Check(path + "XmlComments", true, false)
+        scripts:Check(path + "XmlProcessingInstructions", true, false)
+        scripts:Check(path + "XmlSelfClosing", true, false)
+        scripts:Check(path + "XmlWhitespace", true, false)
+        scripts:Check(path + "XmlEmptyElements", true, false)
+        scripts:Check(path + "XmlMixedContent", true, false)
+        scripts:Check(path + "XmlNamespaces", true, false)
+        scripts:Check(path + "XmlDocumentType", true, false)
+        scripts:Check(path + "XmlDocumentTypeDefaults", true, false)
+        scripts:Check(path + "XmlMalformedTags", true, false)
+        scripts:Check(path + "XmlMalformedAttributes", true, false)
+        scripts:Check(path + "XmlMalformedEntities", true, false)
+        scripts:Check(path + "XmlReaderActions", true, false)
+        scripts:Check(path + "DtdReadText", true, false)
+        scripts:Check(path + "DtdClasses", true, false)
+        scripts:CheckEverywhere(path + "XmlElementClasses")
+        scripts:Check(path + "XmlFiles", false, false)
+    end
+
+    action GetName returns text
+        return "XML Tests"
+    end
+
+    action GetCompilerTestSuite returns QuorumTest
+        return suite
+    end
+
+    action SetCompilerTestSuite(QuorumTest suite)
+        me:suite = suite
+    end
+end

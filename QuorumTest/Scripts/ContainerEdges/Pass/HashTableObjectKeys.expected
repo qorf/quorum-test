@@ -1,0 +1,7 @@
+HashTable Add(key 1, one), Add(key 2, two) then GetValue(a new key 1) = [one], size 2
+HashTable Add(another key 1, uno): size 2, GetValue(key 1) = [uno]
+HashTable RemoveKey(a new key 2) = [two], size 1, HasKey(key 2) = false
+HashTable 60 keys that all have hash code 7: size 60, GetValue right for 60 of 60
+Colliding keys Set(key 30, replaced), RemoveKey(0) = [c0], RemoveKey(31) = [c31], RemoveKey(59) = [c59], size 57, GetValue(key 30) = [replaced], HasKey(31) = false, HasKey(32) = true
+HashTable with two plain Objects as keys: size 2, GetValue(first) = [a], GetValue(second) = [b]
+HashTable with two plain Objects: HasKey(a third Object) = false

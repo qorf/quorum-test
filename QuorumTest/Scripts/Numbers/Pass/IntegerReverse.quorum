@@ -1,0 +1,36 @@
+/*
+    Integer:Reverse reverses the order of the 32 bits: 1 becomes the minimum
+    integer, 2 becomes 1073741824, -1 stays -1.
+    Each case runs on an integer primitive and on an Integer object.
+*/
+class Main
+    action Main
+        ShowReverse(0)
+        ShowReverse(1)
+        ShowReverse(2)
+        ShowReverse(3)
+        ShowReverse(-1)
+        ShowReverse(-2)
+        ShowReverse(-2147483647 - 1)
+        ShowReverse(2147483647)
+        ShowReverse(305419896)
+    end
+
+    action ShowReverse(integer value)
+        text call = "Reverse(" + value + ")"
+        check
+            integer result = value:Reverse()
+            output call + " = " + result
+        detect e
+            output call + " unexpected error: " + e:GetErrorMessage()
+        end
+        Integer object
+        object:SetValue(value)
+        check
+            integer result = object:Reverse()
+            output "Integer " + call + " = " + result
+        detect e
+            output "Integer " + call + " unexpected error: " + e:GetErrorMessage()
+        end
+    end
+end

@@ -1,0 +1,39 @@
+/*
+    Integer:LowestOneBit gives the value of the lowest one bit alone (Java's
+    Integer.lowestOneBit; the documentation calls it the location): 12 gives
+    4, and 0 gives 0. Calling it must not change the value it is called on,
+    so each line calls it twice and prints the value afterwards.
+    Each case runs on an integer primitive and on an Integer object.
+*/
+class Main
+    action Main
+        ShowLowestOneBit(0)
+        ShowLowestOneBit(1)
+        ShowLowestOneBit(12)
+        ShowLowestOneBit(7)
+        ShowLowestOneBit(-8)
+        ShowLowestOneBit(-1)
+        ShowLowestOneBit(1073741824)
+        ShowLowestOneBit(-2147483647 - 1)
+    end
+
+    action ShowLowestOneBit(integer value)
+        text call = "LowestOneBit(" + value + ")"
+        check
+            integer result = value:LowestOneBit()
+            integer again = value:LowestOneBit()
+            output call + " = " + result + ", called again = " + again + ", value after = " + value
+        detect e
+            output call + " unexpected error: " + e:GetErrorMessage()
+        end
+        Integer object
+        object:SetValue(value)
+        check
+            integer result = object:LowestOneBit()
+            integer again = object:LowestOneBit()
+            output "Integer " + call + " = " + result + ", called again = " + again
+        detect e
+            output "Integer " + call + " unexpected error: " + e:GetErrorMessage()
+        end
+    end
+end

@@ -1,0 +1,6 @@
+GetDirectoryListing(folder with a.txt, b.txt, sub) size = 3
+GetDirectoryListing item: a.txt (file, contents of FileListing)
+GetDirectoryListing item: b.txt (file, contents of FileListing)
+GetDirectoryListing item: sub (folder, contents of FileListing)
+GetDirectoryListing(empty sub) size = 0
+GetDirectoryListing(b.txt, a file) is undefined = true

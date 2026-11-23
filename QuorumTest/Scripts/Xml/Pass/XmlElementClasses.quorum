@@ -1,0 +1,138 @@
+use Libraries.Data.Formats.Element
+use Libraries.Data.Formats.ElementImplementation
+use Libraries.Data.Formats.Attribute
+use Libraries.Data.Formats.AttributesImplementation
+
+/*
+The classes the XML reader hands to a listener, used directly: Element's
+getters and defaults, ElementImplementation's SetName, SetValue and Add,
+Attribute's name and value fields, and every action of
+AttributesImplementation (GetName, GetValue, GetSize, Add, Empty), including
+an index past the end, which should fail like an Array's.
+*/
+class Main
+    action Main
+        check
+            Element element
+            AttributesImplementation attributes = element:GetAttributes()
+            output "new Element: GetName() = [" + element:GetName() + "], GetValue() = [" + element:GetValue() + "], GetAttributes():GetSize() = " + attributes:GetSize()
+        detect e
+            output "new Element unexpected error: " + e:GetErrorMessage()
+        end
+
+        check
+            ElementImplementation book
+            book:SetName("book")
+            book:SetValue("Lord of the Flies")
+            output "ElementImplementation SetName(book) SetValue(Lord of the Flies): GetName() = [" + book:GetName() + "], GetValue() = [" + book:GetValue() + "]"
+        detect e
+            output "ElementImplementation SetName/SetValue unexpected error: " + e:GetErrorMessage()
+        end
+
+        check
+            ElementImplementation book
+            book:SetName("first")
+            book:SetName("second")
+            book:SetValue("")
+            output "ElementImplementation SetName twice keeps the last = [" + book:GetName() + "], SetValue() empty = [" + book:GetValue() + "]"
+        detect e
+            output "ElementImplementation SetName twice unexpected error: " + e:GetErrorMessage()
+        end
+
+        check
+            ElementImplementation book
+            Attribute author
+            author:name = "author"
+            author:value = "William Golding"
+            Attribute year
+            year:name = "year"
+            year:value = "1954"
+            book:Add(author)
+            book:Add(year)
+            AttributesImplementation attributes = book:GetAttributes()
+            output "ElementImplementation Add(author) Add(year): size = " + attributes:GetSize() + ", 0 = [" + attributes:GetName(0) + "=" + attributes:GetValue(0) + "], 1 = [" + attributes:GetName(1) + "=" + attributes:GetValue(1) + "]"
+        detect e
+            output "ElementImplementation Add unexpected error: " + e:GetErrorMessage()
+        end
+
+        check
+            Element asElement
+            ElementImplementation book
+            book:SetName("cast")
+            asElement = book
+            output "ElementImplementation used as an Element: GetName() = [" + asElement:GetName() + "]"
+        detect e
+            output "ElementImplementation used as an Element unexpected error: " + e:GetErrorMessage()
+        end
+
+        check
+            Attribute attribute
+            output "new Attribute: name = [" + attribute:name + "], value = [" + attribute:value + "]"
+        detect e
+            output "new Attribute unexpected error: " + e:GetErrorMessage()
+        end
+
+        check
+            AttributesImplementation attributes
+            output "new AttributesImplementation GetSize() = " + attributes:GetSize()
+        detect e
+            output "new AttributesImplementation unexpected error: " + e:GetErrorMessage()
+        end
+
+        check
+            AttributesImplementation attributes
+            Attribute day
+            day:name = "day"
+            day:value = "01"
+            Attribute month
+            month:name = "month"
+            month:value = "02"
+            attributes:Add(day)
+            attributes:Add(month)
+            output "AttributesImplementation Add(day=01) Add(month=02): GetSize() = " + attributes:GetSize() + ", GetName(1) = [" + attributes:GetName(1) + "], GetValue(1) = [" + attributes:GetValue(1) + "], GetName(0) = [" + attributes:GetName(0) + "], GetValue(0) = [" + attributes:GetValue(0) + "]"
+        detect e
+            output "AttributesImplementation Add/GetName/GetValue unexpected error: " + e:GetErrorMessage()
+        end
+
+        check
+            AttributesImplementation attributes
+            Attribute first
+            Attribute second
+            Attribute third
+            attributes:Add(first)
+            attributes:Add(second)
+            attributes:Add(third)
+            attributes:Empty()
+            output "AttributesImplementation Empty() after three Adds: GetSize() = " + attributes:GetSize()
+        detect e
+            output "AttributesImplementation Empty unexpected error: " + e:GetErrorMessage()
+        end
+
+        check
+            AttributesImplementation attributes
+            Attribute day
+            day:name = "day"
+            attributes:Add(day)
+            text name = attributes:GetName(1)
+            output "AttributesImplementation GetName(1) with one attribute should fail but returned [" + name + "]"
+        detect e
+            output "AttributesImplementation GetName(1) with one attribute fails, as it should"
+        end
+
+        check
+            AttributesImplementation attributes
+            text value = attributes:GetValue(0)
+            output "AttributesImplementation GetValue(0) when empty should fail but returned [" + value + "]"
+        detect e
+            output "AttributesImplementation GetValue(0) when empty fails, as it should"
+        end
+
+        check
+            AttributesImplementation attributes
+            text value = attributes:GetName(-1)
+            output "AttributesImplementation GetName(-1) should fail but returned [" + value + "]"
+        detect e
+            output "AttributesImplementation GetName(-1) fails, as it should"
+        end
+    end
+end

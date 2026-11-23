@@ -1,0 +1,3 @@
+Read(a,b,) rows = 1: [a][b][]
+Read(a,b,\nc,d,) rows = 2: [a][b][] | [c][d][]
+Read(a,b,\n) rows = 1: [a][b][]

@@ -1,0 +1,150 @@
+use Libraries.Web.Styles.WebColor
+use Libraries.Web.Styles.WebTextStyle
+
+/*
+Tests WebTextStyle: each setter's CSS declaration, the getters, and the
+order declarations are written in. Sizes are in rem, 16 pixels each.
+*/
+class Main
+    action Main
+        check
+            WebTextStyle t
+            output "new WebTextStyle Generate() = [" + Flat(t:Generate()) + "]"
+        detect e
+            output "new WebTextStyle Generate() unexpected error: " + e:GetErrorMessage()
+        end
+        check
+            WebTextStyle t
+            t:SetFontSize(24)
+            output "SetFontSize(24) Generate() = [" + Flat(t:Generate()) + "]"
+        detect e
+            output "SetFontSize(24) Generate() unexpected error: " + e:GetErrorMessage()
+        end
+        check
+            WebTextStyle t
+            t:SetFontSize(24)
+            output "SetFontSize(24) GetFontSize() = " + t:GetFontSize()
+        detect e
+            output "SetFontSize(24) GetFontSize() unexpected error: " + e:GetErrorMessage()
+        end
+        check
+            WebTextStyle t
+            t:SetLineHeight(40)
+            output "SetLineHeight(40) Generate() = [" + Flat(t:Generate()) + "]"
+        detect e
+            output "SetLineHeight(40) Generate() unexpected error: " + e:GetErrorMessage()
+        end
+        check
+            WebTextStyle t
+            t:SetBold(true)
+            output "SetBold(true) Generate() and IsBold() = [" + Flat(t:Generate() + " " + t:IsBold()) + "]"
+        detect e
+            output "SetBold(true) Generate() and IsBold() unexpected error: " + e:GetErrorMessage()
+        end
+        check
+            WebTextStyle t
+            t:SetBold(false)
+            output "SetBold(false) Generate() = [" + Flat(t:Generate()) + "]"
+        detect e
+            output "SetBold(false) Generate() unexpected error: " + e:GetErrorMessage()
+        end
+        check
+            WebTextStyle t
+            t:SetSemibold(true)
+            output "SetSemibold(true) Generate() = [" + Flat(t:Generate()) + "]"
+        detect e
+            output "SetSemibold(true) Generate() unexpected error: " + e:GetErrorMessage()
+        end
+        check
+            WebTextStyle t
+            t:SetItalic(true)
+            output "SetItalic(true) Generate() and IsItalic() = [" + Flat(t:Generate() + " " + t:IsItalic()) + "]"
+        detect e
+            output "SetItalic(true) Generate() and IsItalic() unexpected error: " + e:GetErrorMessage()
+        end
+        check
+            WebTextStyle t
+            t:UseSurroundingFont()
+            output "UseSurroundingFont() Generate() and UsesSurroundingFont() = [" + Flat(t:Generate() + " " + t:UsesSurroundingFont()) + "]"
+        detect e
+            output "UseSurroundingFont() Generate() and UsesSurroundingFont() unexpected error: " + e:GetErrorMessage()
+        end
+        check
+            WebTextStyle t
+            WebColor red
+            red:SetColor(255, 0, 0)
+            t:SetColor(red)
+            output "SetColor(255,0,0) Generate() = [" + Flat(t:Generate()) + "]"
+        detect e
+            output "SetColor(255,0,0) Generate() unexpected error: " + e:GetErrorMessage()
+        end
+        check
+            WebTextStyle t
+            WebColor red
+            red:SetColor(255, 0, 0)
+            t:SetColor(red)
+            output "SetColor then GetColor():GetRed() = " + t:GetColor():GetRed()
+        detect e
+            output "SetColor then GetColor():GetRed() unexpected error: " + e:GetErrorMessage()
+        end
+        check
+            WebTextStyle t
+            t:SetUnderline(false)
+            output "SetUnderline(false) Generate() = [" + Flat(t:Generate()) + "]"
+        detect e
+            output "SetUnderline(false) Generate() unexpected error: " + e:GetErrorMessage()
+        end
+        check
+            WebTextStyle t
+            t:SetUppercase(true)
+            output "SetUppercase(true) Generate() = [" + Flat(t:Generate()) + "]"
+        detect e
+            output "SetUppercase(true) Generate() unexpected error: " + e:GetErrorMessage()
+        end
+        check
+            WebTextStyle t
+            t:AlignCenter()
+            output "AlignCenter() Generate() = [" + Flat(t:Generate()) + "]"
+        detect e
+            output "AlignCenter() Generate() unexpected error: " + e:GetErrorMessage()
+        end
+        check
+            WebTextStyle t
+            t:AlignLeft()
+            t:AlignRight()
+            output "AlignLeft() then AlignRight() Generate() = [" + Flat(t:Generate()) + "]"
+        detect e
+            output "AlignLeft() then AlignRight() Generate() unexpected error: " + e:GetErrorMessage()
+        end
+        check
+            WebTextStyle t
+            t:AlignLeft()
+            t:SetBold(true)
+            t:SetFontSize(24)
+            output "SetFontSize(24) SetBold(true) AlignLeft() Generate() order = [" + Flat(t:Generate()) + "]"
+        detect e
+            output "SetFontSize(24) SetBold(true) AlignLeft() Generate() order unexpected error: " + e:GetErrorMessage()
+        end
+        check
+            WebTextStyle t
+            WebColor none = undefined
+            t:SetColor(none)
+            output "SetColor(undefined) Generate() = [" + Flat(t:Generate()) + "]"
+        detect e
+            output "SetColor(undefined) Generate() unexpected error: " + e:GetErrorMessage()
+        end
+    end
+
+    /* Shows line breaks as the two characters \n and double quotes as ', so each case is one line. */
+    action Flat(text value) returns text
+        text lf = ""
+        lf = lf:GetLineFeed()
+        text cr = ""
+        cr = cr:GetCarriageReturn()
+        text quote = ""
+        quote = quote:GetDoubleQuote()
+        text result = value:Replace(cr, "")
+        result = result:Replace(lf, "\n")
+        return result:Replace(quote, "'")
+    end
+end

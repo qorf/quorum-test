@@ -1,0 +1,28 @@
+GetDiagonal = 4.0 2.8 2.2
+GetSubDiagonal = -2.2361 -0.4
+GetTridiagonalMatrix gives a 3 by 3 matrix:
+|4.0, -2.2361, 0.0|
+|-2.2361, 2.8, -0.4|
+|0.0, -0.4, 2.2|
+Q times T times Q transposed gives a 3 by 3 matrix:
+|4.0, 1.0, 2.0|
+|1.0, 2.0, 0.0|
+|2.0, 0.0, 3.0|
+Q transposed times Q gives a 3 by 3 matrix:
+|1.0, 0.0, 0.0|
+|0.0, 1.0, 0.0|
+|0.0, 0.0, 1.0|
+GetOriginalMatrix gives a 3 by 3 matrix:
+|4.0, 1.0, 2.0|
+|1.0, 2.0, 0.0|
+|2.0, 0.0, 3.0|
+2 by 2 GetTridiagonalMatrix gives a 2 by 2 matrix:
+|2.0, 1.0|
+|1.0, 3.0|
+2 by 2 Q times T times Q transposed gives a 2 by 2 matrix:
+|2.0, 1.0|
+|1.0, 3.0|
+2 by 2 Q transposed times Q gives a 2 by 2 matrix:
+|1.0, 0.0|
+|0.0, 1.0|
+Calculate of the non-symmetric |1, 2| |3, 4| fails, as it should

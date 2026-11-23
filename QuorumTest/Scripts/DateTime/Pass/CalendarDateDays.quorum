@@ -1,0 +1,68 @@
+use Libraries.System.CalendarDate
+
+/*
+Tests GetDayOfWeek (1 is Monday, 7 is Sunday), GetDayOfYear, IsLeapYear,
+GetDaysInMonth, GetDayNumber (days from January 1, 1970) and SetDayNumber,
+including dates before 1970 and in year 1. The values were worked out with
+Python's datetime module, which uses the same proleptic Gregorian calendar.
+*/
+class Main
+    action Main
+        Show(1970, 1, 1)
+        Show(1969, 12, 31)
+        Show(2000, 1, 1)
+        Show(2024, 2, 29)
+        Show(2023, 12, 31)
+        Show(2024, 12, 31)
+        Show(1900, 3, 1)
+        Show(1, 1, 1)
+        Show(2026, 11, 12)
+        Months(2023)
+        Months(2024)
+        FromNumber(0)
+        FromNumber(-1)
+        FromNumber(19675)
+        FromNumber(10957)
+        FromNumber(-719162)
+        FromNumber(20088)
+    end
+
+    action Show(integer year, integer month, integer day)
+        CalendarDate date
+        check
+            boolean valid = date:SetDate(year, month, day)
+            output date:ToText() + ": GetDayOfWeek() = " + date:GetDayOfWeek() + ", GetDayOfYear() = " + date:GetDayOfYear() + ", IsLeapYear() = " + date:IsLeapYear() + ", GetDaysInMonth() = " + date:GetDaysInMonth() + ", GetDayNumber() = " + date:GetDayNumber()
+        detect e
+            output year + "/" + month + "/" + day + " unexpected error: " + e:GetErrorMessage()
+        end
+    end
+
+    action Months(integer year)
+        CalendarDate date
+        text days = ""
+        check
+            integer month = 1
+            repeat while month <= 12
+                boolean valid = date:SetDate(year, month, 1)
+                days = days + date:GetDaysInMonth()
+                if month < 12
+                    days = days + " "
+                end
+                month = month + 1
+            end
+            output "GetDaysInMonth() for each month of " + year + " = [" + days + "]"
+        detect e
+            output "GetDaysInMonth() for " + year + " unexpected error: " + e:GetErrorMessage()
+        end
+    end
+
+    action FromNumber(integer days)
+        CalendarDate date
+        check
+            date:SetDayNumber(days)
+            output "SetDayNumber(" + days + "): ToText() = [" + date:ToText() + "], GetDayNumber() = " + date:GetDayNumber() + ", GetDayOfWeek() = " + date:GetDayOfWeek()
+        detect e
+            output "SetDayNumber(" + days + ") unexpected error: " + e:GetErrorMessage()
+        end
+    end
+end

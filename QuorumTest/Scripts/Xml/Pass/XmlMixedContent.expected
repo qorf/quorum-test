@@ -1,0 +1,4 @@
+Read(<p>a<b>c</b>d</p>) events: Start(p) Value[a] Start(b) Value[c] End(b) Value[d] End(p)
+Read(<p>Hello <b>bold</b> world</p>) events: Start(p) Value[Hello ] Start(b) Value[bold] End(b) Value[ world] End(p)
+Read(<p><i>x</i> and <i>y</i></p>) events: Start(p) Start(i) Value[x] End(i) Value[ and ] Start(i) Value[y] End(i) End(p)
+Read(<p>line<br/>break</p>) events: Start(p) Value[line] Start(br) End(br) Value[break] End(p)

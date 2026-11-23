@@ -1,0 +1,119 @@
+use Libraries.Web.Page.Base
+use Libraries.Web.Page.MetaData
+use Libraries.Web.Page.Script
+use Libraries.Web.Page.WebPageHeader
+
+/*
+Tests WebPageHeader: its title, meta data, scripts, base and links, and
+its HTML. A page can have only one base. The base is a void element, so
+it has no end tag (HTML Living Standard 13.1.2). A new header writes an
+empty title, which every HTML page needs.
+*/
+class Main
+    action Main
+        check
+            WebPageHeader h
+            output "new WebPageHeader Generate() = [" + Flat(h:Generate()) + "]"
+        detect e
+            output "new WebPageHeader Generate() unexpected error: " + e:GetErrorMessage()
+        end
+        check
+            WebPageHeader h
+            h:SetTitleHeaderValue("Home")
+            output "SetTitleHeaderValue(Home) Generate() = [" + Flat(h:Generate()) + "]"
+        detect e
+            output "SetTitleHeaderValue(Home) Generate() unexpected error: " + e:GetErrorMessage()
+        end
+        check
+            WebPageHeader h
+            h:SetTitleHeaderValue("Home")
+            output "SetTitleHeaderValue(Home) GetTitleHeader():Generate() = [" + Flat(h:GetTitleHeader():Generate()) + "]"
+        detect e
+            output "SetTitleHeaderValue(Home) GetTitleHeader():Generate() unexpected error: " + e:GetErrorMessage()
+        end
+        check
+            WebPageHeader h
+            MetaData m
+            m:SetCharacterSet("UTF-8")
+            h:Add(m)
+            Script s
+            s:SetGenerateType(false)
+            s:SetCode("go();")
+            h:Add(s)
+            output "Add(MetaData charset) and Add(Script) Generate() = [" + Flat(h:Generate()) + "]"
+        detect e
+            output "Add(MetaData charset) and Add(Script) Generate() unexpected error: " + e:GetErrorMessage()
+        end
+        check
+            WebPageHeader h
+            MetaData a
+            MetaData b
+            h:Add(a)
+            h:Add(b)
+            output "two Add(MetaData) GetNumberOfMetaDataItems() = " + h:GetNumberOfMetaDataItems()
+        detect e
+            output "two Add(MetaData) GetNumberOfMetaDataItems() unexpected error: " + e:GetErrorMessage()
+        end
+        check
+            WebPageHeader h
+            MetaData a
+            h:Add(a)
+            h:Remove(a)
+            output "Add then Remove(MetaData) GetNumberOfMetaDataItems() = " + h:GetNumberOfMetaDataItems()
+        detect e
+            output "Add then Remove(MetaData) GetNumberOfMetaDataItems() unexpected error: " + e:GetErrorMessage()
+        end
+        check
+            WebPageHeader h
+            Script s
+            h:Add(s)
+            output "Add(Script) GetNumberOfScriptItems() = " + h:GetNumberOfScriptItems()
+        detect e
+            output "Add(Script) GetNumberOfScriptItems() unexpected error: " + e:GetErrorMessage()
+        end
+        check
+            WebPageHeader h
+            output "AddStylesheet(s.css) returns a link to it = [" + Flat(h:AddStylesheet("s.css"):GetAddress():GetValue()) + "]"
+        detect e
+            output "AddStylesheet(s.css) returns a link to it unexpected error: " + e:GetErrorMessage()
+        end
+        check
+            WebPageHeader h
+            output "AddIcon(i.png) returns a link with rel icon = [" + Flat(h:AddIcon("i.png"):GetRelationship():GetValue()) + "]"
+        detect e
+            output "AddIcon(i.png) returns a link with rel icon unexpected error: " + e:GetErrorMessage()
+        end
+        check
+            WebPageHeader h
+            Base b
+            b:SetIdentifier("x")
+            h:Add(b)
+            output "Add(Base) once Generate() = [" + Flat(h:Generate()) + "]"
+        detect e
+            output "Add(Base) once Generate() unexpected error: " + e:GetErrorMessage()
+        end
+        check
+            WebPageHeader h
+            Base a
+            Base b
+            h:Add(a)
+            h:Add(b)
+            output "two Add(Base) Generate() should fail but returned [" + h:Generate() + "]"
+        detect e
+            output "two Add(Base) Generate() fails, as it should"
+        end
+    end
+
+    /* Shows line breaks as the two characters \n and double quotes as ', so each case is one line. */
+    action Flat(text value) returns text
+        text lf = ""
+        lf = lf:GetLineFeed()
+        text cr = ""
+        cr = cr:GetCarriageReturn()
+        text quote = ""
+        quote = quote:GetDoubleQuote()
+        text result = value:Replace(cr, "")
+        result = result:Replace(lf, "\n")
+        return result:Replace(quote, "'")
+    end
+end

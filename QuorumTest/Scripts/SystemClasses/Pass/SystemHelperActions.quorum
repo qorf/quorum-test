@@ -1,0 +1,52 @@
+use Libraries.System.SystemHelper
+
+/*
+Tests the SystemHelper actions that are safe to run in a test: Sleep,
+RequestGarbageCollection, GetFreeMemory, GetMaximumMemory, GetTotalMemory,
+GetAvailableProcessors and GetThreadName. Their values depend on the
+machine, so only facts true everywhere are printed: memory amounts are more
+than 0, free memory is at most the total and the total at most the maximum,
+there is at least one processor, and the thread has a name. Exit would end
+the test and OpenInDefaultTextEditor would open a window, so they are not
+run.
+*/
+class Main
+    action Main
+        SystemHelper helper
+        check
+            helper:Sleep(10)
+            output "Sleep(10) = done"
+        detect e
+            output "Sleep(10) unexpected error: " + e:GetErrorMessage()
+        end
+        check
+            helper:RequestGarbageCollection()
+            output "RequestGarbageCollection() = done"
+        detect e
+            output "RequestGarbageCollection() unexpected error: " + e:GetErrorMessage()
+        end
+        check
+            number free = helper:GetFreeMemory()
+            number total = helper:GetTotalMemory()
+            number maximum = helper:GetMaximumMemory()
+            output "GetFreeMemory() is more than 0 = " + (free > 0)
+            output "GetTotalMemory() is more than 0 = " + (total > 0)
+            output "GetMaximumMemory() is more than 0 = " + (maximum > 0)
+            output "GetFreeMemory() is at most GetTotalMemory() = " + (free <= total)
+            output "GetTotalMemory() is at most GetMaximumMemory() = " + (total <= maximum)
+        detect e
+            output "Memory unexpected error: " + e:GetErrorMessage()
+        end
+        check
+            output "GetAvailableProcessors() is at least 1 = " + (helper:GetAvailableProcessors() >= 1)
+        detect e
+            output "GetAvailableProcessors() unexpected error: " + e:GetErrorMessage()
+        end
+        check
+            text name = helper:GetThreadName()
+            output "GetThreadName() is not empty = " + (not name:IsEmpty())
+        detect e
+            output "GetThreadName() unexpected error: " + e:GetErrorMessage()
+        end
+    end
+end

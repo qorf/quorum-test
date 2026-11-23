@@ -1,0 +1,39 @@
+/*
+    Integer:HighestOneBit. The documentation calls the result the location of
+    the highest one bit; the expectation follows the Java plugin
+    (Integer.highestOneBit), which returns the value of that bit alone:
+    10 gives 8, and 0 (no one bits) gives 0. Negative values are tested in
+    IntegerHighestOneBitNegative, separately, because a JavaScript bug can
+    loop forever on them.
+    Each case runs on an integer primitive and on an Integer object.
+*/
+class Main
+    action Main
+        ShowHighestOneBit(0)
+        ShowHighestOneBit(1)
+        ShowHighestOneBit(2)
+        ShowHighestOneBit(3)
+        ShowHighestOneBit(10)
+        ShowHighestOneBit(255)
+        ShowHighestOneBit(1073741824)
+        ShowHighestOneBit(2147483647)
+    end
+
+    action ShowHighestOneBit(integer value)
+        text call = "HighestOneBit(" + value + ")"
+        check
+            integer result = value:HighestOneBit()
+            output call + " = " + result
+        detect e
+            output call + " unexpected error: " + e:GetErrorMessage()
+        end
+        Integer object
+        object:SetValue(value)
+        check
+            integer result = object:HighestOneBit()
+            output "Integer " + call + " = " + result
+        detect e
+            output "Integer " + call + " unexpected error: " + e:GetErrorMessage()
+        end
+    end
+end

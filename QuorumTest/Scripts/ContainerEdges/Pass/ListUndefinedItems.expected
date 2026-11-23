@@ -1,0 +1,10 @@
+List Add(undefined), Add(b), Add(undefined), Add(b) gives [undefined,b,undefined,b], size 4
+List[undefined,b,undefined,b] Has(b) = true
+List[undefined,b,undefined,b] Has(z) = false
+List[undefined,b,undefined,b] GetFirstLocation(b) = 1
+List[undefined,b,undefined,b] GetLastLocation(b) = 3
+List[undefined,b,undefined,b] Has(undefined) = false
+List[undefined,b,undefined,b] Remove(b) = true, leaving [undefined,undefined,b]
+List[undefined,b,undefined,b] RemoveAll(b) = true, leaving [undefined,undefined]
+List[undefined,b,undefined,b] Remove(undefined) = false, leaving [undefined,b,undefined,b]
+List[undefined,b,undefined,b] RemoveFromFront() = undefined, leaving [b,undefined,b]

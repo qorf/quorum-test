@@ -1,0 +1,7 @@
+Move(old.txt to new.txt) = true
+Exists(old.txt) after Move = false
+Read(new.txt) after Move = [moving]
+Move(folder box to crate) = true
+Read(crate/item.txt) after moving the folder = [item]
+Move(missing.txt to other.txt) = false
+Move(new.txt into a missing folder) = false

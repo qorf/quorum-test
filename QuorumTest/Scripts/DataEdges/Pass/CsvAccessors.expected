@@ -1,0 +1,11 @@
+Read(name,age\nAnn,30\nBob,41) GetNumberOfRows() = 3, GetSize() = 3, GetNumberOfColumns() = 2, IsConsistent() = true
+Read(name,age\nAnn,30\nBob,41) Get(0, 0) = [name], Get(1, 0) = [Ann], Get(2, 1) = [41]
+Read(name,age\nAnn,30\nBob,41) GetRow(1) size = 2, cells = [Ann][30]
+Read(name,age\nAnn,30\nBob,41) Get(3, 0) fails, as it should
+Read(name,age\nAnn,30\nBob,41) Get(0, 2) fails, as it should
+Read(name,age\nAnn,30\nBob,41) GetRow(5) fails, as it should
+Read(a,b\nc) IsConsistent() = false, GetNumberOfRows() = 2
+Read() GetNumberOfRows() = 0, IsConsistent() = true
+new SeparatedValue GetNumberOfRows() = 0, GetSize() = 0, GetNumberOfColumns() = 0, IsConsistent() = true, GetSeparator() = [,]
+SetSeparator(;) GetSeparator() = [;]
+new SeparatedValue Get(0, 0) fails, as it should

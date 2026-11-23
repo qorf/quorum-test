@@ -1,0 +1,41 @@
+/*
+    Text:Contains(text) returns true when the parameter is a substring of
+    the text. The empty text is a substring of every text (Java agrees).
+    Each case runs on a text primitive and on a Text object, because the
+    two compile to different plugin code.
+*/
+class Main
+    action Main
+        Show("abc", "b")
+        Show("abc", "a")
+        Show("abc", "c")
+        Show("abc", "abc")
+        Show("abc", "abcd")
+        Show("abc", "x")
+        Show("abc", "B")
+        Show("abc", "")
+        Show("a", "a")
+        Show("", "a")
+        Show("", "")
+        Show("   ", " ")
+        Show("aab", "ab")
+        Show("hello world", "o w")
+        Show("hello", "lo")
+    end
+
+    action Show(text value, text search)
+        text call = "Contains(" + value + ", " + search + ")"
+        check
+            output call + " = " + value:Contains(search)
+        detect e
+            output call + " unexpected error: " + e:GetErrorMessage()
+        end
+        Text object
+        object:SetValue(value)
+        check
+            output "Text " + call + " = " + object:Contains(search)
+        detect e
+            output "Text " + call + " unexpected error: " + e:GetErrorMessage()
+        end
+    end
+end

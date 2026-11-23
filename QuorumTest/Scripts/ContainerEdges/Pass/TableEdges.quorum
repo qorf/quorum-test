@@ -1,0 +1,177 @@
+use Libraries.Containers.Table
+use Libraries.Containers.Array
+use Libraries.Containers.Iterator
+
+/*
+    Table edges: an empty table, locations at and past the edges (row or
+    column = size, -1), a table made with SetSize (filled with undefined
+    items) being searched, a negative SetSize, and Copy being independent.
+*/
+class Main
+    action Show(text value) returns text
+        if value = undefined
+            return "undefined"
+        end
+        return "[" + value + "]"
+    end
+
+    action Describe(Array<text> array) returns text
+        text result = "["
+        integer i = 0
+        repeat while i < array:GetSize()
+            if i > 0
+                result = result + ","
+            end
+            text value = array:Get(i)
+            if value = undefined
+                result = result + "undefined"
+            else
+                result = result + value
+            end
+            i = i + 1
+        end
+        return result + "]"
+    end
+
+    action DescribeTable(Table<text> table) returns text
+        text result = "["
+        integer row = 0
+        repeat while row < table:GetNumberOfRows()
+            if row > 0
+                result = result + ","
+            end
+            result = result + Describe(table:GetRow(row))
+            row = row + 1
+        end
+        return result + "]"
+    end
+
+    action Row(text first, text second) returns Array<text>
+        Array<text> row
+        if first not= ""
+            row:Add(first)
+        end
+        if second not= ""
+            row:Add(second)
+        end
+        return row
+    end
+
+    action Main
+        Table<text> empty
+        check
+            output "Table[] GetNumberOfRows() = " + empty:GetNumberOfRows() + ", IsEmpty() = " + empty:IsEmpty() + ", Has(a) = " + empty:Has("a") + ", Remove(a) = " + empty:Remove("a") + ", RemoveAll(a) = " + empty:RemoveAll("a")
+        detect e
+            output "Table[] queries unexpected error: " + e:GetErrorMessage()
+        end
+        check
+            text value = empty:Get(0, 0)
+            output "Table[] Get(0, 0) should fail but returned " + Show(value)
+        detect e
+            output "Table[] Get(0, 0) fails, as it should"
+        end
+        check
+            integer size = empty:GetSizeOfRow(0)
+            output "Table[] GetSizeOfRow(0) should fail but returned " + size
+        detect e
+            output "Table[] GetSizeOfRow(0) fails, as it should"
+        end
+        check
+            Iterator<Array<text>> it = empty:GetRowIterator()
+            output "Table[] GetRowIterator() HasNext() = " + it:HasNext()
+        detect e
+            output "Table[] GetRowIterator() unexpected error: " + e:GetErrorMessage()
+        end
+
+        Table<text> table
+        table:AddRow(Row("a", "b"))
+        table:AddRow(Row("c", ""))
+        check
+            text value = table:Get(2, 0)
+            output "Table[[a,b],[c]] Get(2, 0) should fail but returned " + Show(value)
+        detect e
+            output "Table[[a,b],[c]] Get(2, 0) fails, as it should"
+        end
+        check
+            text value = table:Get(1, 1)
+            output "Table[[a,b],[c]] Get(1, 1) should fail but returned " + Show(value)
+        detect e
+            output "Table[[a,b],[c]] Get(1, 1) fails, as it should"
+        end
+        check
+            text value = table:Get(-1, 0)
+            output "Table[[a,b],[c]] Get(-1, 0) should fail but returned " + Show(value)
+        detect e
+            output "Table[[a,b],[c]] Get(-1, 0) fails, as it should"
+        end
+        check
+            table:Set(0, 2, "x")
+            output "Table[[a,b],[c]] Set(0, 2, x) should fail but gave " + DescribeTable(table)
+        detect e
+            output "Table[[a,b],[c]] Set(0, 2, x) fails, as it should"
+        end
+        check
+            integer size = table:GetSizeOfRow(2)
+            output "Table[[a,b],[c]] GetSizeOfRow(2) should fail but returned " + size
+        detect e
+            output "Table[[a,b],[c]] GetSizeOfRow(2) fails, as it should"
+        end
+        check
+            integer size = table:GetSizeOfRow(-1)
+            output "Table[[a,b],[c]] GetSizeOfRow(-1) should fail but returned " + size
+        detect e
+            output "Table[[a,b],[c]] GetSizeOfRow(-1) fails, as it should"
+        end
+        check
+            table:Add(1, 1, "d")
+            table:Add(2, 0, "e")
+            output "Table[[a,b],[c]] Add(1, 1, d), Add(2, 0, e) gives " + DescribeTable(table)
+        detect e
+            output "Table Add(1, 1, d), Add(2, 0, e) unexpected error: " + e:GetErrorMessage()
+        end
+        check
+            table:Add(4, 0, "x")
+            output "Table of 3 rows Add(4, 0, x) should fail but gave " + DescribeTable(table)
+        detect e
+            output "Table of 3 rows Add(4, 0, x) fails, as it should"
+        end
+
+        Table<text> sized
+        check
+            sized:SetSize(2, 3)
+            output "Table SetSize(2, 3) gives " + DescribeTable(sized) + ", GetSizeOfRow(1) = " + sized:GetSizeOfRow(1)
+        detect e
+            output "Table SetSize(2, 3) unexpected error: " + e:GetErrorMessage()
+        end
+        check
+            sized:Set(1, 2, "z")
+            output "Table SetSize(2, 3), Set(1, 2, z): Has(z) = " + sized:Has("z") + ", Has(q) = " + sized:Has("q")
+        detect e
+            output "Table SetSize(2, 3), Set(1, 2, z) Has unexpected error: " + e:GetErrorMessage()
+        end
+        check
+            sized:SetSize(-1, 2)
+            output "Table SetSize(-1, 2) should fail but gave " + DescribeTable(sized)
+        detect e
+            output "Table SetSize(-1, 2) fails, as it should"
+        end
+
+        Table<text> original
+        original:AddRow(Row("a", "b"))
+        check
+            Object copyObject = original:Copy()
+            Table<text> copy = cast(Table<text>, copyObject)
+            copy:Set(0, 0, "x")
+            copy:AddRow(Row("y", ""))
+            output "Table[[a,b]] Copy() then copy Set(0, 0, x), AddRow([y]): copy " + DescribeTable(copy) + ", original " + DescribeTable(original)
+        detect e
+            output "Table Copy() unexpected error: " + e:GetErrorMessage()
+        end
+        check
+            original:Empty()
+            output "Table[[a,b]] Empty(): IsEmpty() = " + original:IsEmpty() + ", GetNumberOfRows() = " + original:GetNumberOfRows()
+        detect e
+            output "Table Empty() unexpected error: " + e:GetErrorMessage()
+        end
+    end
+end

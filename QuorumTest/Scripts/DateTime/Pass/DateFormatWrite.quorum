@@ -1,0 +1,74 @@
+use Libraries.System.CalendarDate
+use Libraries.System.DateFormat
+
+/*
+Tests DateFormat's SetPattern, GetPattern, ToText, GetLongFormat,
+GetNumericFormat and GetISOFormat, writing fixed dates. The pattern letters
+are those in the class documentation (yyyy, yy, M, MM, MMM, MMMM, d, dd,
+EEE, EEEE); text in single quotes is written as it is, and two single quotes
+are one quote. An undefined date is an empty text; an undefined pattern is
+an empty pattern.
+*/
+class Main
+    action Main
+        CalendarDate date
+        boolean valid = date:SetDate(2026, 11, 3)
+        DateFormat format
+        check
+            output "New DateFormat: GetPattern() = [" + format:GetPattern() + "], ToText(2026-11-03) = [" + format:ToText(date) + "]"
+        detect e
+            output "New DateFormat unexpected error: " + e:GetErrorMessage()
+        end
+        Write(date, "MM/dd/yyyy")
+        Write(date, "M/d/yy")
+        Write(date, "yyyy-MM-dd")
+        Write(date, "EEEE, MMMM d, yyyy")
+        Write(date, "EEE d MMM yyyy")
+        Write(date, "'Day' d 'of' MMMM")
+        Write(date, "d MMMM ''yy")
+        Write(date, "yyyyMMdd")
+        Write(date, "dd.MM.yyyy")
+        CalendarDate early
+        valid = early:SetDate(987, 6, 5)
+        Write(early, "yyyy-MM-dd")
+        Write(early, "yy")
+        CalendarDate five
+        valid = five:SetDate(2005, 1, 9)
+        Write(five, "yy/M/d")
+
+        check
+            CalendarDate none = undefined
+            output "ToText(undefined date) = [" + format:ToText(none) + "]"
+        detect e
+            output "ToText(undefined date) unexpected error: " + e:GetErrorMessage()
+        end
+        DateFormat blank
+        check
+            text nothing = undefined
+            blank:SetPattern(nothing)
+            output "SetPattern(undefined): GetPattern() = [" + blank:GetPattern() + "], ToText(2026-11-03) = [" + blank:ToText(date) + "]"
+        detect e
+            output "SetPattern(undefined) unexpected error: " + e:GetErrorMessage()
+        end
+        check
+            DateFormat long = format:GetLongFormat()
+            output "GetLongFormat(): GetPattern() = [" + long:GetPattern() + "], ToText(2026-11-03) = [" + long:ToText(date) + "]"
+            DateFormat numeric = format:GetNumericFormat()
+            output "GetNumericFormat(): GetPattern() = [" + numeric:GetPattern() + "], ToText(2026-11-03) = [" + numeric:ToText(date) + "]"
+            DateFormat iso = format:GetISOFormat()
+            output "GetISOFormat(): GetPattern() = [" + iso:GetPattern() + "], ToText(2026-11-03) = [" + iso:ToText(date) + "]"
+        detect e
+            output "Get...Format unexpected error: " + e:GetErrorMessage()
+        end
+    end
+
+    action Write(CalendarDate date, text pattern)
+        DateFormat format
+        check
+            format:SetPattern(pattern)
+            output "SetPattern(" + pattern + "): ToText(" + date:ToText() + ") = [" + format:ToText(date) + "]"
+        detect e
+            output "SetPattern(" + pattern + ") unexpected error: " + e:GetErrorMessage()
+        end
+    end
+end

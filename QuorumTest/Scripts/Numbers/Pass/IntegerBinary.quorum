@@ -1,0 +1,35 @@
+/*
+    Integer:GetBinary gives the base-2 digits of the 32-bit two's complement
+    form with no prefix and no leading zeros (Java's toBinaryString): -1 gives
+    32 ones, not a minus sign.
+    Each case runs on an integer primitive and on an Integer object.
+*/
+class Main
+    action Main
+        Show(0)
+        Show(1)
+        Show(5)
+        Show(8)
+        Show(255)
+        Show(-1)
+        Show(-8)
+        Show(2147483647)
+        Show(-2147483647 - 1)
+    end
+
+    action Show(integer value)
+        text call = "GetBinary(" + value + ")"
+        check
+            output call + " = [" + value:GetBinary() + "]"
+        detect e
+            output call + " unexpected error: " + e:GetErrorMessage()
+        end
+        Integer object
+        object:SetValue(value)
+        check
+            output "Integer " + call + " = [" + object:GetBinary() + "]"
+        detect e
+            output "Integer " + call + " unexpected error: " + e:GetErrorMessage()
+        end
+    end
+end

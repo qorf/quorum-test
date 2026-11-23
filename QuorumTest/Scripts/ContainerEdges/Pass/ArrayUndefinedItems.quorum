@@ -1,0 +1,119 @@
+use Libraries.Containers.Array
+
+/*
+    Searching an Array that holds undefined items (as SetSize leaves it).
+    Searches for a real item skip the undefined ones. Searching for undefined
+    itself finds nothing: GetFirstLocation and GetLastLocation return -1 for
+    an undefined value on purpose (the library checks for it), and this test
+    holds Has, Remove and RemoveAll to the same rule (false, nothing removed).
+*/
+class Main
+    action Show(text value) returns text
+        if value = undefined
+            return "undefined"
+        end
+        return "[" + value + "]"
+    end
+
+    action Describe(Array<text> array) returns text
+        text result = "["
+        integer i = 0
+        repeat while i < array:GetSize()
+            if i > 0
+                result = result + ","
+            end
+            text value = array:Get(i)
+            if value = undefined
+                result = result + "undefined"
+            else
+                result = result + value
+            end
+            i = i + 1
+        end
+        return result + "]"
+    end
+    action Make returns Array<text>
+        Array<text> array
+        array:SetSize(4)
+        array:Set(1, "b")
+        array:Set(3, "b")
+        return array
+    end
+
+    action Main
+        Array<text> array = Make()
+        check
+            output "Array[undefined,b,undefined,b] Has(b) = " + array:Has("b")
+        detect e
+            output "Array[undefined,b,undefined,b] Has(b) unexpected error: " + e:GetErrorMessage()
+        end
+        check
+            output "Array[undefined,b,undefined,b] Has(z) = " + array:Has("z")
+        detect e
+            output "Array[undefined,b,undefined,b] Has(z) unexpected error: " + e:GetErrorMessage()
+        end
+        check
+            output "Array[undefined,b,undefined,b] GetFirstLocation(b) = " + array:GetFirstLocation("b")
+        detect e
+            output "Array[undefined,b,undefined,b] GetFirstLocation(b) unexpected error: " + e:GetErrorMessage()
+        end
+        check
+            output "Array[undefined,b,undefined,b] GetLastLocation(b) = " + array:GetLastLocation("b")
+        detect e
+            output "Array[undefined,b,undefined,b] GetLastLocation(b) unexpected error: " + e:GetErrorMessage()
+        end
+        check
+            output "Array[undefined,b,undefined,b] GetFirstLocation(undefined) = " + array:GetFirstLocation(undefined)
+        detect e
+            output "Array[undefined,b,undefined,b] GetFirstLocation(undefined) unexpected error: " + e:GetErrorMessage()
+        end
+        check
+            output "Array[undefined,b,undefined,b] Has(undefined) = " + array:Has(undefined)
+        detect e
+            output "Array[undefined,b,undefined,b] Has(undefined) unexpected error: " + e:GetErrorMessage()
+        end
+        check
+            boolean removed = array:Remove("b")
+            output "Array[undefined,b,undefined,b] Remove(b) = " + removed + ", leaving " + Describe(array)
+        detect e
+            output "Array[undefined,b,undefined,b] Remove(b) unexpected error: " + e:GetErrorMessage()
+        end
+
+        Array<text> second = Make()
+        check
+            boolean removed = second:RemoveAll("b")
+            output "Array[undefined,b,undefined,b] RemoveAll(b) = " + removed + ", leaving " + Describe(second)
+        detect e
+            output "Array[undefined,b,undefined,b] RemoveAll(b) unexpected error: " + e:GetErrorMessage()
+        end
+
+        Array<text> third = Make()
+        check
+            boolean removed = third:Remove(undefined)
+            output "Array[undefined,b,undefined,b] Remove(undefined) = " + removed + ", leaving " + Describe(third)
+        detect e
+            output "Array[undefined,b,undefined,b] Remove(undefined) unexpected error: " + e:GetErrorMessage()
+        end
+        check
+            boolean removed = third:RemoveAll(undefined)
+            output "Array[undefined,b,undefined,b] RemoveAll(undefined) = " + removed + ", leaving " + Describe(third)
+        detect e
+            output "Array[undefined,b,undefined,b] RemoveAll(undefined) unexpected error: " + e:GetErrorMessage()
+        end
+
+        Array<text> fourth
+        fourth:Add("a")
+        fourth:Add(undefined)
+        fourth:Add("c")
+        check
+            output "Array Add(a), Add(undefined), Add(c) gives " + Describe(fourth) + ", size " + fourth:GetSize()
+        detect e
+            output "Array Add(undefined) unexpected error: " + e:GetErrorMessage()
+        end
+        check
+            output "Array[a,undefined,c] Has(c) = " + fourth:Has("c")
+        detect e
+            output "Array[a,undefined,c] Has(c) unexpected error: " + e:GetErrorMessage()
+        end
+    end
+end

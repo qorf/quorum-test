@@ -1,0 +1,6 @@
+Read(<a><b>x</b></a>) events: Start(a) Start(b) Value[x] End(b) End(a)
+Read(<a><b>1</b><c>2</c></a>) events: Start(a) Start(b) Value[1] End(b) Start(c) Value[2] End(c) End(a)
+Read(<a><b><c><d>deep</d></c></b></a>) events: Start(a) Start(b) Start(c) Start(d) Value[deep] End(d) End(c) End(b) End(a)
+Read(<a><a><a/></a></a>) events: Start(a) Start(a) Start(a) End(a) End(a) End(a)
+Read(<list><i>1</i><i>2</i><i>3</i></list>) events: Start(list) Start(i) Value[1] End(i) Start(i) Value[2] End(i) Start(i) Value[3] End(i) End(list)
+Read(<a>\n  <b>x</b>\n  <c/>\n</a>) events: Start(a) Start(b) Value[x] End(b) Start(c) End(c) End(a)

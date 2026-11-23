@@ -1,0 +1,64 @@
+/*
+    Number:GetInteger casts to an integer, which drops the fraction toward
+    zero (Java's cast agrees): 2.9 gives 2 and -2.5 gives -2, not -3.
+    Extreme values (NaN, infinity, beyond the integer range) are not tested:
+    the documentation does not say what they give.
+    Number:GetText casts to text; Number:SetValue and GetValue store the
+    value. Each case runs on a number primitive and on a Number object.
+*/
+class Main
+    action Main
+        Show(2.5)
+        Show(2.9)
+        Show(-2.5)
+        Show(-2.9)
+        Show(-0.1)
+        Show(0.0)
+        Show(7.0)
+        Show(-7.0)
+        Show(1000000.75)
+        Number object
+        check
+            output "new Number GetValue() = " + object:GetValue()
+        detect e
+            output "new Number GetValue() unexpected error: " + e:GetErrorMessage()
+        end
+        check
+            object:SetValue(1.25)
+            object:SetValue(-3.5)
+            output "SetValue(1.25) then SetValue(-3.5): GetValue() = " + object:GetValue() + ", GetInteger() = " + object:GetInteger()
+        detect e
+            output "SetValue twice unexpected error: " + e:GetErrorMessage()
+        end
+    end
+
+    action Show(number value)
+        check
+            output "GetInteger(" + value + ") = " + value:GetInteger()
+        detect e
+            output "GetInteger(" + value + ") unexpected error: " + e:GetErrorMessage()
+        end
+        check
+            output "GetText(" + value + ") = [" + value:GetText() + "]"
+        detect e
+            output "GetText(" + value + ") unexpected error: " + e:GetErrorMessage()
+        end
+        Number object
+        object:SetValue(value)
+        check
+            output "Number GetInteger(" + value + ") = " + object:GetInteger()
+        detect e
+            output "Number GetInteger(" + value + ") unexpected error: " + e:GetErrorMessage()
+        end
+        check
+            output "Number GetText(" + value + ") = [" + object:GetText() + "]"
+        detect e
+            output "Number GetText(" + value + ") unexpected error: " + e:GetErrorMessage()
+        end
+        check
+            output "Number GetValue(" + value + ") = " + object:GetValue()
+        detect e
+            output "Number GetValue(" + value + ") unexpected error: " + e:GetErrorMessage()
+        end
+    end
+end

@@ -1,0 +1,5 @@
+Array[a,b,c] Copy() then copy Set(0, x), Add(d), RemoveAt(1): copy [x,c,d], original [a,b,c]
+Then original Set(2, z), AddToFront(w): original [w,a,b,z], copy [x,c,d]
+Array[w,a,b,z] CopyToArray() then copy Empty(): copy size 0, original [w,a,b,z]
+Array[a] auto-resize off Copy(): copy [a], size 1
+Array[[i]] Copy(), then adding j to the copy's inner Array: original inner [i,j] (elements are shared)

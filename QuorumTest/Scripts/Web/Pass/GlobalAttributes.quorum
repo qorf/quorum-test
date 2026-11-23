@@ -1,0 +1,213 @@
+use Libraries.Web.Page.Attribute
+use Libraries.Web.Page.Canvas
+
+/*
+Tests the global attributes every element accepts (GlobalAttributeAccepter
+and AttributeAccepter), on a canvas element: each setter writes the HTML
+attribute's own name, attributes can be added, read, replaced and
+removed, and a boolean attribute (hidden) is removed when set to false.
+Only one attribute is generated per case, so the order of a table of
+attributes can't matter.
+*/
+class Main
+    action Main
+        check
+            Canvas c
+            c:SetIdentifier("main")
+            output "SetIdentifier(main) GetIdentifier():Generate() = [" + Flat(c:GetIdentifier():Generate()) + "]"
+        detect e
+            output "SetIdentifier(main) GetIdentifier():Generate() unexpected error: " + e:GetErrorMessage()
+        end
+        check
+            Canvas c
+            c:SetClassAttribute("big")
+            output "SetClassAttribute(big) GetClassAttribute():GetValue() = [" + Flat(c:GetClassAttribute():GetValue()) + "]"
+        detect e
+            output "SetClassAttribute(big) GetClassAttribute():GetValue() unexpected error: " + e:GetErrorMessage()
+        end
+        check
+            Canvas c
+            c:SetClassAttribute("big")
+            c:AddClassAttribute("red")
+            output "SetClassAttribute(big) AddClassAttribute(red) GetClassAttribute():GetValue() = [" + Flat(c:GetClassAttribute():GetValue()) + "]"
+        detect e
+            output "SetClassAttribute(big) AddClassAttribute(red) GetClassAttribute():GetValue() unexpected error: " + e:GetErrorMessage()
+        end
+        check
+            Canvas c
+            c:AddClassAttribute("red")
+            output "AddClassAttribute(red) with no class yet GetClassAttribute():GetValue() = [" + Flat(c:GetClassAttribute():GetValue()) + "]"
+        detect e
+            output "AddClassAttribute(red) with no class yet GetClassAttribute():GetValue() unexpected error: " + e:GetErrorMessage()
+        end
+        check
+            Canvas c
+            c:SetTitle("Hint")
+            output "SetTitle(Hint) GetTitle():Generate() = [" + Flat(c:GetTitle():Generate()) + "]"
+        detect e
+            output "SetTitle(Hint) GetTitle():Generate() unexpected error: " + e:GetErrorMessage()
+        end
+        check
+            Canvas c
+            c:SetLanguage("en")
+            output "SetLanguage(en) GetLanguage():Generate() = [" + Flat(c:GetLanguage():Generate()) + "]"
+        detect e
+            output "SetLanguage(en) GetLanguage():Generate() unexpected error: " + e:GetErrorMessage()
+        end
+        check
+            Canvas c
+            c:SetTextDirection("rtl")
+            output "SetTextDirection(rtl) GetTextDirection():Generate() = [" + Flat(c:GetTextDirection():Generate()) + "]"
+        detect e
+            output "SetTextDirection(rtl) GetTextDirection():Generate() unexpected error: " + e:GetErrorMessage()
+        end
+        check
+            Canvas c
+            c:SetTabIndex("0")
+            output "SetTabIndex(0) GetTabIndex():Generate() = [" + Flat(c:GetTabIndex():Generate()) + "]"
+        detect e
+            output "SetTabIndex(0) GetTabIndex():Generate() unexpected error: " + e:GetErrorMessage()
+        end
+        check
+            Canvas c
+            c:SetStyle("color:red;")
+            output "SetStyle(color:red;) GetStyle():Generate() = [" + Flat(c:GetStyle():Generate()) + "]"
+        detect e
+            output "SetStyle(color:red;) GetStyle():Generate() unexpected error: " + e:GetErrorMessage()
+        end
+        check
+            Canvas c
+            c:SetContentEditable("true")
+            output "SetContentEditable(true) GetContentEditable():Generate() = [" + Flat(c:GetContentEditable():Generate()) + "]"
+        detect e
+            output "SetContentEditable(true) GetContentEditable():Generate() unexpected error: " + e:GetErrorMessage()
+        end
+        check
+            Canvas c
+            c:SetDraggable(true)
+            output "SetDraggable(true) GetDraggable():Generate() = [" + Flat(c:GetDraggable():Generate()) + "]"
+        detect e
+            output "SetDraggable(true) GetDraggable():Generate() unexpected error: " + e:GetErrorMessage()
+        end
+        check
+            Canvas c
+            c:SetDraggable(false)
+            output "SetDraggable(false) GetDraggable():Generate() = [" + Flat(c:GetDraggable():Generate()) + "]"
+        detect e
+            output "SetDraggable(false) GetDraggable():Generate() unexpected error: " + e:GetErrorMessage()
+        end
+        check
+            Canvas c
+            c:SetSpellcheck(false)
+            output "SetSpellcheck(false) GetSpellcheck():Generate() = [" + Flat(c:GetSpellcheck():Generate()) + "]"
+        detect e
+            output "SetSpellcheck(false) GetSpellcheck():Generate() unexpected error: " + e:GetErrorMessage()
+        end
+        check
+            Canvas c
+            c:SetHidden(true)
+            output "SetHidden(true) Generate() = [" + Flat(c:Generate()) + "]"
+        detect e
+            output "SetHidden(true) Generate() unexpected error: " + e:GetErrorMessage()
+        end
+        check
+            Canvas c
+            c:SetHidden(true)
+            c:SetHidden(false)
+            output "SetHidden(true) then SetHidden(false) Generate() = [" + Flat(c:Generate()) + "]"
+        detect e
+            output "SetHidden(true) then SetHidden(false) Generate() unexpected error: " + e:GetErrorMessage()
+        end
+        check
+            Canvas c
+            output "new element GetNumberOfAttributes() = " + c:GetNumberOfAttributes()
+        detect e
+            output "new element GetNumberOfAttributes() unexpected error: " + e:GetErrorMessage()
+        end
+        check
+            Canvas c
+            output "new element GetIdentifier() is undefined = " + (c:GetIdentifier() = undefined)
+        detect e
+            output "new element GetIdentifier() is undefined unexpected error: " + e:GetErrorMessage()
+        end
+        check
+            Canvas c
+            c:AddAttribute("data-x", "1")
+            output "AddAttribute(data-x, 1) GetAttributeValue(data-x) = [" + Flat(c:GetAttributeValue("data-x")) + "]"
+        detect e
+            output "AddAttribute(data-x, 1) GetAttributeValue(data-x) unexpected error: " + e:GetErrorMessage()
+        end
+        check
+            Canvas c
+            c:AddAttribute("data-x", "1")
+            output "AddAttribute(data-x, 1) HasAttribute(data-x) = " + c:HasAttribute("data-x")
+        detect e
+            output "AddAttribute(data-x, 1) HasAttribute(data-x) unexpected error: " + e:GetErrorMessage()
+        end
+        check
+            Canvas c
+            output "HasAttribute(data-y) when absent = " + c:HasAttribute("data-y")
+        detect e
+            output "HasAttribute(data-y) when absent unexpected error: " + e:GetErrorMessage()
+        end
+        check
+            Canvas c
+            c:AddAttribute("data-x", "1")
+            c:AddAttribute("data-x", "2")
+            output "AddAttribute(data-x, 1) twice with 2 GetAttributeValue and count = [" + Flat(c:GetAttributeValue("data-x") + " count " + c:GetNumberOfAttributes()) + "]"
+        detect e
+            output "AddAttribute(data-x, 1) twice with 2 GetAttributeValue and count unexpected error: " + e:GetErrorMessage()
+        end
+        check
+            Canvas c
+            c:AddAttribute("data-x", "1")
+            output "AddAttribute(data-x, 1) RemoveAttribute(data-x):GetValue() = [" + Flat(c:RemoveAttribute("data-x"):GetValue() + " then count " + c:GetNumberOfAttributes()) + "]"
+        detect e
+            output "AddAttribute(data-x, 1) RemoveAttribute(data-x):GetValue() unexpected error: " + e:GetErrorMessage()
+        end
+        check
+            Canvas c
+            output "RemoveAttribute(data-z) when absent is undefined = " + (c:RemoveAttribute("data-z") = undefined)
+        detect e
+            output "RemoveAttribute(data-z) when absent is undefined unexpected error: " + e:GetErrorMessage()
+        end
+        check
+            Canvas c
+            c:AddAttribute("data-x", "1")
+            output "AddAttribute(data-x, 1) GenerateAttributes() = [" + Flat(c:GenerateAttributes()) + "]"
+        detect e
+            output "AddAttribute(data-x, 1) GenerateAttributes() unexpected error: " + e:GetErrorMessage()
+        end
+        check
+            Attribute a
+            a:SetName("alt")
+            a:SetValue("A cat")
+            output "Attribute SetName(alt) SetValue(A cat) Generate() = [" + Flat(a:Generate()) + "]"
+        detect e
+            output "Attribute SetName(alt) SetValue(A cat) Generate() unexpected error: " + e:GetErrorMessage()
+        end
+        check
+            Canvas c
+            Attribute a
+            a:SetName("alt")
+            a:SetValue("A cat")
+            c:Add(a)
+            output "Add(Attribute alt) GetAttributeValue(alt) = [" + Flat(c:GetAttributeValue("alt")) + "]"
+        detect e
+            output "Add(Attribute alt) GetAttributeValue(alt) unexpected error: " + e:GetErrorMessage()
+        end
+    end
+
+    /* Shows line breaks as the two characters \n and double quotes as ', so each case is one line. */
+    action Flat(text value) returns text
+        text lf = ""
+        lf = lf:GetLineFeed()
+        text cr = ""
+        cr = cr:GetCarriageReturn()
+        text quote = ""
+        quote = quote:GetDoubleQuote()
+        text result = value:Replace(cr, "")
+        result = result:Replace(lf, "\n")
+        return result:Replace(quote, "'")
+    end
+end

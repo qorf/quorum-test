@@ -1,0 +1,37 @@
+AddScalar GetValue after SetValue(matrix, 10) = 10.0
+AddScalar 10 gives a 2 by 2 matrix:
+|11.0, 12.0|
+|13.0, 14.0|
+AddScalar GetValueMatrix after SetValue(values) gives a 2 by 2 matrix:
+|10.0, 20.0|
+|30.0, 40.0|
+AddScalar values gives a 2 by 2 matrix:
+|11.0, 22.0|
+|33.0, 44.0|
+SubtractScalar GetValue after SetValue(matrix, 1.5) = 1.5
+SubtractScalar 1.5 gives a 2 by 2 matrix:
+|-0.5, 0.5|
+|1.5, 2.5|
+SubtractScalar values gives a 2 by 2 matrix:
+|-9.0, -18.0|
+|-27.0, -36.0|
+MultiplyScalar GetValue after SetValue(matrix, -2) = -2.0
+MultiplyScalar -2 gives a 2 by 2 matrix:
+|-2.0, -4.0|
+|-6.0, -8.0|
+MultiplyScalar values gives a 2 by 2 matrix:
+|10.0, 40.0|
+|90.0, 160.0|
+DivideScalar GetValue after SetValue(matrix, 4) = 4.0
+DivideScalar 4 gives a 2 by 2 matrix:
+|0.25, 0.5|
+|0.75, 1.0|
+DivideScalar values gives a 2 by 2 matrix:
+|0.1, 0.1|
+|0.1, 0.1|
+DivideScalar 0 gives a 2 by 2 matrix:
+|Infinity, Infinity|
+|Infinity, Infinity|
+the input matrix afterwards, which must be unchanged, gives a 2 by 2 matrix:
+|1.0, 2.0|
+|3.0, 4.0|

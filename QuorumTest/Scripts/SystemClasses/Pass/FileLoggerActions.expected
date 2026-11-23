@@ -1,0 +1,11 @@
+FileLogger: GetFile() at first is undefined = true
+FileLogger:Log(this line) with no file wrote this line
+FileLogger: SetFile(log.txt), GetFile():GetFileName() = [log.txt]
+FileLogger: Log(first), Log(second), Close(): the file has 2 lines
+FileLogger: line 0 = [first]
+FileLogger: line 1 = [second]
+FileLogger: IsLoggingTime() at first = false
+FileLogger: SetLoggingTime(true), IsLoggingTime() = true
+FileLogger: a second logger with time on, Log(third): the file has 4 lines
+FileLogger: line 2 starts with Time: = true
+FileLogger: line 3 = [third]

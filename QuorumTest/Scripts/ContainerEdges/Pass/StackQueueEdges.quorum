@@ -1,0 +1,75 @@
+use Libraries.Containers.Stack
+use Libraries.Containers.Queue
+use Libraries.Containers.Iterator
+
+/*
+    Stack and Queue when empty (Peek, Pop, GetFromFront and RemoveFromFront
+    return undefined, as the List underneath does on purpose) and their
+    copies: a copy keeps the order (a Stack copy pops newest first, a Queue
+    copy removes oldest first) and is independent of the original.
+*/
+class Main
+    action Show(text value) returns text
+        if value = undefined
+            return "undefined"
+        end
+        return "[" + value + "]"
+    end
+    action Main
+        Stack<text> stack
+        check
+            output "Stack[] GetSize() = " + stack:GetSize() + ", IsEmpty() = " + stack:IsEmpty() + ", Peek() = " + Show(stack:Peek()) + ", Pop() = " + Show(stack:Pop()) + ", Has(a) = " + stack:Has("a") + ", Remove(a) = " + stack:Remove("a")
+        detect e
+            output "Stack[] queries unexpected error: " + e:GetErrorMessage()
+        end
+        check
+            Iterator<text> it = stack:GetIterator()
+            output "Stack[] GetIterator() HasNext() = " + it:HasNext()
+        detect e
+            output "Stack[] GetIterator() unexpected error: " + e:GetErrorMessage()
+        end
+        stack:Push("1")
+        stack:Push("2")
+        stack:Push("3")
+        check
+            Object copyObject = stack:Copy()
+            Stack<text> copy = cast(Stack<text>, copyObject)
+            text popped = copy:Pop() + copy:Pop()
+            copy:Push("x")
+            output "Stack pushed 1,2,3 Copy(): copy Pop() twice = " + popped + ", then copy Push(x); original Peek() = " + Show(stack:Peek()) + ", original size " + stack:GetSize() + ", copy size " + copy:GetSize()
+        detect e
+            output "Stack Copy() unexpected error: " + e:GetErrorMessage()
+        end
+        check
+            text popped = stack:Pop() + stack:Pop() + stack:Pop()
+            output "Stack pushed 1,2,3 Pop() three times = " + popped + ", then Pop() = " + Show(stack:Pop()) + ", IsEmpty() = " + stack:IsEmpty()
+        detect e
+            output "Stack Pop() until empty unexpected error: " + e:GetErrorMessage()
+        end
+
+        Queue<text> queue
+        check
+            output "Queue[] GetSize() = " + queue:GetSize() + ", IsEmpty() = " + queue:IsEmpty() + ", GetFromFront() = " + Show(queue:GetFromFront()) + ", RemoveFromFront() = " + Show(queue:RemoveFromFront()) + ", Has(a) = " + queue:Has("a") + ", RemoveAll(a) = " + queue:RemoveAll("a")
+        detect e
+            output "Queue[] queries unexpected error: " + e:GetErrorMessage()
+        end
+        queue:Add("1")
+        queue:AddToEnd("2")
+        queue:Add("3")
+        check
+            Object copyObject = queue:Copy()
+            Queue<text> copy = cast(Queue<text>, copyObject)
+            text removed = copy:RemoveFromFront() + copy:RemoveFromFront()
+            copy:Add("x")
+            output "Queue added 1,2,3 Copy(): copy RemoveFromFront() twice = " + removed + ", then copy Add(x); original GetFromFront() = " + Show(queue:GetFromFront()) + ", original size " + queue:GetSize() + ", copy size " + copy:GetSize()
+        detect e
+            output "Queue Copy() unexpected error: " + e:GetErrorMessage()
+        end
+        check
+            text removed = queue:RemoveFromFront() + queue:RemoveFromFront() + queue:RemoveFromFront()
+            output "Queue added 1,2,3 RemoveFromFront() three times = " + removed + ", then RemoveFromFront() = " + Show(queue:RemoveFromFront()) + ", IsEmpty() = " + queue:IsEmpty()
+        detect e
+            output "Queue RemoveFromFront() until empty unexpected error: " + e:GetErrorMessage()
+        end
+    end
+end

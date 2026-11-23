@@ -1,0 +1,16 @@
+HighestOneBit(0) = 0
+Integer HighestOneBit(0) = 0
+HighestOneBit(1) = 1
+Integer HighestOneBit(1) = 1
+HighestOneBit(2) = 2
+Integer HighestOneBit(2) = 2
+HighestOneBit(3) = 2
+Integer HighestOneBit(3) = 2
+HighestOneBit(10) = 8
+Integer HighestOneBit(10) = 8
+HighestOneBit(255) = 128
+Integer HighestOneBit(255) = 128
+HighestOneBit(1073741824) = 1073741824
+Integer HighestOneBit(1073741824) = 1073741824
+HighestOneBit(2147483647) = 1073741824
+Integer HighestOneBit(2147483647) = 1073741824

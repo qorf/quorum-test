@@ -1,0 +1,4 @@
+Add 100000 text keys: size 100000, GetValue(key99999) = 99999
+Add 400000 text keys: size 400000, GetValue(key399999) = 399999
+Add 400000 text keys: within 2000 ms
+Add scales linearly (4x keys, at most 8x time)

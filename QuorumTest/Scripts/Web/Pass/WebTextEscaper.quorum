@@ -1,0 +1,104 @@
+use Libraries.Web.WebTextEscaper
+
+/*
+Tests WebTextEscaper: Escape for element text, EscapeAttribute for
+attribute values, and EscapeForScript for quoted values inside scripts.
+*/
+class Main
+    action Main
+        check
+            WebTextEscaper esc
+            output "Escape(Q&A)  = [" + Flat(esc:Escape("Q&A")) + "]"
+        detect e
+            output "Escape(Q&A)  unexpected error: " + e:GetErrorMessage()
+        end
+        check
+            WebTextEscaper esc
+            output "Escape(a<b>c) = [" + Flat(esc:Escape("a<b>c")) + "]"
+        detect e
+            output "Escape(a<b>c) unexpected error: " + e:GetErrorMessage()
+        end
+        check
+            WebTextEscaper esc
+            output "Escape(&lt;) escapes the ampersand once = [" + Flat(esc:Escape("&lt;")) + "]"
+        detect e
+            output "Escape(&lt;) escapes the ampersand once unexpected error: " + e:GetErrorMessage()
+        end
+        check
+            WebTextEscaper esc
+            output "Escape of text with no special characters = [" + Flat(esc:Escape("plain words")) + "]"
+        detect e
+            output "Escape of text with no special characters unexpected error: " + e:GetErrorMessage()
+        end
+        check
+            WebTextEscaper esc
+            output "Escape of empty text = [" + Flat(esc:Escape("")) + "]"
+        detect e
+            output "Escape of empty text unexpected error: " + e:GetErrorMessage()
+        end
+        check
+            WebTextEscaper esc
+            output "EscapeAttribute(a=1&b=2) = [" + Flat(esc:EscapeAttribute("a=1&b=2")) + "]"
+        detect e
+            output "EscapeAttribute(a=1&b=2) unexpected error: " + e:GetErrorMessage()
+        end
+        check
+            WebTextEscaper esc
+            text q = ""
+            q = q:GetDoubleQuote()
+            output "EscapeAttribute of a double quote, shown raw as a marker = [" + Flat(Marked(esc:EscapeAttribute("say " + q + "hi" + q))) + "]"
+        detect e
+            output "EscapeAttribute of a double quote, shown raw as a marker unexpected error: " + e:GetErrorMessage()
+        end
+        check
+            WebTextEscaper esc
+            output "EscapeForScript(x < y) = [" + Flat(esc:EscapeForScript("x < y")) + "]"
+        detect e
+            output "EscapeForScript(x < y) unexpected error: " + e:GetErrorMessage()
+        end
+        check
+            WebTextEscaper esc
+            text q = ""
+            q = q:GetDoubleQuote()
+            output "EscapeForScript of a double quote = [" + Flat(Marked(esc:EscapeForScript(q))) + "]"
+        detect e
+            output "EscapeForScript of a double quote unexpected error: " + e:GetErrorMessage()
+        end
+        check
+            WebTextEscaper esc
+            text lf = ""
+            lf = lf:GetLineFeed()
+            output "EscapeForScript of a line feed = [" + Flat(esc:EscapeForScript("a" + lf + "b")) + "]"
+        detect e
+            output "EscapeForScript of a line feed unexpected error: " + e:GetErrorMessage()
+        end
+        check
+            WebTextEscaper esc
+            text slash = ""
+            slash = slash:GetUnicodeValue(92)
+            output "EscapeForScript of a backslash = [" + Flat(esc:EscapeForScript("a" + slash + "b")) + "]"
+        detect e
+            output "EscapeForScript of a backslash unexpected error: " + e:GetErrorMessage()
+        end
+    end
+
+    /* Shows line breaks as the two characters \n and double quotes as ', so each case is one line. */
+    action Flat(text value) returns text
+        text lf = ""
+        lf = lf:GetLineFeed()
+        text cr = ""
+        cr = cr:GetCarriageReturn()
+        text quote = ""
+        quote = quote:GetDoubleQuote()
+        text result = value:Replace(cr, "")
+        result = result:Replace(lf, "\n")
+        return result:Replace(quote, "'")
+    end
+
+    /* Shows double quotes as [quote], to tell them from the quotes Flat changes. */
+    action Marked(text value) returns text
+        text quote = ""
+        quote = quote:GetDoubleQuote()
+        return value:Replace(quote, "[quote]")
+    end
+end

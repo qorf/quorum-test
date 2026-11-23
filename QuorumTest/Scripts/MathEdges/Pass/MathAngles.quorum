@@ -1,0 +1,63 @@
+use Libraries.Compute.Math
+
+/*
+Math:DegreesToRadians and Math:RadiansToDegrees. Results are rounded to 10
+places where the last binary digit could differ between back ends.
+*/
+class Main
+    Math math
+
+    action Main
+        check
+            output "DegreesToRadians(0) = " + math:DegreesToRadians(0)
+        detect e
+            output "DegreesToRadians(0) unexpected error: " + e:GetErrorMessage()
+        end
+        check
+            output "DegreesToRadians(180) rounded to 10 places = " + math:Round(math:DegreesToRadians(180), 10)
+        detect e
+            output "DegreesToRadians(180) unexpected error: " + e:GetErrorMessage()
+        end
+        check
+            output "DegreesToRadians(90) rounded to 10 places = " + math:Round(math:DegreesToRadians(90), 10)
+        detect e
+            output "DegreesToRadians(90) unexpected error: " + e:GetErrorMessage()
+        end
+        check
+            output "DegreesToRadians(-45) rounded to 10 places = " + math:Round(math:DegreesToRadians(-45), 10)
+        detect e
+            output "DegreesToRadians(-45) unexpected error: " + e:GetErrorMessage()
+        end
+        check
+            output "DegreesToRadians(720) rounded to 10 places = " + math:Round(math:DegreesToRadians(720), 10)
+        detect e
+            output "DegreesToRadians(720) unexpected error: " + e:GetErrorMessage()
+        end
+        check
+            output "RadiansToDegrees(0) = " + math:RadiansToDegrees(0)
+        detect e
+            output "RadiansToDegrees(0) unexpected error: " + e:GetErrorMessage()
+        end
+        check
+            output "RadiansToDegrees(pi) rounded to 10 places = " + math:Round(math:RadiansToDegrees(math:pi), 10)
+        detect e
+            output "RadiansToDegrees(pi) unexpected error: " + e:GetErrorMessage()
+        end
+        check
+            output "RadiansToDegrees(-pi / 2) rounded to 10 places = " + math:Round(math:RadiansToDegrees(-math:piOver2), 10)
+        detect e
+            output "RadiansToDegrees(-pi / 2) unexpected error: " + e:GetErrorMessage()
+        end
+        check
+            output "RadiansToDegrees(1) rounded to 6 places = " + math:Round(math:RadiansToDegrees(1), 6)
+        detect e
+            output "RadiansToDegrees(1) unexpected error: " + e:GetErrorMessage()
+        end
+        check
+            number back = math:RadiansToDegrees(math:DegreesToRadians(37.5))
+            output "RadiansToDegrees(DegreesToRadians(37.5)) rounded to 10 places = " + math:Round(back, 10)
+        detect e
+            output "RadiansToDegrees(DegreesToRadians(37.5)) unexpected error: " + e:GetErrorMessage()
+        end
+    end
+end

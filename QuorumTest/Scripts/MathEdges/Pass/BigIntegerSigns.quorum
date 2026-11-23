@@ -1,0 +1,98 @@
+use Libraries.Compute.BigInteger
+
+/*
+BigInteger with negative numbers. Mod is documented to always give a
+non-negative remainder (Mod(-7, 3) is 2) while Remainder keeps the sign of
+the value divided (Remainder(-7, 3) is -1). Divide truncates toward zero.
+Mod with a negative divisor is left out: the documentation does not say
+what it gives. Dividing by zero has no answer, so Divide, Mod and Remainder
+by zero must fail.
+*/
+class Main
+    action Main
+        ShowMod("-7", "3")
+        ShowMod("7", "3")
+        ShowMod("-6", "3")
+        ShowMod("-100000000000000000001", "7")
+        ShowRemainder("-7", "3")
+        ShowRemainder("7", "-3")
+        ShowRemainder("-7", "-3")
+        ShowDivide("-7", "2")
+        ShowDivide("7", "-2")
+        ShowDivide("-7", "-2")
+        ShowDivide("-100000000000000000000", "3")
+        check
+            BigInteger a
+            BigInteger b
+            a:SetValue("5")
+            b:SetValue("0")
+            BigInteger result = a:Divide(b)
+            output "Divide(5, 0) should fail but returned " + result:GetText()
+        detect e
+            output "Divide(5, 0) fails, as it should"
+        end
+        check
+            BigInteger a
+            BigInteger b
+            a:SetValue("5")
+            b:SetValue("0")
+            BigInteger result = a:Mod(b)
+            output "Mod(5, 0) should fail but returned " + result:GetText()
+        detect e
+            output "Mod(5, 0) fails, as it should"
+        end
+        check
+            BigInteger a
+            BigInteger b
+            a:SetValue("5")
+            b:SetValue("0")
+            BigInteger result = a:Remainder(b)
+            output "Remainder(5, 0) should fail but returned " + result:GetText()
+        detect e
+            output "Remainder(5, 0) fails, as it should"
+        end
+        check
+            BigInteger a
+            a:SetValue("-12")
+            output "GetSignValue(-12) = " + a:GetSignValue() + ", Negate(-12) = " + a:Negate():GetText()
+        detect e
+            output "GetSignValue/Negate(-12) unexpected error: " + e:GetErrorMessage()
+        end
+    end
+
+    action ShowMod(text left, text right)
+        check
+            BigInteger a
+            BigInteger b
+            a:SetValue(left)
+            b:SetValue(right)
+            output "Mod(" + left + ", " + right + ") = " + a:Mod(b):GetText()
+        detect e
+            output "Mod(" + left + ", " + right + ") unexpected error: " + e:GetErrorMessage()
+        end
+    end
+
+    action ShowRemainder(text left, text right)
+        check
+            BigInteger a
+            BigInteger b
+            a:SetValue(left)
+            b:SetValue(right)
+            output "Remainder(" + left + ", " + right + ") = " + a:Remainder(b):GetText()
+        detect e
+            output "Remainder(" + left + ", " + right + ") unexpected error: " + e:GetErrorMessage()
+        end
+    end
+
+    action ShowDivide(text left, text right)
+        check
+            BigInteger a
+            BigInteger b
+            a:SetValue(left)
+            b:SetValue(right)
+            output "Divide(" + left + ", " + right + ") = " + a:Divide(b):GetText()
+        detect e
+            output "Divide(" + left + ", " + right + ") unexpected error: " + e:GetErrorMessage()
+        end
+    end
+end

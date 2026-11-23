@@ -1,0 +1,54 @@
+package Libraries.Language.Compile.Test
+
+use Libraries.Testing.QuorumTest
+use Libraries.Testing.ScriptCheck
+
+/*
+    Every public action of Text, on all three back ends (bytecode,
+    JavaScript and Python), because each back end has its own Text plugin
+    and they disagree on edge cases. Each script runs every case on a text
+    primitive and on a Text object, since the two compile to different
+    plugin code. Expected files hold the documented behavior, so a script
+    fails where a plugin is wrong.
+*/
+class TextTester
+    QuorumTest suite = undefined
+    ScriptCheck scripts
+    text path = "Scripts/Text/Pass/"
+
+    action Test
+        scripts:SetSuite(suite)
+        scripts:CheckEverywhere(path + "TextReplace")
+        scripts:CheckEverywhere(path + "TextReplaceObject")
+        scripts:CheckEverywhere(path + "TextContains")
+        scripts:CheckEverywhere(path + "TextStartsEndsWith")
+        scripts:CheckEverywhere(path + "TextIndexOf")
+        scripts:CheckEverywhere(path + "TextIsEmptySize")
+        scripts:CheckEverywhere(path + "TextSubtext")
+        scripts:CheckEverywhere(path + "TextCharacter")
+        scripts:CheckEverywhere(path + "TextTrimCase")
+        scripts:CheckEverywhere(path + "TextEquals")
+        scripts:CheckEverywhere(path + "TextCompare")
+        scripts:CheckEverywhere(path + "TextHashCode")
+        scripts:CheckEverywhere(path + "TextParseInteger")
+        scripts:CheckEverywhere(path + "TextParseNumber")
+        scripts:CheckEverywhere(path + "TextParseBoolean")
+        scripts:CheckEverywhere(path + "TextSpecialCharacters")
+        scripts:CheckEverywhere(path + "TextSplit")
+        scripts:CheckEverywhere(path + "TextSplitInclude")
+        scripts:CheckEverywhere(path + "TextSplitIntoLines")
+        scripts:CheckEverywhere(path + "TextValue")
+    end
+
+    action GetName returns text
+        return "Text Tests"
+    end
+
+    action GetCompilerTestSuite returns QuorumTest
+        return suite
+    end
+
+    action SetCompilerTestSuite(QuorumTest suite)
+        me:suite = suite
+    end
+end

@@ -1,0 +1,114 @@
+use Libraries.Containers.Array
+
+/*
+    The three ways to empty an Array: Empty(), Empty(true) and Empty(false).
+    Empty(false) is documented to set the size to 0 without clearing the
+    stored contents; ClearContents(start, stop) then clears remnants. The
+    stop location is treated as exclusive, as in the Java and JavaScript
+    plugins (the documentation does not say).
+*/
+class Main
+    action Show(text value) returns text
+        if value = undefined
+            return "undefined"
+        end
+        return "[" + value + "]"
+    end
+
+    action Describe(Array<text> array) returns text
+        text result = "["
+        integer i = 0
+        repeat while i < array:GetSize()
+            if i > 0
+                result = result + ","
+            end
+            text value = array:Get(i)
+            if value = undefined
+                result = result + "undefined"
+            else
+                result = result + value
+            end
+            i = i + 1
+        end
+        return result + "]"
+    end
+    action Make returns Array<text>
+        Array<text> array
+        array:Add("a")
+        array:Add("b")
+        array:Add("c")
+        array:Add("d")
+        return array
+    end
+
+    action Main
+        Array<text> one = Make()
+        check
+            one:Empty()
+            output "Array[a,b,c,d] Empty(): size " + one:GetSize() + ", IsEmpty() = " + one:IsEmpty()
+        detect e
+            output "Array[a,b,c,d] Empty() unexpected error: " + e:GetErrorMessage()
+        end
+        check
+            one:Add("x")
+            output "Array emptied with Empty() then Add(x) gives " + Describe(one)
+        detect e
+            output "Array emptied with Empty() then Add(x) unexpected error: " + e:GetErrorMessage()
+        end
+
+        Array<text> two = Make()
+        check
+            two:Empty(true)
+            output "Array[a,b,c,d] Empty(true): size " + two:GetSize() + ", IsEmpty() = " + two:IsEmpty()
+        detect e
+            output "Array[a,b,c,d] Empty(true) unexpected error: " + e:GetErrorMessage()
+        end
+        check
+            two:Add("x")
+            output "Array emptied with Empty(true) then Add(x) gives " + Describe(two)
+        detect e
+            output "Array emptied with Empty(true) then Add(x) unexpected error: " + e:GetErrorMessage()
+        end
+
+        Array<text> three = Make()
+        check
+            three:Empty(false)
+            output "Array[a,b,c,d] Empty(false): size " + three:GetSize() + ", IsEmpty() = " + three:IsEmpty()
+        detect e
+            output "Array[a,b,c,d] Empty(false) unexpected error: " + e:GetErrorMessage()
+        end
+        check
+            text value = three:Get(0)
+            output "Array emptied with Empty(false) Get(0) should fail but returned " + Show(value)
+        detect e
+            output "Array emptied with Empty(false) Get(0) fails, as it should"
+        end
+        check
+            three:ClearContents(0, 4)
+            output "Array emptied with Empty(false) ClearContents(0, 4): size " + three:GetSize()
+        detect e
+            output "Array emptied with Empty(false) ClearContents(0, 4) unexpected error: " + e:GetErrorMessage()
+        end
+        check
+            three:Add("x")
+            three:Add("y")
+            output "Array emptied with Empty(false) then Add(x), Add(y) gives " + Describe(three)
+        detect e
+            output "Array emptied with Empty(false) then Add(x), Add(y) unexpected error: " + e:GetErrorMessage()
+        end
+
+        Array<text> four = Make()
+        check
+            four:ClearContents(1, 3)
+            output "Array[a,b,c,d] ClearContents(1, 3) gives " + Describe(four)
+        detect e
+            output "Array[a,b,c,d] ClearContents(1, 3) unexpected error: " + e:GetErrorMessage()
+        end
+        check
+            four:ClearContents(0, 0)
+            output "Array[a,undefined,undefined,d] ClearContents(0, 0) gives " + Describe(four)
+        detect e
+            output "Array ClearContents(0, 0) unexpected error: " + e:GetErrorMessage()
+        end
+    end
+end

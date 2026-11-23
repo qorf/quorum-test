@@ -1,0 +1,10 @@
+empty StyleSheet Generate() = [@keyframes quorum-spin{to{transform:rotate(360deg);}}@media (prefers-reduced-motion:reduce){*,::before,::after{animation:none!important;}}\n]
+AddRule(b, color:red;) then AddRule(a, margin:0;) Generate() sorts by name = [@keyframes quorum-spin{to{transform:rotate(360deg);}}@media (prefers-reduced-motion:reduce){*,::before,::after{animation:none!important;}}\n.a{margin:0;}\n.b{color:red;}\n]
+AddStateRule(q1, color:blue;, :hover) Generate() = [@keyframes quorum-spin{to{transform:rotate(360deg);}}@media (prefers-reduced-motion:reduce){*,::before,::after{animation:none!important;}}\n.q1:hover{color:blue;}\n]
+AddStateRule with a surroundings state (:disabled with a space) Generate() = [@keyframes quorum-spin{to{transform:rotate(360deg);}}@media (prefers-reduced-motion:reduce){*,::before,::after{animation:none!important;}}\n:disabled .q2{opacity:0.5;}\n]
+AddWidthRule at 1024 and 640 Generate() orders widths narrowest first = [@keyframes quorum-spin{to{transform:rotate(360deg);}}@media (prefers-reduced-motion:reduce){*,::before,::after{animation:none!important;}}\n@media (min-width:40.0rem){.w2{display:block;}}\n@media (min-width:64.0rem){.w1{display:none;}}\n]
+two AddWidthRule at the same width share one media block = [@keyframes quorum-spin{to{transform:rotate(360deg);}}@media (prefers-reduced-motion:reduce){*,::before,::after{animation:none!important;}}\n@media (min-width:40.0rem){.x{a:1;}.y{b:2;}}\n]
+AddScriptRule keeps the order added, after plain rules = [@keyframes quorum-spin{to{transform:rotate(360deg);}}@media (prefers-reduced-motion:reduce){*,::before,::after{animation:none!important;}}\n.p{e:5;}\n.z{c:3;}\n.m{d:4;}\n]
+SetReset(true) Generate() starts with the reset = true
+AddRule(a) twice fails, as it should
+AddRule(a) then AddStateRule(a) fails, as it should

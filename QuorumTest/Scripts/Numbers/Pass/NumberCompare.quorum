@@ -1,0 +1,47 @@
+/*
+    Number:Compare(Object) returns -1, 0 or 1 and Number:Equals(Object)
+    compares values. The other value is a Number object. Each case runs on
+    a number primitive and on a Number object. The labels are written as
+    text, not printed from the values, because back ends print some numbers
+    differently (JavaScript prints -0.0 as 0.0).
+*/
+class Main
+    action Main
+        Show("1.5", 1.5, "2.5", 2.5)
+        Show("2.5", 2.5, "1.5", 1.5)
+        Show("2.0", 2.0, "2.0", 2.0)
+        Show("-1.0", -1.0, "1.0", 1.0)
+        Show("0.0", 0.0, "-0.0", -0.0)
+        Show("-3.25", -3.25, "-3.5", -3.5)
+        Show("0.1", 0.1, "0.10000001", 0.10000001)
+    end
+
+    action Show(text valueLabel, number value, text otherLabel, number other)
+        Number otherObject
+        otherObject:SetValue(other)
+        text compare = "Compare(" + valueLabel + ", " + otherLabel + ")"
+        text equals = "Equals(" + valueLabel + ", " + otherLabel + ")"
+        check
+            output compare + " = " + value:Compare(otherObject)
+        detect e
+            output compare + " unexpected error: " + e:GetErrorMessage()
+        end
+        check
+            output equals + " = " + value:Equals(otherObject)
+        detect e
+            output equals + " unexpected error: " + e:GetErrorMessage()
+        end
+        Number object
+        object:SetValue(value)
+        check
+            output "Number " + compare + " = " + object:Compare(otherObject)
+        detect e
+            output "Number " + compare + " unexpected error: " + e:GetErrorMessage()
+        end
+        check
+            output "Number " + equals + " = " + object:Equals(otherObject)
+        detect e
+            output "Number " + equals + " unexpected error: " + e:GetErrorMessage()
+        end
+    end
+end

@@ -1,0 +1,123 @@
+use Libraries.Compute.Statistics.DataFrame
+use Libraries.Compute.Statistics.DataFrameColumn
+use Libraries.Compute.Statistics.Transforms.DelimiterColumnSplitter
+use Libraries.Containers.Array
+
+/*
+Tests ColumnSplitter through DelimiterColumnSplitter and
+DataFrame:SplitSelectedColumns: each selected column's cells split into
+new columns named by the headers (with .column-index added when more than
+one column is split). ColumnSplitter's documentation says an undefined
+cell puts undefined values in the new columns by default, and that the
+row is left out when SetIncludeUndefined(false). Frames are shown one per
+line: header=values, columns separated by |, NA for undefined.
+*/
+class Main
+    action Main
+        Array<text> names
+        names:Add("first")
+        names:Add("last")
+        text people = "id,full;1,Ada Lovelace;2,Alan Turing"
+        check
+            DataFrame frame = Frame(people)
+            frame:AddSelectedColumn(1)
+            output "SplitSelectedColumns([first, last], space) = " + Show(frame:SplitSelectedColumns(names, " "))
+        detect e
+            output "SplitSelectedColumns unexpected error: " + e:GetErrorMessage()
+        end
+        check
+            DataFrame frame = Frame(people)
+            frame:AddSelectedColumn(1)
+            DelimiterColumnSplitter splitter
+            splitter:SetHeaders(names)
+            splitter:SetDelimiter(" ")
+            output "DelimiterColumnSplitter Transform = " + Show(frame:Transform(splitter)) + " (delimiter read back [" + splitter:GetDelimiter() + "], headers " + splitter:GetHeaders():GetSize() + ")"
+        detect e
+            output "DelimiterColumnSplitter Transform unexpected error: " + e:GetErrorMessage()
+        end
+        check
+            DataFrame frame = Frame("a,b;1-2,3-4;5-6,7-8")
+            frame:AddSelectedColumn(0)
+            frame:AddSelectedColumn(1)
+            Array<text> parts
+            parts:Add("low")
+            parts:Add("high")
+            output "SplitSelectedColumns of two columns by - = " + Show(frame:SplitSelectedColumns(parts, "-"))
+        detect e
+            output "SplitSelectedColumns of two columns unexpected error: " + e:GetErrorMessage()
+        end
+        check
+            DataFrame frame = Frame("id,full;1,Ada Lovelace;2,Plato")
+            frame:AddSelectedColumn(1)
+            output "SplitSelectedColumns with a cell that splits into one part should fail but returned " + Show(frame:SplitSelectedColumns(names, " "))
+        detect e
+            output "SplitSelectedColumns with a cell that splits into one part fails, as it should"
+        end
+        text gaps = "id,full;1,Ada Lovelace;2,;3,Alan Turing"
+        check
+            DataFrame frame = Frame(gaps)
+            frame:AddSelectedColumn(1)
+            output "SplitSelectedColumns with an undefined cell, default = " + Show(frame:SplitSelectedColumns(names, " "))
+        detect e
+            output "SplitSelectedColumns with an undefined cell, default unexpected error: " + e:GetErrorMessage()
+        end
+        check
+            DataFrame frame = Frame(gaps)
+            frame:AddSelectedColumn(1)
+            output "SplitSelectedColumns with an undefined cell, includeUndefined false = " + Show(frame:SplitSelectedColumns(names, " ", false))
+        detect e
+            output "SplitSelectedColumns with an undefined cell, includeUndefined false unexpected error: " + e:GetErrorMessage()
+        end
+        check
+            DataFrame frame = Frame(people)
+            DelimiterColumnSplitter splitter
+            splitter:SetDelimiter(" ")
+            frame:AddSelectedColumn(1)
+            output "DelimiterColumnSplitter with no headers should fail but returned " + Show(frame:Transform(splitter))
+        detect e
+            output "DelimiterColumnSplitter with no headers fails, as it should"
+        end
+        check
+            DataFrame frame = Frame(people)
+            output "SplitSelectedColumns with no selected column should fail but returned " + Show(frame:SplitSelectedColumns(names, " "))
+        detect e
+            output "SplitSelectedColumns with no selected column fails, as it should"
+        end
+    end
+
+    /* A frame as one line: each column's header, then its values; NA for undefined. */
+    action Show(DataFrame frame) returns text
+        text result = ""
+        integer i = 0
+        repeat while i < frame:GetSize()
+            DataFrameColumn column = frame:GetColumn(i)
+            if i > 0
+                result = result + " | "
+            end
+            result = result + column:GetHeader() + "="
+            integer j = 0
+            repeat while j < column:GetSize()
+                if j > 0
+                    result = result + ","
+                end
+                if column:IsUndefined(j)
+                    result = result + "NA"
+                else
+                    result = result + column:GetAsText(j)
+                end
+                j = j + 1
+            end
+            i = i + 1
+        end
+        return result
+    end
+
+    /* Makes a frame from comma separated text whose rows are separated by ; */
+    action Frame(text rows) returns DataFrame
+        text lf = ""
+        lf = lf:GetLineFeed()
+        DataFrame frame
+        frame:LoadFromCommaSeparatedValue(rows:Replace(";", lf))
+        return frame
+    end
+end

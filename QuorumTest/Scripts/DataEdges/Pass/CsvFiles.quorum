@@ -1,0 +1,86 @@
+use Libraries.Data.Formats.SeparatedValue
+use Libraries.Data.Formats.SeparatedValueFileReader
+use Libraries.Containers.Array
+use Libraries.System.File
+
+/*
+The file actions: SeparatedValue:Read(File) on a file with a quoted field
+holding a comma and a line break and Windows line endings, Read(File) of a
+missing file (documented to fail with FileNotFoundError), Read(File) twice,
+and SeparatedValueFileReader:OpenForRead then ReadLines. Files live in a
+scratch folder, CsvScratch, made in the working directory and deleted at the
+end.
+*/
+class Main
+    action Main
+        text lf = ""
+        lf = lf:GetLineFeed()
+        text crlf = lf:GetCarriageReturn() + lf
+        text dq = lf:GetDoubleQuote()
+        File folder
+        folder:SetPath("CsvScratch")
+        check
+            folder:Delete(true)
+        detect cleanup
+        end
+        folder:CreateDirectories()
+        File data
+        data:SetPath("CsvScratch/data.csv")
+        data:Write("name,note" + crlf + "Ann," + dq + "a, b" + lf + "c" + dq + crlf + "Bob,ok" + crlf)
+
+        check
+            SeparatedValue csv
+            csv:Read(data)
+            output "Read(File data.csv holding name,note\r\nAnn," + dq + "a, b\nc" + dq + "\r\nBob,ok\r\n) GetNumberOfRows() = " + csv:GetNumberOfRows() + ", GetNumberOfColumns() = " + csv:GetNumberOfColumns() + ", Get(1, 1) = [" + Show(csv:Get(1, 1)) + "], Get(2, 1) = [" + Show(csv:Get(2, 1)) + "]"
+        detect e
+            output "Read(File data.csv) unexpected error: " + e:GetErrorMessage()
+        end
+
+        check
+            SeparatedValue csv
+            csv:Read(data)
+            csv:Read(data)
+            output "Read(File data.csv) twice GetNumberOfRows() = " + csv:GetNumberOfRows()
+        detect e
+            output "Read(File data.csv) twice unexpected error: " + e:GetErrorMessage()
+        end
+
+        check
+            SeparatedValue csv
+            File missing
+            missing:SetPath("CsvScratch/missing.csv")
+            csv:Read(missing)
+            output "Read(File missing.csv) should fail but returned " + csv:GetNumberOfRows() + " rows"
+        detect e
+            output "Read(File missing.csv) fails, as it should"
+        end
+
+        check
+            SeparatedValueFileReader reader
+            reader:OpenForRead(data)
+            Array<text> lines = reader:ReadLines()
+            text result = ""
+            integer i = 0
+            repeat while i < lines:GetSize()
+                result = result + "[" + Show(lines:Get(i)) + "]"
+                i = i + 1
+            end
+            output "SeparatedValueFileReader OpenForRead(data.csv) ReadLines() = " + lines:GetSize() + " lines " + result
+        detect e
+            output "SeparatedValueFileReader ReadLines unexpected error: " + e:GetErrorMessage()
+        end
+
+        check
+            folder:Delete(true)
+            output "scratch folder removed = [" + (not folder:Exists()) + "]"
+        detect e
+            output "removing the scratch folder unexpected error: " + e:GetErrorMessage()
+        end
+    end
+
+    action Show(text value) returns text
+        text result = value:Replace(value:GetCarriageReturn(), "\r")
+        result = result:Replace(value:GetLineFeed(), "\n")
+        return result
+    end
+end

@@ -1,0 +1,27 @@
+/*
+    Text:Replace(old, new) should replace every occurrence of old (the
+    documentation says "all occurrences"). Each line names the call and
+    shows the result in brackets, so trailing spaces are visible.
+*/
+class Main
+    action Main
+        Show("hello", "l", "z")
+        Show("aaaa", "a", "b")
+        Show("aaaa", "aa", "b")
+        Show("banana", "an", "AN")
+        Show("hello", "x", "y")
+        Show("hello", "hello", "")
+        Show("", "a", "b")
+        Show("a.b.c", ".", "-")
+        Show("one two  three", " ", "_")
+        Show("abcabc", "abc", "abcabc")
+    end
+
+    action Show(text value, text old, text replacement)
+        check
+            output "Replace(" + value + ", " + old + ", " + replacement + ") = [" + value:Replace(old, replacement) + "]"
+        detect e
+            output "Replace(" + value + ", " + old + ", " + replacement + ") unexpected error: " + e:GetErrorMessage()
+        end
+    end
+end

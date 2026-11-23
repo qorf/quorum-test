@@ -1,0 +1,32 @@
+/*
+    Text:Replace(old, new) on a Text object, which runs different plugin
+    code from the text primitive in TextReplace. Every occurrence is
+    replaced (the documentation says "all occurrences").
+*/
+class Main
+    action Main
+        Show("hello", "l", "z")
+        Show("aaaa", "a", "b")
+        Show("aaaa", "aa", "b")
+        Show("banana", "an", "AN")
+        Show("hello", "x", "y")
+        Show("hello", "hello", "")
+        Show("", "a", "b")
+        Show("a.b.c", ".", "-")
+        Show("one two  three", " ", "_")
+        Show("abcabc", "abc", "abcabc")
+        Show("a+b+c", "+", "")
+        Show("(a)(b)", ")(", ", ")
+    end
+
+    action Show(text value, text old, text replacement)
+        Text object
+        object:SetValue(value)
+        text call = "Text Replace(" + value + ", " + old + ", " + replacement + ")"
+        check
+            output call + " = [" + object:Replace(old, replacement) + "]"
+        detect e
+            output call + " unexpected error: " + e:GetErrorMessage()
+        end
+    end
+end

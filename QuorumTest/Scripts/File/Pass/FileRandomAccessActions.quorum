@@ -1,0 +1,147 @@
+use Libraries.System.File
+use Libraries.System.FileRandomAccess
+use Libraries.System.Blueprints.FileRandomAccessBlueprint
+use Libraries.Containers.Array
+
+/*
+Tests FileRandomAccess (OpenForRandomAccess, GetPosition, SetPosition,
+GoToBeginning, IsAtEndOfFile, Read, Read(integer), ReadLine, ReadLines,
+Write, WriteLine, Close) and File's OpenForRandomAccess, inside a scratch
+folder (FileTestsWork/FileRandomAccessActions), deleted at the end. As the
+documentation says: Read(integer) near the end returns only what is left;
+Read at the end raises an EndOfFileError; SetPosition below zero raises an
+InvalidArgumentError; opening a path that is not a valid file raises an error
+(and File's OpenForRandomAccess returns undefined). WriteLine's line ending
+is the system's line separator; the check compares it with a line feed, the
+separator on Mac and Linux.
+*/
+class Main
+    action Main
+        File work
+        work:SetPath("FileTestsWork/FileRandomAccessActions")
+        work:Delete(true)
+        boolean made = work:CreateDirectories()
+        text lf = ""
+        lf = lf:GetLineFeed()
+        File file
+        file:SetPath("FileTestsWork/FileRandomAccessActions/digits.txt")
+        file:Write("0123456789")
+
+        FileRandomAccess access
+        check
+            access:OpenForRandomAccess(file)
+            output "OpenForRandomAccess(digits.txt): GetPosition() = " + cast(integer, access:GetPosition())
+            output "OpenForRandomAccess(digits.txt): IsAtEndOfFile() = " + access:IsAtEndOfFile()
+            output "Read(4) = [" + access:Read(4) + "]"
+            output "GetPosition() after Read(4) = " + cast(integer, access:GetPosition())
+            access:SetPosition(7)
+            output "SetPosition(7), GetPosition() = " + cast(integer, access:GetPosition())
+            output "Read() from 7 = [" + access:Read() + "]"
+            output "IsAtEndOfFile() after Read() = " + access:IsAtEndOfFile()
+            output "GetPosition() after Read() = " + cast(integer, access:GetPosition())
+        detect e
+            output "FileRandomAccess reading digits.txt unexpected error: " + e:GetErrorMessage()
+        end
+        check
+            text value = access:Read()
+            output "Read() at the end of the file should fail but returned [" + value + "]"
+        detect e
+            output "Read() at the end of the file fails, as it should"
+        end
+        check
+            access:GoToBeginning()
+            output "GoToBeginning(), GetPosition() = " + cast(integer, access:GetPosition())
+            output "Read(3) after GoToBeginning() = [" + access:Read(3) + "]"
+        detect e
+            output "GoToBeginning() unexpected error: " + e:GetErrorMessage()
+        end
+        check
+            access:SetPosition(2)
+            access:Write("ab")
+            output "SetPosition(2), Write(ab), GetPosition() = " + cast(integer, access:GetPosition())
+            access:GoToBeginning()
+            output "GoToBeginning(), Read() after Write(ab) at 2 = [" + access:Read() + "]"
+        detect e
+            output "Write(ab) at 2 unexpected error: " + e:GetErrorMessage()
+        end
+        check
+            access:SetPosition(5)
+            text value = access:Read(20)
+            output "SetPosition(5), Read(20) with 5 bytes left = [" + value + "], size " + value:GetSize()
+        detect e
+            output "Read(20) with 5 bytes left unexpected error: " + e:GetErrorMessage()
+        end
+        check
+            access:SetPosition(-1)
+            output "SetPosition(-1) should fail but returned normally"
+        detect e
+            output "SetPosition(-1) fails, as it should"
+        end
+        check
+            access:SetPosition(10)
+            access:WriteLine("end")
+            access:Close()
+            text content = file:Read()
+            output "SetPosition(10), WriteLine(end), Close(): the file is 01ab456789end and a line feed = " + (content = "01ab456789end" + lf)
+        detect e
+            output "WriteLine(end) at 10 unexpected error: " + e:GetErrorMessage()
+        end
+
+        File colors
+        colors:SetPath("FileTestsWork/FileRandomAccessActions/colors.txt")
+        colors:Write("red" + lf + "green" + lf + "blue")
+        FileRandomAccess lines
+        check
+            lines:OpenForRandomAccess(colors)
+            output "ReadLine() first = [" + lines:ReadLine() + "]"
+            output "ReadLine() second = [" + lines:ReadLine() + "]"
+            lines:GoToBeginning()
+            Array<text> all = lines:ReadLines()
+            output "GoToBeginning(), ReadLines() size = " + all:GetSize()
+            integer i = 0
+            repeat while i < all:GetSize()
+                output "ReadLines() line " + i + " = [" + all:Get(i) + "]"
+                i = i + 1
+            end
+            lines:Close()
+        detect e
+            output "ReadLine and ReadLines unexpected error: " + e:GetErrorMessage()
+        end
+
+        check
+            FileRandomAccessBlueprint opened = colors:OpenForRandomAccess()
+            output "File:OpenForRandomAccess(colors.txt) then Read(3) = [" + opened:Read(3) + "]"
+            colors:Close()
+        detect e
+            output "File:OpenForRandomAccess(colors.txt) unexpected error: " + e:GetErrorMessage()
+        end
+        File missing
+        missing:SetPath("FileTestsWork/FileRandomAccessActions/missing.txt")
+        check
+            FileRandomAccessBlueprint none = missing:OpenForRandomAccess()
+            output "File:OpenForRandomAccess(missing.txt) is undefined = " + (none = undefined)
+        detect e
+            output "File:OpenForRandomAccess(missing.txt) unexpected error: " + e:GetErrorMessage()
+        end
+        FileRandomAccess folderAccess
+        check
+            folderAccess:OpenForRandomAccess(work)
+            output "OpenForRandomAccess(a folder) should fail but returned normally"
+        detect e
+            output "OpenForRandomAccess(a folder) fails, as it should"
+        end
+        FileRandomAccess missingAccess
+        check
+            missingAccess:OpenForRandomAccess(missing)
+            output "OpenForRandomAccess(missing.txt) should fail but returned normally"
+            missingAccess:Close()
+        detect e
+            output "OpenForRandomAccess(missing.txt) fails, as it should"
+        end
+
+        work:Delete(true)
+        File top
+        top:SetPath("FileTestsWork")
+        boolean removed = top:Delete()
+    end
+end

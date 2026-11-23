@@ -1,0 +1,274 @@
+use Libraries.Compute.Statistics.DataFrame
+use Libraries.Compute.Statistics.DataFrameColumn
+use Libraries.Compute.Statistics.Columns.TextColumn
+use Libraries.Compute.Statistics.Loaders.CommaSeparatedLoader
+use Libraries.Compute.Statistics.Loaders.CommaSeparatedSaver
+use Libraries.System.File
+
+/*
+Tests CommaSeparatedLoader (the column kind chosen from each column's first
+value, short and long rows, AddColumnOnLoad), CommaSeparatedSaver and
+DataFrame:ToText (quoting, row limits, headers), and saving to and loading
+from a file in a scratch folder the script makes and deletes. The loader's
+comments say a row longer than the header keeps only the header's cells.
+Saved text follows RFC 4180: a value with a comma or a double quote is
+quoted, and a double quote inside it is doubled. Text is shown with line
+breaks as \n and double quotes as '.
+*/
+class Main
+    action Main
+        check
+            DataFrame frame = Frame("n,b,d,a,w;1.5,true,2015-03-14,3/14/2015,hi")
+            text kinds = ""
+            integer i = 0
+            repeat while i < frame:GetSize()
+                DataFrameColumn column = frame:GetColumn(i)
+                kinds = kinds + column:GetHeader() + ":" + Kind(column) + " "
+                i = i + 1
+            end
+            output "LoadFromCommaSeparatedValue column kinds = " + kinds + "values " + Show(frame)
+        detect e
+            output "LoadFromCommaSeparatedValue column kinds unexpected error: " + e:GetErrorMessage()
+        end
+        check
+            DataFrame frame = Frame("whole;2;3")
+            output "a column of whole numbers is a number column = " + Kind(frame:GetColumn(0)) + " " + Show(frame)
+        detect e
+            output "whole numbers unexpected error: " + e:GetErrorMessage()
+        end
+        check
+            DataFrame frame = Frame("a,b;,x;1.5,y")
+            output "a first value that is empty makes a text column = " + Kind(frame:GetColumn(0)) + " " + Show(frame)
+        detect e
+            output "empty first value unexpected error: " + e:GetErrorMessage()
+        end
+        check
+            DataFrame frame = Frame("a,b;1.5,x;2.5")
+            output "a short row gets undefined values = " + Show(frame)
+        detect e
+            output "short row unexpected error: " + e:GetErrorMessage()
+        end
+        check
+            DataFrame frame = Frame("a,b;1.5,x;2.5,y,extra")
+            output "a long row keeps only the header's cells = " + Show(frame)
+        detect e
+            output "long row unexpected error: " + e:GetErrorMessage()
+        end
+        check
+            DataFrame frame
+            TextColumn codes
+            frame:AddColumnOnLoad(1, codes)
+            text lf = ""
+            lf = lf:GetLineFeed()
+            frame:LoadFromCommaSeparatedValue("id,code" + lf + "1.5,007")
+            output "AddColumnOnLoad(1, TextColumn) keeps 007 as text = " + Kind(frame:GetColumn(1)) + " " + Show(frame)
+        detect e
+            output "AddColumnOnLoad unexpected error: " + e:GetErrorMessage()
+        end
+        check
+            DataFrame frame
+            CommaSeparatedLoader loader
+            text lf = ""
+            lf = lf:GetLineFeed()
+            loader:Load(frame, "x,y" + lf + "1.5,a")
+            output "CommaSeparatedLoader Load(frame, text) = " + Show(frame)
+        detect e
+            output "CommaSeparatedLoader Load unexpected error: " + e:GetErrorMessage()
+        end
+        check
+            DataFrame frame
+            CommaSeparatedLoader loader
+            loader:Load(frame, "")
+            output "CommaSeparatedLoader Load of empty text should fail but returned " + Show(frame)
+        detect e
+            output "CommaSeparatedLoader Load of empty text fails, as it should"
+        end
+
+        text data = "name,score;Ada,1.5;Alan,2.5;Grace,3.5"
+        check
+            DataFrame frame = Frame(data)
+            output "ToText() = [" + Flat(frame:ToText()) + "]"
+        detect e
+            output "ToText() unexpected error: " + e:GetErrorMessage()
+        end
+        check
+            DataFrame frame = Frame(data)
+            output "ToText(1, true) = [" + Flat(frame:ToText(1, true)) + "]"
+        detect e
+            output "ToText(1, true) unexpected error: " + e:GetErrorMessage()
+        end
+        check
+            DataFrame frame = Frame(data)
+            output "ToText(2, false) = [" + Flat(frame:ToText(2, false)) + "]"
+        detect e
+            output "ToText(2, false) unexpected error: " + e:GetErrorMessage()
+        end
+        check
+            DataFrame frame = Frame(data)
+            output "ToText(0, true) = [" + Flat(frame:ToText(0, true)) + "]"
+        detect e
+            output "ToText(0, true) unexpected error: " + e:GetErrorMessage()
+        end
+        check
+            DataFrame frame = Frame("a,b;1.5,x;2.5")
+            CommaSeparatedSaver saver
+            output "ConvertToText with an undefined cell = [" + Flat(saver:ConvertToText(frame)) + "]"
+        detect e
+            output "ConvertToText with an undefined cell unexpected error: " + e:GetErrorMessage()
+        end
+        check
+            DataFrame frame
+            TextColumn words
+            words:SetHeader("last, first")
+            words:Add("Lovelace, Ada")
+            words:Add("plain")
+            frame:AddColumn(words)
+            CommaSeparatedSaver saver
+            output "ConvertToText quotes a header and a value with commas = [" + Flat(saver:ConvertToText(frame, 5)) + "]"
+        detect e
+            output "ConvertToText with commas unexpected error: " + e:GetErrorMessage()
+        end
+        check
+            text q = ""
+            q = q:GetDoubleQuote()
+            DataFrame frame
+            TextColumn words
+            words:SetHeader("said")
+            words:Add("say " + q + "hi" + q)
+            frame:AddColumn(words)
+            CommaSeparatedSaver saver
+            output "ConvertToText of a value with double quotes, shown raw = [" + Raw(saver:ConvertToText(frame, -1, false)) + "]"
+        detect e
+            output "ConvertToText with double quotes unexpected error: " + e:GetErrorMessage()
+        end
+
+        File folder
+        folder:SetPath("StatisticsScratch")
+        check
+            boolean made = folder:CreateDirectories()
+            DataFrame frame = Frame(data)
+            frame:Save("StatisticsScratch/scores.csv")
+            File saved
+            saved:SetPath("StatisticsScratch/scores.csv")
+            output "Save(scores.csv) writes = [" + Flat(saved:Read()) + "]"
+        detect e
+            output "Save(scores.csv) unexpected error: " + e:GetErrorMessage()
+        end
+        check
+            DataFrame loaded
+            loaded:Load("StatisticsScratch/scores.csv")
+            output "Load(scores.csv) after Save = " + Show(loaded)
+        detect e
+            output "Load(scores.csv) unexpected error: " + e:GetErrorMessage()
+        end
+        check
+            DataFrame frame = Frame("k,v;a,1.5")
+            File target
+            target:SetPath("StatisticsScratch/saver.csv")
+            CommaSeparatedSaver saver
+            frame:Save(target, saver)
+            DataFrame loaded
+            CommaSeparatedLoader loader
+            loaded:Load(target, loader)
+            output "Save(file, CommaSeparatedSaver) then Load(file, CommaSeparatedLoader) = " + Show(loaded)
+        detect e
+            output "Save and Load with saver and loader unexpected error: " + e:GetErrorMessage()
+        end
+        check
+            DataFrame frame = Frame("k,v;a,1.5")
+            frame:Save("StatisticsScratch/ignored.txt")
+            File ignored
+            ignored:SetPath("StatisticsScratch/ignored.txt")
+            output "Save(ignored.txt) with an extension other than csv writes a file = " + ignored:Exists()
+        detect e
+            output "Save(ignored.txt) unexpected error: " + e:GetErrorMessage()
+        end
+        check
+            DataFrame missing
+            missing:Load("StatisticsScratch/missing.csv")
+            output "Load(missing.csv) should fail but returned " + Show(missing)
+        detect e
+            output "Load(missing.csv) fails, as it should"
+        end
+        check
+            folder:Delete(true)
+            output "scratch folder deleted = " + (not folder:Exists())
+        detect e
+            output "deleting the scratch folder unexpected error: " + e:GetErrorMessage()
+        end
+    end
+
+    action Kind(DataFrameColumn column) returns text
+        if column:IsNumberColumn()
+            return "number"
+        elseif column:IsIntegerColumn()
+            return "integer"
+        elseif column:IsBooleanColumn()
+            return "boolean"
+        elseif column:IsDateTimeColumn()
+            return "datetime"
+        elseif column:IsTextColumn()
+            return "text"
+        end
+        return "other"
+    end
+
+    /* Line breaks as \n, double quotes as '. */
+    action Flat(text value) returns text
+        text lf = ""
+        lf = lf:GetLineFeed()
+        text cr = ""
+        cr = cr:GetCarriageReturn()
+        text quote = ""
+        quote = quote:GetDoubleQuote()
+        text result = value:Replace(cr, "")
+        result = result:Replace(lf, "\n")
+        return result:Replace(quote, "'")
+    end
+
+    /* Line breaks as \n, double quotes as [quote]. */
+    action Raw(text value) returns text
+        text lf = ""
+        lf = lf:GetLineFeed()
+        text quote = ""
+        quote = quote:GetDoubleQuote()
+        text result = value:Replace(lf, "\n")
+        return result:Replace(quote, "[quote]")
+    end
+
+    /* A frame as one line: each column's header, then its values; NA for undefined. */
+    action Show(DataFrame frame) returns text
+        text result = ""
+        integer i = 0
+        repeat while i < frame:GetSize()
+            DataFrameColumn column = frame:GetColumn(i)
+            if i > 0
+                result = result + " | "
+            end
+            result = result + column:GetHeader() + "="
+            integer j = 0
+            repeat while j < column:GetSize()
+                if j > 0
+                    result = result + ","
+                end
+                if column:IsUndefined(j)
+                    result = result + "NA"
+                else
+                    result = result + column:GetAsText(j)
+                end
+                j = j + 1
+            end
+            i = i + 1
+        end
+        return result
+    end
+
+    /* Makes a frame from comma separated text whose rows are separated by ; */
+    action Frame(text rows) returns DataFrame
+        text lf = ""
+        lf = lf:GetLineFeed()
+        DataFrame frame
+        frame:LoadFromCommaSeparatedValue(rows:Replace(";", lf))
+        return frame
+    end
+end

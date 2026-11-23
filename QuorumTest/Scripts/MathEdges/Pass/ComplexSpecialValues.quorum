@@ -1,0 +1,105 @@
+use Libraries.Compute.ComplexNumber
+
+/*
+ComplexNumber with NaN, infinity and zero, following the rules in each
+action's documentation: dividing by zero gives NaN, a finite number divided
+by an infinite one gives zero, multiplying by an infinite number gives
+infinity, anything involving NaN gives NaN, two NaN values are Equal, and
+the natural logarithm of 0 is -Infinity + 0i (the documentation's own
+example). The reciprocal of 0 is infinity, as in Apache Commons, which the
+class says it was ported from. Also the constant values.
+*/
+class Main
+    action Main
+        number zero = 0.0
+        number infinity = 1.0 / zero
+        number notANumber = zero / zero
+        ComplexNumber value
+        value:SetValue(3, 4)
+        ComplexNumber nothing = Make(0, 0)
+        ComplexNumber huge = Make(infinity, 0)
+        ComplexNumber broken = Make(notANumber, 1)
+
+        output "GetNotANumberValue = " + value:GetNotANumberValue():ToText() + ", IsNotANumber = " + value:GetNotANumberValue():IsNotANumber()
+        output "GetPositiveInfinityValue = " + value:GetPositiveInfinityValue():ToText() + ", IsInfinite = " + value:GetPositiveInfinityValue():IsInfinite()
+        output "GetImaginaryOneValue = " + value:GetImaginaryOneValue():ToText()
+        output "GetOneValue = " + value:GetOneValue():ToText()
+        output "GetZeroValue = " + value:GetZeroValue():ToText()
+        output "3 + 4i IsNotANumber = " + value:IsNotANumber() + ", IsInfinite = " + value:IsInfinite()
+        output "NaN + 1i IsNotANumber = " + broken:IsNotANumber() + ", IsInfinite = " + broken:IsInfinite()
+        output "1 + Infinity i IsNotANumber = " + Make(1, infinity):IsNotANumber() + ", IsInfinite = " + Make(1, infinity):IsInfinite()
+        check
+            output "3 + 4i Divide 0 + 0i = " + value:Divide(nothing):ToText()
+        detect e
+            output "Divide by complex zero unexpected error: " + e:GetErrorMessage()
+        end
+        check
+            output "3 + 4i Divide 0 = " + value:Divide(0):ToText()
+        detect e
+            output "Divide by zero unexpected error: " + e:GetErrorMessage()
+        end
+        check
+            output "3 + 4i Divide Infinity + 0i = " + value:Divide(huge):ToText()
+        detect e
+            output "Divide by infinity unexpected error: " + e:GetErrorMessage()
+        end
+        check
+            output "3 + 4i Divide Infinity = " + value:Divide(infinity):ToText()
+        detect e
+            output "Divide by number infinity unexpected error: " + e:GetErrorMessage()
+        end
+        check
+            output "3 + 4i Multiply Infinity + 0i = " + value:Multiply(huge):ToText()
+        detect e
+            output "Multiply by infinity unexpected error: " + e:GetErrorMessage()
+        end
+        check
+            output "0 + 0i Reciprocal = " + nothing:Reciprocal():ToText()
+        detect e
+            output "Reciprocal of zero unexpected error: " + e:GetErrorMessage()
+        end
+        check
+            output "Infinity + 0i Reciprocal = " + huge:Reciprocal():ToText()
+        detect e
+            output "Reciprocal of infinity unexpected error: " + e:GetErrorMessage()
+        end
+        check
+            output "3 + 4i Add NaN + 1i IsNotANumber = " + value:Add(broken):IsNotANumber()
+        detect e
+            output "Add NaN unexpected error: " + e:GetErrorMessage()
+        end
+        check
+            output "NaN + 1i Conjugate IsNotANumber = " + broken:Conjugate():IsNotANumber()
+        detect e
+            output "Conjugate NaN unexpected error: " + e:GetErrorMessage()
+        end
+        check
+            output "NaN + 1i SquareRoot IsNotANumber = " + broken:SquareRoot():IsNotANumber()
+        detect e
+            output "SquareRoot NaN unexpected error: " + e:GetErrorMessage()
+        end
+        check
+            output "NaN + 1i Equals GetNotANumberValue = " + broken:Equals(value:GetNotANumberValue())
+            output "3 + 4i Equals GetNotANumberValue = " + value:Equals(value:GetNotANumberValue())
+        detect e
+            output "Equals NaN unexpected error: " + e:GetErrorMessage()
+        end
+        check
+            output "NaN + 1i AbsoluteValue = " + broken:AbsoluteValue()
+            output "Infinity + 0i AbsoluteValue = " + huge:AbsoluteValue()
+        detect e
+            output "AbsoluteValue special unexpected error: " + e:GetErrorMessage()
+        end
+        check
+            output "0 + 0i NaturalLogarithm = " + nothing:NaturalLogarithm():ToText()
+        detect e
+            output "NaturalLogarithm(0) unexpected error: " + e:GetErrorMessage()
+        end
+    end
+
+    action Make(number real, number imaginary) returns ComplexNumber
+        ComplexNumber result
+        result:SetValue(real, imaginary)
+        return result
+    end
+end

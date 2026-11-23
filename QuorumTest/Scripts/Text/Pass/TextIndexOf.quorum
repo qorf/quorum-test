@@ -1,0 +1,85 @@
+/*
+    Text:IndexOf(subText) gives the index of the first occurrence, or -1
+    when it is not found. The empty text is found at index 0 (Java agrees).
+    IndexOf(subText, index) starts searching at index; the library alerts an
+    error unless 0 <= index < size, so an empty text fails for every index.
+    Each case runs on a text primitive and on a Text object.
+*/
+class Main
+    action Main
+        Show("hello", "l")
+        Show("hello", "h")
+        Show("hello", "o")
+        Show("hello", "lo")
+        Show("hello", "hello")
+        Show("hello", "x")
+        Show("hello", "L")
+        Show("hello", "")
+        Show("", "a")
+        Show("", "")
+        Show("a", "a")
+        Show("  a", " ")
+        ShowFrom("hello", "l", 0)
+        ShowFrom("hello", "l", 3)
+        ShowFrom("hello", "l", 4)
+        ShowFrom("hello", "h", 0)
+        ShowFrom("hello", "h", 1)
+        ShowFrom("hello", "o", 4)
+        ShowFrom("abcabc", "abc", 1)
+        ShowFrom("abcabc", "", 2)
+        FailFrom("hello", "l", 5)
+        FailFrom("hello", "l", 6)
+        FailFrom("hello", "l", -1)
+        FailFrom("", "a", 0)
+    end
+
+    action Show(text value, text search)
+        text call = "IndexOf(" + value + ", " + search + ")"
+        check
+            output call + " = " + value:IndexOf(search)
+        detect e
+            output call + " unexpected error: " + e:GetErrorMessage()
+        end
+        Text object
+        object:SetValue(value)
+        check
+            output "Text " + call + " = " + object:IndexOf(search)
+        detect e
+            output "Text " + call + " unexpected error: " + e:GetErrorMessage()
+        end
+    end
+
+    action ShowFrom(text value, text search, integer index)
+        text call = "IndexOf(" + value + ", " + search + ", " + index + ")"
+        check
+            output call + " = " + value:IndexOf(search, index)
+        detect e
+            output call + " unexpected error: " + e:GetErrorMessage()
+        end
+        Text object
+        object:SetValue(value)
+        check
+            output "Text " + call + " = " + object:IndexOf(search, index)
+        detect e
+            output "Text " + call + " unexpected error: " + e:GetErrorMessage()
+        end
+    end
+
+    action FailFrom(text value, text search, integer index)
+        text call = "IndexOf(" + value + ", " + search + ", " + index + ")"
+        check
+            integer result = value:IndexOf(search, index)
+            output call + " should fail but returned " + result
+        detect e
+            output call + " fails, as it should"
+        end
+        Text object
+        object:SetValue(value)
+        check
+            integer result = object:IndexOf(search, index)
+            output "Text " + call + " should fail but returned " + result
+        detect e
+            output "Text " + call + " fails, as it should"
+        end
+    end
+end

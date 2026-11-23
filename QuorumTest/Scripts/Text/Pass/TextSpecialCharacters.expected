@@ -1,0 +1,31 @@
+GetLineFeed has size 1 and unicode value 10
+Text GetLineFeed has size 1 and unicode value 10
+GetCarriageReturn has size 1 and unicode value 13
+Text GetCarriageReturn has size 1 and unicode value 13
+GetTab has size 1 and unicode value 9
+Text GetTab has size 1 and unicode value 9
+GetDoubleQuote has size 1 and unicode value 34
+Text GetDoubleQuote has size 1 and unicode value 34
+GetDoubleQuote printed = ["]
+GetUnicodeValue(65) = [A]
+Text GetUnicodeValue(65) = [A]
+GetUnicodeValue(97) = [a]
+Text GetUnicodeValue(97) = [a]
+GetUnicodeValue(32) = [ ]
+Text GetUnicodeValue(32) = [ ]
+GetUnicodeValue(48) = [0]
+Text GetUnicodeValue(48) = [0]
+GetUnicodeInteger(abc, 0) = 97
+Text GetUnicodeInteger(abc, 0) = 97
+GetUnicodeInteger(abc, 2) = 99
+Text GetUnicodeInteger(abc, 2) = 99
+GetUnicodeInteger(A, 0) = 65
+Text GetUnicodeInteger(A, 0) = 65
+GetUnicodeInteger( , 0) = 32
+Text GetUnicodeInteger( , 0) = 32
+GetUnicodeInteger(abc, 3) fails, as it should
+Text GetUnicodeInteger(abc, 3) fails, as it should
+GetUnicodeInteger(abc, -1) fails, as it should
+Text GetUnicodeInteger(abc, -1) fails, as it should
+GetUnicodeInteger(, 0) fails, as it should
+Text GetUnicodeInteger(, 0) fails, as it should

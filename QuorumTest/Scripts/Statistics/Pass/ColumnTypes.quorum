@@ -1,0 +1,168 @@
+use Libraries.Compute.Statistics.DataFrameColumn
+use Libraries.Compute.Statistics.Columns.BooleanColumn
+use Libraries.Compute.Statistics.Columns.BigIntegerColumn
+use Libraries.Compute.Statistics.Columns.DateTimeColumn
+use Libraries.Compute.Statistics.DateTimeParsers.AmericanDateParser
+
+/*
+Tests BooleanColumn, BigIntegerColumn and DateTimeColumn: adding values as
+text, undefined values, reading values back, copies, sorting and the kind
+of column each reports. A DateTimeColumn reads and writes timestamps until
+SetParser changes how. Columns are shown as values separated by commas,
+NA for undefined.
+*/
+class Main
+    action Main
+        BooleanColumn flags
+        flags:SetHeader("flags")
+        check
+            flags:Add("true")
+            flags:Add("No")
+            flags:Add("Y")
+            flags:Add("0")
+            flags:Add("t")
+            flags:Add("")
+            flags:Add("maybe")
+            output "BooleanColumn Add(true, No, Y, 0, t, empty, maybe) = " + Show(flags)
+        detect e
+            output "BooleanColumn Add unexpected error: " + e:GetErrorMessage()
+        end
+        check
+            output "BooleanColumn GetSize() and GetUndefinedSize() = " + flags:GetSize() + " " + flags:GetUndefinedSize()
+        detect e
+            output "BooleanColumn sizes unexpected error: " + e:GetErrorMessage()
+        end
+        check
+            output "BooleanColumn GetAsBoolean(2) = " + flags:GetAsBoolean(2)
+        detect e
+            output "BooleanColumn GetAsBoolean(2) unexpected error: " + e:GetErrorMessage()
+        end
+        check
+            flags:SetAsBoolean(1, true)
+            output "BooleanColumn SetAsBoolean(1, true) GetAsText(1) = " + flags:GetAsText(1)
+        detect e
+            output "BooleanColumn SetAsBoolean unexpected error: " + e:GetErrorMessage()
+        end
+        check
+            output "BooleanColumn IsBooleanColumn() IsNumberColumn() IsTextColumn() = " + flags:IsBooleanColumn() + " " + flags:IsNumberColumn() + " " + flags:IsTextColumn()
+        detect e
+            output "BooleanColumn kind unexpected error: " + e:GetErrorMessage()
+        end
+        check
+            DataFrameColumn copy = flags:Copy()
+            copy:SetAsBoolean(0, false)
+            output "BooleanColumn Copy() then change the copy: copy = " + Show(copy) + ", original = " + Show(flags) + ", header " + copy:GetHeader()
+        detect e
+            output "BooleanColumn Copy unexpected error: " + e:GetErrorMessage()
+        end
+        check
+            BooleanColumn few
+            few:Add("true")
+            few:Add("false")
+            few:Add("true")
+            output "BooleanColumn Copy(sort, unique) = " + Show(few:Copy(true, true))
+        detect e
+            output "BooleanColumn Copy(sort, unique) unexpected error: " + e:GetErrorMessage()
+        end
+        check
+            BooleanColumn few
+            few:Add("true")
+            few:Add("")
+            few:ReplaceUndefined("false")
+            output "BooleanColumn ReplaceUndefined(false) = " + Show(few)
+        detect e
+            output "BooleanColumn ReplaceUndefined unexpected error: " + e:GetErrorMessage()
+        end
+
+        BigIntegerColumn big
+        check
+            big:Add("123456789012345678901234567890")
+            big:Add("-42")
+            big:Add("")
+            big:Add("twelve")
+            output "BigIntegerColumn Add(30-digit, -42, empty, twelve) = " + Show(big)
+        detect e
+            output "BigIntegerColumn Add unexpected error: " + e:GetErrorMessage()
+        end
+        check
+            output "BigIntegerColumn GetSize() and GetUndefinedSize() = " + big:GetSize() + " " + big:GetUndefinedSize()
+        detect e
+            output "BigIntegerColumn sizes unexpected error: " + e:GetErrorMessage()
+        end
+        check
+            output "BigIntegerColumn GetAsInteger(1) = " + big:GetAsInteger(1)
+        detect e
+            output "BigIntegerColumn GetAsInteger(1) unexpected error: " + e:GetErrorMessage()
+        end
+        check
+            big:SetAsInteger(1, 7)
+            output "BigIntegerColumn SetAsInteger(1, 7) GetAsText(1) = " + big:GetAsText(1)
+        detect e
+            output "BigIntegerColumn SetAsInteger unexpected error: " + e:GetErrorMessage()
+        end
+        check
+            BigIntegerColumn some
+            some:Add("30")
+            some:Add("-5")
+            some:Add("30")
+            some:Add("100000000000000000000")
+            output "BigIntegerColumn Copy(sort, unique) = " + Show(some:Copy(true, true))
+        detect e
+            output "BigIntegerColumn Copy(sort, unique) unexpected error: " + e:GetErrorMessage()
+        end
+        check
+            BigIntegerColumn some
+            some:Add("5")
+            some:Add("")
+            some:ReplaceUndefined("9")
+            output "BigIntegerColumn ReplaceUndefined(9) = " + Show(some)
+        detect e
+            output "BigIntegerColumn ReplaceUndefined unexpected error: " + e:GetErrorMessage()
+        end
+
+        DateTimeColumn stamps
+        check
+            stamps:Add("2015-03-14 09:26:53")
+            stamps:Add("")
+            stamps:Add("not a time")
+            output "DateTimeColumn Add(timestamp, empty, not a time) = " + Show(stamps)
+        detect e
+            output "DateTimeColumn Add unexpected error: " + e:GetErrorMessage()
+        end
+        check
+            output "DateTimeColumn IsDateTimeColumn() and GetUndefinedSize() = " + stamps:IsDateTimeColumn() + " " + stamps:GetUndefinedSize()
+        detect e
+            output "DateTimeColumn kind unexpected error: " + e:GetErrorMessage()
+        end
+        check
+            DateTimeColumn days
+            AmericanDateParser american
+            days:SetParser(american)
+            days:Add("7/4/1976")
+            days:Add("12/25/1975")
+            days:Add("7/4/1976")
+            output "DateTimeColumn SetParser(AmericanDateParser) Add(7/4/1976, 12/25/1975, 7/4/1976) = " + Show(days)
+            output "DateTimeColumn Copy(sort, unique) = " + Show(days:Copy(true, true))
+            output "DateTimeColumn GetAsDateTime(1) year = " + days:GetAsDateTime(1):GetYear()
+        detect e
+            output "DateTimeColumn with AmericanDateParser unexpected error: " + e:GetErrorMessage()
+        end
+    end
+
+    action Show(DataFrameColumn column) returns text
+        text result = ""
+        integer i = 0
+        repeat while i < column:GetSize()
+            if i > 0
+                result = result + ","
+            end
+            if column:IsUndefined(i)
+                result = result + "NA"
+            else
+                result = result + column:GetAsText(i)
+            end
+            i = i + 1
+        end
+        return result
+    end
+end

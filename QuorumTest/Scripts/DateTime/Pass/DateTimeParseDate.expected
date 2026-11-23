@@ -1,0 +1,18 @@
+ParseDate(2023-12-25): GetYear() = 2023
+ParseDate(2023-12-25): GetMonth() = 12
+ParseDate(2023-12-25): GetDayOfMonth() = 25
+ParseDate(2023-12-25): GetDayOfWeek() = 1
+ParseDate(2023-12-25): GetHour() = 0
+ParseDate(2023-12-25): GetMinute() = 0
+ParseDate(2023-12-25): GetSecond() = 0
+ParseDate(2024-02-29): GetMonth() = 2, GetDayOfMonth() = 29, GetDayOfWeek() = 4
+ParseDate(2023-02-29) fails, as it should
+ParseDate(December 25, 2023) fails, as it should
+ParseAmericanDate(7/4/2021): GetYear() = 2021
+ParseAmericanDate(7/4/2021): GetMonth() = 7
+ParseAmericanDate(7/4/2021): GetDayOfMonth() = 4
+ParseAmericanDate(7/4/2021): GetDayOfWeek() = 7
+ParseAmericanDate(7/4/2021): GetHour() = 0
+ParseAmericanDate(11/09/1989): GetYear() = 1989, GetMonth() = 11, GetDayOfMonth() = 9
+ParseAmericanDate(1/2/21): GetYear() = 2021, GetMonth() = 1, GetDayOfMonth() = 2
+ParseAmericanDate(13/40/2021) fails, as it should

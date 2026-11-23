@@ -1,0 +1,8 @@
+Array[] SetSize(0): size 0, IsEmpty() = true
+Array SetSize(0) then Add(x) gives [x]
+Array SetSize(0) then Add(0, x) gives [x]
+Array SetSize(0) then AddToFront(x), AddToFront(w), AddToEnd(y) gives [w,x,y]
+Array[a,b] SetSize(0): size 0, IsEmpty() = true
+Array[a,b] SetSize(0) then 25 Adds: size 25, Get(0) = [n0], Get(24) = [n24]
+Array[a] SetSize(-1) fails, as it should
+Array[a] after SetSize(-1) is [a]

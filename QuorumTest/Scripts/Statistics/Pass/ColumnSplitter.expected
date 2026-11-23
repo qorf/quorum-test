@@ -1,0 +1,8 @@
+SplitSelectedColumns([first, last], space) = first=Ada,Alan | last=Lovelace,Turing
+DelimiterColumnSplitter Transform = first=Ada,Alan | last=Lovelace,Turing (delimiter read back [ ], headers 2)
+SplitSelectedColumns of two columns by - = low.0=1,5 | high.0=2,6 | low.1=3,7 | high.1=4,8
+SplitSelectedColumns with a cell that splits into one part fails, as it should
+SplitSelectedColumns with an undefined cell, default = first=Ada,NA,Alan | last=Lovelace,NA,Turing
+SplitSelectedColumns with an undefined cell, includeUndefined false = first=Ada,Alan | last=Lovelace,Turing
+DelimiterColumnSplitter with no headers fails, as it should
+SplitSelectedColumns with no selected column fails, as it should

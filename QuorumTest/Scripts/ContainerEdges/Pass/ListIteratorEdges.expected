@@ -1,0 +1,7 @@
+List[a,b] iterator before Next: HasNext() = true, GetCurrent() = undefined
+List[a,b] iterator Next() = [a], GetCurrent() = [a], HasNext() = true
+List[a,b] iterator Next() = [b], GetCurrent() = [b], HasNext() = false
+List[a,b] iterator at the end GetCurrent() twice = [b] [b]
+List[a,b] iterator Next() past the end fails, as it should
+List[a,b] iterator Rewind(): HasNext() = true, GetCurrent() = undefined, Next() = [a]
+List[undefined,b] iterating: 2 items undefined[b]

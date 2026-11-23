@@ -1,0 +1,14 @@
+GetAbsolutePath() of a new File equals GetWorkingDirectory() = true
+GetAbsolutePath(FileTestsWork/FileLocations/inner.txt) ends with it = true
+SetWorkingDirectory(scratch folder), SetPath(inner.txt): GetPath() = [inner.txt]
+SetWorkingDirectory(scratch folder): GetWorkingDirectory() is the folder = true
+SetWorkingDirectory(scratch folder), SetPath(inner.txt): Read() = [inner]
+SetAbsolutePath(.../inner.txt): GetPath() = [inner.txt]
+SetAbsolutePath(.../inner.txt): GetWorkingDirectory() ends with FileTestsWork/FileLocations = true
+SetAbsolutePath(.../inner.txt): Read() = [inner]
+SetAbsolutePath(noslashes) fails, as it should
+GetParentDirectory(inner.txt): GetFileName() = [FileLocations]
+GetParentDirectory(inner.txt): IsDirectory() = true
+GetParentDirectory(inner.txt): GetAbsolutePath() ends with FileTestsWork/FileLocations = true
+GetParentDirectory() of the root / is undefined = true
+SetWorkingDirectoryToStorage(): GetWorkingDirectory() is the program's working directory = true

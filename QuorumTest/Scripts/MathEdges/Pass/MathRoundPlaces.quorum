@@ -1,0 +1,53 @@
+use Libraries.Compute.Math
+
+/*
+Math:Round(value, decimalPlace) and Round(value, decimalPlace, roundUp). The
+inputs are chosen so that value times the power of ten is exact in binary
+(1.25 times 10 is exactly 12.5), so a midpoint really is a midpoint. With
+decimalPlace 0 the roundUp flag must still decide the midpoint, as the
+documentation says it does for every decimalPlace.
+*/
+class Main
+    Math math
+
+    action Main
+        Show(3.14159, 2)
+        Show(-3.14159, 2)
+        Show(1.23456789, 4)
+        Show(1.25, 1)
+        Show(-1.25, 1)
+        Show(2.5, 0)
+        Show(-2.5, 0)
+        Show(0.0, 3)
+        Show(-0.04, 1)
+        Show(5.0, 20)
+        ShowFlag(1.25, 1, true)
+        ShowFlag(1.25, 1, false)
+        ShowFlag(-1.25, 1, true)
+        ShowFlag(-1.25, 1, false)
+        ShowFlag(-1.375, 2, false)
+        ShowFlag(1.375, 2, false)
+        ShowFlag(2.5, 0, true)
+        ShowFlag(2.5, 0, false)
+        ShowFlag(-2.5, 0, false)
+        ShowFlag(-2.75, 1, false)
+        ShowFlag(-2.25, 1, false)
+        ShowFlag(-2.27, 1, false)
+    end
+
+    action Show(number value, integer places)
+        check
+            output "Round(" + value + ", " + places + ") = " + math:Round(value, places)
+        detect e
+            output "Round(" + value + ", " + places + ") unexpected error: " + e:GetErrorMessage()
+        end
+    end
+
+    action ShowFlag(number value, integer places, boolean roundUp)
+        check
+            output "Round(" + value + ", " + places + ", " + roundUp + ") = " + math:Round(value, places, roundUp)
+        detect e
+            output "Round(" + value + ", " + places + ", " + roundUp + ") unexpected error: " + e:GetErrorMessage()
+        end
+    end
+end

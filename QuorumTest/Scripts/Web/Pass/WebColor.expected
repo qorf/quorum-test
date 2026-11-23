@@ -1,0 +1,15 @@
+new WebColor Generate() = [rgb(0,0,0)]
+new WebColor GetOpacity() = 1.0
+SetColor(18, 90, 119) Generate() = [rgb(18,90,119)]
+SetColor(18, 90, 119) GetRed/GetGreen/GetBlue = 18,90,119
+SetOpacity(0.5) Generate() = [rgba(18,90,119,0.5)]
+SetOpacity(0.5) GetOpacity() = 0.5
+Copy() Generate() = [rgba(18,90,119,0.5)]
+Copy() then SetColor(1, 2, 3) on the copy: copy = [rgba(1,2,3,0.5)], original = [rgba(18,90,119,0.5)]
+SetColor(255, 255, 255) SetOpacity(0) Generate() = [rgba(255,255,255,0.0)]
+SetOpacity(0.25) then SetOpacity(1) Generate() = [rgb(0,0,0)]
+SetColor(256, 0, 0) fails, as it should
+SetColor(0, -1, 0) fails, as it should
+SetOpacity(1.5) fails, as it should
+SetOpacity(-0.1) fails, as it should
+after refused calls Generate() = [rgb(0,0,0)]

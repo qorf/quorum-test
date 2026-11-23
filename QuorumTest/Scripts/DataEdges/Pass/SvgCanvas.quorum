@@ -1,0 +1,78 @@
+use Libraries.Data.Formats.ScalableVectorGraphics.ScalableVectorGraphics
+use Libraries.Data.Formats.ScalableVectorGraphics.Circle
+
+/*
+A whole SVG document from ScalableVectorGraphics:ToText: size, the xmlns
+declaration on a top-level svg, children, Empty, a nested (not top-level)
+svg with a position, a view box and a title. Line
+feeds and tabs are shown as \n and \t; the expected layout is the library's
+own (blank lines between parts are allowed whitespace in XML). Every object
+sets its tab index to 0, the documented default, so the output doesn't
+depend on the default.
+*/
+class Main
+    action Main
+        check
+            ScalableVectorGraphics canvas
+            canvas:SetSize(100, 50)
+            canvas:SetTabIndex(0)
+            Circle circle
+            circle:SetPosition(12.5, 20.5)
+            circle:SetRadius(5.5)
+            circle:SetTabIndex(0)
+            canvas:Add(circle)
+            output "SetSize(100, 50) Add(circle) ToText() = [" + Show(canvas:ToText()) + "]"
+            output "GetWidth() = [" + canvas:GetWidth() + "], GetHeight() = [" + canvas:GetHeight() + "], IsTopLevel() = [" + canvas:IsTopLevel() + "]"
+        detect e
+            output "canvas with a circle unexpected error: " + e:GetErrorMessage()
+        end
+
+        check
+            ScalableVectorGraphics canvas
+            canvas:SetSize(10, 10)
+            canvas:SetTabIndex(0)
+            Circle circle
+            circle:SetTabIndex(0)
+            canvas:Add(circle)
+            canvas:Empty()
+            output "Add(circle) then Empty() ToText() = [" + Show(canvas:ToText()) + "]"
+        detect e
+            output "Empty unexpected error: " + e:GetErrorMessage()
+        end
+
+        check
+            ScalableVectorGraphics inner
+            inner:SetIsTopLevel(false)
+            inner:SetSize(20, 30)
+            inner:SetPosition(5, 6)
+            inner:SetTabIndex(0)
+            output "SetIsTopLevel(false) SetSize(20, 30) SetPosition(5, 6) ToText() = [" + Show(inner:ToText()) + "]"
+            output "IsTopLevel() = [" + inner:IsTopLevel() + "], GetPositionX() = [" + inner:GetPositionX() + "], GetPositionY() = [" + inner:GetPositionY() + "]"
+        detect e
+            output "nested svg unexpected error: " + e:GetErrorMessage()
+        end
+
+        check
+            ScalableVectorGraphics canvas
+            canvas:SetViewBox(0, 0, 10, 20)
+            canvas:SetTitle("Chart")
+            canvas:SetTabIndex(0)
+            text result = canvas:ToText()
+            output "SetViewBox(0, 0, 10, 20) ToText() contains viewBox=" + Quote() + "0 0 10 20" + Quote() + " = [" + result:Contains("viewBox=" + Quote() + "0 0 10 20" + Quote()) + "]"
+            output "SetTitle(Chart) ToText() contains <title>Chart</title> = [" + result:Contains("<title>Chart</title>") + "]"
+        detect e
+            output "view box and title unexpected error: " + e:GetErrorMessage()
+        end
+    end
+
+    action Quote returns text
+        text result = ""
+        return result:GetDoubleQuote()
+    end
+
+    action Show(text value) returns text
+        text result = value:Replace(value:GetLineFeed(), "\n")
+        result = result:Replace(value:GetTab(), "\t")
+        return result
+    end
+end

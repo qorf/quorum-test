@@ -1,0 +1,59 @@
+use Libraries.Containers.Array
+
+/*
+    Text:Split(delimiter) splits on every occurrence of the delimiter,
+    which is plain text, not a pattern: "." and "+" and "|" split only on
+    themselves. Following the library's own comments: empty pieces between
+    delimiters are kept, ONE empty piece after a final delimiter is not
+    added (so "a,b,,," gives a, b, "", ""), an empty text gives one empty
+    piece, and an empty delimiter gives the whole text. Each case runs on a
+    text primitive and on a Text object; pieces are shown in brackets.
+*/
+class Main
+    action Main
+        Show("a,b,c", ",")
+        Show("a,b,,,", ",")
+        Show("a,b,", ",")
+        Show(",a", ",")
+        Show(",,a", ",")
+        Show(",", ",")
+        Show("abc", ",")
+        Show("", ",")
+        Show("a.b.c", ".")
+        Show("a+b", "+")
+        Show("a|b", "|")
+        Show("a*b", "*")
+        Show("a--b--c", "--")
+        Show("a b  c", " ")
+        Show("aaa", "aa")
+        Show("abc", "")
+    end
+
+    action Show(text value, text delimiter)
+        text call = "Split([" + value + "] on [" + delimiter + "])"
+        check
+            Array<text> pieces = value:Split(delimiter)
+            output call + " = " + Pieces(pieces)
+        detect e
+            output call + " unexpected error: " + e:GetErrorMessage()
+        end
+        Text object
+        object:SetValue(value)
+        check
+            Array<text> pieces = object:Split(delimiter)
+            output "Text " + call + " = " + Pieces(pieces)
+        detect e
+            output "Text " + call + " unexpected error: " + e:GetErrorMessage()
+        end
+    end
+
+    action Pieces(Array<text> pieces) returns text
+        text result = "" + pieces:GetSize() + " pieces "
+        integer i = 0
+        repeat while i < pieces:GetSize()
+            result = result + "[" + pieces:Get(i) + "]"
+            i = i + 1
+        end
+        return result
+    end
+end

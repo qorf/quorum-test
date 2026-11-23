@@ -1,0 +1,23 @@
+GetNotANumberValue = NaN + NaNi, IsNotANumber = true
+GetPositiveInfinityValue = Infinity + Infinityi, IsInfinite = true
+GetImaginaryOneValue = 0.0 + 1.0i
+GetOneValue = 1.0 + 0.0i
+GetZeroValue = 0.0 + 0.0i
+3 + 4i IsNotANumber = false, IsInfinite = false
+NaN + 1i IsNotANumber = true, IsInfinite = false
+1 + Infinity i IsNotANumber = false, IsInfinite = true
+3 + 4i Divide 0 + 0i = NaN + NaNi
+3 + 4i Divide 0 = NaN + NaNi
+3 + 4i Divide Infinity + 0i = 0.0 + 0.0i
+3 + 4i Divide Infinity = 0.0 + 0.0i
+3 + 4i Multiply Infinity + 0i = Infinity + Infinityi
+0 + 0i Reciprocal = Infinity + Infinityi
+Infinity + 0i Reciprocal = 0.0 + 0.0i
+3 + 4i Add NaN + 1i IsNotANumber = true
+NaN + 1i Conjugate IsNotANumber = true
+NaN + 1i SquareRoot IsNotANumber = true
+NaN + 1i Equals GetNotANumberValue = true
+3 + 4i Equals GetNotANumberValue = false
+NaN + 1i AbsoluteValue = NaN
+Infinity + 0i AbsoluteValue = Infinity
+0 + 0i NaturalLogarithm = -Infinity + 0.0i

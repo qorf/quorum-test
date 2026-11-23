@@ -1,0 +1,42 @@
+ParseInteger([12]) = 12
+Text ParseInteger([12]) = 12
+ParseInteger([-7]) = -7
+Text ParseInteger([-7]) = -7
+ParseInteger([0]) = 0
+Text ParseInteger([0]) = 0
+ParseInteger([-0]) = 0
+Text ParseInteger([-0]) = 0
+ParseInteger([007]) = 7
+Text ParseInteger([007]) = 7
+ParseInteger([+5]) = 5
+Text ParseInteger([+5]) = 5
+ParseInteger([2147483647]) = 2147483647
+Text ParseInteger([2147483647]) = 2147483647
+ParseInteger([-2147483648]) = -2147483648
+Text ParseInteger([-2147483648]) = -2147483648
+ParseInteger([2147483648]) fails, as it should
+Text ParseInteger([2147483648]) fails, as it should
+ParseInteger([-2147483649]) fails, as it should
+Text ParseInteger([-2147483649]) fails, as it should
+ParseInteger([12abc]) fails, as it should
+Text ParseInteger([12abc]) fails, as it should
+ParseInteger([abc]) fails, as it should
+Text ParseInteger([abc]) fails, as it should
+ParseInteger([]) fails, as it should
+Text ParseInteger([]) fails, as it should
+ParseInteger([ ]) fails, as it should
+Text ParseInteger([ ]) fails, as it should
+ParseInteger([ 12 ]) fails, as it should
+Text ParseInteger([ 12 ]) fails, as it should
+ParseInteger([12 ]) fails, as it should
+Text ParseInteger([12 ]) fails, as it should
+ParseInteger([1_000]) fails, as it should
+Text ParseInteger([1_000]) fails, as it should
+ParseInteger([12.5]) fails, as it should
+Text ParseInteger([12.5]) fails, as it should
+ParseInteger([1,000]) fails, as it should
+Text ParseInteger([1,000]) fails, as it should
+ParseInteger([-]) fails, as it should
+Text ParseInteger([-]) fails, as it should
+ParseInteger([0x10]) fails, as it should
+Text ParseInteger([0x10]) fails, as it should

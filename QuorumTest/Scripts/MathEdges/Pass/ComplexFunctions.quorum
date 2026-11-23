@@ -1,0 +1,76 @@
+use Libraries.Compute.ComplexNumber
+use Libraries.Compute.Math
+
+/*
+ComplexNumber functions at values with known answers, rounded to 4 places:
+the square roots of -4, 3 + 4i and -3 - 4i are 2i, 2 + i and 1 - 2i; the
+natural logarithm of -1 is pi i; e to the power pi i is -1; i squared is -1;
+i to the power i is e^(-pi/2) = 0.2079; sine of i is sinh(1) i; the
+inverse tangent of 1 is pi/4 (0.7854).
+The values for 1 + i come from the formulas in each action's
+documentation, for example tan(a + bi) = sin(2a)/(cos(2a)+cosh(2b)) +
+[sinh(2b)/(cos(2a)+cosh(2b))]i.
+*/
+class Main
+    Math math
+
+    action Main
+        ComplexNumber one
+        one:SetValue(1, 1)
+        ComplexNumber i
+        i:SetValue(0, 1)
+        Show("SquareRoot(-4)", Make(-4, 0):SquareRoot())
+        Show("SquareRoot(3 + 4i)", Make(3, 4):SquareRoot())
+        Show("SquareRoot(-3 - 4i)", Make(-3, -4):SquareRoot())
+        Show("SquareRoot(0)", Make(0, 0):SquareRoot())
+        Show("NaturalLogarithm(-1)", Make(-1, 0):NaturalLogarithm())
+        Show("NaturalLogarithm(i)", i:NaturalLogarithm())
+        Show("NaturalLogarithm(-i)", Make(0, -1):NaturalLogarithm())
+        Show("NaturalLogarithm(1 + i)", one:NaturalLogarithm())
+        Show("NaturalLogarithm(-1 - i)", Make(-1, -1):NaturalLogarithm())
+        Show("NaturalExponent(0)", Make(0, 0):NaturalExponent())
+        Show("NaturalExponent(pi i)", Make(0, math:pi):NaturalExponent())
+        Show("NaturalExponent(1 + i)", one:NaturalExponent())
+        Show("RaiseToPower(i, 2)", i:RaiseToPower(2))
+        Show("RaiseToPower(1 + i, 2)", one:RaiseToPower(2))
+        Show("RaiseToPower(i, i)", i:RaiseToPower(i))
+        Show("RaiseToPower(2, complex 3)", Make(2, 0):RaiseToPower(Make(3, 0)))
+        Show("Sine(i)", i:Sine())
+        Show("Sine(pi / 2)", Make(math:piOver2, 0):Sine())
+        Show("Sine(1 + i)", one:Sine())
+        Show("Cosine(i)", i:Cosine())
+        Show("Cosine(1 + i)", one:Cosine())
+        Show("Tangent(pi / 4)", Make(math:piOver4, 0):Tangent())
+        Show("Tangent(i)", i:Tangent())
+        Show("Tangent(1 + i)", one:Tangent())
+        Show("Tangent(30i)", Make(0, 30):Tangent())
+        Show("Tangent(-30i)", Make(0, -30):Tangent())
+        Show("HyperbolicSine(i)", i:HyperbolicSine())
+        Show("HyperbolicSine(1 + i)", one:HyperbolicSine())
+        Show("HyperbolicCosine(i)", i:HyperbolicCosine())
+        Show("HyperbolicCosine(1 + i)", one:HyperbolicCosine())
+        Show("HyperbolicTangent(1 + i)", one:HyperbolicTangent())
+        Show("HyperbolicTangent(30)", Make(30, 0):HyperbolicTangent())
+        Show("HyperbolicTangent(-30)", Make(-30, 0):HyperbolicTangent())
+        Show("InverseSine(0.5)", Make(0.5, 0):InverseSine())
+        Show("InverseSine(i)", i:InverseSine())
+        Show("InverseCosine(0.5)", Make(0.5, 0):InverseCosine())
+        Show("InverseCosine(i)", i:InverseCosine())
+        Show("InverseTangent(1)", Make(1, 0):InverseTangent())
+        Show("InverseTangent(1 + i)", one:InverseTangent())
+    end
+
+    action Make(number real, number imaginary) returns ComplexNumber
+        ComplexNumber result
+        result:SetValue(real, imaginary)
+        return result
+    end
+
+    action Show(text call, ComplexNumber value)
+        check
+            output call + " = " + math:Round(value:GetReal(), 4) + " + " + math:Round(value:GetImaginary(), 4) + "i"
+        detect e
+            output call + " unexpected error: " + e:GetErrorMessage()
+        end
+    end
+end

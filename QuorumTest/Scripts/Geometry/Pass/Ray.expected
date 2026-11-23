@@ -1,0 +1,18 @@
+Set(origin (1, 2, 3), direction (0, 0, 1)): GetOrigin = (1.0, 2.0, 3.0), GetDirection = (0.0, 0.0, 1.0)
+Set returns the same ray = true
+GetEndPoint(5) = (1.0, 2.0, 8.0)
+GetEndPoint(-2.5) = (1.0, 2.0, 0.5)
+GetEndPoint(0) = (1.0, 2.0, 3.0)
+the ray after GetEndPoint: GetOrigin = (1.0, 2.0, 3.0), GetDirection = (0.0, 0.0, 1.0)
+Set(1, 1, 1, 0.6, 0.8, 0): GetOrigin = (1.0, 1.0, 1.0), GetDirection = (0.6, 0.8, 0.0)
+GetEndPoint(10) = (7.0, 9.0, 1.0)
+after SetOrigin (-1, 0, 4) and SetDirection (0, -1, 0): GetOrigin = (-1.0, 0.0, 4.0), GetDirection = (0.0, -1.0, 0.0)
+Copy Equals original = true, Set(ray) Equals original = true
+Copy is a different object = true
+original Equals itself = true
+after changing the original: Copy = (1.0, 2.0, 3.0), Set(ray) = (1.0, 2.0, 3.0)
+Copy Equals the changed original = false
+rays with different directions Equal = false
+Multiply by a translation of (10, 0, -1): GetOrigin = (11.0, 2.0, 2.0), GetDirection = (0.0, 0.0, 1.0)
+Multiply returns the same ray = true
+Multiply by a scaling of 2: GetOrigin = (2.0, 4.0, 6.0), GetDirection = (0.0, 0.0, 2.0)

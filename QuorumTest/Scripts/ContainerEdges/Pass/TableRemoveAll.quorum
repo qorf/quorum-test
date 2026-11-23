@@ -1,0 +1,103 @@
+use Libraries.Containers.Table
+use Libraries.Containers.Array
+
+/*
+    Table RemoveAll removes every occurrence of an item from every row (the
+    rows themselves stay). The item may be in any row, including the last,
+    and in several rows next to each other.
+*/
+class Main
+    action Show(text value) returns text
+        if value = undefined
+            return "undefined"
+        end
+        return "[" + value + "]"
+    end
+
+    action Describe(Array<text> array) returns text
+        text result = "["
+        integer i = 0
+        repeat while i < array:GetSize()
+            if i > 0
+                result = result + ","
+            end
+            text value = array:Get(i)
+            if value = undefined
+                result = result + "undefined"
+            else
+                result = result + value
+            end
+            i = i + 1
+        end
+        return result + "]"
+    end
+
+    action DescribeTable(Table<text> table) returns text
+        text result = "["
+        integer row = 0
+        repeat while row < table:GetNumberOfRows()
+            if row > 0
+                result = result + ","
+            end
+            result = result + Describe(table:GetRow(row))
+            row = row + 1
+        end
+        return result + "]"
+    end
+
+    action Row(text first, text second) returns Array<text>
+        Array<text> row
+        if first not= ""
+            row:Add(first)
+        end
+        if second not= ""
+            row:Add(second)
+        end
+        return row
+    end
+
+    action Main
+        Table<text> table
+        table:AddRow(Row("1", ""))
+        table:AddRow(Row("2", ""))
+        table:AddRow(Row("1", ""))
+        check
+            boolean removed = table:RemoveAll("1")
+            output "Table[[1],[2],[1]] RemoveAll(1) = " + removed + ", gives " + DescribeTable(table) + ", Has(1) = " + table:Has("1")
+        detect e
+            output "Table[[1],[2],[1]] RemoveAll(1) unexpected error: " + e:GetErrorMessage()
+        end
+
+        Table<text> second
+        second:AddRow(Row("1", "1"))
+        second:AddRow(Row("1", "3"))
+        second:AddRow(Row("1", ""))
+        second:AddRow(Row("4", "1"))
+        check
+            boolean removed = second:RemoveAll("1")
+            output "Table[[1,1],[1,3],[1],[4,1]] RemoveAll(1) = " + removed + ", gives " + DescribeTable(second) + ", Has(1) = " + second:Has("1") + ", rows " + second:GetNumberOfRows()
+        detect e
+            output "Table[[1,1],[1,3],[1],[4,1]] RemoveAll(1) unexpected error: " + e:GetErrorMessage()
+        end
+
+        Table<text> third
+        third:AddRow(Row("5", ""))
+        third:AddRow(Row("6", ""))
+        check
+            boolean removed = third:RemoveAll("1")
+            output "Table[[5],[6]] RemoveAll(1) = " + removed + ", gives " + DescribeTable(third)
+        detect e
+            output "Table[[5],[6]] RemoveAll(1) unexpected error: " + e:GetErrorMessage()
+        end
+
+        Table<text> fourth
+        fourth:AddRow(Row("1", "2"))
+        fourth:AddRow(Row("3", "1"))
+        check
+            boolean removed = fourth:Remove("1")
+            output "Table[[1,2],[3,1]] Remove(1) = " + removed + ", gives " + DescribeTable(fourth)
+        detect e
+            output "Table[[1,2],[3,1]] Remove(1) unexpected error: " + e:GetErrorMessage()
+        end
+    end
+end

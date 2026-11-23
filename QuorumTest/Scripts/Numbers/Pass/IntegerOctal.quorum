@@ -1,0 +1,35 @@
+/*
+    Integer:GetOctal gives the base-8 digits of the 32-bit two's complement
+    form with no prefix (Java's toOctalString): 8 gives 10 and -1 gives
+    37777777777.
+    Each case runs on an integer primitive and on an Integer object.
+*/
+class Main
+    action Main
+        Show(0)
+        Show(1)
+        Show(7)
+        Show(8)
+        Show(64)
+        Show(-1)
+        Show(-8)
+        Show(2147483647)
+        Show(-2147483647 - 1)
+    end
+
+    action Show(integer value)
+        text call = "GetOctal(" + value + ")"
+        check
+            output call + " = [" + value:GetOctal() + "]"
+        detect e
+            output call + " unexpected error: " + e:GetErrorMessage()
+        end
+        Integer object
+        object:SetValue(value)
+        check
+            output "Integer " + call + " = [" + object:GetOctal() + "]"
+        detect e
+            output "Integer " + call + " unexpected error: " + e:GetErrorMessage()
+        end
+    end
+end

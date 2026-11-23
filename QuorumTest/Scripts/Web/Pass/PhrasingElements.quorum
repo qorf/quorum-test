@@ -1,0 +1,621 @@
+use Libraries.Web.Page.Abbreviation
+use Libraries.Web.Page.Article
+use Libraries.Web.Page.Aside
+use Libraries.Web.Page.BiDirectionalIsolation
+use Libraries.Web.Page.BiDirectionalOverride
+use Libraries.Web.Page.BlockQuote
+use Libraries.Web.Page.Body
+use Libraries.Web.Page.Bold
+use Libraries.Web.Page.Button
+use Libraries.Web.Page.Cite
+use Libraries.Web.Page.CodeBlock
+use Libraries.Web.Page.Definition
+use Libraries.Web.Page.DefinitionList
+use Libraries.Web.Page.Deleted
+use Libraries.Web.Page.Details
+use Libraries.Web.Page.Division
+use Libraries.Web.Page.Emphasize
+use Libraries.Web.Page.FieldSet
+use Libraries.Web.Page.FigureCaption
+use Libraries.Web.Page.Footer
+use Libraries.Web.Page.Form
+use Libraries.Web.Page.Header
+use Libraries.Web.Page.Heading
+use Libraries.Web.Page.Highlight
+use Libraries.Web.Page.Inserted
+use Libraries.Web.Page.Italic
+use Libraries.Web.Page.KeyboardInput
+use Libraries.Web.Page.Label
+use Libraries.Web.Page.Legend
+use Libraries.Web.Page.Link
+use Libraries.Web.Page.ListItem
+use Libraries.Web.Page.ListOptions
+use Libraries.Web.Page.MainContent
+use Libraries.Web.Page.NavigationDivision
+use Libraries.Web.Page.NoRuby
+use Libraries.Web.Page.OrderedList
+use Libraries.Web.Page.OwnerAddress
+use Libraries.Web.Page.Paragraph
+use Libraries.Web.Page.PerformanceGauge
+use Libraries.Web.Page.PreformattedText
+use Libraries.Web.Page.ProgressBar
+use Libraries.Web.Page.Quote
+use Libraries.Web.Page.RubyContext
+use Libraries.Web.Page.SampleOutput
+use Libraries.Web.Page.Section
+use Libraries.Web.Page.SmallText
+use Libraries.Web.Page.Span
+use Libraries.Web.Page.StrikeThrough
+use Libraries.Web.Page.StrongText
+use Libraries.Web.Page.SubscriptText
+use Libraries.Web.Page.Summary
+use Libraries.Web.Page.SuperscriptText
+use Libraries.Web.Page.TableBody
+use Libraries.Web.Page.TableCaption
+use Libraries.Web.Page.TableData
+use Libraries.Web.Page.TableFooter
+use Libraries.Web.Page.TableHeader
+use Libraries.Web.Page.TableHeaderCell
+use Libraries.Web.Page.TableRow
+use Libraries.Web.Page.TextArea
+use Libraries.Web.Page.Time
+use Libraries.Web.Page.UnderlineText
+use Libraries.Web.Page.UnorderedList
+use Libraries.Web.Page.Variable
+
+/*
+Tests that each flow and phrasing element class writes its own HTML tag
+with its attributes, its content and an end tag (HTML Living Standard),
+and that a heading's scale is 1 to 6 (Heading:SetScale's documentation).
+These classes reach WebPage, and through it the statistics and interface
+libraries.
+*/
+class Main
+    action Main
+        check
+            Abbreviation abbreviationElement
+            abbreviationElement:SetIdentifier("x")
+            abbreviationElement:AddText("words")
+            output "Abbreviation with SetIdentifier(x) and AddText(words) Generate() = [" + Flat(abbreviationElement:Generate()) + "]"
+        detect e
+            output "Abbreviation with SetIdentifier(x) and AddText(words) Generate() unexpected error: " + e:GetErrorMessage()
+        end
+        check
+            Article articleElement
+            articleElement:SetIdentifier("x")
+            articleElement:AddText("words")
+            output "Article with SetIdentifier(x) and AddText(words) Generate() = [" + Flat(articleElement:Generate()) + "]"
+        detect e
+            output "Article with SetIdentifier(x) and AddText(words) Generate() unexpected error: " + e:GetErrorMessage()
+        end
+        check
+            Aside asideElement
+            asideElement:SetIdentifier("x")
+            asideElement:AddText("words")
+            output "Aside with SetIdentifier(x) and AddText(words) Generate() = [" + Flat(asideElement:Generate()) + "]"
+        detect e
+            output "Aside with SetIdentifier(x) and AddText(words) Generate() unexpected error: " + e:GetErrorMessage()
+        end
+        check
+            BiDirectionalIsolation biDirectionalIsolationElement
+            biDirectionalIsolationElement:SetIdentifier("x")
+            biDirectionalIsolationElement:AddText("words")
+            output "BiDirectionalIsolation with SetIdentifier(x) and AddText(words) Generate() = [" + Flat(biDirectionalIsolationElement:Generate()) + "]"
+        detect e
+            output "BiDirectionalIsolation with SetIdentifier(x) and AddText(words) Generate() unexpected error: " + e:GetErrorMessage()
+        end
+        check
+            BiDirectionalOverride biDirectionalOverrideElement
+            biDirectionalOverrideElement:SetIdentifier("x")
+            biDirectionalOverrideElement:AddText("words")
+            output "BiDirectionalOverride with SetIdentifier(x) and AddText(words) Generate() = [" + Flat(biDirectionalOverrideElement:Generate()) + "]"
+        detect e
+            output "BiDirectionalOverride with SetIdentifier(x) and AddText(words) Generate() unexpected error: " + e:GetErrorMessage()
+        end
+        check
+            BlockQuote blockQuoteElement
+            blockQuoteElement:SetIdentifier("x")
+            blockQuoteElement:AddText("words")
+            output "BlockQuote with SetIdentifier(x) and AddText(words) Generate() = [" + Flat(blockQuoteElement:Generate()) + "]"
+        detect e
+            output "BlockQuote with SetIdentifier(x) and AddText(words) Generate() unexpected error: " + e:GetErrorMessage()
+        end
+        check
+            Body bodyElement
+            bodyElement:SetIdentifier("x")
+            bodyElement:AddText("words")
+            output "Body with SetIdentifier(x) and AddText(words) Generate() = [" + Flat(bodyElement:Generate()) + "]"
+        detect e
+            output "Body with SetIdentifier(x) and AddText(words) Generate() unexpected error: " + e:GetErrorMessage()
+        end
+        check
+            Bold boldElement
+            boldElement:SetIdentifier("x")
+            boldElement:AddText("words")
+            output "Bold with SetIdentifier(x) and AddText(words) Generate() = [" + Flat(boldElement:Generate()) + "]"
+        detect e
+            output "Bold with SetIdentifier(x) and AddText(words) Generate() unexpected error: " + e:GetErrorMessage()
+        end
+        check
+            Button buttonElement
+            buttonElement:SetIdentifier("x")
+            buttonElement:AddText("words")
+            output "Button with SetIdentifier(x) and AddText(words) Generate() = [" + Flat(buttonElement:Generate()) + "]"
+        detect e
+            output "Button with SetIdentifier(x) and AddText(words) Generate() unexpected error: " + e:GetErrorMessage()
+        end
+        check
+            Cite citeElement
+            citeElement:SetIdentifier("x")
+            citeElement:AddText("words")
+            output "Cite with SetIdentifier(x) and AddText(words) Generate() = [" + Flat(citeElement:Generate()) + "]"
+        detect e
+            output "Cite with SetIdentifier(x) and AddText(words) Generate() unexpected error: " + e:GetErrorMessage()
+        end
+        check
+            CodeBlock codeBlockElement
+            codeBlockElement:SetIdentifier("x")
+            codeBlockElement:AddText("words")
+            output "CodeBlock with SetIdentifier(x) and AddText(words) Generate() = [" + Flat(codeBlockElement:Generate()) + "]"
+        detect e
+            output "CodeBlock with SetIdentifier(x) and AddText(words) Generate() unexpected error: " + e:GetErrorMessage()
+        end
+        check
+            Definition definitionElement
+            definitionElement:SetIdentifier("x")
+            definitionElement:AddText("words")
+            output "Definition with SetIdentifier(x) and AddText(words) Generate() = [" + Flat(definitionElement:Generate()) + "]"
+        detect e
+            output "Definition with SetIdentifier(x) and AddText(words) Generate() unexpected error: " + e:GetErrorMessage()
+        end
+        check
+            DefinitionList definitionListElement
+            definitionListElement:SetIdentifier("x")
+            definitionListElement:AddText("words")
+            output "DefinitionList with SetIdentifier(x) and AddText(words) Generate() = [" + Flat(definitionListElement:Generate()) + "]"
+        detect e
+            output "DefinitionList with SetIdentifier(x) and AddText(words) Generate() unexpected error: " + e:GetErrorMessage()
+        end
+        check
+            Deleted deletedElement
+            deletedElement:SetIdentifier("x")
+            deletedElement:AddText("words")
+            output "Deleted with SetIdentifier(x) and AddText(words) Generate() = [" + Flat(deletedElement:Generate()) + "]"
+        detect e
+            output "Deleted with SetIdentifier(x) and AddText(words) Generate() unexpected error: " + e:GetErrorMessage()
+        end
+        check
+            Details detailsElement
+            detailsElement:SetIdentifier("x")
+            detailsElement:AddText("words")
+            output "Details with SetIdentifier(x) and AddText(words) Generate() = [" + Flat(detailsElement:Generate()) + "]"
+        detect e
+            output "Details with SetIdentifier(x) and AddText(words) Generate() unexpected error: " + e:GetErrorMessage()
+        end
+        check
+            Division divisionElement
+            divisionElement:SetIdentifier("x")
+            divisionElement:AddText("words")
+            output "Division with SetIdentifier(x) and AddText(words) Generate() = [" + Flat(divisionElement:Generate()) + "]"
+        detect e
+            output "Division with SetIdentifier(x) and AddText(words) Generate() unexpected error: " + e:GetErrorMessage()
+        end
+        check
+            Emphasize emphasizeElement
+            emphasizeElement:SetIdentifier("x")
+            emphasizeElement:AddText("words")
+            output "Emphasize with SetIdentifier(x) and AddText(words) Generate() = [" + Flat(emphasizeElement:Generate()) + "]"
+        detect e
+            output "Emphasize with SetIdentifier(x) and AddText(words) Generate() unexpected error: " + e:GetErrorMessage()
+        end
+        check
+            FieldSet fieldSetElement
+            fieldSetElement:SetIdentifier("x")
+            fieldSetElement:AddText("words")
+            output "FieldSet with SetIdentifier(x) and AddText(words) Generate() = [" + Flat(fieldSetElement:Generate()) + "]"
+        detect e
+            output "FieldSet with SetIdentifier(x) and AddText(words) Generate() unexpected error: " + e:GetErrorMessage()
+        end
+        check
+            FigureCaption figureCaptionElement
+            figureCaptionElement:SetIdentifier("x")
+            figureCaptionElement:AddText("words")
+            output "FigureCaption with SetIdentifier(x) and AddText(words) Generate() = [" + Flat(figureCaptionElement:Generate()) + "]"
+        detect e
+            output "FigureCaption with SetIdentifier(x) and AddText(words) Generate() unexpected error: " + e:GetErrorMessage()
+        end
+        check
+            Footer footerElement
+            footerElement:SetIdentifier("x")
+            footerElement:AddText("words")
+            output "Footer with SetIdentifier(x) and AddText(words) Generate() = [" + Flat(footerElement:Generate()) + "]"
+        detect e
+            output "Footer with SetIdentifier(x) and AddText(words) Generate() unexpected error: " + e:GetErrorMessage()
+        end
+        check
+            Form formElement
+            formElement:SetIdentifier("x")
+            formElement:AddText("words")
+            output "Form with SetIdentifier(x) and AddText(words) Generate() = [" + Flat(formElement:Generate()) + "]"
+        detect e
+            output "Form with SetIdentifier(x) and AddText(words) Generate() unexpected error: " + e:GetErrorMessage()
+        end
+        check
+            Header headerElement
+            headerElement:SetIdentifier("x")
+            headerElement:AddText("words")
+            output "Header with SetIdentifier(x) and AddText(words) Generate() = [" + Flat(headerElement:Generate()) + "]"
+        detect e
+            output "Header with SetIdentifier(x) and AddText(words) Generate() unexpected error: " + e:GetErrorMessage()
+        end
+        check
+            Highlight highlightElement
+            highlightElement:SetIdentifier("x")
+            highlightElement:AddText("words")
+            output "Highlight with SetIdentifier(x) and AddText(words) Generate() = [" + Flat(highlightElement:Generate()) + "]"
+        detect e
+            output "Highlight with SetIdentifier(x) and AddText(words) Generate() unexpected error: " + e:GetErrorMessage()
+        end
+        check
+            Inserted insertedElement
+            insertedElement:SetIdentifier("x")
+            insertedElement:AddText("words")
+            output "Inserted with SetIdentifier(x) and AddText(words) Generate() = [" + Flat(insertedElement:Generate()) + "]"
+        detect e
+            output "Inserted with SetIdentifier(x) and AddText(words) Generate() unexpected error: " + e:GetErrorMessage()
+        end
+        check
+            Italic italicElement
+            italicElement:SetIdentifier("x")
+            italicElement:AddText("words")
+            output "Italic with SetIdentifier(x) and AddText(words) Generate() = [" + Flat(italicElement:Generate()) + "]"
+        detect e
+            output "Italic with SetIdentifier(x) and AddText(words) Generate() unexpected error: " + e:GetErrorMessage()
+        end
+        check
+            KeyboardInput keyboardInputElement
+            keyboardInputElement:SetIdentifier("x")
+            keyboardInputElement:AddText("words")
+            output "KeyboardInput with SetIdentifier(x) and AddText(words) Generate() = [" + Flat(keyboardInputElement:Generate()) + "]"
+        detect e
+            output "KeyboardInput with SetIdentifier(x) and AddText(words) Generate() unexpected error: " + e:GetErrorMessage()
+        end
+        check
+            Label labelElement
+            labelElement:SetIdentifier("x")
+            labelElement:AddText("words")
+            output "Label with SetIdentifier(x) and AddText(words) Generate() = [" + Flat(labelElement:Generate()) + "]"
+        detect e
+            output "Label with SetIdentifier(x) and AddText(words) Generate() unexpected error: " + e:GetErrorMessage()
+        end
+        check
+            Legend legendElement
+            legendElement:SetIdentifier("x")
+            legendElement:AddText("words")
+            output "Legend with SetIdentifier(x) and AddText(words) Generate() = [" + Flat(legendElement:Generate()) + "]"
+        detect e
+            output "Legend with SetIdentifier(x) and AddText(words) Generate() unexpected error: " + e:GetErrorMessage()
+        end
+        check
+            Link linkElement
+            linkElement:SetIdentifier("x")
+            linkElement:AddText("words")
+            output "Link with SetIdentifier(x) and AddText(words) Generate() = [" + Flat(linkElement:Generate()) + "]"
+        detect e
+            output "Link with SetIdentifier(x) and AddText(words) Generate() unexpected error: " + e:GetErrorMessage()
+        end
+        check
+            ListItem listItemElement
+            listItemElement:SetIdentifier("x")
+            listItemElement:AddText("words")
+            output "ListItem with SetIdentifier(x) and AddText(words) Generate() = [" + Flat(listItemElement:Generate()) + "]"
+        detect e
+            output "ListItem with SetIdentifier(x) and AddText(words) Generate() unexpected error: " + e:GetErrorMessage()
+        end
+        check
+            ListOptions listOptionsElement
+            listOptionsElement:SetIdentifier("x")
+            listOptionsElement:AddText("words")
+            output "ListOptions with SetIdentifier(x) and AddText(words) Generate() = [" + Flat(listOptionsElement:Generate()) + "]"
+        detect e
+            output "ListOptions with SetIdentifier(x) and AddText(words) Generate() unexpected error: " + e:GetErrorMessage()
+        end
+        check
+            MainContent mainContentElement
+            mainContentElement:SetIdentifier("x")
+            mainContentElement:AddText("words")
+            output "MainContent with SetIdentifier(x) and AddText(words) Generate() = [" + Flat(mainContentElement:Generate()) + "]"
+        detect e
+            output "MainContent with SetIdentifier(x) and AddText(words) Generate() unexpected error: " + e:GetErrorMessage()
+        end
+        check
+            NavigationDivision navigationDivisionElement
+            navigationDivisionElement:SetIdentifier("x")
+            navigationDivisionElement:AddText("words")
+            output "NavigationDivision with SetIdentifier(x) and AddText(words) Generate() = [" + Flat(navigationDivisionElement:Generate()) + "]"
+        detect e
+            output "NavigationDivision with SetIdentifier(x) and AddText(words) Generate() unexpected error: " + e:GetErrorMessage()
+        end
+        check
+            NoRuby noRubyElement
+            noRubyElement:SetIdentifier("x")
+            noRubyElement:AddText("words")
+            output "NoRuby with SetIdentifier(x) and AddText(words) Generate() = [" + Flat(noRubyElement:Generate()) + "]"
+        detect e
+            output "NoRuby with SetIdentifier(x) and AddText(words) Generate() unexpected error: " + e:GetErrorMessage()
+        end
+        check
+            OrderedList orderedListElement
+            orderedListElement:SetIdentifier("x")
+            orderedListElement:AddText("words")
+            output "OrderedList with SetIdentifier(x) and AddText(words) Generate() = [" + Flat(orderedListElement:Generate()) + "]"
+        detect e
+            output "OrderedList with SetIdentifier(x) and AddText(words) Generate() unexpected error: " + e:GetErrorMessage()
+        end
+        check
+            OwnerAddress ownerAddressElement
+            ownerAddressElement:SetIdentifier("x")
+            ownerAddressElement:AddText("words")
+            output "OwnerAddress with SetIdentifier(x) and AddText(words) Generate() = [" + Flat(ownerAddressElement:Generate()) + "]"
+        detect e
+            output "OwnerAddress with SetIdentifier(x) and AddText(words) Generate() unexpected error: " + e:GetErrorMessage()
+        end
+        check
+            Paragraph paragraphElement
+            paragraphElement:SetIdentifier("x")
+            paragraphElement:AddText("words")
+            output "Paragraph with SetIdentifier(x) and AddText(words) Generate() = [" + Flat(paragraphElement:Generate()) + "]"
+        detect e
+            output "Paragraph with SetIdentifier(x) and AddText(words) Generate() unexpected error: " + e:GetErrorMessage()
+        end
+        check
+            PerformanceGauge performanceGaugeElement
+            performanceGaugeElement:SetIdentifier("x")
+            performanceGaugeElement:AddText("words")
+            output "PerformanceGauge with SetIdentifier(x) and AddText(words) Generate() = [" + Flat(performanceGaugeElement:Generate()) + "]"
+        detect e
+            output "PerformanceGauge with SetIdentifier(x) and AddText(words) Generate() unexpected error: " + e:GetErrorMessage()
+        end
+        check
+            PreformattedText preformattedTextElement
+            preformattedTextElement:SetIdentifier("x")
+            preformattedTextElement:AddText("words")
+            output "PreformattedText with SetIdentifier(x) and AddText(words) Generate() = [" + Flat(preformattedTextElement:Generate()) + "]"
+        detect e
+            output "PreformattedText with SetIdentifier(x) and AddText(words) Generate() unexpected error: " + e:GetErrorMessage()
+        end
+        check
+            ProgressBar progressBarElement
+            progressBarElement:SetIdentifier("x")
+            progressBarElement:AddText("words")
+            output "ProgressBar with SetIdentifier(x) and AddText(words) Generate() = [" + Flat(progressBarElement:Generate()) + "]"
+        detect e
+            output "ProgressBar with SetIdentifier(x) and AddText(words) Generate() unexpected error: " + e:GetErrorMessage()
+        end
+        check
+            Quote quoteElement
+            quoteElement:SetIdentifier("x")
+            quoteElement:AddText("words")
+            output "Quote with SetIdentifier(x) and AddText(words) Generate() = [" + Flat(quoteElement:Generate()) + "]"
+        detect e
+            output "Quote with SetIdentifier(x) and AddText(words) Generate() unexpected error: " + e:GetErrorMessage()
+        end
+        check
+            RubyContext rubyContextElement
+            rubyContextElement:SetIdentifier("x")
+            rubyContextElement:AddText("words")
+            output "RubyContext with SetIdentifier(x) and AddText(words) Generate() = [" + Flat(rubyContextElement:Generate()) + "]"
+        detect e
+            output "RubyContext with SetIdentifier(x) and AddText(words) Generate() unexpected error: " + e:GetErrorMessage()
+        end
+        check
+            SampleOutput sampleOutputElement
+            sampleOutputElement:SetIdentifier("x")
+            sampleOutputElement:AddText("words")
+            output "SampleOutput with SetIdentifier(x) and AddText(words) Generate() = [" + Flat(sampleOutputElement:Generate()) + "]"
+        detect e
+            output "SampleOutput with SetIdentifier(x) and AddText(words) Generate() unexpected error: " + e:GetErrorMessage()
+        end
+        check
+            Section sectionElement
+            sectionElement:SetIdentifier("x")
+            sectionElement:AddText("words")
+            output "Section with SetIdentifier(x) and AddText(words) Generate() = [" + Flat(sectionElement:Generate()) + "]"
+        detect e
+            output "Section with SetIdentifier(x) and AddText(words) Generate() unexpected error: " + e:GetErrorMessage()
+        end
+        check
+            SmallText smallTextElement
+            smallTextElement:SetIdentifier("x")
+            smallTextElement:AddText("words")
+            output "SmallText with SetIdentifier(x) and AddText(words) Generate() = [" + Flat(smallTextElement:Generate()) + "]"
+        detect e
+            output "SmallText with SetIdentifier(x) and AddText(words) Generate() unexpected error: " + e:GetErrorMessage()
+        end
+        check
+            Span spanElement
+            spanElement:SetIdentifier("x")
+            spanElement:AddText("words")
+            output "Span with SetIdentifier(x) and AddText(words) Generate() = [" + Flat(spanElement:Generate()) + "]"
+        detect e
+            output "Span with SetIdentifier(x) and AddText(words) Generate() unexpected error: " + e:GetErrorMessage()
+        end
+        check
+            StrikeThrough strikeThroughElement
+            strikeThroughElement:SetIdentifier("x")
+            strikeThroughElement:AddText("words")
+            output "StrikeThrough with SetIdentifier(x) and AddText(words) Generate() = [" + Flat(strikeThroughElement:Generate()) + "]"
+        detect e
+            output "StrikeThrough with SetIdentifier(x) and AddText(words) Generate() unexpected error: " + e:GetErrorMessage()
+        end
+        check
+            StrongText strongTextElement
+            strongTextElement:SetIdentifier("x")
+            strongTextElement:AddText("words")
+            output "StrongText with SetIdentifier(x) and AddText(words) Generate() = [" + Flat(strongTextElement:Generate()) + "]"
+        detect e
+            output "StrongText with SetIdentifier(x) and AddText(words) Generate() unexpected error: " + e:GetErrorMessage()
+        end
+        check
+            SubscriptText subscriptTextElement
+            subscriptTextElement:SetIdentifier("x")
+            subscriptTextElement:AddText("words")
+            output "SubscriptText with SetIdentifier(x) and AddText(words) Generate() = [" + Flat(subscriptTextElement:Generate()) + "]"
+        detect e
+            output "SubscriptText with SetIdentifier(x) and AddText(words) Generate() unexpected error: " + e:GetErrorMessage()
+        end
+        check
+            Summary summaryElement
+            summaryElement:SetIdentifier("x")
+            summaryElement:AddText("words")
+            output "Summary with SetIdentifier(x) and AddText(words) Generate() = [" + Flat(summaryElement:Generate()) + "]"
+        detect e
+            output "Summary with SetIdentifier(x) and AddText(words) Generate() unexpected error: " + e:GetErrorMessage()
+        end
+        check
+            SuperscriptText superscriptTextElement
+            superscriptTextElement:SetIdentifier("x")
+            superscriptTextElement:AddText("words")
+            output "SuperscriptText with SetIdentifier(x) and AddText(words) Generate() = [" + Flat(superscriptTextElement:Generate()) + "]"
+        detect e
+            output "SuperscriptText with SetIdentifier(x) and AddText(words) Generate() unexpected error: " + e:GetErrorMessage()
+        end
+        check
+            TableBody tableBodyElement
+            tableBodyElement:SetIdentifier("x")
+            tableBodyElement:AddText("words")
+            output "TableBody with SetIdentifier(x) and AddText(words) Generate() = [" + Flat(tableBodyElement:Generate()) + "]"
+        detect e
+            output "TableBody with SetIdentifier(x) and AddText(words) Generate() unexpected error: " + e:GetErrorMessage()
+        end
+        check
+            TableCaption tableCaptionElement
+            tableCaptionElement:SetIdentifier("x")
+            tableCaptionElement:AddText("words")
+            output "TableCaption with SetIdentifier(x) and AddText(words) Generate() = [" + Flat(tableCaptionElement:Generate()) + "]"
+        detect e
+            output "TableCaption with SetIdentifier(x) and AddText(words) Generate() unexpected error: " + e:GetErrorMessage()
+        end
+        check
+            TableData tableDataElement
+            tableDataElement:SetIdentifier("x")
+            tableDataElement:AddText("words")
+            output "TableData with SetIdentifier(x) and AddText(words) Generate() = [" + Flat(tableDataElement:Generate()) + "]"
+        detect e
+            output "TableData with SetIdentifier(x) and AddText(words) Generate() unexpected error: " + e:GetErrorMessage()
+        end
+        check
+            TableFooter tableFooterElement
+            tableFooterElement:SetIdentifier("x")
+            tableFooterElement:AddText("words")
+            output "TableFooter with SetIdentifier(x) and AddText(words) Generate() = [" + Flat(tableFooterElement:Generate()) + "]"
+        detect e
+            output "TableFooter with SetIdentifier(x) and AddText(words) Generate() unexpected error: " + e:GetErrorMessage()
+        end
+        check
+            TableHeader tableHeaderElement
+            tableHeaderElement:SetIdentifier("x")
+            tableHeaderElement:AddText("words")
+            output "TableHeader with SetIdentifier(x) and AddText(words) Generate() = [" + Flat(tableHeaderElement:Generate()) + "]"
+        detect e
+            output "TableHeader with SetIdentifier(x) and AddText(words) Generate() unexpected error: " + e:GetErrorMessage()
+        end
+        check
+            TableHeaderCell tableHeaderCellElement
+            tableHeaderCellElement:SetIdentifier("x")
+            tableHeaderCellElement:AddText("words")
+            output "TableHeaderCell with SetIdentifier(x) and AddText(words) Generate() = [" + Flat(tableHeaderCellElement:Generate()) + "]"
+        detect e
+            output "TableHeaderCell with SetIdentifier(x) and AddText(words) Generate() unexpected error: " + e:GetErrorMessage()
+        end
+        check
+            TableRow tableRowElement
+            tableRowElement:SetIdentifier("x")
+            tableRowElement:AddText("words")
+            output "TableRow with SetIdentifier(x) and AddText(words) Generate() = [" + Flat(tableRowElement:Generate()) + "]"
+        detect e
+            output "TableRow with SetIdentifier(x) and AddText(words) Generate() unexpected error: " + e:GetErrorMessage()
+        end
+        check
+            TextArea textAreaElement
+            textAreaElement:SetIdentifier("x")
+            textAreaElement:AddText("words")
+            output "TextArea with SetIdentifier(x) and AddText(words) Generate() = [" + Flat(textAreaElement:Generate()) + "]"
+        detect e
+            output "TextArea with SetIdentifier(x) and AddText(words) Generate() unexpected error: " + e:GetErrorMessage()
+        end
+        check
+            Time timeElement
+            timeElement:SetIdentifier("x")
+            timeElement:AddText("words")
+            output "Time with SetIdentifier(x) and AddText(words) Generate() = [" + Flat(timeElement:Generate()) + "]"
+        detect e
+            output "Time with SetIdentifier(x) and AddText(words) Generate() unexpected error: " + e:GetErrorMessage()
+        end
+        check
+            UnderlineText underlineTextElement
+            underlineTextElement:SetIdentifier("x")
+            underlineTextElement:AddText("words")
+            output "UnderlineText with SetIdentifier(x) and AddText(words) Generate() = [" + Flat(underlineTextElement:Generate()) + "]"
+        detect e
+            output "UnderlineText with SetIdentifier(x) and AddText(words) Generate() unexpected error: " + e:GetErrorMessage()
+        end
+        check
+            UnorderedList unorderedListElement
+            unorderedListElement:SetIdentifier("x")
+            unorderedListElement:AddText("words")
+            output "UnorderedList with SetIdentifier(x) and AddText(words) Generate() = [" + Flat(unorderedListElement:Generate()) + "]"
+        detect e
+            output "UnorderedList with SetIdentifier(x) and AddText(words) Generate() unexpected error: " + e:GetErrorMessage()
+        end
+        check
+            Variable variableElement
+            variableElement:SetIdentifier("x")
+            variableElement:AddText("words")
+            output "Variable with SetIdentifier(x) and AddText(words) Generate() = [" + Flat(variableElement:Generate()) + "]"
+        detect e
+            output "Variable with SetIdentifier(x) and AddText(words) Generate() unexpected error: " + e:GetErrorMessage()
+        end
+        check
+            Heading h
+            output "new Heading GetScale() = " + h:GetScale()
+        detect e
+            output "new Heading GetScale() unexpected error: " + e:GetErrorMessage()
+        end
+        check
+            Heading h
+            h:SetScale(2)
+            h:AddText("Top")
+            output "Heading SetScale(2) AddText(Top) Generate() = [" + Flat(h:Generate()) + "]"
+        detect e
+            output "Heading SetScale(2) AddText(Top) Generate() unexpected error: " + e:GetErrorMessage()
+        end
+        check
+            Heading h
+            h:SetScale(7)
+            output "Heading SetScale(7) should fail but returned [" + h:GetScale() + "]"
+        detect e
+            output "Heading SetScale(7) fails, as it should"
+        end
+        check
+            Heading h
+            h:SetScale(0)
+            output "Heading SetScale(0) should fail but returned [" + h:GetScale() + "]"
+        detect e
+            output "Heading SetScale(0) fails, as it should"
+        end
+    end
+
+    /* Shows line breaks as the two characters \n and double quotes as ', so each case is one line. */
+    action Flat(text value) returns text
+        text lf = ""
+        lf = lf:GetLineFeed()
+        text cr = ""
+        cr = cr:GetCarriageReturn()
+        text quote = ""
+        quote = quote:GetDoubleQuote()
+        text result = value:Replace(cr, "")
+        result = result:Replace(lf, "\n")
+        return result:Replace(quote, "'")
+    end
+end

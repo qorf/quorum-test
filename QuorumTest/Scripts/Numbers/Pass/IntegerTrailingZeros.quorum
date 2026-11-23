@@ -1,0 +1,39 @@
+/*
+    Integer:TrailingZeros counts the zero bits after the lowest one bit in
+    the 32-bit form: 0 gives 32, 8 gives 3, the minimum integer gives 31.
+    Calling it must not change the value it is called on, so each line
+    calls it twice and prints the value afterwards.
+    Each case runs on an integer primitive and on an Integer object.
+*/
+class Main
+    action Main
+        ShowTrailingZeros(0)
+        ShowTrailingZeros(1)
+        ShowTrailingZeros(8)
+        ShowTrailingZeros(12)
+        ShowTrailingZeros(-1)
+        ShowTrailingZeros(-8)
+        ShowTrailingZeros(1073741824)
+        ShowTrailingZeros(-2147483647 - 1)
+    end
+
+    action ShowTrailingZeros(integer value)
+        text call = "TrailingZeros(" + value + ")"
+        check
+            integer result = value:TrailingZeros()
+            integer again = value:TrailingZeros()
+            output call + " = " + result + ", called again = " + again + ", value after = " + value
+        detect e
+            output call + " unexpected error: " + e:GetErrorMessage()
+        end
+        Integer object
+        object:SetValue(value)
+        check
+            integer result = object:TrailingZeros()
+            integer again = object:TrailingZeros()
+            output "Integer " + call + " = " + result + ", called again = " + again
+        detect e
+            output "Integer " + call + " unexpected error: " + e:GetErrorMessage()
+        end
+    end
+end

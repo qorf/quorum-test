@@ -1,0 +1,4 @@
+Read("a\nb",c\nd,e) rows = 2: [a\nb][c] | [d][e]
+Read("a\r\nb",c) rows = 1: [a\r\nb][c]
+Read(x,"line1\nline2\nline3") rows = 1: [x][line1\nline2\nline3]
+Read("a\n",b) rows = 1: [a\n][b]

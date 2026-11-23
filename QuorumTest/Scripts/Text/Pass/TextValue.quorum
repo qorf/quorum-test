@@ -1,0 +1,35 @@
+/*
+    Text:SetValue and Text:GetValue store and return the value, including
+    the empty text and spaces. Setting a new value replaces the old one,
+    and actions that read the value (GetSize, Contains) use the new one.
+*/
+class Main
+    action Main
+        Text object
+        check
+            output "new Text GetValue = [" + object:GetValue() + "] size " + object:GetSize()
+        detect e
+            output "new Text GetValue unexpected error: " + e:GetErrorMessage()
+        end
+        Show(object, "hello")
+        Show(object, "")
+        Show(object, "  ")
+        Show(object, "a")
+        check
+            object:SetValue("first")
+            object:SetValue("second")
+            output "SetValue(first) then SetValue(second): GetValue = [" + object:GetValue() + "], GetSize = " + object:GetSize() + ", Contains(first) = " + object:Contains("first") + ", ToUpperCase = [" + object:ToUpperCase() + "]"
+        detect e
+            output "SetValue twice unexpected error: " + e:GetErrorMessage()
+        end
+    end
+
+    action Show(Text object, text value)
+        check
+            object:SetValue(value)
+            output "SetValue([" + value + "]) then GetValue = [" + object:GetValue() + "], GetSize = " + object:GetSize()
+        detect e
+            output "SetValue([" + value + "]) unexpected error: " + e:GetErrorMessage()
+        end
+    end
+end

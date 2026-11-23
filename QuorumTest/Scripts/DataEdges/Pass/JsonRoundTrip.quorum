@@ -1,0 +1,57 @@
+use Libraries.Data.Formats.JavaScriptObjectNotation
+
+/*
+Round trips: a value (and a key) built with GetDoubleQuote, a backslash, a
+line feed and a tab is added to an object, written with ToText, read back
+into a new object, and compared with the original. RFC 8259 escaping on
+write and unescaping on read must give back exactly the original text.
+Control characters are shown as <LF> and <TAB>.
+*/
+class Main
+    action Main
+        text dq = ""
+        dq = dq:GetDoubleQuote()
+        text lf = dq:GetLineFeed()
+        text tab = dq:GetTab()
+        RoundTrip("plain", "plain value")
+        RoundTrip("say " + dq + "hi" + dq, "value with double quotes")
+        RoundTrip("C:\temp\new", "value with backslashes")
+        RoundTrip("line1" + lf + "line2", "value with a line feed")
+        RoundTrip("a" + tab + "b", "value with a tab")
+        RoundTrip(dq + "\" + lf + tab, "value with all four")
+        RoundTrip(dq + "\" + lf + tab + "end", "value with all four then text")
+
+        check
+            text key = "odd" + dq + "\" + lf + tab + "key"
+            JavaScriptObjectNotation json
+            json:Add(key, "v")
+            text written = json:ToText()
+            JavaScriptObjectNotation back
+            back:Read(written)
+            JavaScriptObjectNotation child = back:Get(0)
+            output "key with all four: read back GetKey() = [" + Show(child:GetKey()) + "], same as original = [" + (child:GetKey() = key) + "]"
+        detect e
+            output "key with all four: unexpected error: " + e:GetErrorMessage()
+        end
+    end
+
+    action Show(text value) returns text
+        text result = value:Replace(value:GetLineFeed(), "<LF>")
+        result = result:Replace(value:GetTab(), "<TAB>")
+        return result
+    end
+
+    action RoundTrip(text value, text description)
+        check
+            JavaScriptObjectNotation json
+            json:Add("k", value)
+            text written = json:ToText()
+            JavaScriptObjectNotation back
+            back:Read(written)
+            text result = back:GetValue("k")
+            output description + ": original [" + Show(value) + "], read back [" + Show(result) + "], same = [" + (result = value) + "]"
+        detect e
+            output description + ": original [" + Show(value) + "], unexpected error: " + e:GetErrorMessage()
+        end
+    end
+end

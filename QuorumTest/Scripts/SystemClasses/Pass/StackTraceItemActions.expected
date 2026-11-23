@@ -1,0 +1,12 @@
+New item: GetClassName() = [], GetMethodName() = [], GetFileName() = [], GetLineNumber() = 0
+Init(Main, Run, Main.quorum, 42): GetClassName() = [Main]
+Init(Main, Run, Main.quorum, 42): GetMethodName() = [Run]
+Init(Main, Run, Main.quorum, 42): GetFileName() = [Main.quorum]
+Init(Main, Run, Main.quorum, 42): GetLineNumber() = 42
+Equals(Main, Run, Main.quorum, 42) = true
+Equals(Other, Run, Main.quorum, 42) = false
+Equals(Main, Walk, Main.quorum, 42) = false
+Equals(Main, Run, Other.quorum, 42) = false
+Equals(Main, Run, Main.quorum, 43) = false
+Equals(the same item) = true
+Equals(a Text, not a StackTraceItem) = false

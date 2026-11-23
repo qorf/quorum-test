@@ -1,0 +1,74 @@
+/*
+    Number limit actions, checked by their properties rather than printed,
+    so number-to-text formatting does not decide the test:
+    GetMaximumValue is (2-2^-52)*2^1023: positive, finite, and doubling it
+    overflows to infinity. GetMinimumValue is its negative.
+    GetMinimumPositiveValue is 4.9e-324, the smallest positive number:
+    above 0, and half of it rounds to 0. GetPositiveInfinityValue and
+    GetNegativeInfinityValue are infinite and beyond the limits.
+    GetNotANumberValue is NaN, which is not equal to itself.
+    GetNumberOfBits is 64. Each action runs on a number primitive and on a
+    Number object.
+*/
+class Main
+    action Main
+        number value = 3.5
+        Number object
+        object:SetValue(3.5)
+        Check("number", value:GetMaximumValue(), value:GetMinimumValue(), value:GetMinimumPositiveValue(), value:GetPositiveInfinityValue(), value:GetNegativeInfinityValue(), value:GetNotANumberValue())
+        Check("Number", object:GetMaximumValue(), object:GetMinimumValue(), object:GetMinimumPositiveValue(), object:GetPositiveInfinityValue(), object:GetNegativeInfinityValue(), object:GetNotANumberValue())
+        check
+            output "number GetNumberOfBits() = " + value:GetNumberOfBits()
+        detect e
+            output "number GetNumberOfBits() unexpected error: " + e:GetErrorMessage()
+        end
+        check
+            output "Number GetNumberOfBits() = " + object:GetNumberOfBits()
+        detect e
+            output "Number GetNumberOfBits() unexpected error: " + e:GetErrorMessage()
+        end
+    end
+
+    action Check(text kind, number maximum, number minimum, number smallest, number positiveInfinity, number negativeInfinity, number nan)
+        check
+            output kind + " GetMaximumValue() > 1000000 is " + (maximum > 1000000.0)
+            output kind + " GetMaximumValue() IsInfinite is " + maximum:IsInfinite()
+            number doubled = maximum * 2.0
+            output kind + " GetMaximumValue() * 2 IsInfinite is " + doubled:IsInfinite()
+        detect e
+            output kind + " GetMaximumValue() unexpected error: " + e:GetErrorMessage()
+        end
+        check
+            output kind + " GetMinimumValue() = -GetMaximumValue() is " + (minimum = -maximum)
+            output kind + " GetMinimumValue() < 0 is " + (minimum < 0.0)
+        detect e
+            output kind + " GetMinimumValue() unexpected error: " + e:GetErrorMessage()
+        end
+        check
+            output kind + " GetMinimumPositiveValue() > 0 is " + (smallest > 0.0)
+            output kind + " GetMinimumPositiveValue() / 2 = 0 is " + (smallest / 2.0 = 0.0)
+            output kind + " GetMinimumPositiveValue() < 0.0000000001 is " + (smallest < 0.0000000001)
+        detect e
+            output kind + " GetMinimumPositiveValue() unexpected error: " + e:GetErrorMessage()
+        end
+        check
+            output kind + " GetPositiveInfinityValue() IsInfinite is " + positiveInfinity:IsInfinite()
+            output kind + " GetPositiveInfinityValue() > GetMaximumValue() is " + (positiveInfinity > maximum)
+        detect e
+            output kind + " GetPositiveInfinityValue() unexpected error: " + e:GetErrorMessage()
+        end
+        check
+            output kind + " GetNegativeInfinityValue() IsInfinite is " + negativeInfinity:IsInfinite()
+            output kind + " GetNegativeInfinityValue() < GetMinimumValue() is " + (negativeInfinity < minimum)
+            output kind + " GetNegativeInfinityValue() = -GetPositiveInfinityValue() is " + (negativeInfinity = -positiveInfinity)
+        detect e
+            output kind + " GetNegativeInfinityValue() unexpected error: " + e:GetErrorMessage()
+        end
+        check
+            output kind + " GetNotANumberValue() IsNotANumber is " + nan:IsNotANumber()
+            output kind + " GetNotANumberValue() = itself is " + (nan = nan)
+        detect e
+            output kind + " GetNotANumberValue() unexpected error: " + e:GetErrorMessage()
+        end
+    end
+end

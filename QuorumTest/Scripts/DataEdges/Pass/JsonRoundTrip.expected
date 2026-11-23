@@ -1,0 +1,8 @@
+plain value: original [plain], read back [plain], same = [true]
+value with double quotes: original [say "hi"], read back [say "hi"], same = [true]
+value with backslashes: original [C:\temp\new], read back [C:\temp\new], same = [true]
+value with a line feed: original [line1<LF>line2], read back [line1<LF>line2], same = [true]
+value with a tab: original [a<TAB>b], read back [a<TAB>b], same = [true]
+value with all four: original ["\<LF><TAB>], read back ["\<LF><TAB>], same = [true]
+value with all four then text: original ["\<LF><TAB>end], read back ["\<LF><TAB>end], same = [true]
+key with all four: read back GetKey() = [odd"\<LF><TAB>key], same as original = [true]

@@ -1,0 +1,49 @@
+use Libraries.Data.Formats.NumberFormatter
+
+/*
+Every NumberFormatter action (Fixed, Short, Percent, Rounded) on cases the
+existing Formats tests don't cover: more and fewer decimals, rounding that
+carries into a new digit, negative values, values that round to zero (never
+"-0"), whole numbers past six digits (never scientific notation), and tiny
+values. Ties (x.5) are avoided because the documentation compares Fixed to
+printf, whose tie rule differs between platforms.
+*/
+class Main
+    action Main
+        NumberFormatter format
+        output "Fixed(3.14159, 0) = [" + format:Fixed(3.14159, 0) + "]"
+        output "Fixed(3.14159, 4) = [" + format:Fixed(3.14159, 4) + "]"
+        output "Fixed(-2.71828, 3) = [" + format:Fixed(-2.71828, 3) + "]"
+        output "Fixed(0.0, 2) = [" + format:Fixed(0.0, 2) + "]"
+        output "Fixed(9.999, 2) = [" + format:Fixed(9.999, 2) + "]"
+        output "Fixed(-9.999, 1) = [" + format:Fixed(-9.999, 1) + "]"
+        output "Fixed(0.001, 2) = [" + format:Fixed(0.001, 2) + "]"
+        output "Fixed(-0.004, 2) = [" + format:Fixed(-0.004, 2) + "]"
+        output "Fixed(1.0 / 3.0, 6) = [" + format:Fixed(1.0 / 3.0, 6) + "]"
+        output "Fixed(12345678901.0, 1) = [" + format:Fixed(12345678901.0, 1) + "]"
+        output "Fixed(-0.07, 1) = [" + format:Fixed(-0.07, 1) + "]"
+        output "Fixed(0.999, 0) = [" + format:Fixed(0.999, 0) + "]"
+        output "Short(0.0) = [" + format:Short(0.0) + "]"
+        output "Short(1.0) = [" + format:Short(1.0) + "]"
+        output "Short(-2.5) = [" + format:Short(-2.5) + "]"
+        output "Short(1234567.0) = [" + format:Short(1234567.0) + "]"
+        output "Short(0.000001) = [" + format:Short(0.000001) + "]"
+        output "Short(0.0000004) = [" + format:Short(0.0000004) + "]"
+        output "Short(-0.0000004) = [" + format:Short(-0.0000004) + "]"
+        output "Short(12.3456789) = [" + format:Short(12.3456789) + "]"
+        output "Short(99.99999) = [" + format:Short(99.99999) + "]"
+        output "Short(1000000000000000.0) = [" + format:Short(1000000000000000.0) + "]"
+        output "Short(-1234.56789) = [" + format:Short(-1234.56789) + "]"
+        output "Percent(0.0) = [" + format:Percent(0.0) + "]"
+        output "Percent(0.5) = [" + format:Percent(0.5) + "]"
+        output "Percent(0.125) = [" + format:Percent(0.125) + "]"
+        output "Percent(1.5) = [" + format:Percent(1.5) + "]"
+        output "Percent(-0.25) = [" + format:Percent(-0.25) + "]"
+        output "Rounded(209.6) = [" + format:Rounded(209.6) + "]"
+        output "Rounded(209.4) = [" + format:Rounded(209.4) + "]"
+        output "Rounded(-3.7) = [" + format:Rounded(-3.7) + "]"
+        output "Rounded(0.4) = [" + format:Rounded(0.4) + "]"
+        output "Rounded(-0.4) = [" + format:Rounded(-0.4) + "]"
+        output "Rounded(1234567.8) = [" + format:Rounded(1234567.8) + "]"
+    end
+end

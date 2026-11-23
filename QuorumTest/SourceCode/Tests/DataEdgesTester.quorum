@@ -1,0 +1,58 @@
+package Libraries.Language.Compile.Test
+
+use Libraries.Testing.QuorumTest
+use Libraries.Testing.ScriptCheck
+
+/*
+Edge cases of the data format classes in Libraries.Data.Formats:
+SeparatedValue (RFC 4180 quoting, line endings, reading twice) and its text
+reader, JavaScriptObjectNotation escaping and round trips (RFC 8259),
+NumberFormatter, DataEncoder and the ScalableVectorGraphics shapes.
+
+Back ends: JSON, NumberFormatter and SVG scripts are pure Quorum and run
+everywhere. The CSV scripts run on bytecode and JavaScript but not Python:
+SeparatedValue reads through FileReader, which has no Python plugin. CsvFiles
+and DataEncoderActions use real files (and DataEncoder's JavaScript version
+is documented to return the path instead), so they run on bytecode only.
+*/
+class DataEdgesTester
+    QuorumTest suite = undefined
+    ScriptCheck scripts
+    text path = "Scripts/DataEdges/Pass/"
+
+    action Test
+        scripts:SetSuite(suite)
+        scripts:Check(path + "CsvQuotedFields", true, false)
+        scripts:Check(path + "CsvEscapedQuotes", true, false)
+        scripts:Check(path + "CsvNewlineInQuotes", true, false)
+        scripts:Check(path + "CsvEmptyFields", true, false)
+        scripts:Check(path + "CsvTrailingComma", true, false)
+        scripts:Check(path + "CsvLineEndings", true, false)
+        scripts:Check(path + "CsvSpaces", true, false)
+        scripts:Check(path + "CsvSeparators", true, false)
+        scripts:Check(path + "CsvAccessors", true, false)
+        scripts:Check(path + "CsvReadTwice", true, false)
+        scripts:Check(path + "CsvTextReader", true, false)
+        scripts:Check(path + "CsvFiles", false, false)
+        scripts:CheckEverywhere(path + "JsonWriteEscapes")
+        scripts:CheckEverywhere(path + "JsonReadEscapes")
+        scripts:CheckEverywhere(path + "JsonRoundTrip")
+        scripts:CheckEverywhere(path + "NumberFormatterActions")
+        scripts:Check(path + "DataEncoderActions", false, false)
+        scripts:CheckEverywhere(path + "SvgShapes")
+        scripts:CheckEverywhere(path + "SvgAttributes")
+        scripts:CheckEverywhere(path + "SvgCanvas")
+    end
+
+    action GetName returns text
+        return "Data Format Edge Tests"
+    end
+
+    action GetCompilerTestSuite returns QuorumTest
+        return suite
+    end
+
+    action SetCompilerTestSuite(QuorumTest suite)
+        me:suite = suite
+    end
+end

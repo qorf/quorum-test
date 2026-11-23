@@ -1,0 +1,37 @@
+GetName() = [Elegoo Neptune 4 Pro]
+Describe() = [Elegoo Neptune 4 Pro: 225 x 225 x 265 mm, 0.4 mm nozzle, PLA at 215 C, 0.2 mm layers]
+GetText(bedWidth) = [225]
+GetText(bedDepth) = [225]
+GetText(bedHeight) = [265]
+GetText(maxNozzleTemperature) = [300]
+GetText(maxBedTemperature) = [110]
+GetText(nozzleTemperature) = [215]
+GetText(bedTemperature) = [60]
+GetText(retractLength) = [0.8]
+GetText(retractSpeed) = [30]
+GetText(retractLimitCount) = [10]
+GetText(zHopMinTravel) = [1.5]
+GetText(maxFlow) = [15]
+GetText(outerWallSpeed) = [120]
+GetText(firstLayerSpeed) = [30]
+GetText(travelSpeed) = [350]
+GetText(accelTravel) = [7000]
+GetText(filamentDiameter) = [1.75]
+GetText(lineWidth) = [0.45]
+GetText(zHop) = [0.4]
+GetText(minLayerTime) = [8]
+GetText(bambuExtras) = [false]
+GetText(write3mf) = [false]
+SetsOwn(startGcodeFile) = true
+GetText(startGcodeFile) = []
+is BowdenPrinter = false
+is DirectDrivePrinter = true
+is KlipperPrinter = true
+is BambuPrinter = false
+Validate() problem count = 0
+GetStartGcode() = [PRINT_START BED={BED_TEMP} EXTRUDER={NOZZLE_TEMP}]
+GetEndGcode() = [PRINT_END]
+Describe() after SetBed(150.5, 160, 170) = [Elegoo Neptune 4 Pro: 150.5 x 160 x 170 mm, 0.4 mm nozzle, PLA at 215 C, 0.2 mm layers]
+Lines(A, B) = [A\nB]
+child profile GetStartGcode() = printer's = true
+child profile GetText(maxNozzleTemperature) = [300]

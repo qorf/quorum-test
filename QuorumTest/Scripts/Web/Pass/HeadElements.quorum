@@ -1,0 +1,218 @@
+use Libraries.Web.Page.Comment
+use Libraries.Web.Page.DocumentType
+use Libraries.Web.Page.HeaderLink
+use Libraries.Web.Page.MetaData
+use Libraries.Web.Page.Script
+use Libraries.Web.Page.Style
+use Libraries.Web.Page.Title
+
+/*
+Tests the elements of a page's head and its comments: Comment,
+DocumentType, Script, Style, Title, MetaData and HeaderLink. Double
+quotes are shown as ' so each case is one line.
+*/
+class Main
+    action Main
+        check
+            Comment c
+            c:SetDescription("note")
+            output "Comment SetDescription(note) Generate() = [" + Flat(c:Generate()) + "]"
+        detect e
+            output "Comment SetDescription(note) Generate() unexpected error: " + e:GetErrorMessage()
+        end
+        check
+            Comment c
+            c:SetDescription("note")
+            c:SetCommentClose(false)
+            output "Comment SetCommentClose(false) Generate() = [" + Flat(c:Generate()) + "]"
+        detect e
+            output "Comment SetCommentClose(false) Generate() unexpected error: " + e:GetErrorMessage()
+        end
+        check
+            Comment c
+            c:SetDescription("note")
+            output "Comment GetDescription() and GetCommentClose() = [" + Flat(c:GetDescription() + " " + c:GetCommentClose()) + "]"
+        detect e
+            output "Comment GetDescription() and GetCommentClose() unexpected error: " + e:GetErrorMessage()
+        end
+        check
+            DocumentType d
+            output "DocumentType default Generate() = [" + Flat(d:Generate()) + "]"
+        detect e
+            output "DocumentType default Generate() unexpected error: " + e:GetErrorMessage()
+        end
+        check
+            DocumentType d
+            d:SetToHTML4Strict()
+            output "DocumentType SetToHTML4Strict() Generate() = [" + Flat(d:Generate()) + "]"
+        detect e
+            output "DocumentType SetToHTML4Strict() Generate() unexpected error: " + e:GetErrorMessage()
+        end
+        check
+            DocumentType d
+            d:SetToHTML4Strict()
+            d:SetToHTML5()
+            output "DocumentType SetToHTML4Strict() then SetToHTML5() Generate() = [" + Flat(d:Generate()) + "]"
+        detect e
+            output "DocumentType SetToHTML4Strict() then SetToHTML5() Generate() unexpected error: " + e:GetErrorMessage()
+        end
+        check
+            Script s
+            s:SetCode("go();")
+            output "Script SetCode(go();) Generate() = [" + Flat(s:Generate()) + "]"
+        detect e
+            output "Script SetCode(go();) Generate() unexpected error: " + e:GetErrorMessage()
+        end
+        check
+            Script s
+            s:SetCode("go();")
+            output "Script SetCode(go();) GetCode() = [" + Flat(s:GetCode()) + "]"
+        detect e
+            output "Script SetCode(go();) GetCode() unexpected error: " + e:GetErrorMessage()
+        end
+        check
+            Script s
+            s:SetGenerateType(false)
+            output "Script SetGenerateType(false) Generate() = [" + Flat(s:Generate()) + "]"
+        detect e
+            output "Script SetGenerateType(false) Generate() unexpected error: " + e:GetErrorMessage()
+        end
+        check
+            Script s
+            s:SetGenerateType(false)
+            s:SetAsync(true)
+            output "Script SetAsync(true) IsAsync() and Generate() = [" + Flat(s:IsAsync() + " " + s:Generate()) + "]"
+        detect e
+            output "Script SetAsync(true) IsAsync() and Generate() unexpected error: " + e:GetErrorMessage()
+        end
+        check
+            Script s
+            s:SetDefer(true)
+            output "Script SetDefer(true) GetDefer() = " + s:GetDefer()
+        detect e
+            output "Script SetDefer(true) GetDefer() unexpected error: " + e:GetErrorMessage()
+        end
+        check
+            Script s
+            s:SetAddress("a.js")
+            output "Script SetAddress(a.js) GetAddress():Generate() = [" + Flat(s:GetAddress():Generate()) + "]"
+        detect e
+            output "Script SetAddress(a.js) GetAddress():Generate() unexpected error: " + e:GetErrorMessage()
+        end
+        check
+            Script s
+            s:SetCharSet("UTF-8")
+            output "Script SetCharSet(UTF-8) GetCharSet():Generate() = [" + Flat(s:GetCharSet():Generate()) + "]"
+        detect e
+            output "Script SetCharSet(UTF-8) GetCharSet():Generate() unexpected error: " + e:GetErrorMessage()
+        end
+        check
+            Style s
+            s:AddText("p{color:red}")
+            output "Style AddText(p{color:red}) Generate() = [" + Flat(s:Generate()) + "]"
+        detect e
+            output "Style AddText(p{color:red}) Generate() unexpected error: " + e:GetErrorMessage()
+        end
+        check
+            Style s
+            s:SetMedia("print")
+            output "Style SetMedia(print) GetMedia():Generate() = [" + Flat(s:GetMedia():Generate()) + "]"
+        detect e
+            output "Style SetMedia(print) GetMedia():Generate() unexpected error: " + e:GetErrorMessage()
+        end
+        check
+            Style s
+            s:SetScoped(true)
+            output "Style SetScoped(true) GetScoped() = " + s:GetScoped()
+        detect e
+            output "Style SetScoped(true) GetScoped() unexpected error: " + e:GetErrorMessage()
+        end
+        check
+            Title t
+            t:AddText("Home")
+            output "Title AddText(Home) Generate() = [" + Flat(t:Generate()) + "]"
+        detect e
+            output "Title AddText(Home) Generate() unexpected error: " + e:GetErrorMessage()
+        end
+        check
+            MetaData m
+            m:SetCharacterSet("UTF-8")
+            output "MetaData SetCharacterSet(UTF-8) Generate() = [" + Flat(m:Generate()) + "]"
+        detect e
+            output "MetaData SetCharacterSet(UTF-8) Generate() unexpected error: " + e:GetErrorMessage()
+        end
+        check
+            MetaData m
+            m:SetName("viewport")
+            output "MetaData SetName(viewport) GetName():Generate() = [" + Flat(m:GetName():Generate()) + "]"
+        detect e
+            output "MetaData SetName(viewport) GetName():Generate() unexpected error: " + e:GetErrorMessage()
+        end
+        check
+            MetaData m
+            m:SetContent("width=device-width")
+            output "MetaData SetContent(width=device-width) GetContent():Generate() = [" + Flat(m:GetContent():Generate()) + "]"
+        detect e
+            output "MetaData SetContent(width=device-width) GetContent():Generate() unexpected error: " + e:GetErrorMessage()
+        end
+        check
+            MetaData m
+            m:SetHeaderInformation("refresh")
+            output "MetaData SetHeaderInformation(refresh) GetHeaderInformation():Generate() = [" + Flat(m:GetHeaderInformation():Generate()) + "]"
+        detect e
+            output "MetaData SetHeaderInformation(refresh) GetHeaderInformation():Generate() unexpected error: " + e:GetErrorMessage()
+        end
+        check
+            HeaderLink h
+            output "new HeaderLink GetRelationship():Generate() = [" + Flat(h:GetRelationship():Generate()) + "]"
+        detect e
+            output "new HeaderLink GetRelationship():Generate() unexpected error: " + e:GetErrorMessage()
+        end
+        check
+            HeaderLink h
+            output "new HeaderLink GetType():Generate() = [" + Flat(h:GetType():Generate()) + "]"
+        detect e
+            output "new HeaderLink GetType():Generate() unexpected error: " + e:GetErrorMessage()
+        end
+        check
+            HeaderLink h
+            h:SetAddress("s.css")
+            output "HeaderLink SetAddress(s.css) GetAddress():Generate() = [" + Flat(h:GetAddress():Generate()) + "]"
+        detect e
+            output "HeaderLink SetAddress(s.css) GetAddress():Generate() unexpected error: " + e:GetErrorMessage()
+        end
+        check
+            HeaderLink h
+            h:SetRelationship("icon")
+            output "HeaderLink SetRelationship(icon) GetRelationship():Generate() = [" + Flat(h:GetRelationship():Generate()) + "]"
+        detect e
+            output "HeaderLink SetRelationship(icon) GetRelationship():Generate() unexpected error: " + e:GetErrorMessage()
+        end
+        check
+            HeaderLink h
+            h:SetLinkedResourceSize("16x16")
+            output "HeaderLink SetLinkedResourceSize(16x16) GetLinkedResourceSize():Generate() = [" + Flat(h:GetLinkedResourceSize():Generate()) + "]"
+        detect e
+            output "HeaderLink SetLinkedResourceSize(16x16) GetLinkedResourceSize():Generate() unexpected error: " + e:GetErrorMessage()
+        end
+        check
+            HeaderLink h
+            output "HeaderLink new GetNumberOfAttributes() = " + h:GetNumberOfAttributes()
+        detect e
+            output "HeaderLink new GetNumberOfAttributes() unexpected error: " + e:GetErrorMessage()
+        end
+    end
+
+    /* Shows line breaks as the two characters \n and double quotes as ', so each case is one line. */
+    action Flat(text value) returns text
+        text lf = ""
+        lf = lf:GetLineFeed()
+        text cr = ""
+        cr = cr:GetCarriageReturn()
+        text quote = ""
+        quote = quote:GetDoubleQuote()
+        text result = value:Replace(cr, "")
+        result = result:Replace(lf, "\n")
+        return result:Replace(quote, "'")
+    end
+end

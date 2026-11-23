@@ -1,0 +1,136 @@
+use Libraries.Containers.Array
+use Libraries.Containers.Iterator
+
+/*
+    Every read and remove action on an Array that has nothing in it. Get-style
+    actions that take a location fail, because no location is valid; search
+    actions report "not found"; Sort, Copy and the iterator work on nothing.
+*/
+class Main
+    action Show(text value) returns text
+        if value = undefined
+            return "undefined"
+        end
+        return "[" + value + "]"
+    end
+
+    action Main
+        Array<text> array
+
+        check
+            output "Array[] GetSize() = " + array:GetSize()
+        detect e
+            output "Array[] GetSize() unexpected error: " + e:GetErrorMessage()
+        end
+        check
+            output "Array[] IsEmpty() = " + array:IsEmpty()
+        detect e
+            output "Array[] IsEmpty() unexpected error: " + e:GetErrorMessage()
+        end
+        check
+            text value = array:Get(0)
+            output "Array[] Get(0) should fail but returned " + Show(value)
+        detect e
+            output "Array[] Get(0) fails, as it should"
+        end
+        check
+            text value = array:RemoveAt(0)
+            output "Array[] RemoveAt(0) should fail but returned " + Show(value)
+        detect e
+            output "Array[] RemoveAt(0) fails, as it should"
+        end
+        check
+            array:Set(0, "a")
+            output "Array[] Set(0, a) should fail but succeeded"
+        detect e
+            output "Array[] Set(0, a) fails, as it should"
+        end
+        check
+            text value = array:GetFromFront()
+            output "Array[] GetFromFront() should fail but returned " + Show(value)
+        detect e
+            output "Array[] GetFromFront() fails, as it should"
+        end
+        check
+            text value = array:GetFromEnd()
+            output "Array[] GetFromEnd() should fail but returned " + Show(value)
+        detect e
+            output "Array[] GetFromEnd() fails, as it should"
+        end
+        check
+            text value = array:RemoveFromFront()
+            output "Array[] RemoveFromFront() should fail but returned " + Show(value)
+        detect e
+            output "Array[] RemoveFromFront() fails, as it should"
+        end
+        check
+            text value = array:RemoveFromEnd()
+            output "Array[] RemoveFromEnd() should fail but returned " + Show(value)
+        detect e
+            output "Array[] RemoveFromEnd() fails, as it should"
+        end
+        check
+            output "Array[] GetFirstLocation(a) = " + array:GetFirstLocation("a")
+        detect e
+            output "Array[] GetFirstLocation(a) unexpected error: " + e:GetErrorMessage()
+        end
+        check
+            output "Array[] GetLastLocation(a) = " + array:GetLastLocation("a")
+        detect e
+            output "Array[] GetLastLocation(a) unexpected error: " + e:GetErrorMessage()
+        end
+        check
+            output "Array[] Has(a) = " + array:Has("a")
+        detect e
+            output "Array[] Has(a) unexpected error: " + e:GetErrorMessage()
+        end
+        check
+            output "Array[] Remove(a) = " + array:Remove("a")
+        detect e
+            output "Array[] Remove(a) unexpected error: " + e:GetErrorMessage()
+        end
+        check
+            output "Array[] RemoveAll(a) = " + array:RemoveAll("a")
+        detect e
+            output "Array[] RemoveAll(a) unexpected error: " + e:GetErrorMessage()
+        end
+        check
+            array:Sort()
+            output "Array[] Sort() leaves size " + array:GetSize()
+        detect e
+            output "Array[] Sort() unexpected error: " + e:GetErrorMessage()
+        end
+        check
+            Object copyObject = array:Copy()
+            Array<text> copy = cast(Array<text>, copyObject)
+            output "Array[] Copy() has size " + copy:GetSize()
+        detect e
+            output "Array[] Copy() unexpected error: " + e:GetErrorMessage()
+        end
+        check
+            Array<text> copy = array:CopyToArray()
+            output "Array[] CopyToArray() has size " + copy:GetSize()
+        detect e
+            output "Array[] CopyToArray() unexpected error: " + e:GetErrorMessage()
+        end
+        check
+            Iterator<text> iterator = array:GetIterator()
+            output "Array[] GetIterator() HasNext() = " + iterator:HasNext()
+            output "Array[] GetIterator() GetCurrent() = " + Show(iterator:GetCurrent())
+        detect e
+            output "Array[] GetIterator() unexpected error: " + e:GetErrorMessage()
+        end
+        check
+            array:Empty()
+            output "Array[] Empty() leaves size " + array:GetSize()
+        detect e
+            output "Array[] Empty() unexpected error: " + e:GetErrorMessage()
+        end
+        check
+            array:Add("a")
+            output "Array[] then Add(a): size " + array:GetSize() + ", Get(0) = " + Show(array:Get(0))
+        detect e
+            output "Array[] then Add(a) unexpected error: " + e:GetErrorMessage()
+        end
+    end
+end

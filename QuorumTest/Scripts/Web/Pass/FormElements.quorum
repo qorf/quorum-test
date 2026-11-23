@@ -1,0 +1,243 @@
+use Libraries.Web.Page.Input
+use Libraries.Web.Page.Option
+use Libraries.Web.Page.OptionGroup
+use Libraries.Web.Page.Select
+
+/*
+Tests Input, Option, OptionGroup and Select: attribute setters write the
+HTML attribute's name, each boolean getter reads back what its setter
+set, and options nest inside groups and selects.
+*/
+class Main
+    action Main
+        check
+            Input i
+            i:SetType("text")
+            output "Input SetType(text) Generate() = [" + Flat(i:Generate()) + "]"
+        detect e
+            output "Input SetType(text) Generate() unexpected error: " + e:GetErrorMessage()
+        end
+        check
+            Input i
+            i:SetName("age")
+            output "Input SetName(age) GetName():Generate() = [" + Flat(i:GetName():Generate()) + "]"
+        detect e
+            output "Input SetName(age) GetName():Generate() unexpected error: " + e:GetErrorMessage()
+        end
+        check
+            Input i
+            i:SetDefaultValue("4")
+            output "Input SetDefaultValue(4) GetDefaultValue():Generate() = [" + Flat(i:GetDefaultValue():Generate()) + "]"
+        detect e
+            output "Input SetDefaultValue(4) GetDefaultValue():Generate() unexpected error: " + e:GetErrorMessage()
+        end
+        check
+            Input i
+            i:SetPlaceHolder("Name")
+            output "Input SetPlaceHolder(Name) GetPlaceHolder():Generate() = [" + Flat(i:GetPlaceHolder():Generate()) + "]"
+        detect e
+            output "Input SetPlaceHolder(Name) GetPlaceHolder():Generate() unexpected error: " + e:GetErrorMessage()
+        end
+        check
+            Input i
+            i:SetMaxLength("5")
+            output "Input SetMaxLength(5) GetMaxLength():Generate() = [" + Flat(i:GetMaxLength():Generate()) + "]"
+        detect e
+            output "Input SetMaxLength(5) GetMaxLength():Generate() unexpected error: " + e:GetErrorMessage()
+        end
+        check
+            Input i
+            i:SetMin("1")
+            output "Input SetMin(1) GetMin():Generate() = [" + Flat(i:GetMin():Generate()) + "]"
+        detect e
+            output "Input SetMin(1) GetMin():Generate() unexpected error: " + e:GetErrorMessage()
+        end
+        check
+            Input i
+            i:SetPattern("[0-9]+")
+            output "Input SetPattern([0-9]+) GetPattern():Generate() = [" + Flat(i:GetPattern():Generate()) + "]"
+        detect e
+            output "Input SetPattern([0-9]+) GetPattern():Generate() unexpected error: " + e:GetErrorMessage()
+        end
+        check
+            Input i
+            i:SetChecked(true)
+            output "Input SetChecked(true) GetChecked() = " + i:GetChecked()
+        detect e
+            output "Input SetChecked(true) GetChecked() unexpected error: " + e:GetErrorMessage()
+        end
+        check
+            Input i
+            i:SetChecked(true)
+            i:SetChecked(false)
+            output "Input SetChecked(true) then SetChecked(false) GetChecked() = " + i:GetChecked()
+        detect e
+            output "Input SetChecked(true) then SetChecked(false) GetChecked() unexpected error: " + e:GetErrorMessage()
+        end
+        check
+            Input i
+            i:SetRequired(true)
+            output "Input SetRequired(true) GetRequired() = " + i:GetRequired()
+        detect e
+            output "Input SetRequired(true) GetRequired() unexpected error: " + e:GetErrorMessage()
+        end
+        check
+            Input i
+            i:SetReadOnly(true)
+            output "Input SetReadOnly(true) GetReadOnly() = " + i:GetReadOnly()
+        detect e
+            output "Input SetReadOnly(true) GetReadOnly() unexpected error: " + e:GetErrorMessage()
+        end
+        check
+            Input i
+            i:SetMultiple(true)
+            output "Input SetMultiple(true) GetMultiple() = " + i:GetMultiple()
+        detect e
+            output "Input SetMultiple(true) GetMultiple() unexpected error: " + e:GetErrorMessage()
+        end
+        check
+            Input i
+            i:SetFormNovalidate(true)
+            output "Input SetFormNovalidate(true) GetFormNovalidate() = " + i:GetFormNovalidate()
+        detect e
+            output "Input SetFormNovalidate(true) GetFormNovalidate() unexpected error: " + e:GetErrorMessage()
+        end
+        check
+            Input i
+            i:SetDisabled(true)
+            output "Input SetDisabled(true) GetDisabled() = " + i:GetDisabled()
+        detect e
+            output "Input SetDisabled(true) GetDisabled() unexpected error: " + e:GetErrorMessage()
+        end
+        check
+            Input i
+            i:SetAutofocus(true)
+            output "Input SetAutofocus(true) GetAutofocus() = " + i:GetAutofocus()
+        detect e
+            output "Input SetAutofocus(true) GetAutofocus() unexpected error: " + e:GetErrorMessage()
+        end
+        check
+            Input i
+            i:SetAutocomplete(false)
+            output "Input SetAutocomplete(false) GetAutocomplete() and attribute = [" + Flat(i:GetAutocomplete() + " " + i:GetAttributeValue("autocomplete")) + "]"
+        detect e
+            output "Input SetAutocomplete(false) GetAutocomplete() and attribute unexpected error: " + e:GetErrorMessage()
+        end
+        check
+            Input i
+            i:SetAutocomplete(true)
+            output "Input SetAutocomplete(true) GetAutocomplete() and attribute = [" + Flat(i:GetAutocomplete() + " " + i:GetAttributeValue("autocomplete")) + "]"
+        detect e
+            output "Input SetAutocomplete(true) GetAutocomplete() and attribute unexpected error: " + e:GetErrorMessage()
+        end
+        check
+            Input i
+            output "new Input GetChecked() = " + i:GetChecked()
+        detect e
+            output "new Input GetChecked() unexpected error: " + e:GetErrorMessage()
+        end
+        check
+            Option o
+            o:SetSelected(true)
+            output "Option SetSelected(true) GetSelected() = " + o:GetSelected()
+        detect e
+            output "Option SetSelected(true) GetSelected() unexpected error: " + e:GetErrorMessage()
+        end
+        check
+            Option o
+            o:SetDefaultValue("r")
+            o:AddText("Red")
+            output "Option SetDefaultValue(r) and AddText(Red) Generate() = [" + Flat(o:Generate()) + "]"
+        detect e
+            output "Option SetDefaultValue(r) and AddText(Red) Generate() unexpected error: " + e:GetErrorMessage()
+        end
+        check
+            Option o
+            o:SetLabel("Red")
+            output "Option SetLabel(Red) GetLabel():Generate() = [" + Flat(o:GetLabel():Generate()) + "]"
+        detect e
+            output "Option SetLabel(Red) GetLabel():Generate() unexpected error: " + e:GetErrorMessage()
+        end
+        check
+            Option o
+            o:SetDisabled(true)
+            output "Option SetDisabled(true) GetDisabled() = " + o:GetDisabled()
+        detect e
+            output "Option SetDisabled(true) GetDisabled() unexpected error: " + e:GetErrorMessage()
+        end
+        check
+            Select s
+            Option a
+            a:AddText("A")
+            Option b
+            b:AddText("B")
+            s:AddOption(a)
+            s:AddOption(b)
+            output "Select with two AddOption Generate() = [" + Flat(s:Generate()) + "]"
+        detect e
+            output "Select with two AddOption Generate() unexpected error: " + e:GetErrorMessage()
+        end
+        check
+            Select s
+            Option a
+            a:AddText("A")
+            Option b
+            b:AddText("B")
+            s:AddOption(a)
+            s:AddOption(b)
+            s:RemoveOption(a)
+            output "Select AddOption twice then RemoveOption(first) Generate() = [" + Flat(s:Generate()) + "]"
+        detect e
+            output "Select AddOption twice then RemoveOption(first) Generate() unexpected error: " + e:GetErrorMessage()
+        end
+        check
+            Select s
+            s:SetMultiple(true)
+            output "Select SetMultiple(true) GetMultiple() = " + s:GetMultiple()
+        detect e
+            output "Select SetMultiple(true) GetMultiple() unexpected error: " + e:GetErrorMessage()
+        end
+        check
+            Select s
+            s:SetName("color")
+            output "Select SetName(color) GetName():Generate() = [" + Flat(s:GetName():Generate()) + "]"
+        detect e
+            output "Select SetName(color) GetName():Generate() unexpected error: " + e:GetErrorMessage()
+        end
+        check
+            Select s
+            OptionGroup g
+            g:SetLabel("Warm")
+            Option a
+            a:AddText("Red")
+            g:AddOption(a)
+            s:AddOptionGroup(g)
+            output "Select with an OptionGroup holding an Option Generate() = [" + Flat(s:Generate()) + "]"
+        detect e
+            output "Select with an OptionGroup holding an Option Generate() unexpected error: " + e:GetErrorMessage()
+        end
+        check
+            OptionGroup g
+            Option a
+            Option b
+            g:AddOption(a)
+            g:AddOption(b)
+            output "OptionGroup with two options GetNumberOfOptions() = " + g:GetNumberOfOptions()
+        detect e
+            output "OptionGroup with two options GetNumberOfOptions() unexpected error: " + e:GetErrorMessage()
+        end
+    end
+
+    /* Shows line breaks as the two characters \n and double quotes as ', so each case is one line. */
+    action Flat(text value) returns text
+        text lf = ""
+        lf = lf:GetLineFeed()
+        text cr = ""
+        cr = cr:GetCarriageReturn()
+        text quote = ""
+        quote = quote:GetDoubleQuote()
+        text result = value:Replace(cr, "")
+        result = result:Replace(lf, "\n")
+        return result:Replace(quote, "'")
+    end
+end

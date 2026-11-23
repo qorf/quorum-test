@@ -1,0 +1,101 @@
+use Libraries.Compute.ComplexNumber
+
+/*
+ComplexNumber arithmetic on 3 + 4i and 1 - 2i, all checkable by hand:
+the sum is 4 + 2i, the product 11 - 2i, the quotient -1 + 2i, the
+reciprocal of 3 + 4i is 0.12 - 0.16i and its absolute value is 5. Also
+SetValue with only a real part, Conjugate, Negate, Equals, the getters and
+ToText.
+*/
+class Main
+    action Main
+        ComplexNumber first
+        first:SetValue(3, 4)
+        ComplexNumber second
+        second:SetValue(1, -2)
+        output "first is " + first:ToText() + " and second is " + second:ToText()
+        output "first GetReal = " + first:GetReal() + ", GetImaginary = " + first:GetImaginary()
+        check
+            output "first Add second = " + first:Add(second):ToText()
+        detect e
+            output "Add unexpected error: " + e:GetErrorMessage()
+        end
+        check
+            output "first Add 2 = " + first:Add(2):ToText()
+        detect e
+            output "Add number unexpected error: " + e:GetErrorMessage()
+        end
+        check
+            output "first Subtract second = " + first:Subtract(second):ToText()
+        detect e
+            output "Subtract unexpected error: " + e:GetErrorMessage()
+        end
+        check
+            output "first Subtract 1 = " + first:Subtract(1):ToText()
+        detect e
+            output "Subtract number unexpected error: " + e:GetErrorMessage()
+        end
+        check
+            output "first Multiply second = " + first:Multiply(second):ToText()
+        detect e
+            output "Multiply unexpected error: " + e:GetErrorMessage()
+        end
+        check
+            output "first Multiply 2 = " + first:Multiply(2):ToText()
+        detect e
+            output "Multiply number unexpected error: " + e:GetErrorMessage()
+        end
+        check
+            output "first Divide second = " + first:Divide(second):ToText()
+        detect e
+            output "Divide unexpected error: " + e:GetErrorMessage()
+        end
+        check
+            output "first Divide 2 = " + first:Divide(2):ToText()
+        detect e
+            output "Divide number unexpected error: " + e:GetErrorMessage()
+        end
+        check
+            output "first Conjugate = " + first:Conjugate():ToText()
+        detect e
+            output "Conjugate unexpected error: " + e:GetErrorMessage()
+        end
+        check
+            output "first Negate = " + first:Negate():ToText()
+        detect e
+            output "Negate unexpected error: " + e:GetErrorMessage()
+        end
+        check
+            output "first AbsoluteValue = " + first:AbsoluteValue()
+        detect e
+            output "AbsoluteValue unexpected error: " + e:GetErrorMessage()
+        end
+        check
+            output "first Reciprocal = " + first:Reciprocal():ToText()
+        detect e
+            output "Reciprocal unexpected error: " + e:GetErrorMessage()
+        end
+        check
+            ComplexNumber same
+            same:SetValue(3, 4)
+            output "first Equals 3 + 4i = " + first:Equals(same)
+            output "first Equals second = " + first:Equals(second)
+        detect e
+            output "Equals unexpected error: " + e:GetErrorMessage()
+        end
+        check
+            ComplexNumber real
+            real:SetValue(7)
+            output "SetValue(7) gives " + real:ToText()
+        detect e
+            output "SetValue(7) unexpected error: " + e:GetErrorMessage()
+        end
+        check
+            ComplexNumber product = first:Multiply(first:Reciprocal())
+            output "first Multiply its Reciprocal Equals one = " + product:Equals(first:GetOneValue())
+        detect e
+            output "Multiply Reciprocal unexpected error: " + e:GetErrorMessage()
+        end
+        output "first is still " + first:ToText() + " and second is still " + second:ToText()
+    end
+end

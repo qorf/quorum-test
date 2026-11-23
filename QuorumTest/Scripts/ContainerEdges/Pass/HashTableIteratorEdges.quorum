@@ -1,0 +1,152 @@
+use Libraries.Containers.HashTable
+use Libraries.Containers.Array
+use Libraries.Containers.Iterator
+
+/*
+    The HashTable key and value iterators. Iterator documents GetCurrent as
+    "gets the current item and does not move onto the next item", so it is
+    undefined before the first Next (as for Array) and then the key (or
+    value) the last Next returned. Rewind starts over and visits every key
+    again. Order across keys depends on hashing, so multi-key results are
+    sorted or counted.
+*/
+class Main
+    action Show(text value) returns text
+        if value = undefined
+            return "undefined"
+        end
+        return "[" + value + "]"
+    end
+
+    action Describe(Array<text> array) returns text
+        text result = "["
+        integer i = 0
+        repeat while i < array:GetSize()
+            if i > 0
+                result = result + ","
+            end
+            text value = array:Get(i)
+            if value = undefined
+                result = result + "undefined"
+            else
+                result = result + value
+            end
+            i = i + 1
+        end
+        return result + "]"
+    end
+
+    // The keys sorted, so the output does not depend on hash order.
+    action SortedKeys(HashTable<text, text> table) returns text
+        Array<text> keys = table:CopyToKeyArray()
+        keys:Sort()
+        return Describe(keys)
+    end
+
+    action Main
+        HashTable<text, text> one
+        one:Add("only", "v")
+        Iterator<text> keys = one:GetKeyIterator()
+        check
+            output "HashTable{only:v} key iterator before Next: HasNext() = " + keys:HasNext() + ", GetCurrent() = " + Show(keys:GetCurrent())
+        detect e
+            output "HashTable{only:v} key iterator before Next unexpected error: " + e:GetErrorMessage()
+        end
+        check
+            text key = keys:Next()
+            output "HashTable{only:v} key iterator Next() = " + Show(key) + ", HasNext() = " + keys:HasNext()
+        detect e
+            output "HashTable{only:v} key iterator Next() unexpected error: " + e:GetErrorMessage()
+        end
+        check
+            output "HashTable{only:v} key iterator after Next GetCurrent() = " + Show(keys:GetCurrent())
+        detect e
+            output "HashTable{only:v} key iterator after Next GetCurrent() unexpected error: " + e:GetErrorMessage()
+        end
+        check
+            keys:Rewind()
+            output "HashTable{only:v} key iterator Rewind(): HasNext() = " + keys:HasNext() + ", Next() = " + Show(keys:Next())
+        detect e
+            output "HashTable{only:v} key iterator Rewind() unexpected error: " + e:GetErrorMessage()
+        end
+
+        Iterator<text> values = one:GetValueIterator()
+        check
+            output "HashTable{only:v} value iterator before Next: HasNext() = " + values:HasNext() + ", GetCurrent() = " + Show(values:GetCurrent())
+        detect e
+            output "HashTable{only:v} value iterator before Next unexpected error: " + e:GetErrorMessage()
+        end
+        check
+            text value = values:Next()
+            output "HashTable{only:v} value iterator Next() = " + Show(value) + ", HasNext() = " + values:HasNext()
+        detect e
+            output "HashTable{only:v} value iterator Next() unexpected error: " + e:GetErrorMessage()
+        end
+        check
+            output "HashTable{only:v} value iterator after Next GetCurrent() = " + Show(values:GetCurrent())
+        detect e
+            output "HashTable{only:v} value iterator after Next GetCurrent() unexpected error: " + e:GetErrorMessage()
+        end
+
+        HashTable<text, text> table
+        integer i = 0
+        repeat 20 times
+            table:Add("k" + i, "v" + i)
+            i = i + 1
+        end
+        check
+            Iterator<text> it = table:GetKeyIterator()
+            integer matches = 0
+            integer count = 0
+            repeat while it:HasNext()
+                text key = it:Next()
+                text current = it:GetCurrent()
+                if current = key
+                    matches = matches + 1
+                end
+                count = count + 1
+            end
+            output "HashTable of 20 keys: key iterator visits " + count + ", GetCurrent() equals the key Next() returned " + matches + " times"
+        detect e
+            output "HashTable of 20 keys key iterator GetCurrent unexpected error: " + e:GetErrorMessage()
+        end
+        check
+            Iterator<text> it = table:GetKeyIterator()
+            integer first = 0
+            repeat while it:HasNext()
+                text key = it:Next()
+                first = first + 1
+            end
+            it:Rewind()
+            Array<text> seen
+            repeat while it:HasNext()
+                seen:Add(it:Next())
+            end
+            seen:Sort()
+            output "HashTable of 20 keys: key iterator visits " + first + ", after Rewind() " + seen:GetSize() + ", first and last sorted " + seen:Get(0) + " " + seen:Get(19)
+        detect e
+            output "HashTable of 20 keys key iterator Rewind unexpected error: " + e:GetErrorMessage()
+        end
+        check
+            Iterator<text> it = table:GetValueIterator()
+            Array<text> seen
+            repeat while it:HasNext()
+                seen:Add(it:Next())
+            end
+            seen:Sort()
+            output "HashTable of 20 keys: value iterator visits " + seen:GetSize() + ", first and last sorted " + seen:Get(0) + " " + seen:Get(19)
+        detect e
+            output "HashTable of 20 keys value iterator unexpected error: " + e:GetErrorMessage()
+        end
+        check
+            Iterator<text> it = table:GetKeyIterator()
+            repeat while it:HasNext()
+                text key = it:Next()
+            end
+            text value = it:Next()
+            output "HashTable of 20 keys: key iterator Next() past the end should fail but returned " + Show(value)
+        detect e
+            output "HashTable of 20 keys: key iterator Next() past the end fails, as it should"
+        end
+    end
+end

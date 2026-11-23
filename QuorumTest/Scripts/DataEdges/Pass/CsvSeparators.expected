@@ -1,0 +1,5 @@
+SetSeparator(;) Read(a;b,c) rows = 1: [a][b,c]
+SetSeparator(|) Read(a|b|c) rows = 1: [a][b][c]
+SetSeparator(\t) Read(a\tb c\td) rows = 1: [a][b c][d]
+SetSeparator(;) Read("a;b";c) rows = 1: [a;b][c]
+SetSeparator(;) Read(a;;b\nc;d;) rows = 2: [a][][b] | [c][d][]

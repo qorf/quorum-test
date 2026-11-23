@@ -1,0 +1,100 @@
+use Libraries.Web.Styles.WebColor
+
+/*
+Tests WebColor: SetColor, SetOpacity, the getters, Copy and Generate, and
+that amounts outside 0-255 and opacities outside 0-1 are refused.
+*/
+class Main
+    action Main
+        WebColor plain
+        check
+            output "new WebColor Generate() = [" + plain:Generate() + "]"
+        detect e
+            output "new WebColor Generate() unexpected error: " + e:GetErrorMessage()
+        end
+        check
+            output "new WebColor GetOpacity() = " + plain:GetOpacity()
+        detect e
+            output "new WebColor GetOpacity() unexpected error: " + e:GetErrorMessage()
+        end
+
+        WebColor teal
+        check
+            teal:SetColor(18, 90, 119)
+            output "SetColor(18, 90, 119) Generate() = [" + teal:Generate() + "]"
+        detect e
+            output "SetColor(18, 90, 119) unexpected error: " + e:GetErrorMessage()
+        end
+        check
+            output "SetColor(18, 90, 119) GetRed/GetGreen/GetBlue = " + teal:GetRed() + "," + teal:GetGreen() + "," + teal:GetBlue()
+        detect e
+            output "GetRed/GetGreen/GetBlue unexpected error: " + e:GetErrorMessage()
+        end
+        check
+            teal:SetOpacity(0.5)
+            output "SetOpacity(0.5) Generate() = [" + teal:Generate() + "]"
+        detect e
+            output "SetOpacity(0.5) unexpected error: " + e:GetErrorMessage()
+        end
+        check
+            output "SetOpacity(0.5) GetOpacity() = " + teal:GetOpacity()
+        detect e
+            output "GetOpacity() unexpected error: " + e:GetErrorMessage()
+        end
+        check
+            WebColor copy = teal:Copy()
+            output "Copy() Generate() = [" + copy:Generate() + "]"
+            copy:SetColor(1, 2, 3)
+            output "Copy() then SetColor(1, 2, 3) on the copy: copy = [" + copy:Generate() + "], original = [" + teal:Generate() + "]"
+        detect e
+            output "Copy() unexpected error: " + e:GetErrorMessage()
+        end
+        check
+            WebColor clear
+            clear:SetColor(255, 255, 255)
+            clear:SetOpacity(0)
+            output "SetColor(255, 255, 255) SetOpacity(0) Generate() = [" + clear:Generate() + "]"
+        detect e
+            output "SetOpacity(0) unexpected error: " + e:GetErrorMessage()
+        end
+        check
+            WebColor solid
+            solid:SetOpacity(0.25)
+            solid:SetOpacity(1)
+            output "SetOpacity(0.25) then SetOpacity(1) Generate() = [" + solid:Generate() + "]"
+        detect e
+            output "SetOpacity(1) unexpected error: " + e:GetErrorMessage()
+        end
+
+        WebColor bad
+        check
+            bad:SetColor(256, 0, 0)
+            output "SetColor(256, 0, 0) should fail but returned [" + bad:Generate() + "]"
+        detect e
+            output "SetColor(256, 0, 0) fails, as it should"
+        end
+        check
+            bad:SetColor(0, -1, 0)
+            output "SetColor(0, -1, 0) should fail but returned [" + bad:Generate() + "]"
+        detect e
+            output "SetColor(0, -1, 0) fails, as it should"
+        end
+        check
+            bad:SetOpacity(1.5)
+            output "SetOpacity(1.5) should fail but returned [" + bad:Generate() + "]"
+        detect e
+            output "SetOpacity(1.5) fails, as it should"
+        end
+        check
+            bad:SetOpacity(-0.1)
+            output "SetOpacity(-0.1) should fail but returned [" + bad:Generate() + "]"
+        detect e
+            output "SetOpacity(-0.1) fails, as it should"
+        end
+        check
+            output "after refused calls Generate() = [" + bad:Generate() + "]"
+        detect e
+            output "after refused calls unexpected error: " + e:GetErrorMessage()
+        end
+    end
+end

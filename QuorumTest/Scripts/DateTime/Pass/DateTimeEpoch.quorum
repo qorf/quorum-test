@@ -1,0 +1,111 @@
+use Libraries.System.DateTime
+
+/*
+Tests SetEpochTime, GetEpochTime and the difference actions
+(GetMillisecondDifference, GetSecondDifference, GetMinuteDifference,
+GetHourDifference, GetDayDifference, GetMonthDifference) with fixed epoch
+times in milliseconds. These do not depend on the time zone. GetEpochTime's
+documentation says it always returns the current time, but the difference
+actions are built on it and would mean nothing then; the Java plugin returns
+the time that was set, so this test expects that.
+The Get actions after SetEpochTime depend on the time zone, so only facts
+that hold in every zone are checked (a week later, away from daylight saving
+changes, is the same weekday and clock time; every whole zone has the same
+seconds); DateTimeTimeZone checks the values with the zone set.
+The second time is 2 days, 3 hours, 4 minutes and 5 seconds after the first:
+183845000 milliseconds. GetMonthDifference divides days by 30.417, so 30.417
+days (2628028800 milliseconds) is one month; it is printed rounded to 3
+places, since it is a fraction.
+*/
+class Main
+    action Main
+        number base = 1700000000000.0
+        DateTime first
+        DateTime second
+        check
+            first:SetEpochTime(base)
+            output "SetEpochTime(1700000000000), GetEpochTime() is 1700000000000 = " + (first:GetEpochTime() = base)
+        detect e
+            output "SetEpochTime(1700000000000) unexpected error: " + e:GetErrorMessage()
+        end
+        check
+            second:SetEpochTime(base + 183845000)
+            output "SetEpochTime(1700000000000 + 183845000), GetEpochTime() minus 1700000000000 = " + cast(integer, second:GetEpochTime() - base)
+        detect e
+            output "SetEpochTime(1700000000000 + 183845000) unexpected error: " + e:GetErrorMessage()
+        end
+        check
+            output "GetMillisecondDifference(later minus earlier) = " + cast(integer, second:GetMillisecondDifference(first))
+            output "GetMillisecondDifference(earlier minus later) = " + cast(integer, first:GetMillisecondDifference(second))
+            output "GetSecondDifference(later minus earlier) = " + cast(integer, second:GetSecondDifference(first))
+            output "GetMinuteDifference(later minus earlier) rounded = " + Round(second:GetMinuteDifference(first))
+            output "GetHourDifference(later minus earlier) rounded = " + Round(second:GetHourDifference(first))
+            output "GetDayDifference(later minus earlier) rounded = " + Round(second:GetDayDifference(first))
+            output "GetDayDifference(earlier minus later) rounded = " + Round(first:GetDayDifference(second))
+            output "GetDayDifference(same time) = " + Round(first:GetDayDifference(first))
+        detect e
+            output "Differences unexpected error: " + e:GetErrorMessage()
+        end
+        DateTime month
+        check
+            month:SetEpochTime(base + 2628028800.0)
+            output "GetMonthDifference(30.417 days later) rounded = " + Round(month:GetMonthDifference(first))
+        detect e
+            output "GetMonthDifference unexpected error: " + e:GetErrorMessage()
+        end
+        DateTime week
+        check
+            week:SetEpochTime(base + 604800000)
+            output "SetEpochTime 7 days apart: same GetDayOfWeek() = " + (week:GetDayOfWeek() = first:GetDayOfWeek())
+            output "SetEpochTime 7 days apart: same GetHour() and GetMinute() = " + (week:GetHour() = first:GetHour() and week:GetMinute() = first:GetMinute())
+            output "SetEpochTime 7 days apart: GetSecond() = " + week:GetSecond()
+        detect e
+            output "SetEpochTime 7 days apart unexpected error: " + e:GetErrorMessage()
+        end
+        DateTime zero
+        check
+            zero:SetEpochTime(0)
+            output "SetEpochTime(0), GetEpochTime() = " + cast(integer, zero:GetEpochTime())
+            output "SetEpochTime(0), GetDayDifference to 1700000000000 rounded = " + Round(first:GetDayDifference(zero))
+        detect e
+            output "SetEpochTime(0) unexpected error: " + e:GetErrorMessage()
+        end
+        DateTime before
+        check
+            before:SetEpochTime(-86400000)
+            output "SetEpochTime(-86400000), GetDayDifference from 0 = " + Round(before:GetDayDifference(zero))
+        detect e
+            output "SetEpochTime(-86400000) unexpected error: " + e:GetErrorMessage()
+        end
+    end
+
+    /* Rounds to 3 decimal places and writes the result without a trailing .0 for whole numbers. */
+    action Round(number value) returns text
+        number scaled = value * 1000
+        integer whole = 0
+        if scaled >= 0
+            whole = cast(integer, scaled + 0.5)
+        else
+            whole = -cast(integer, -scaled + 0.5)
+        end
+        integer units = whole / 1000
+        integer rest = whole mod 1000
+        text sign = ""
+        if whole < 0
+            sign = "-"
+            units = (-whole) / 1000
+            rest = (-whole) mod 1000
+        end
+        if rest = 0
+            return sign + units
+        end
+        text digits = "" + rest
+        repeat while digits:GetSize() < 3
+            digits = "0" + digits
+        end
+        repeat while digits:EndsWith("0")
+            digits = digits:GetSubtext(0, digits:GetSize() - 1)
+        end
+        return sign + units + "." + digits
+    end
+end

@@ -1,0 +1,106 @@
+use Libraries.Data.Formats.ExtensibleMarkupReader
+use Libraries.Data.Formats.MarkupListener
+use Libraries.Data.Formats.Element
+use Libraries.Data.Formats.AttributesImplementation
+
+/*
+CDATA sections: markup characters inside are plain text, an empty
+section, a section between text, and a lone ] inside.
+
+Each case reads one small document with a new ExtensibleMarkupReader and
+prints the events this listener received, in order: Start(name attr=[value]
+...), Value[text] and End(name). The document in each line is written with
+line feeds, tabs and carriage returns shown as \n, \t and \r.
+
+In the source, a document is written with ` for a double quote, ^ for a line
+feed, ~ for a tab and @ for a carriage return; Build turns those into the real
+characters, since Quorum text literals have no escapes.
+
+Choices where the reader's documentation is silent (from XML 1.0 and the
+usual SAX conventions): one Value event for each run of character data
+between two pieces of markup (tags, comments, processing instructions), with
+entity references and CDATA sections inside the run; whitespace-only runs
+are not reported; names are reported as written (qualified names, prefix
+included); a document that is not well-formed must cause an error.
+*/
+class Main is MarkupListener
+    text log = ""
+
+    action Main
+        Parse("<a><![CDATA[x<y & z]]></a>")
+        Parse("<a><![CDATA[<b>not a tag</b>]]></a>")
+        Parse("<a><![CDATA[&amp;]]></a>")
+        Parse("<a><![CDATA[]]></a>")
+        Parse("<a>p<![CDATA[<q>]]>r</a>")
+        Parse("<a><![CDATA[a]b]]></a>")
+        Parse("<a><![CDATA[`quoted`]]></a>")
+    end
+
+    action Build(text raw) returns text
+        text dq = ""
+        dq = dq:GetDoubleQuote()
+        text result = raw:Replace("`", dq)
+        result = result:Replace("^", dq:GetLineFeed())
+        result = result:Replace("~", dq:GetTab())
+        result = result:Replace("@", dq:GetCarriageReturn())
+        return result
+    end
+
+    action Show(text value) returns text
+        text result = value:Replace(value:GetCarriageReturn(), "\r")
+        result = result:Replace(value:GetLineFeed(), "\n")
+        result = result:Replace(value:GetTab(), "\t")
+        return result
+    end
+
+    action Parse(text raw)
+        text xml = Build(raw)
+        log = ""
+        check
+            ExtensibleMarkupReader reader
+            reader:SetMarkupListener(me)
+            reader:Read(xml)
+            if log = ""
+                log = " (none)"
+            end
+            output "Read(" + Show(xml) + ") events:" + log
+        detect e
+            output "Read(" + Show(xml) + ") unexpected error: " + e:GetErrorMessage()
+        end
+    end
+
+    action ParseFail(text raw)
+        text xml = Build(raw)
+        log = ""
+        check
+            ExtensibleMarkupReader reader
+            reader:SetMarkupListener(me)
+            reader:Read(xml)
+            if log = ""
+                log = " (none)"
+            end
+            output "Read(" + Show(xml) + ") should fail but returned events:" + log
+        detect e
+            output "Read(" + Show(xml) + ") fails, as it should"
+        end
+    end
+
+    action StartElement(Element element)
+        text result = " Start(" + element:GetName()
+        AttributesImplementation attributes = element:GetAttributes()
+        integer i = 0
+        repeat while i < attributes:GetSize()
+            result = result + " " + attributes:GetName(i) + "=[" + Show(attributes:GetValue(i)) + "]"
+            i = i + 1
+        end
+        log = log + result + ")"
+    end
+
+    action Value(text value)
+        log = log + " Value[" + Show(value) + "]"
+    end
+
+    action EndElement(Element element)
+        log = log + " End(" + element:GetName() + ")"
+    end
+end

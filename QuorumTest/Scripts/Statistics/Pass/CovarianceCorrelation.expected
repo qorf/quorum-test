@@ -1,0 +1,9 @@
+CovarianceMatrixTransform(x, y) matrix = [1.666667, 3.166667; 3.166667, 6.166667]
+CovarianceMatrixTransform(x, y) frame headers and row names = x,y rows x,y
+CovarianceMatrixTransform UsePopulation(true) matrix = [1.25, 2.375; 2.375, 4.625] (UsePopulation true, UseSample false)
+CovarianceMatrixTransform of two rows matrix = [2.0, 4.0; 4.0, 8.0]
+DataFrame CovarianceMatrix() = [1.666667, 3.166667; 3.166667, 6.166667]
+CorrelationMatrixTransform(x, y) matrix = [1.0, 0.987763; 0.987763, 1.0]
+DataFrame CorrelationMatrix() of y, x = [1.0, 0.987763; 0.987763, 1.0]
+CovarianceMatrixTransform with a text column fails, as it should
+CorrelationMatrixTransform with no columns fails, as it should

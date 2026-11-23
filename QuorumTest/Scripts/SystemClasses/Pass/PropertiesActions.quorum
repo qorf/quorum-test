@@ -1,0 +1,90 @@
+use Libraries.System.Properties
+use Libraries.System.File
+use Libraries.Containers.HashTable
+
+/*
+Tests Properties: GetProperty, SetProperty, GetEnvironmentVariable,
+GetOperatingSystemName, GetArchitecture, GetOperatingSystemVersion, the Is
+actions, GetRequestedWebPage, GetProperties, GetEnvironmentVariables,
+GetRunLocation and the public constants. Values that depend on the machine
+are never printed: only whether they are empty, and facts true on any
+desktop computer (it is one of Windows, Mac or Linux, and not a phone or a
+web browser). A missing property or environment variable is an empty text,
+as GetProperty and GetEnvironmentVariable return. The program runs from a
+jar, so GetRunLocation is a file ending in .jar.
+*/
+class Main
+    action Main
+        Properties props
+        check
+            output "Constants: operatingSystem = [" + props:operatingSystem + "], architecture = [" + props:architecture + "], version = [" + props:version + "]"
+            output "Constants: javaRuntimeName = [" + props:javaRuntimeName + "], requestedWebPage = [" + props:requestedWebPage + "], iosSimulator = [" + props:iosSimulator + "]"
+        detect e
+            output "Constants unexpected error: " + e:GetErrorMessage()
+        end
+        check
+            output "GetProperty(quorum.test.missing.property) = [" + props:GetProperty("quorum.test.missing.property") + "]"
+        detect e
+            output "GetProperty(missing) unexpected error: " + e:GetErrorMessage()
+        end
+        check
+            props:SetProperty("quorum.test.property", "a value")
+            output "SetProperty(quorum.test.property, a value), GetProperty(quorum.test.property) = [" + props:GetProperty("quorum.test.property") + "]"
+            props:SetProperty("quorum.test.property", "another")
+            output "SetProperty(quorum.test.property, another), GetProperty(quorum.test.property) = [" + props:GetProperty("quorum.test.property") + "]"
+        detect e
+            output "SetProperty unexpected error: " + e:GetErrorMessage()
+        end
+        check
+            text os = props:GetOperatingSystemName()
+            output "GetOperatingSystemName() is not empty = " + (not os:IsEmpty())
+            output "GetOperatingSystemName() is the os.name property = " + (os = props:GetProperty("os.name"))
+            text arch = props:GetArchitecture()
+            output "GetArchitecture() is not empty = " + (not arch:IsEmpty())
+            text version = props:GetOperatingSystemVersion()
+            output "GetOperatingSystemVersion() is not empty = " + (not version:IsEmpty())
+        detect e
+            output "Operating system values unexpected error: " + e:GetErrorMessage()
+        end
+        check
+            text os = props:GetOperatingSystemName()
+            output "IsWindows() or IsMac() or Linux = " + (props:IsWindows() or props:IsMac() or os:Contains("Linux"))
+            output "IsWindows() and IsMac() are not both true = " + (not (props:IsWindows() and props:IsMac()))
+            output "IsAndroid() = " + props:IsAndroid()
+            output "IsIos() = " + props:IsIos()
+            output "IsIosSimulator() = " + props:IsIosSimulator()
+            output "IsWebBrowser() = " + props:IsWebBrowser()
+        detect e
+            output "Is actions unexpected error: " + e:GetErrorMessage()
+        end
+        check
+            output "GetEnvironmentVariable(QUORUM_TEST_MISSING_VARIABLE) = [" + props:GetEnvironmentVariable("QUORUM_TEST_MISSING_VARIABLE") + "]"
+            text path = props:GetEnvironmentVariable("PATH")
+            output "GetEnvironmentVariable(PATH) is not empty = " + (not path:IsEmpty())
+            output "GetRequestedWebPage() = [" + props:GetRequestedWebPage() + "]"
+        detect e
+            output "Environment variables unexpected error: " + e:GetErrorMessage()
+        end
+        check
+            HashTable<text, text> all = props:GetProperties()
+            output "GetProperties() has os.name = " + all:HasKey("os.name")
+            output "GetProperties() has quorum.test.property = [" + all:GetValue("quorum.test.property") + "]"
+        detect e
+            output "GetProperties() unexpected error: " + e:GetErrorMessage()
+        end
+        check
+            HashTable<text, text> environment = props:GetEnvironmentVariables()
+            output "GetEnvironmentVariables() is not empty = " + (not environment:IsEmpty())
+            output "GetEnvironmentVariables() has QUORUM_TEST_MISSING_VARIABLE = " + environment:HasKey("QUORUM_TEST_MISSING_VARIABLE")
+        detect e
+            output "GetEnvironmentVariables() unexpected error: " + e:GetErrorMessage()
+        end
+        check
+            File location = props:GetRunLocation()
+            output "GetRunLocation() is defined = " + (location not= undefined)
+            output "GetRunLocation() is a .jar file = " + (location:GetFileExtension() = "jar" and location:IsFile())
+        detect e
+            output "GetRunLocation() unexpected error: " + e:GetErrorMessage()
+        end
+    end
+end

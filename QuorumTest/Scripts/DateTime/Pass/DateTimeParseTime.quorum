@@ -1,0 +1,56 @@
+use Libraries.System.DateTime
+
+/*
+Tests ParseTime(text) and ParseTime(text, boolean). A parsed time sets the
+hour, minute and second; with keepDate true the date already held is kept,
+and with ParseTime(text) the date is today (not printed, as it changes).
+After a parse the DateTime holds that time, so GetHour returns the parsed
+hour, not the current one. Text that is not a time raises an error.
+*/
+class Main
+    action Main
+        DateTime alone
+        check
+            alone:ParseTime("03:04:05")
+            output "ParseTime(03:04:05): GetHour() = " + alone:GetHour()
+            output "ParseTime(03:04:05): GetMinute() = " + alone:GetMinute()
+            output "ParseTime(03:04:05): GetSecond() = " + alone:GetSecond()
+            output "ParseTime(03:04:05): TimeToText() = [" + alone:TimeToText() + "]"
+        detect e
+            output "ParseTime(03:04:05) unexpected error: " + e:GetErrorMessage()
+        end
+        DateTime kept
+        check
+            kept:ParseDate("2022-08-09")
+            kept:ParseTime("21:30:15", true)
+            output "ParseDate(2022-08-09), ParseTime(21:30:15, true): GetTimestamp() = [" + kept:GetTimestamp() + "]"
+            output "ParseDate(2022-08-09), ParseTime(21:30:15, true): GetDayOfMonth() = " + kept:GetDayOfMonth()
+            output "ParseDate(2022-08-09), ParseTime(21:30:15, true): GetHour() = " + kept:GetHour()
+        detect e
+            output "ParseTime(21:30:15, true) unexpected error: " + e:GetErrorMessage()
+        end
+        DateTime replaced
+        check
+            replaced:ParseDate("2022-08-09")
+            replaced:ParseTime("06:07:08", false)
+            output "ParseDate(2022-08-09), ParseTime(06:07:08, false): GetHour() = " + replaced:GetHour() + ", GetMinute() = " + replaced:GetMinute() + ", GetSecond() = " + replaced:GetSecond()
+            output "ParseDate(2022-08-09), ParseTime(06:07:08, false): the date is no longer 2022-08-09 = " + (replaced:DateToText() not= "2022-08-09")
+        detect e
+            output "ParseTime(06:07:08, false) unexpected error: " + e:GetErrorMessage()
+        end
+        DateTime bad
+        check
+            bad:ParseTime("25:00:00")
+            output "ParseTime(25:00:00) should fail but returned normally"
+        detect e
+            output "ParseTime(25:00:00) fails, as it should"
+        end
+        DateTime words
+        check
+            words:ParseTime("noon")
+            output "ParseTime(noon) should fail but returned normally"
+        detect e
+            output "ParseTime(noon) fails, as it should"
+        end
+    end
+end

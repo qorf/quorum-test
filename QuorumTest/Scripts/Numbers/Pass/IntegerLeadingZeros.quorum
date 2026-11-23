@@ -1,0 +1,35 @@
+/*
+    Integer:LeadingZeros counts the zero bits before the highest one bit in
+    the 32-bit form: 0 gives 32, 1 gives 31 and any negative value gives 0.
+    Each case runs on an integer primitive and on an Integer object.
+*/
+class Main
+    action Main
+        ShowLeadingZeros(0)
+        ShowLeadingZeros(1)
+        ShowLeadingZeros(2)
+        ShowLeadingZeros(255)
+        ShowLeadingZeros(65536)
+        ShowLeadingZeros(2147483647)
+        ShowLeadingZeros(-1)
+        ShowLeadingZeros(-2147483647 - 1)
+    end
+
+    action ShowLeadingZeros(integer value)
+        text call = "LeadingZeros(" + value + ")"
+        check
+            integer result = value:LeadingZeros()
+            output call + " = " + result
+        detect e
+            output call + " unexpected error: " + e:GetErrorMessage()
+        end
+        Integer object
+        object:SetValue(value)
+        check
+            integer result = object:LeadingZeros()
+            output "Integer " + call + " = " + result
+        detect e
+            output "Integer " + call + " unexpected error: " + e:GetErrorMessage()
+        end
+    end
+end

@@ -1,0 +1,11 @@
+ParseTime(03:04:05): GetHour() = 3
+ParseTime(03:04:05): GetMinute() = 4
+ParseTime(03:04:05): GetSecond() = 5
+ParseTime(03:04:05): TimeToText() = [03:04:05]
+ParseDate(2022-08-09), ParseTime(21:30:15, true): GetTimestamp() = [2022-08-09T21:30:15]
+ParseDate(2022-08-09), ParseTime(21:30:15, true): GetDayOfMonth() = 9
+ParseDate(2022-08-09), ParseTime(21:30:15, true): GetHour() = 21
+ParseDate(2022-08-09), ParseTime(06:07:08, false): GetHour() = 6, GetMinute() = 7, GetSecond() = 8
+ParseDate(2022-08-09), ParseTime(06:07:08, false): the date is no longer 2022-08-09 = true
+ParseTime(25:00:00) fails, as it should
+ParseTime(noon) fails, as it should

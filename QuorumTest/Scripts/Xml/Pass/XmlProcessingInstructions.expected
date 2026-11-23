@@ -1,0 +1,8 @@
+Read(<?xml version='1.0'?><a/>) events: Start(a) End(a)
+Read(<?xml version="1.0" encoding="UTF-8"?><a>t</a>) events: Start(a) Value[t] End(a)
+Read(<?xml version='1.0'?>\n<a>t</a>\n) events: Start(a) Value[t] End(a)
+Read(<a><?target data?></a>) events: Start(a) End(a)
+Read(<a>x<?pi?>y</a>) events: Start(a) Value[x] Value[y] End(a)
+Read(<?pi a>b?><a/>) events: Start(a) End(a)
+Read(<?style href='s.css'?><a/>) events: Start(a) End(a)
+Read(<a/><?pi after?>) events: Start(a) End(a)

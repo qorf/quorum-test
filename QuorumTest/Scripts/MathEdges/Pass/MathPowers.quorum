@@ -1,0 +1,58 @@
+use Libraries.Compute.Math
+
+/*
+Math:RaiseNaturalNumberToPower (e to a power) and the edge cases of
+Math:RaiseToPower. Anything to the power 0 is 1, including 0; a negative
+base to a fractional power has no real answer and gives NaN, as Java's
+Math.pow does; 0 to a negative power is infinity.
+*/
+class Main
+    Math math
+
+    action Main
+        check
+            output "RaiseNaturalNumberToPower(0) = " + math:RaiseNaturalNumberToPower(0)
+        detect e
+            output "RaiseNaturalNumberToPower(0) unexpected error: " + e:GetErrorMessage()
+        end
+        check
+            output "RaiseNaturalNumberToPower(1) rounded to 10 places = " + math:Round(math:RaiseNaturalNumberToPower(1), 10)
+        detect e
+            output "RaiseNaturalNumberToPower(1) unexpected error: " + e:GetErrorMessage()
+        end
+        check
+            output "RaiseNaturalNumberToPower(-1) rounded to 10 places = " + math:Round(math:RaiseNaturalNumberToPower(-1), 10)
+        detect e
+            output "RaiseNaturalNumberToPower(-1) unexpected error: " + e:GetErrorMessage()
+        end
+        check
+            output "RaiseNaturalNumberToPower(2) rounded to 10 places = " + math:Round(math:RaiseNaturalNumberToPower(2), 10)
+        detect e
+            output "RaiseNaturalNumberToPower(2) unexpected error: " + e:GetErrorMessage()
+        end
+        check
+            output "RaiseNaturalNumberToPower(NaturalLogarithm(5)) rounded to 10 places = " + math:Round(math:RaiseNaturalNumberToPower(math:NaturalLogarithm(5)), 10)
+        detect e
+            output "RaiseNaturalNumberToPower(NaturalLogarithm(5)) unexpected error: " + e:GetErrorMessage()
+        end
+        ShowPower(0, 0)
+        ShowPower(5, 0)
+        ShowPower(2, 10)
+        ShowPower(2, -1)
+        ShowPower(-2, 3)
+        ShowPower(-2, 2)
+        ShowPower(9, 0.5)
+        ShowPower(-8, 0.5)
+        ShowPower(0, -1)
+        ShowPower(10, 300)
+        ShowPower(10, 400)
+    end
+
+    action ShowPower(number value, number power)
+        check
+            output "RaiseToPower(" + value + ", " + power + ") = " + math:RaiseToPower(value, power)
+        detect e
+            output "RaiseToPower(" + value + ", " + power + ") unexpected error: " + e:GetErrorMessage()
+        end
+    end
+end

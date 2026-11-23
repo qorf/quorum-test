@@ -1,0 +1,36 @@
+/*
+    Integer:GetHex gives the lower case base-16 digits of the 32-bit two's
+    complement form with no 0x prefix (Java's toHexString): 255 gives ff and
+    -1 gives ffffffff.
+    Each case runs on an integer primitive and on an Integer object.
+*/
+class Main
+    action Main
+        Show(0)
+        Show(1)
+        Show(10)
+        Show(15)
+        Show(16)
+        Show(255)
+        Show(-1)
+        Show(-8)
+        Show(2147483647)
+        Show(-2147483647 - 1)
+    end
+
+    action Show(integer value)
+        text call = "GetHex(" + value + ")"
+        check
+            output call + " = [" + value:GetHex() + "]"
+        detect e
+            output call + " unexpected error: " + e:GetErrorMessage()
+        end
+        Integer object
+        object:SetValue(value)
+        check
+            output "Integer " + call + " = [" + object:GetHex() + "]"
+        detect e
+            output "Integer " + call + " unexpected error: " + e:GetErrorMessage()
+        end
+    end
+end

@@ -1,0 +1,56 @@
+use Libraries.Compute.Matrix
+use Libraries.Compute.MatrixTransform.Multiply
+
+/*
+Multiply:TransformInHardware falls back to the CPU, and gives the CPU's
+answer, when the numbers can't be held as two 32-bit numbers each. This is
+the DOUBLE_NUMBER_32 mode's range check, so the program sets that mode.
+With no graphics card that can compute, TransformInHardware also uses the
+CPU, so every line below is the same with or without one.
+
+The large case is |1.0E39, 1| |1, 1| times itself: 1.0E39 is past the
+largest 32-bit number. Its (1, 1) is 1 * 1 + 1 * 1 = 2. The tiny case is
+the 2 by 2 matrix of 1.0E-20 times itself: each product, 1.0E-40, is too
+small for the low part of two 32-bit numbers.
+*/
+class Main
+    action Main
+        check
+            Multiply multiply
+            multiply:SetNumberMode(multiply:DOUBLE_NUMBER_32)
+            Matrix large
+            large:Fill(2, 2, 1.0)
+            large:Set(0, 0, 1.0e39)
+            multiply:SetValue(large)
+            Matrix expected = multiply:TransformInSoftware(large)
+            Matrix result = multiply:TransformInHardware(large)
+            text call = "TransformInHardware, DOUBLE_NUMBER_32, of |1.0E39, 1| |1, 1| by itself:"
+            output call + " RanInHardware = " + multiply:RanInHardware()
+            output call + " has " + result:GetRows() + " rows and " + result:GetColumns() + " columns"
+            output call + " (0, 0) equals TransformInSoftware's: " + (result:Get(0, 0) = expected:Get(0, 0))
+            output call + " (0, 1) equals TransformInSoftware's: " + (result:Get(0, 1) = expected:Get(0, 1))
+            output call + " (1, 1) = " + result:Get(1, 1) + ", hand-worked 2"
+            multiply:Release()
+        detect problem
+            output "Large number unexpected error: " + problem:GetErrorMessage()
+        end
+
+        check
+            Multiply multiply
+            multiply:SetNumberMode(multiply:DOUBLE_NUMBER_32)
+            Matrix tiny
+            tiny:Fill(2, 2, 1.0e-20)
+            multiply:SetValue(tiny)
+            Matrix expected = multiply:TransformInSoftware(tiny)
+            Matrix result = multiply:TransformInHardware(tiny)
+            text call = "TransformInHardware, DOUBLE_NUMBER_32, of the 2 by 2 matrix of 1.0E-20 by itself:"
+            output call + " RanInHardware = " + multiply:RanInHardware()
+            output call + " (0, 1) equals TransformInSoftware's: " + (result:Get(0, 1) = expected:Get(0, 1))
+            output call + " (1, 0) equals TransformInSoftware's: " + (result:Get(1, 0) = expected:Get(1, 0))
+            output call + " (0, 1) is above 0: " + (result:Get(0, 1) > 0)
+            multiply:Release()
+        detect problem
+            output "Tiny number unexpected error: " + problem:GetErrorMessage()
+        end
+    end
+end

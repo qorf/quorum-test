@@ -1,0 +1,15 @@
+CombineFrames(a b, then c) = name=a,b,c | score=1.5,2.5,3.5
+CombineFrames leaves both frames unchanged = name=a,b | score=1.5,2.5 / name=c | score=3.5
+CombineFrames GetToCombine() = name=c | score=3.5
+CombineFrames with different column counts fails, as it should
+CombineFrames with nothing to combine fails, as it should
+ColumnFilterTransform AddColumn(2) AddColumn(0) = c=true,false | a=1.5,2.5
+ColumnFilterTransform with no columns GetSize() = 0
+ColumnRowFilterTransform settings read back = 1 2 3 4
+ColumnRoundTransform SetDecimalPlace(2) on column x = x=1.23,9.88 | y=2.71828,-0.55555
+RoundSelectedColumns(3) on x and y = x=1.235,9.877 | y=2.718,-0.556
+RoundSelectedColumns(1) leaves the original frame unchanged = x=1.23456,9.87654 | y=2.71828,-0.55555
+RoundSelectedColumns(1) with an undefined cell = x=1.2,NA,3.8 | k=a,b,c
+ColumnRoundTransform SetDecimalPlace(0) fails, as it should
+RoundSelectedColumns on a text column fails, as it should
+ReplaceUndefined(0) = w=hi,0,yo | x=1.5,0.0,2.5

@@ -1,0 +1,11 @@
+new WebPageHeader Generate() = [<head ><title ></title></head>]
+SetTitleHeaderValue(Home) Generate() = [<head ><title >Home</title></head>]
+SetTitleHeaderValue(Home) GetTitleHeader():Generate() = [<title >Home</title>]
+Add(MetaData charset) and Add(Script) Generate() = [<head ><title ></title><meta charset= 'UTF-8' ><script >go();</script></head>]
+two Add(MetaData) GetNumberOfMetaDataItems() = 2
+Add then Remove(MetaData) GetNumberOfMetaDataItems() = 0
+Add(Script) GetNumberOfScriptItems() = 1
+AddStylesheet(s.css) returns a link to it = [s.css]
+AddIcon(i.png) returns a link with rel icon = [icon]
+Add(Base) once Generate() = [<head ><title ></title><base id= 'x' ></head>]
+two Add(Base) Generate() fails, as it should

@@ -14,8 +14,17 @@ use Libraries.Containers.Array
 class TesterCatalog
     public constant text LANGUAGE = "Language"
     public constant text LIBRARY = "Library"
+    // The groups below were added with the testers in NewTests.md.
+    public constant text LIBRARY_EDGES = "Library edge cases"
+    public constant text SYSTEM = "System"
     public constant text FILES_AND_DATA = "Files and data"
+    public constant text SPEED = "Speed"
+    public constant text GAME = "Game and physics"
+    public constant text COMPUTE = "Compute"
     public constant text SCIENCE = "Science"
+
+    // The groups in the order the runner window shows them.
+    Array<text> groupOrder
 
     Array<text> keys
     Array<text> labels
@@ -23,6 +32,16 @@ class TesterCatalog
     Array<integer> weights
 
     on create
+        groupOrder:Add(LANGUAGE)
+        groupOrder:Add(LIBRARY)
+        groupOrder:Add(LIBRARY_EDGES)
+        groupOrder:Add(SYSTEM)
+        groupOrder:Add(FILES_AND_DATA)
+        groupOrder:Add(SPEED)
+        groupOrder:Add(GAME)
+        groupOrder:Add(COMPUTE)
+        groupOrder:Add(SCIENCE)
+
         Add("Expressions", "Expressions", LANGUAGE, 378)
         Add("TypeCheck", "Type check", LANGUAGE, 863)
         Add("TypeCheckGenerated", "Type check generated", LANGUAGE, 1091)
@@ -55,6 +74,39 @@ class TesterCatalog
         Add("DataFormats", "Data formats", FILES_AND_DATA, 8)
         Add("Fabrication", "Fabrication", FILES_AND_DATA, 23)
         Add("Science", "Science", SCIENCE, 80)
+
+        // Added with NewTests.md (2026-11-22). Weights are the test counts:
+        // scripts times the back ends each runs on, or the in-process test
+        // count. The speed tests take longer than their count suggests.
+        Add("Text", "Text", LIBRARY_EDGES, 60)
+        Add("Numbers", "Numbers", LIBRARY_EDGES, 60)
+        Add("ContainerEdges", "Container edges", LIBRARY_EDGES, 117)
+        Add("MathEdges", "Math edges", LIBRARY_EDGES, 91)
+        Add("Geometry", "Geometry", LIBRARY_EDGES, 9)
+        Add("TextSupport", "Text support", LIBRARY_EDGES, 8)
+        Add("File", "File", SYSTEM, 15)
+        Add("DateTime", "Date and time", SYSTEM, 54)
+        Add("SystemClasses", "System classes", SYSTEM, 10)
+        Add("Xml", "XML", FILES_AND_DATA, 52)
+        Add("DataEdges", "Data edges", FILES_AND_DATA, 45)
+        Add("Web", "Web", FILES_AND_DATA, 41)
+        Add("Printers", "Printers", FILES_AND_DATA, 52)
+        Add("HashTableSpeed", "Hash table speed", SPEED, 18)
+        Add("Physics", "Physics", GAME, 93)
+        Add("RenderTrees", "Render trees", GAME, 22)
+        Add("Worlds", "Worlds", GAME, 22)
+        Add("Compute", "Compute", COMPUTE, 5)
+        Add("Statistics", "Statistics", SCIENCE, 21)
+    end
+
+    /* How many groups the runner window shows. */
+    action GetGroupCount returns integer
+        return groupOrder:GetSize()
+    end
+
+    /* The group at a place in the window's order. */
+    action GetGroupName(integer index) returns text
+        return groupOrder:Get(index)
     end
 
     private action Add(text key, text label, text group, integer weight)

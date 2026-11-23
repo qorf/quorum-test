@@ -1,0 +1,18 @@
+GetCharacter(abc, 0) = [a]
+Text GetCharacter(abc, 0) = [a]
+GetCharacter(abc, 1) = [b]
+Text GetCharacter(abc, 1) = [b]
+GetCharacter(abc, 2) = [c]
+Text GetCharacter(abc, 2) = [c]
+GetCharacter(a, 0) = [a]
+Text GetCharacter(a, 0) = [a]
+GetCharacter( x, 0) = [ ]
+Text GetCharacter( x, 0) = [ ]
+GetCharacter(abc, 3) fails, as it should
+Text GetCharacter(abc, 3) fails, as it should
+GetCharacter(abc, -1) fails, as it should
+Text GetCharacter(abc, -1) fails, as it should
+GetCharacter(abc, 100) fails, as it should
+Text GetCharacter(abc, 100) fails, as it should
+GetCharacter(, 0) fails, as it should
+Text GetCharacter(, 0) fails, as it should

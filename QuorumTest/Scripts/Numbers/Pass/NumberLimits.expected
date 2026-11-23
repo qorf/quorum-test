@@ -1,0 +1,32 @@
+number GetMaximumValue() > 1000000 is true
+number GetMaximumValue() IsInfinite is false
+number GetMaximumValue() * 2 IsInfinite is true
+number GetMinimumValue() = -GetMaximumValue() is true
+number GetMinimumValue() < 0 is true
+number GetMinimumPositiveValue() > 0 is true
+number GetMinimumPositiveValue() / 2 = 0 is true
+number GetMinimumPositiveValue() < 0.0000000001 is true
+number GetPositiveInfinityValue() IsInfinite is true
+number GetPositiveInfinityValue() > GetMaximumValue() is true
+number GetNegativeInfinityValue() IsInfinite is true
+number GetNegativeInfinityValue() < GetMinimumValue() is true
+number GetNegativeInfinityValue() = -GetPositiveInfinityValue() is true
+number GetNotANumberValue() IsNotANumber is true
+number GetNotANumberValue() = itself is false
+Number GetMaximumValue() > 1000000 is true
+Number GetMaximumValue() IsInfinite is false
+Number GetMaximumValue() * 2 IsInfinite is true
+Number GetMinimumValue() = -GetMaximumValue() is true
+Number GetMinimumValue() < 0 is true
+Number GetMinimumPositiveValue() > 0 is true
+Number GetMinimumPositiveValue() / 2 = 0 is true
+Number GetMinimumPositiveValue() < 0.0000000001 is true
+Number GetPositiveInfinityValue() IsInfinite is true
+Number GetPositiveInfinityValue() > GetMaximumValue() is true
+Number GetNegativeInfinityValue() IsInfinite is true
+Number GetNegativeInfinityValue() < GetMinimumValue() is true
+Number GetNegativeInfinityValue() = -GetPositiveInfinityValue() is true
+Number GetNotANumberValue() IsNotANumber is true
+Number GetNotANumberValue() = itself is false
+number GetNumberOfBits() = 64
+Number GetNumberOfBits() = 64

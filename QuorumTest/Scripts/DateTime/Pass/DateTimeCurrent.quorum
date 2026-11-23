@@ -1,0 +1,60 @@
+use Libraries.System.DateTime
+use Libraries.System.SystemHelper
+
+/*
+Tests a DateTime that was never set, which follows the clock, and Now. The
+current time is never printed: only facts that are true at any time after
+2025 (the values are in range, the clock moves forward). A DateTime that
+follows the clock compares as the time at the moment of comparison: a time
+set 300 milliseconds after a clock-following DateTime was made is before it
+once 800 milliseconds have passed. IsDaylightSavings and GetTimeZone depend
+on the machine, so only their types are used.
+*/
+class Main
+    action Main
+        DateTime clock
+        check
+            output "GetYear() is 2025 or later = " + (clock:GetYear() >= 2025)
+            output "GetMonth() is from 1 to 12 = " + (clock:GetMonth() >= 1 and clock:GetMonth() <= 12)
+            output "GetDayOfMonth() is from 1 to 31 = " + (clock:GetDayOfMonth() >= 1 and clock:GetDayOfMonth() <= 31)
+            output "GetDayOfWeek() is from 1 to 7 = " + (clock:GetDayOfWeek() >= 1 and clock:GetDayOfWeek() <= 7)
+            output "GetHour() is from 0 to 23 = " + (clock:GetHour() >= 0 and clock:GetHour() <= 23)
+            output "GetMinute() is from 0 to 59 = " + (clock:GetMinute() >= 0 and clock:GetMinute() <= 59)
+            output "GetSecond() is from 0 to 59 = " + (clock:GetSecond() >= 0 and clock:GetSecond() <= 59)
+            output "GetTimeZone() is from -12 to 14 = " + (clock:GetTimeZone() >= -12 and clock:GetTimeZone() <= 14)
+            boolean daylight = clock:IsDaylightSavings()
+            output "IsDaylightSavings() returns a boolean = true"
+        detect e
+            output "Clock values unexpected error: " + e:GetErrorMessage()
+        end
+        check
+            number current = clock:Now()
+            output "Now() is after January 1, 2025 in milliseconds = " + (current > 1735689600000.0)
+            output "GetEpochTime() of a clock DateTime is after January 1, 2025 in milliseconds = " + (clock:GetEpochTime() > 1735689600000.0)
+        detect e
+            output "Now() unexpected error: " + e:GetErrorMessage()
+        end
+        DateTime past
+        check
+            past:ParseDate("2000-01-01")
+            output "clock:IsAfter(2000-01-01) = " + clock:IsAfter(past)
+            output "2000-01-01:IsBefore(clock) = " + past:IsBefore(clock)
+            output "clock:Compare(2000-01-01) = " + clock:Compare(past)
+        detect e
+            output "Comparing with the clock unexpected error: " + e:GetErrorMessage()
+        end
+
+        DateTime follower
+        DateTime soon
+        SystemHelper helper
+        check
+            soon:SetEpochTime(follower:GetEpochTime() + 300)
+            helper:Sleep(800)
+            output "After 800 ms, a time set 300 ms after the clock DateTime: soon:IsBefore(clock) = " + soon:IsBefore(follower)
+            output "After 800 ms: soon:IsAfter(clock) = " + soon:IsAfter(follower)
+            output "After 800 ms: clock:IsAfter(soon) = " + follower:IsAfter(soon)
+        detect e
+            output "Comparing with a moving clock unexpected error: " + e:GetErrorMessage()
+        end
+    end
+end

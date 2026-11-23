@@ -1,0 +1,29 @@
+GetText(true) = [true]
+GetHashCode(true) = 1231
+Boolean GetValue(true) = true
+Boolean GetText(true) = [true]
+Boolean GetHashCode(true) = 1231
+GetText(false) = [false]
+GetHashCode(false) = 1237
+Boolean GetValue(false) = false
+Boolean GetText(false) = [false]
+Boolean GetHashCode(false) = 1237
+Compare(false, true) = -1
+Equals(false, true) = false
+Boolean Compare(false, true) = -1
+Boolean Equals(false, true) = false
+Compare(true, false) = 1
+Equals(true, false) = false
+Boolean Compare(true, false) = 1
+Boolean Equals(true, false) = false
+Compare(true, true) = 0
+Equals(true, true) = true
+Boolean Compare(true, true) = 0
+Boolean Equals(true, true) = true
+Compare(false, false) = 0
+Equals(false, false) = true
+Boolean Compare(false, false) = 0
+Boolean Equals(false, false) = true
+new Boolean GetValue() = false
+SetValue(true) then SetValue(false): GetValue() = false, GetHashCode() = 1237
+SetValue(true) again: GetValue() = true, GetHashCode() = 1231

@@ -1,0 +1,79 @@
+use Libraries.Compute.Math
+
+/*
+Math:MaximumOf, MinimumOf, Remainder, Clamp and Equals(x, y, epsilon).
+Remainder is computed as a - b * Floor(a / b), so its answer takes the sign
+of the divisor (Remainder(-7, 3) is 2, Remainder(7, -3) is -2). That is
+what the action's code does; its documentation only says "the remainder".
+Epsilons are 0.001 or larger, which every back end prints the same way.
+*/
+class Main
+    Math math
+
+    action Main
+        check
+            output "MaximumOf(3, 7) = " + math:MaximumOf(3, 7)
+        detect e
+            output "MaximumOf(3, 7) unexpected error: " + e:GetErrorMessage()
+        end
+        check
+            output "MaximumOf(-3, -7) = " + math:MaximumOf(-3, -7)
+        detect e
+            output "MaximumOf(-3, -7) unexpected error: " + e:GetErrorMessage()
+        end
+        check
+            output "MaximumOf(2.5, 2.5) = " + math:MaximumOf(2.5, 2.5)
+        detect e
+            output "MaximumOf(2.5, 2.5) unexpected error: " + e:GetErrorMessage()
+        end
+        check
+            output "MinimumOf(3, 7) = " + math:MinimumOf(3, 7)
+        detect e
+            output "MinimumOf(3, 7) unexpected error: " + e:GetErrorMessage()
+        end
+        check
+            output "MinimumOf(-3, -7) = " + math:MinimumOf(-3, -7)
+        detect e
+            output "MinimumOf(-3, -7) unexpected error: " + e:GetErrorMessage()
+        end
+        ShowRemainder(7, 3)
+        ShowRemainder(-7, 3)
+        ShowRemainder(7, -3)
+        ShowRemainder(-7, -3)
+        ShowRemainder(7.5, 2)
+        ShowRemainder(6, 3)
+        ShowClamp(5, 0, 10)
+        ShowClamp(-5, 0, 10)
+        ShowClamp(15, 0, 10)
+        ShowClamp(0, 0, 10)
+        ShowClamp(10, 0, 10)
+        ShowEquals(1.0, 1.05, 0.1)
+        ShowEquals(1.0, 1.2, 0.1)
+        ShowEquals(-1.0, 1.0, 0.1)
+        ShowEquals(0.1 + 0.2, 0.3, 0.001)
+    end
+
+    action ShowRemainder(number a, number b)
+        check
+            output "Remainder(" + a + ", " + b + ") = " + math:Remainder(a, b)
+        detect e
+            output "Remainder(" + a + ", " + b + ") unexpected error: " + e:GetErrorMessage()
+        end
+    end
+
+    action ShowClamp(number value, number lower, number upper)
+        check
+            output "Clamp(" + value + ", " + lower + ", " + upper + ") = " + math:Clamp(value, lower, upper)
+        detect e
+            output "Clamp(" + value + ", " + lower + ", " + upper + ") unexpected error: " + e:GetErrorMessage()
+        end
+    end
+
+    action ShowEquals(number x, number y, number epsilon)
+        check
+            output "Equals(" + x + ", " + y + ", " + epsilon + ") = " + math:Equals(x, y, epsilon)
+        detect e
+            output "Equals(" + x + ", " + y + ", " + epsilon + ") unexpected error: " + e:GetErrorMessage()
+        end
+    end
+end

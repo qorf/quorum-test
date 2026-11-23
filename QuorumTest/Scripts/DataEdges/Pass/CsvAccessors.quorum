@@ -1,0 +1,111 @@
+use Libraries.Data.Formats.SeparatedValue
+use Libraries.Containers.Array
+
+/*
+SeparatedValue's getters after reading name,age / Ann,30 / Bob,41 (lines
+separated by line feeds, shown as \n): GetNumberOfRows, GetSize,
+GetNumberOfColumns, IsConsistent, Get, GetRow, GetSeparator, SetSeparator;
+indexes past the end, which the documentation says throw an error; an
+inconsistent text; an empty text; and a new SeparatedValue that has read
+nothing, which has no rows and no columns (0, as the documentation says the
+action returns the number of available columns).
+*/
+class Main
+    action Main
+        text lf = ""
+        lf = lf:GetLineFeed()
+        text people = "name,age" + lf + "Ann,30" + lf + "Bob,41"
+        text shown = "name,age\nAnn,30\nBob,41"
+
+        check
+            SeparatedValue csv
+            csv:Read(people)
+            output "Read(" + shown + ") GetNumberOfRows() = " + csv:GetNumberOfRows() + ", GetSize() = " + csv:GetSize() + ", GetNumberOfColumns() = " + csv:GetNumberOfColumns() + ", IsConsistent() = " + csv:IsConsistent()
+        detect e
+            output "Read(" + shown + ") counts unexpected error: " + e:GetErrorMessage()
+        end
+
+        check
+            SeparatedValue csv
+            csv:Read(people)
+            output "Read(" + shown + ") Get(0, 0) = [" + csv:Get(0, 0) + "], Get(1, 0) = [" + csv:Get(1, 0) + "], Get(2, 1) = [" + csv:Get(2, 1) + "]"
+        detect e
+            output "Read(" + shown + ") Get unexpected error: " + e:GetErrorMessage()
+        end
+
+        check
+            SeparatedValue csv
+            csv:Read(people)
+            Array<text> row = csv:GetRow(1)
+            output "Read(" + shown + ") GetRow(1) size = " + row:GetSize() + ", cells = [" + row:Get(0) + "][" + row:Get(1) + "]"
+        detect e
+            output "Read(" + shown + ") GetRow unexpected error: " + e:GetErrorMessage()
+        end
+
+        check
+            SeparatedValue csv
+            csv:Read(people)
+            text value = csv:Get(3, 0)
+            output "Read(" + shown + ") Get(3, 0) should fail but returned [" + value + "]"
+        detect e
+            output "Read(" + shown + ") Get(3, 0) fails, as it should"
+        end
+
+        check
+            SeparatedValue csv
+            csv:Read(people)
+            text value = csv:Get(0, 2)
+            output "Read(" + shown + ") Get(0, 2) should fail but returned [" + value + "]"
+        detect e
+            output "Read(" + shown + ") Get(0, 2) fails, as it should"
+        end
+
+        check
+            SeparatedValue csv
+            csv:Read(people)
+            Array<text> row = csv:GetRow(5)
+            output "Read(" + shown + ") GetRow(5) should fail but returned a row of size " + row:GetSize()
+        detect e
+            output "Read(" + shown + ") GetRow(5) fails, as it should"
+        end
+
+        check
+            SeparatedValue csv
+            csv:Read("a,b" + lf + "c")
+            output "Read(a,b\nc) IsConsistent() = " + csv:IsConsistent() + ", GetNumberOfRows() = " + csv:GetNumberOfRows()
+        detect e
+            output "Read(a,b\nc) unexpected error: " + e:GetErrorMessage()
+        end
+
+        check
+            SeparatedValue csv
+            csv:Read("")
+            output "Read() GetNumberOfRows() = " + csv:GetNumberOfRows() + ", IsConsistent() = " + csv:IsConsistent()
+        detect e
+            output "Read() unexpected error: " + e:GetErrorMessage()
+        end
+
+        check
+            SeparatedValue csv
+            output "new SeparatedValue GetNumberOfRows() = " + csv:GetNumberOfRows() + ", GetSize() = " + csv:GetSize() + ", GetNumberOfColumns() = " + csv:GetNumberOfColumns() + ", IsConsistent() = " + csv:IsConsistent() + ", GetSeparator() = [" + csv:GetSeparator() + "]"
+        detect e
+            output "new SeparatedValue unexpected error: " + e:GetErrorMessage()
+        end
+
+        check
+            SeparatedValue csv
+            csv:SetSeparator(";")
+            output "SetSeparator(;) GetSeparator() = [" + csv:GetSeparator() + "]"
+        detect e
+            output "SetSeparator(;) unexpected error: " + e:GetErrorMessage()
+        end
+
+        check
+            SeparatedValue csv
+            text value = csv:Get(0, 0)
+            output "new SeparatedValue Get(0, 0) should fail but returned [" + value + "]"
+        detect e
+            output "new SeparatedValue Get(0, 0) fails, as it should"
+        end
+    end
+end

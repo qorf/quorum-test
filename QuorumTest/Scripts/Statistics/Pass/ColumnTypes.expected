@@ -1,0 +1,19 @@
+BooleanColumn Add(true, No, Y, 0, t, empty, maybe) = true,false,true,false,true,NA,NA
+BooleanColumn GetSize() and GetUndefinedSize() = 7 2
+BooleanColumn GetAsBoolean(2) = true
+BooleanColumn SetAsBoolean(1, true) GetAsText(1) = true
+BooleanColumn IsBooleanColumn() IsNumberColumn() IsTextColumn() = true false false
+BooleanColumn Copy() then change the copy: copy = false,true,true,false,true,NA,NA, original = true,true,true,false,true,NA,NA, header flags
+BooleanColumn Copy(sort, unique) = false,true
+BooleanColumn ReplaceUndefined(false) = true,false
+BigIntegerColumn Add(30-digit, -42, empty, twelve) = 123456789012345678901234567890,-42,NA,NA
+BigIntegerColumn GetSize() and GetUndefinedSize() = 4 2
+BigIntegerColumn GetAsInteger(1) = -42
+BigIntegerColumn SetAsInteger(1, 7) GetAsText(1) = 7
+BigIntegerColumn Copy(sort, unique) = -5,30,100000000000000000000
+BigIntegerColumn ReplaceUndefined(9) = 5,9
+DateTimeColumn Add(timestamp, empty, not a time) = 2015-03-14T09:26:53,NA,NA
+DateTimeColumn IsDateTimeColumn() and GetUndefinedSize() = true 2
+DateTimeColumn SetParser(AmericanDateParser) Add(7/4/1976, 12/25/1975, 7/4/1976) = 7/4/1976,12/25/1975,7/4/1976
+DateTimeColumn Copy(sort, unique) = 12/25/1975,7/4/1976
+DateTimeColumn GetAsDateTime(1) year = 1975

@@ -1,0 +1,13 @@
+Parsed 2020-05-01T08:00:00 (early, same) and 2020-05-01T08:00:01 (late)
+early:IsBefore(late) = true
+late:IsBefore(early) = false
+early:IsBefore(same) = false
+late:IsAfter(early) = true
+early:IsAfter(late) = false
+early:IsAfter(same) = false
+early:Compare(late) = -1
+late:Compare(early) = 1
+early:Compare(same) = 0
+1900-01-01:IsBefore(2100-12-31) = true
+2100-12-31:IsAfter(1900-01-01) = true
+2100-12-31:Compare(1900-01-01) = 1

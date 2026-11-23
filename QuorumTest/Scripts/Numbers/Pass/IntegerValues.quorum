@@ -1,0 +1,90 @@
+/*
+    Integer:SetValue, GetValue, GetNumber (compared with a number literal,
+    so number-to-text formatting does not decide the test; the literal's label
+    is written as text, since Java prints 2147483647.0 as 2.147483647E9 and
+    JavaScript and Python as 2147483647.0), GetText, GetMaximumValue
+    (2147483647), GetMinimumValue (-2147483648) and GetHashCode (the value
+    itself, as for a Java int). Each case runs on an integer primitive and
+    on an Integer object.
+*/
+class Main
+    action Main
+        Show(0, 0.0, "0.0")
+        Show(7, 7.0, "7.0")
+        Show(-7, -7.0, "-7.0")
+        Show(2147483647, 2147483647.0, "2147483647.0")
+        // -2147483648 is not a valid literal, so it is computed.
+        Show(-2147483647 - 1, -2147483648.0, "-2147483648.0")
+        integer value = 5
+        Integer object
+        check
+            output "integer GetMaximumValue() = " + value:GetMaximumValue()
+            output "integer GetMinimumValue() = " + value:GetMinimumValue()
+        detect e
+            output "integer limits unexpected error: " + e:GetErrorMessage()
+        end
+        check
+            output "Integer GetMaximumValue() = " + object:GetMaximumValue()
+            output "Integer GetMinimumValue() = " + object:GetMinimumValue()
+        detect e
+            output "Integer limits unexpected error: " + e:GetErrorMessage()
+        end
+        check
+            integer maximum = value:GetMaximumValue()
+            integer minimum = value:GetMinimumValue()
+            output "GetMaximumValue() + 1 = GetMinimumValue() is " + (maximum + 1 = minimum)
+        detect e
+            output "GetMaximumValue() + 1 unexpected error: " + e:GetErrorMessage()
+        end
+        check
+            output "new Integer GetValue() = " + object:GetValue()
+            object:SetValue(10)
+            object:SetValue(-20)
+            output "SetValue(10) then SetValue(-20): GetValue() = " + object:GetValue() + ", GetText() = [" + object:GetText() + "], BitCount() = " + object:BitCount()
+        detect e
+            output "SetValue twice unexpected error: " + e:GetErrorMessage()
+        end
+    end
+
+    action Show(integer value, number expected, text expectedLabel)
+        check
+            number result = value:GetNumber()
+            output "GetNumber(" + value + ") equals " + expectedLabel + " is " + (result = expected)
+        detect e
+            output "GetNumber(" + value + ") unexpected error: " + e:GetErrorMessage()
+        end
+        check
+            output "GetText(" + value + ") = [" + value:GetText() + "]"
+        detect e
+            output "GetText(" + value + ") unexpected error: " + e:GetErrorMessage()
+        end
+        check
+            output "GetHashCode(" + value + ") = " + value:GetHashCode()
+        detect e
+            output "GetHashCode(" + value + ") unexpected error: " + e:GetErrorMessage()
+        end
+        Integer object
+        object:SetValue(value)
+        check
+            output "Integer GetValue(" + value + ") = " + object:GetValue()
+        detect e
+            output "Integer GetValue(" + value + ") unexpected error: " + e:GetErrorMessage()
+        end
+        check
+            number result = object:GetNumber()
+            output "Integer GetNumber(" + value + ") equals " + expectedLabel + " is " + (result = expected)
+        detect e
+            output "Integer GetNumber(" + value + ") unexpected error: " + e:GetErrorMessage()
+        end
+        check
+            output "Integer GetText(" + value + ") = [" + object:GetText() + "]"
+        detect e
+            output "Integer GetText(" + value + ") unexpected error: " + e:GetErrorMessage()
+        end
+        check
+            output "Integer GetHashCode(" + value + ") = " + object:GetHashCode()
+        detect e
+            output "Integer GetHashCode(" + value + ") unexpected error: " + e:GetErrorMessage()
+        end
+    end
+end

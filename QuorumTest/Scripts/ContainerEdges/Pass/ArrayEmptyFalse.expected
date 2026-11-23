@@ -1,0 +1,10 @@
+Array[a,b,c,d] Empty(): size 0, IsEmpty() = true
+Array emptied with Empty() then Add(x) gives [x]
+Array[a,b,c,d] Empty(true): size 0, IsEmpty() = true
+Array emptied with Empty(true) then Add(x) gives [x]
+Array[a,b,c,d] Empty(false): size 0, IsEmpty() = true
+Array emptied with Empty(false) Get(0) fails, as it should
+Array emptied with Empty(false) ClearContents(0, 4): size 0
+Array emptied with Empty(false) then Add(x), Add(y) gives [x,y]
+Array[a,b,c,d] ClearContents(1, 3) gives [a,undefined,undefined,d]
+Array[a,undefined,undefined,d] ClearContents(0, 0) gives [a,undefined,undefined,d]

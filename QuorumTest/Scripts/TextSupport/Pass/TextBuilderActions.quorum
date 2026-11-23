@@ -1,0 +1,97 @@
+use Libraries.Language.Support.TextBuilder
+
+/*
+Every TextBuilder action: Append, GetSize, ToText, SetMaxSize and
+GetMaxSize. The documentation says the buffer size (GetMaxSize) always
+matches or exceeds the amount of text in the buffer, so after SetMaxSize(n)
+it is at least n and at least GetSize(), and a smaller SetMaxSize never
+loses text. The exact buffer size isn't printed, since it depends on the
+platform.
+*/
+class Main
+    action Main
+        check
+            TextBuilder builder
+            output "new TextBuilder GetSize() = " + builder:GetSize() + ", ToText() = [" + builder:ToText() + "]"
+        detect e
+            output "new TextBuilder unexpected error: " + e:GetErrorMessage()
+        end
+
+        check
+            TextBuilder builder
+            builder:Append("abc")
+            builder:Append("def")
+            output "Append(abc) Append(def) ToText() = [" + builder:ToText() + "], GetSize() = " + builder:GetSize()
+        detect e
+            output "Append twice unexpected error: " + e:GetErrorMessage()
+        end
+
+        check
+            TextBuilder builder
+            builder:Append("x")
+            builder:Append("")
+            output "Append(x) Append() ToText() = [" + builder:ToText() + "], GetSize() = " + builder:GetSize()
+        detect e
+            output "Append empty unexpected error: " + e:GetErrorMessage()
+        end
+
+        check
+            TextBuilder builder
+            text lf = ""
+            lf = lf:GetLineFeed()
+            builder:Append("a" + lf + "b")
+            output "Append(a\nb) GetSize() = " + builder:GetSize()
+        detect e
+            output "Append with a line feed unexpected error: " + e:GetErrorMessage()
+        end
+
+        check
+            TextBuilder builder
+            repeat 1000 times
+                builder:Append("x")
+            end
+            text result = builder:ToText()
+            output "Append(x) 1000 times GetSize() = " + builder:GetSize() + ", ToText():GetSize() = " + result:GetSize()
+        detect e
+            output "Append 1000 times unexpected error: " + e:GetErrorMessage()
+        end
+
+        check
+            TextBuilder builder
+            builder:Append("ab")
+            text first = builder:ToText()
+            text second = builder:ToText()
+            builder:Append("cd")
+            output "ToText() twice = [" + first + "] and [" + second + "], then Append(cd) ToText() = [" + builder:ToText() + "]"
+        detect e
+            output "ToText twice unexpected error: " + e:GetErrorMessage()
+        end
+
+        check
+            TextBuilder builder
+            builder:SetMaxSize(100)
+            output "SetMaxSize(100) GetMaxSize() >= 100 = [" + (builder:GetMaxSize() >= 100) + "], GetSize() = " + builder:GetSize()
+        detect e
+            output "SetMaxSize(100) unexpected error: " + e:GetErrorMessage()
+        end
+
+        check
+            TextBuilder builder
+            builder:Append("abcdef")
+            builder:SetMaxSize(1)
+            output "Append(abcdef) SetMaxSize(1): GetMaxSize() >= GetSize() = [" + (builder:GetMaxSize() >= builder:GetSize()) + "], ToText() = [" + builder:ToText() + "]"
+        detect e
+            output "SetMaxSize(1) unexpected error: " + e:GetErrorMessage()
+        end
+
+        check
+            TextBuilder builder
+            repeat 500 times
+                builder:Append("yz")
+            end
+            output "Append(yz) 500 times GetMaxSize() >= GetSize() = [" + (builder:GetMaxSize() >= builder:GetSize()) + "], GetSize() = " + builder:GetSize()
+        detect e
+            output "GetMaxSize after growth unexpected error: " + e:GetErrorMessage()
+        end
+    end
+end

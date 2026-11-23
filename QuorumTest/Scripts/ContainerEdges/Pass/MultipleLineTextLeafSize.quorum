@@ -1,0 +1,56 @@
+use Libraries.Containers.MultipleLineText
+
+/*
+    MultipleLineText with a leaf size, as in the documentation's own example
+    (Initialize("Hello world! What a lovely day!", 10)): the text must be
+    stored and returned whole whatever the leaf size, and GetLeafSize reports
+    the size given. Text wrapping is not implemented (the code says so), so
+    this test does not check how the text is split into lines.
+*/
+class Main
+    action Main
+        MultipleLineText tree
+        check
+            tree:Initialize("Hello world! What a lovely day!", 10)
+            output "MultipleLineText Initialize(Hello world! What a lovely day!, 10): GetText() = [" + tree:GetText() + "], GetSize() = " + tree:GetSize() + ", GetLeafSize() as an integer = " + cast(integer, tree:GetLeafSize())
+        detect e
+            output "MultipleLineText Initialize(text, 10) unexpected error: " + e:GetErrorMessage()
+        end
+
+        MultipleLineText second
+        check
+            second:SetLeafSize(10)
+            second:Initialize("Hello world! What a lovely day!")
+            output "MultipleLineText SetLeafSize(10) then Initialize(Hello world! What a lovely day!): GetText() = [" + second:GetText() + "], GetLeafSize() as an integer = " + cast(integer, second:GetLeafSize())
+        detect e
+            output "MultipleLineText SetLeafSize(10) then Initialize unexpected error: " + e:GetErrorMessage()
+        end
+
+        MultipleLineText third
+        check
+            third:Initialize("short", 10)
+            MultipleLineText longer = third:Concatenate(" and now much longer than ten")
+            output "MultipleLineText Initialize(short, 10) then Concatenate( and now much longer than ten): GetText() = [" + longer:GetText() + "], GetSize() = " + longer:GetSize()
+        detect e
+            output "MultipleLineText leaf size 10 Concatenate unexpected error: " + e:GetErrorMessage()
+        end
+
+        MultipleLineText fourth
+        check
+            fourth:Initialize("0123456789", 10)
+            MultipleLineText inserted = fourth:Insert(5, "abcdef")
+            output "MultipleLineText Initialize(0123456789, 10) then Insert(5, abcdef): GetText() = [" + inserted:GetText() + "]"
+        detect e
+            output "MultipleLineText leaf size 10 Insert unexpected error: " + e:GetErrorMessage()
+        end
+
+        MultipleLineText fifth
+        check
+            fifth:Initialize("Hello")
+            MultipleLineText unwrapped = fifth:DisableTextWrapping()
+            output "MultipleLineText(Hello) DisableTextWrapping(): GetText() = [" + unwrapped:GetText() + "], GetLineCount() = " + unwrapped:GetLineCount()
+        detect e
+            output "MultipleLineText DisableTextWrapping() unexpected error: " + e:GetErrorMessage()
+        end
+    end
+end

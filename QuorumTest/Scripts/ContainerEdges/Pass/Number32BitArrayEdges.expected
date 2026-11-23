@@ -1,0 +1,13 @@
+Number32BitArray new GetSize() = 0
+Number32BitArray new Set(0, 1.5) fails, as it should
+Number32BitArray new Get(0) fails, as it should
+Number32BitArray SetSize(3): GetSize() = 3, fill values 0.0 0.0 0.0
+Number32BitArray of 3 Set(0, 1.5), Set(2, -0.25): Get(0) = 1.5, Get(1) = 0.0, Get(2) = -0.25
+Number32BitArray of 3 Set(3, 1.5) fails, as it should
+Number32BitArray of 3 Set(-1, 1.5) fails, as it should
+Number32BitArray of 3 Get(3) fails, as it should
+Number32BitArray of 3 Get(-1) fails, as it should
+Number32BitArray [1.5,0,-0.25] SetSize(5): GetSize() = 5, items 1.5 0.0 -0.25 0.0 0.0
+Number32BitArray of 5 SetSize(2): GetSize() = 2, items 1.5 0.0
+Number32BitArray SetSize(0): GetSize() = 0
+Number32BitArray of 0 Get(0) fails, as it should

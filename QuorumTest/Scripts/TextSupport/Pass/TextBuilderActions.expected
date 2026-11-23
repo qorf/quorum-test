@@ -1,0 +1,9 @@
+new TextBuilder GetSize() = 0, ToText() = []
+Append(abc) Append(def) ToText() = [abcdef], GetSize() = 6
+Append(x) Append() ToText() = [x], GetSize() = 1
+Append(a\nb) GetSize() = 3
+Append(x) 1000 times GetSize() = 1000, ToText():GetSize() = 1000
+ToText() twice = [ab] and [ab], then Append(cd) ToText() = [abcd]
+SetMaxSize(100) GetMaxSize() >= 100 = [true], GetSize() = 0
+Append(abcdef) SetMaxSize(1): GetMaxSize() >= GetSize() = [true], ToText() = [abcdef]
+Append(yz) 500 times GetMaxSize() >= GetSize() = [true], GetSize() = 1000

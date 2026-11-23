@@ -1,0 +1,94 @@
+use Libraries.Compute.Matrix
+use Libraries.Compute.Math
+use Libraries.Compute.MatrixTransform.SingularValueDecomposition
+
+/*
+SingularValueDecomposition on small matrices. Only answers that don't
+depend on the sign choices inside the orthogonal matrices are printed:
+the singular values (largest first), the rank, U times D times V
+transposed (which must give back the original), U transposed times U and
+V transposed times V (which must be the identity), the inverse, and Solve.
+|3, 0| |4, 5| has singular values the square roots of 45 and 5 (6.7082 and
+2.2361); |1, 2| |2, 4| has singular values 5 and 0 and rank 1. Getting the
+inverse must not change the diagonal matrix D. Entries are rounded to 4
+places.
+*/
+class Main
+    Math math
+
+    action Main
+        Matrix full = Make2(3, 0, 4, 5)
+        Matrix low = Make2(1, 2, 2, 4)
+        check
+            SingularValueDecomposition decomposition
+            decomposition:Calculate(full)
+            Show("GetDiagonalMatrix of |3, 0| |4, 5|", decomposition:GetDiagonalMatrix())
+            output "GetRank of |3, 0| |4, 5| = " + decomposition:GetRank()
+            Matrix u = decomposition:GetFirstOrthogonalMatrix()
+            Matrix v = decomposition:GetSecondOrthogonalMatrix()
+            Matrix product = u:Multiply(decomposition:GetDiagonalMatrix())
+            product = product:Multiply(decomposition:GetSecondOrthogonalTransposedMatrix())
+            Show("U times D times V transposed for |3, 0| |4, 5|", product)
+            Show("U transposed times U for |3, 0| |4, 5|", decomposition:GetFirstOrthogonalTransposedMatrix():Multiply(u))
+            Show("V transposed times V for |3, 0| |4, 5|", decomposition:GetSecondOrthogonalTransposedMatrix():Multiply(v))
+            Show("GetOriginalMatrix of |3, 0| |4, 5|", decomposition:GetOriginalMatrix())
+        detect e
+            output "|3, 0| |4, 5| unexpected error: " + e:GetErrorMessage()
+        end
+        check
+            SingularValueDecomposition decomposition
+            decomposition:Calculate(full)
+            Show("GetInverse of |3, 0| |4, 5|", decomposition:GetInverse())
+            Show("GetDiagonalMatrix of |3, 0| |4, 5| after GetInverse", decomposition:GetDiagonalMatrix())
+        detect e
+            output "GetInverse of |3, 0| |4, 5| unexpected error: " + e:GetErrorMessage()
+        end
+        check
+            SingularValueDecomposition decomposition
+            decomposition:Calculate(full)
+            Matrix right
+            right:SetSize(2, 1)
+            right:Set(0, 0, 3)
+            right:Set(1, 0, 9)
+            Show("Solve |3, 0| |4, 5| for the column 3, 9", decomposition:Solve(right))
+        detect e
+            output "Solve |3, 0| |4, 5| unexpected error: " + e:GetErrorMessage()
+        end
+        check
+            SingularValueDecomposition decomposition
+            decomposition:Calculate(low)
+            Show("GetDiagonalMatrix of |1, 2| |2, 4|", decomposition:GetDiagonalMatrix())
+            output "GetRank of |1, 2| |2, 4| = " + decomposition:GetRank()
+        detect e
+            output "|1, 2| |2, 4| unexpected error: " + e:GetErrorMessage()
+        end
+    end
+
+    action Make2(number a, number b, number c, number d) returns Matrix
+        Matrix result
+        result:SetSize(2, 2)
+        result:Set(0, 0, a)
+        result:Set(0, 1, b)
+        result:Set(1, 0, c)
+        result:Set(1, 1, d)
+        return result
+    end
+
+    action Show(text label, Matrix result)
+        output label + " gives a " + result:GetRows() + " by " + result:GetColumns() + " matrix:"
+        integer row = 0
+        repeat while row < result:GetRows()
+            text line = "|"
+            integer column = 0
+            repeat while column < result:GetColumns()
+                line = line + math:Round(result:Get(row, column), 4)
+                if column < result:GetColumns() - 1
+                    line = line + ", "
+                end
+                column = column + 1
+            end
+            output line + "|"
+            row = row + 1
+        end
+    end
+end

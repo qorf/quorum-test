@@ -1,0 +1,5 @@
+Read("say ""hi""",x) rows = 1: [say "hi"][x]
+Read("""") rows = 1: ["]
+Read("a""b") rows = 1: [a"b]
+Read(x,"""""") rows = 1: [x][""]
+Read("a"",""b") rows = 1: [a","b]

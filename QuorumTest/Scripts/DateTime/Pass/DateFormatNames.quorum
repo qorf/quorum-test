@@ -1,0 +1,99 @@
+use Libraries.System.CalendarDate
+use Libraries.System.DateFormat
+use Libraries.Containers.Array
+
+/*
+Tests DateFormat's SetMonthNames and SetDayNames with Spanish names, for
+writing and reading dates. As the documentation says, short names are the
+first three letters; an array without twelve (or seven) names, or an
+undefined one, is ignored; and the Get...Format actions keep this format's
+names. The names are copied, so changing the array afterward does not
+change the format.
+*/
+class Main
+    action Main
+        Array<text> months
+        months:Add("enero")
+        months:Add("febrero")
+        months:Add("marzo")
+        months:Add("abril")
+        months:Add("mayo")
+        months:Add("junio")
+        months:Add("julio")
+        months:Add("agosto")
+        months:Add("septiembre")
+        months:Add("octubre")
+        months:Add("noviembre")
+        months:Add("diciembre")
+        Array<text> days
+        days:Add("lunes")
+        days:Add("martes")
+        days:Add("miercoles")
+        days:Add("jueves")
+        days:Add("viernes")
+        days:Add("sabado")
+        days:Add("domingo")
+
+        CalendarDate date
+        boolean valid = date:SetDate(2026, 11, 3)
+        DateFormat format
+        check
+            format:SetMonthNames(months)
+            format:SetDayNames(days)
+            format:SetPattern("EEEE d 'de' MMMM 'de' yyyy")
+            output "Spanish names, EEEE d 'de' MMMM 'de' yyyy: ToText(2026-11-03) = [" + format:ToText(date) + "]"
+            format:SetPattern("EEE d MMM")
+            output "Spanish names, EEE d MMM: ToText(2026-11-03) = [" + format:ToText(date) + "]"
+        detect e
+            output "Spanish names unexpected error: " + e:GetErrorMessage()
+        end
+        check
+            format:SetPattern("d 'de' MMMM 'de' yyyy")
+            CalendarDate parsed = format:Parse("15 de AGOSTO de 2025")
+            output "Spanish names: Parse(15 de AGOSTO de 2025) = [" + parsed:ToText() + "]"
+            CalendarDate short = format:Parse("15 de ago de 2025")
+            output "Spanish names: Parse(15 de ago de 2025) = [" + short:ToText() + "]"
+            CalendarDate english = format:Parse("15 de August de 2025")
+            output "Spanish names: Parse(15 de August de 2025) is undefined = " + (english = undefined)
+        detect e
+            output "Spanish names Parse unexpected error: " + e:GetErrorMessage()
+        end
+        check
+            Array<text> eleven
+            integer i = 0
+            repeat while i < 11
+                eleven:Add("x")
+                i = i + 1
+            end
+            format:SetMonthNames(eleven)
+            Array<text> none = undefined
+            format:SetMonthNames(none)
+            format:SetDayNames(none)
+            Array<text> six
+            i = 0
+            repeat while i < 6
+                six:Add("y")
+                i = i + 1
+            end
+            format:SetDayNames(six)
+            format:SetPattern("EEEE MMMM")
+            output "After SetMonthNames(11 names), SetMonthNames(undefined), SetDayNames(6 names), SetDayNames(undefined): ToText(2026-11-03) = [" + format:ToText(date) + "]"
+        detect e
+            output "Ignored names unexpected error: " + e:GetErrorMessage()
+        end
+        check
+            months:Set(10, "changed")
+            output "After changing the original array: ToText(2026-11-03) = [" + format:ToText(date) + "]"
+        detect e
+            output "Changing the original array unexpected error: " + e:GetErrorMessage()
+        end
+        check
+            DateFormat long = format:GetLongFormat()
+            output "GetLongFormat() of the Spanish format: ToText(2026-11-03) = [" + long:ToText(date) + "]"
+            DateFormat iso = format:GetISOFormat()
+            output "GetISOFormat() of the Spanish format: ToText(2026-11-03) = [" + iso:ToText(date) + "]"
+        detect e
+            output "Get...Format of the Spanish format unexpected error: " + e:GetErrorMessage()
+        end
+    end
+end

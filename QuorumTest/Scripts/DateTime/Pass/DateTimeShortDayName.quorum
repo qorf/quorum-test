@@ -1,0 +1,26 @@
+use Libraries.System.DateTime
+
+/*
+Tests GetShortDayofWeekName (spelled with a lowercase "of" in the library),
+on its own, since its plugin method may not be found. On a parsed date (the
+same in every time zone) it returns the weekday's short English name.
+*/
+class Main
+    action Main
+        output "GetShortDayofWeekName test starts"
+        DateTime monday
+        check
+            monday:ParseDate("2024-01-01")
+            output "ParseDate(2024-01-01): GetShortDayofWeekName() = [" + monday:GetShortDayofWeekName() + "]"
+        detect e
+            output "ParseDate(2024-01-01): GetShortDayofWeekName() unexpected error: " + e:GetErrorMessage()
+        end
+        DateTime sunday
+        check
+            sunday:ParseDate("2024-01-07")
+            output "ParseDate(2024-01-07): GetShortDayofWeekName() = [" + sunday:GetShortDayofWeekName() + "]"
+        detect e
+            output "ParseDate(2024-01-07): GetShortDayofWeekName() unexpected error: " + e:GetErrorMessage()
+        end
+    end
+end

@@ -1,0 +1,69 @@
+use Libraries.System.DateTime
+
+/*
+Tests SetTimeZone, GetTimeZone and IsDaylightSavings, with SetEpochTime and
+the Get actions. The time zone is always set explicitly, so nothing depends
+on the machine's own time zone. SetTimeZone's documentation says the offset
+(whole hours from UTC) is used when returning date and time information, so
+it applies whether it is set before or after SetEpochTime. A fixed offset
+has no daylight saving time.
+Epoch 1700000000000 is Tuesday, November 14, 2023, 22:13:20 UTC; epoch 0 is
+Thursday, January 1, 1970, 00:00:00 UTC; epoch 1704024000000 is Sunday,
+December 31, 2023, 12:00:00 UTC.
+*/
+class Main
+    action Main
+        DateTime utc
+        check
+            utc:SetTimeZone(0)
+            utc:SetEpochTime(1700000000000.0)
+            output "SetTimeZone(0), SetEpochTime(1700000000000): GetTimeZone() = " + utc:GetTimeZone()
+            output "SetTimeZone(0), SetEpochTime(1700000000000): GetTimestamp() = [" + utc:GetTimestamp() + "]"
+            output "SetTimeZone(0), SetEpochTime(1700000000000): GetYear() = " + utc:GetYear() + ", GetMonth() = " + utc:GetMonth() + ", GetDayOfMonth() = " + utc:GetDayOfMonth()
+            output "SetTimeZone(0), SetEpochTime(1700000000000): GetHour() = " + utc:GetHour() + ", GetMinute() = " + utc:GetMinute() + ", GetSecond() = " + utc:GetSecond()
+            output "SetTimeZone(0), SetEpochTime(1700000000000): GetDayOfWeek() = " + utc:GetDayOfWeek()
+            output "SetTimeZone(0), SetEpochTime(1700000000000): IsDaylightSavings() = " + utc:IsDaylightSavings()
+        detect e
+            output "SetTimeZone(0), SetEpochTime(1700000000000) unexpected error: " + e:GetErrorMessage()
+        end
+        DateTime east
+        check
+            east:SetTimeZone(5)
+            east:SetEpochTime(1700000000000.0)
+            output "SetTimeZone(5), SetEpochTime(1700000000000): GetTimeZone() = " + east:GetTimeZone()
+            output "SetTimeZone(5), SetEpochTime(1700000000000): GetTimestamp() = [" + east:GetTimestamp() + "]"
+            output "SetTimeZone(5), SetEpochTime(1700000000000): GetDayOfWeek() = " + east:GetDayOfWeek()
+        detect e
+            output "SetTimeZone(5), SetEpochTime(1700000000000) unexpected error: " + e:GetErrorMessage()
+        end
+        DateTime west
+        check
+            west:SetTimeZone(-6)
+            west:SetEpochTime(0)
+            output "SetTimeZone(-6), SetEpochTime(0): GetTimeZone() = " + west:GetTimeZone()
+            output "SetTimeZone(-6), SetEpochTime(0): GetTimestamp() = [" + west:GetTimestamp() + "]"
+            output "SetTimeZone(-6), SetEpochTime(0): GetYear() = " + west:GetYear() + ", GetDayOfWeek() = " + west:GetDayOfWeek()
+        detect e
+            output "SetTimeZone(-6), SetEpochTime(0) unexpected error: " + e:GetErrorMessage()
+        end
+        DateTime later
+        check
+            later:SetEpochTime(0)
+            later:SetTimeZone(9)
+            output "SetEpochTime(0), then SetTimeZone(9): GetTimestamp() = [" + later:GetTimestamp() + "]"
+            output "SetEpochTime(0), then SetTimeZone(9): GetEpochTime() = " + cast(integer, later:GetEpochTime())
+        detect e
+            output "SetEpochTime(0), then SetTimeZone(9) unexpected error: " + e:GetErrorMessage()
+        end
+        DateTime december
+        check
+            december:SetTimeZone(0)
+            december:SetEpochTime(1704024000000.0)
+            output "SetTimeZone(0), SetEpochTime(1704024000000): GetMonthName() = [" + december:GetMonthName() + "], GetShortMonthName() = [" + december:GetShortMonthName() + "]"
+            output "SetTimeZone(0), SetEpochTime(1704024000000): GetDayOfWeek() = " + december:GetDayOfWeek() + ", GetDayOfWeekName() = [" + december:GetDayOfWeekName() + "]"
+            output "SetTimeZone(0), SetEpochTime(1704024000000): DateToText() = [" + december:DateToText() + "], TimeToText() = [" + december:TimeToText() + "]"
+        detect e
+            output "SetTimeZone(0), SetEpochTime(1704024000000) unexpected error: " + e:GetErrorMessage()
+        end
+    end
+end

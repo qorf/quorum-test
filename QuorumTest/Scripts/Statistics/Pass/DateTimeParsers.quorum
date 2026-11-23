@@ -1,0 +1,91 @@
+use Libraries.Compute.Statistics.DateTimeParsers.AmericanDateParser
+use Libraries.Compute.Statistics.DateTimeParsers.DefaultDateParser
+use Libraries.Compute.Statistics.DateTimeParsers.TimestampParser
+use Libraries.Compute.Statistics.DateTimeParsers.DateTimeColumnParser
+use Libraries.System.DateTime
+
+/*
+Tests the date parsers DateTimeColumn uses: AmericanDateParser (month/day/
+year), DefaultDateParser (year-month-day) and TimestampParser (date and
+time). Each Parse is checked by the parts of the date it gives, and each
+ToText by the text it writes back. The parts are local dates and times,
+so the time zone doesn't change them.
+*/
+class Main
+    action Main
+        AmericanDateParser american
+        check
+            DateTime day = american:Parse("3/14/2015")
+            output "AmericanDateParser Parse(3/14/2015) year month day = " + day:GetYear() + " " + day:GetMonth() + " " + day:GetDayOfMonth()
+        detect e
+            output "AmericanDateParser Parse(3/14/2015) unexpected error: " + e:GetErrorMessage()
+        end
+        check
+            DateTime day = american:Parse("12/1/1999")
+            output "AmericanDateParser Parse(12/1/1999) then ToText = [" + american:ToText(day) + "]"
+        detect e
+            output "AmericanDateParser Parse(12/1/1999) unexpected error: " + e:GetErrorMessage()
+        end
+        check
+            DateTime day = american:Parse("13/1/1999")
+            output "AmericanDateParser Parse(13/1/1999) should fail but returned [" + american:ToText(day) + "]"
+        detect e
+            output "AmericanDateParser Parse(13/1/1999) fails, as it should"
+        end
+
+        DefaultDateParser plain
+        check
+            DateTime day = plain:Parse("2015-03-14")
+            output "DefaultDateParser Parse(2015-03-14) year month day = " + day:GetYear() + " " + day:GetMonth() + " " + day:GetDayOfMonth()
+        detect e
+            output "DefaultDateParser Parse(2015-03-14) unexpected error: " + e:GetErrorMessage()
+        end
+        check
+            DateTime day = plain:Parse("2015-03-14")
+            output "DefaultDateParser Parse(2015-03-14) then ToText = [" + plain:ToText(day) + "]"
+        detect e
+            output "DefaultDateParser ToText unexpected error: " + e:GetErrorMessage()
+        end
+        check
+            DateTime day = plain:Parse("14/3/2015")
+            output "DefaultDateParser Parse(14/3/2015) should fail but returned [" + plain:ToText(day) + "]"
+        detect e
+            output "DefaultDateParser Parse(14/3/2015) fails, as it should"
+        end
+
+        TimestampParser stamp
+        check
+            DateTime moment = stamp:Parse("2015-03-14 09:26:53")
+            output "TimestampParser Parse(2015-03-14 09:26:53) parts = " + moment:GetYear() + " " + moment:GetMonth() + " " + moment:GetDayOfMonth() + " " + moment:GetHour() + " " + moment:GetMinute() + " " + moment:GetSecond()
+        detect e
+            output "TimestampParser Parse(2015-03-14 09:26:53) unexpected error: " + e:GetErrorMessage()
+        end
+        check
+            DateTime moment = stamp:Parse("2015-03-14 09:26:53")
+            output "TimestampParser Parse(2015-03-14 09:26:53) then ToText = [" + stamp:ToText(moment) + "]"
+        detect e
+            output "TimestampParser ToText unexpected error: " + e:GetErrorMessage()
+        end
+        check
+            DateTime moment = stamp:Parse("2015-03-14T23:05:00")
+            DateTime again = stamp:Parse(stamp:ToText(moment))
+            output "TimestampParser ToText then Parse again keeps the hour and minute = " + again:GetHour() + ":" + again:GetMinute()
+        detect e
+            output "TimestampParser round trip unexpected error: " + e:GetErrorMessage()
+        end
+        check
+            DateTime moment = stamp:Parse("not a time")
+            output "TimestampParser Parse(not a time) should fail but returned [" + stamp:ToText(moment) + "]"
+        detect e
+            output "TimestampParser Parse(not a time) fails, as it should"
+        end
+
+        check
+            DateTimeColumnParser parser = american
+            DateTime day = parser:Parse("7/4/1976")
+            output "a DateTimeColumnParser holding an AmericanDateParser Parse(7/4/1976) then ToText = [" + parser:ToText(day) + "]"
+        detect e
+            output "DateTimeColumnParser unexpected error: " + e:GetErrorMessage()
+        end
+    end
+end

@@ -1,0 +1,114 @@
+use Libraries.System.File
+
+/*
+Tests Delete() and Delete(boolean) inside a scratch folder
+(FileTestsWork/FileDelete), deleted at the end. Delete() removes a file or an
+empty folder and returns false for a missing path or a folder with contents.
+The documentation says Delete(false) is the same as Delete(), so it must
+leave a folder with contents (and the contents) alone; Delete(true) removes a
+folder and everything in it, including subfolders. Delete(boolean) returns
+nothing in the library, though its documentation mentions a result, so only
+what is left on disk is checked.
+*/
+class Main
+    action Main
+        File work
+        work:SetPath("FileTestsWork/FileDelete")
+        work:Delete(true)
+        boolean made = work:CreateDirectories()
+
+        File file
+        file:SetPath("FileTestsWork/FileDelete/single.txt")
+        file:Write("x")
+        check
+            output "Delete(single.txt) = " + file:Delete()
+        detect e
+            output "Delete(single.txt) unexpected error: " + e:GetErrorMessage()
+        end
+        check
+            output "Exists(single.txt) after Delete() = " + file:Exists()
+        detect e
+            output "Exists(single.txt) unexpected error: " + e:GetErrorMessage()
+        end
+        check
+            output "Delete(single.txt) again, when missing = " + file:Delete()
+        detect e
+            output "Delete(single.txt) again unexpected error: " + e:GetErrorMessage()
+        end
+
+        File empty
+        empty:SetPath("FileTestsWork/FileDelete/empty")
+        made = empty:CreateDirectory()
+        check
+            output "Delete(empty folder) = " + empty:Delete()
+        detect e
+            output "Delete(empty folder) unexpected error: " + e:GetErrorMessage()
+        end
+
+        File full
+        full:SetPath("FileTestsWork/FileDelete/full")
+        made = full:CreateDirectory()
+        File inside
+        inside:SetPath("FileTestsWork/FileDelete/full/inside.txt")
+        inside:Write("keep me")
+        File nested
+        nested:SetPath("FileTestsWork/FileDelete/full/nested/deeper.txt")
+        File nestedFolder
+        nestedFolder:SetPath("FileTestsWork/FileDelete/full/nested")
+        made = nestedFolder:CreateDirectory()
+        nested:Write("deep")
+
+        check
+            output "Delete() on a folder with contents = " + full:Delete()
+        detect e
+            output "Delete() on a folder with contents unexpected error: " + e:GetErrorMessage()
+        end
+        check
+            full:Delete(false)
+            output "Delete(false) on a folder with contents, then Exists(full) = " + full:Exists()
+        detect e
+            output "Delete(false) on a folder with contents unexpected error: " + e:GetErrorMessage()
+        end
+        check
+            output "Exists(full/inside.txt) after Delete(false) = " + inside:Exists()
+        detect e
+            output "Exists(full/inside.txt) unexpected error: " + e:GetErrorMessage()
+        end
+        check
+            output "Exists(full/nested/deeper.txt) after Delete(false) = " + nested:Exists()
+        detect e
+            output "Exists(full/nested/deeper.txt) unexpected error: " + e:GetErrorMessage()
+        end
+
+        // Delete(false) may have removed them; put them back for Delete(true).
+        made = full:CreateDirectories()
+        made = nestedFolder:CreateDirectories()
+        inside:Write("keep me")
+        nested:Write("deep")
+        check
+            full:Delete(true)
+            output "Delete(true) on a folder with contents, then Exists(full) = " + full:Exists()
+        detect e
+            output "Delete(true) unexpected error: " + e:GetErrorMessage()
+        end
+        check
+            output "Exists(full/nested/deeper.txt) after Delete(true) = " + nested:Exists()
+        detect e
+            output "Exists(full/nested/deeper.txt) unexpected error: " + e:GetErrorMessage()
+        end
+
+        File plain
+        plain:SetPath("FileTestsWork/FileDelete/plain.txt")
+        plain:Write("x")
+        check
+            plain:Delete(true)
+            output "Delete(true) on a file, then Exists(plain.txt) = " + plain:Exists()
+        detect e
+            output "Delete(true) on a file unexpected error: " + e:GetErrorMessage()
+        end
+        work:Delete(true)
+        File top
+        top:SetPath("FileTestsWork")
+        boolean removed = top:Delete()
+    end
+end

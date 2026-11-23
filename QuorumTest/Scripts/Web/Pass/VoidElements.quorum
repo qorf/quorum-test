@@ -1,0 +1,136 @@
+use Libraries.Web.Page.Area
+use Libraries.Web.Page.Base
+use Libraries.Web.Page.Column
+use Libraries.Web.Page.Embed
+use Libraries.Web.Page.Image
+use Libraries.Web.Page.Input
+use Libraries.Web.Page.LineBreak
+use Libraries.Web.Page.MetaData
+use Libraries.Web.Page.PageBreak
+use Libraries.Web.Page.Parameter
+use Libraries.Web.Page.Source
+use Libraries.Web.Page.Track
+use Libraries.Web.Page.WordBreak
+
+/*
+Tests the void elements, which have no content and no end tag in HTML
+(HTML Living Standard, 13.1.2: void elements only have a start tag; end
+tags must not be specified). Each is given an id, and its HTML should be
+the start tag alone. The documentation is silent on end tags, so the
+standard decides: area, base, embed, source, track and wbr should not be
+followed by an end tag, and a line break keeps its id like any element.
+*/
+class Main
+    action Main
+        check
+            Area area
+            area:SetIdentifier("x")
+            output "Area with SetIdentifier(x) Generate() = [" + Flat(area:Generate()) + "]"
+        detect e
+            output "Area with SetIdentifier(x) Generate() unexpected error: " + e:GetErrorMessage()
+        end
+        check
+            Base base
+            base:SetIdentifier("x")
+            output "Base with SetIdentifier(x) Generate() = [" + Flat(base:Generate()) + "]"
+        detect e
+            output "Base with SetIdentifier(x) Generate() unexpected error: " + e:GetErrorMessage()
+        end
+        check
+            Column column
+            column:SetIdentifier("x")
+            output "Column with SetIdentifier(x) Generate() = [" + Flat(column:Generate()) + "]"
+        detect e
+            output "Column with SetIdentifier(x) Generate() unexpected error: " + e:GetErrorMessage()
+        end
+        check
+            Embed embed
+            embed:SetIdentifier("x")
+            output "Embed with SetIdentifier(x) Generate() = [" + Flat(embed:Generate()) + "]"
+        detect e
+            output "Embed with SetIdentifier(x) Generate() unexpected error: " + e:GetErrorMessage()
+        end
+        check
+            PageBreak pageBreak
+            pageBreak:SetIdentifier("x")
+            output "PageBreak with SetIdentifier(x) Generate() = [" + Flat(pageBreak:Generate()) + "]"
+        detect e
+            output "PageBreak with SetIdentifier(x) Generate() unexpected error: " + e:GetErrorMessage()
+        end
+        check
+            Image image
+            image:SetIdentifier("x")
+            output "Image with SetIdentifier(x) Generate() = [" + Flat(image:Generate()) + "]"
+        detect e
+            output "Image with SetIdentifier(x) Generate() unexpected error: " + e:GetErrorMessage()
+        end
+        check
+            MetaData metaData
+            metaData:SetIdentifier("x")
+            output "MetaData with SetIdentifier(x) Generate() = [" + Flat(metaData:Generate()) + "]"
+        detect e
+            output "MetaData with SetIdentifier(x) Generate() unexpected error: " + e:GetErrorMessage()
+        end
+        check
+            Parameter parameter
+            parameter:SetIdentifier("x")
+            output "Parameter with SetIdentifier(x) Generate() = [" + Flat(parameter:Generate()) + "]"
+        detect e
+            output "Parameter with SetIdentifier(x) Generate() unexpected error: " + e:GetErrorMessage()
+        end
+        check
+            Source source
+            source:SetIdentifier("x")
+            output "Source with SetIdentifier(x) Generate() = [" + Flat(source:Generate()) + "]"
+        detect e
+            output "Source with SetIdentifier(x) Generate() unexpected error: " + e:GetErrorMessage()
+        end
+        check
+            Track track
+            track:SetIdentifier("x")
+            output "Track with SetIdentifier(x) Generate() = [" + Flat(track:Generate()) + "]"
+        detect e
+            output "Track with SetIdentifier(x) Generate() unexpected error: " + e:GetErrorMessage()
+        end
+        check
+            WordBreak wordBreak
+            wordBreak:SetIdentifier("x")
+            output "WordBreak with SetIdentifier(x) Generate() = [" + Flat(wordBreak:Generate()) + "]"
+        detect e
+            output "WordBreak with SetIdentifier(x) Generate() unexpected error: " + e:GetErrorMessage()
+        end
+        check
+            LineBreak lineBreak
+            lineBreak:SetIdentifier("x")
+            output "LineBreak with SetIdentifier(x) Generate() = [" + Flat(lineBreak:Generate()) + "]"
+        detect e
+            output "LineBreak with SetIdentifier(x) Generate() unexpected error: " + e:GetErrorMessage()
+        end
+        check
+            Input field
+            field:SetIdentifier("x")
+            output "Input with SetIdentifier(x) Generate() = [" + Flat(field:Generate()) + "]"
+        detect e
+            output "Input with SetIdentifier(x) Generate() unexpected error: " + e:GetErrorMessage()
+        end
+        check
+            LineBreak lineBreak
+            output "LineBreak with no attributes Generate() = [" + Flat(lineBreak:Generate()) + "]"
+        detect e
+            output "LineBreak with no attributes Generate() unexpected error: " + e:GetErrorMessage()
+        end
+    end
+
+    /* Shows line breaks as the two characters \n and double quotes as ', so each case is one line. */
+    action Flat(text value) returns text
+        text lf = ""
+        lf = lf:GetLineFeed()
+        text cr = ""
+        cr = cr:GetCarriageReturn()
+        text quote = ""
+        quote = quote:GetDoubleQuote()
+        text result = value:Replace(cr, "")
+        result = result:Replace(lf, "\n")
+        return result:Replace(quote, "'")
+    end
+end

@@ -1,0 +1,13 @@
+seed 1979.0 GetNoise(0.5, 0.5) = 0.125
+seed 1979.0 GetNoise(1.25, 2.75) = 0.2322
+seed 1979.0 GetNoise(-3.3, 4.1) = 0.2368
+seed 1979.0 GetNoise(100.7, -250.2) = 0.1189
+GetAdditiveNoise(40, 90) = 0.0101
+GetMultiplicativeNoise(40, 90) = -0.9823
+GetRidgedNoise(40, 90) = 0.2341
+GetRidgedMultifractalNoise(40, 90) = -0.4349
+GetSlopeWeightedNoise(40, 90) = 0.01
+GetWarpedX(40, 90) = 46.3557
+GetWarpedY(40, 90) = 90.8154
+seed 5.0 GetNoise(0.5, 0.5) = -0.125
+seed 5.0 GetNoise(7.77, 3.33) = -0.4297

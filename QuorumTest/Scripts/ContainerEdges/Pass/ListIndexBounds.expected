@@ -1,0 +1,14 @@
+List[a,b,c] Get(3) fails, as it should
+List[a,b,c] Get(-1) fails, as it should
+List[a,b,c] RemoveAt(3) fails, as it should
+List[a,b,c] RemoveAt(-1) fails, as it should
+List[a,b,c] Set(4, x) fails, as it should
+List[a,b,c] Set(-1, x) fails, as it should
+List[a,b,c] Add(4, x) fails, as it should
+List[a,b,c] Add(-1, x) fails, as it should
+List[a,b,c] after the failed calls is [a,b,c], size 3
+List[a,b,c] Add(3, d) gives [a,b,c,d], GetFromEnd() = [d]
+List[a,b,c,d] Set(4, e) gives [a,b,c,d,e]
+List[a,b,c,d,e] Add(0, z), Add(2, m) gives [z,a,m,b,c,d,e]
+List[z,a,m,b,c,d,e] GetLastLocation(z) = 0, GetLastLocation(m) = 2, GetLastLocation(e) = 6
+List[z,a,m,b,c,d,e] Set(6, E), Set(0, Z) gives [Z,a,m,b,c,d,E], size 7

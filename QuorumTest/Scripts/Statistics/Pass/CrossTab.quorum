@@ -1,0 +1,116 @@
+use Libraries.Compute.Statistics.DataFrame
+use Libraries.Compute.Statistics.DataFrameColumn
+use Libraries.Compute.Statistics.Transforms.CrossTab
+
+/*
+Tests CrossTab: the first selected column's sorted unique values down the
+left, the second's across the top, and how many rows have each pair. The
+left column's header is both headers joined by a backslash. Frames are
+shown one per line: header=values, columns separated by |.
+*/
+class Main
+    action Main
+        text data = "color,size;red,small;blue,large;red,small;red,large;blue,large;green,small"
+        check
+            DataFrame frame = Frame(data)
+            frame:AddSelectedColumn(0)
+            frame:AddSelectedColumn(1)
+            DataFrame tab = frame:CrossTab()
+            output "CrossTab(color x size) = " + Show(tab)
+        detect e
+            output "CrossTab(color x size) unexpected error: " + e:GetErrorMessage()
+        end
+        check
+            DataFrame frame = Frame(data)
+            frame:AddSelectedColumn(0)
+            frame:AddSelectedColumn(1)
+            DataFrame tab = frame:CrossTab()
+            output "CrossTab(color x size) cell(red, small) = " + tab:GetColumn("small"):GetAsText(2)
+        detect e
+            output "CrossTab cell(red, small) unexpected error: " + e:GetErrorMessage()
+        end
+        check
+            DataFrame frame = Frame(data)
+            CrossTab cross
+            cross:AddColumn(1)
+            cross:AddColumn(0)
+            DataFrame tab = frame:Transform(cross)
+            output "CrossTab transform with AddColumn(1), AddColumn(0) (size x color) = " + Show(tab)
+        detect e
+            output "CrossTab(size x color) unexpected error: " + e:GetErrorMessage()
+        end
+        check
+            DataFrame frame = Frame("a,b;x,y;y,z")
+            CrossTab cross
+            cross:AddColumn(0)
+            cross:AddColumn(1)
+            cross:FullRowsAndColumns(true)
+            DataFrame tab = frame:Transform(cross)
+            output "CrossTab FullRowsAndColumns(true) (a x b) = " + Show(tab)
+        detect e
+            output "CrossTab FullRowsAndColumns(true) unexpected error: " + e:GetErrorMessage()
+        end
+        check
+            DataFrame frame = Frame("n,flag;1.5,true;2.5,false;1.5,true")
+            frame:AddSelectedColumn(0)
+            frame:AddSelectedColumn(1)
+            DataFrame tab = frame:CrossTab()
+            output "CrossTab of a number column x a boolean column = " + Show(tab)
+        detect e
+            output "CrossTab number x boolean unexpected error: " + e:GetErrorMessage()
+        end
+        check
+            DataFrame frame = Frame(data)
+            frame:AddSelectedColumn(0)
+            DataFrame tab = frame:CrossTab()
+            output "CrossTab with one selected column should fail but returned " + Show(tab)
+        detect e
+            output "CrossTab with one selected column fails, as it should"
+        end
+        check
+            DataFrame frame = Frame(data)
+            frame:AddSelectedColumn(0)
+            frame:AddSelectedColumn(1)
+            DataFrame tab = frame:CrossTab()
+            output "CrossTab leaves the original frame unchanged = " + Show(frame)
+        detect e
+            output "CrossTab original frame unexpected error: " + e:GetErrorMessage()
+        end
+    end
+
+    /* A frame as one line: each column's header, then its values; NA for undefined. */
+    action Show(DataFrame frame) returns text
+        text result = ""
+        integer i = 0
+        repeat while i < frame:GetSize()
+            DataFrameColumn column = frame:GetColumn(i)
+            if i > 0
+                result = result + " | "
+            end
+            result = result + column:GetHeader() + "="
+            integer j = 0
+            repeat while j < column:GetSize()
+                if j > 0
+                    result = result + ","
+                end
+                if column:IsUndefined(j)
+                    result = result + "NA"
+                else
+                    result = result + column:GetAsText(j)
+                end
+                j = j + 1
+            end
+            i = i + 1
+        end
+        return result
+    end
+
+    /* Makes a frame from comma separated text whose rows are separated by ; */
+    action Frame(text rows) returns DataFrame
+        text lf = ""
+        lf = lf:GetLineFeed()
+        DataFrame frame
+        frame:LoadFromCommaSeparatedValue(rows:Replace(";", lf))
+        return frame
+    end
+end

@@ -1,0 +1,91 @@
+use Libraries.Language.Support.FindReplace
+use Libraries.Containers.Support.Pair
+use Libraries.Containers.Array
+
+/*
+FindReplace: SetText, GetText, Find(text) and Find(text, wholeWord,
+matchCase). The class has no documentation, so the expectations follow the
+usual find semantics: matches are found left to right without overlapping,
+each reported as a Pair of the first and last index of the match (as the
+code's own Pairs are built); Find(text) ignores case and doesn't require
+whole words; an empty search finds nothing; with wholeWord, a match must
+not touch a letter, digit or underscore on either side, so spaces, tabs,
+line breaks and punctuation all count as word boundaries. Text with line
+feeds and tabs is shown with \n and \t.
+*/
+class Main
+    action Main
+        text lf = ""
+        lf = lf:GetLineFeed()
+        text tab = lf:GetTab()
+
+        check
+            FindReplace finder
+            output "new FindReplace GetText() = [" + finder:GetText() + "]"
+            finder:SetText("Hello World")
+            output "SetText(Hello World) GetText() = [" + finder:GetText() + "]"
+        detect e
+            output "SetText/GetText unexpected error: " + e:GetErrorMessage()
+        end
+
+        FindDefault("Hello World", "o")
+        FindDefault("Hello hello HELLO", "hello")
+        FindDefault("aaaa", "aa")
+        FindDefault("abcab", "ab")
+        FindDefault("abc", "")
+        FindDefault("abc", "xyz")
+        FindDefault("ab", "abc")
+        FindDefault("", "a")
+        FindDefault("abc", "abc")
+        Find("Hello hello HELLO", "hello", false, true)
+        Find("Hello hello HELLO", "HELLO", false, true)
+        Find("cat concat cat.", "cat", true, false)
+        Find("(cat)", "cat", true, true)
+        Find("Cat cat", "CAT", true, false)
+        Find("Cat cat", "CAT", true, true)
+        Find("a" + lf + "cat" + lf + "b", "cat", true, true)
+        Find("cat_x cat", "cat", true, true)
+        Find("cats cat", "cat", true, true)
+        Find("a" + tab + "cat", "cat", true, true)
+        Find("cat!", "cat", true, true)
+        Find("x;cat", "cat", true, true)
+        Find("cat", "cat", true, true)
+    end
+
+    action Show(text value) returns text
+        text result = value:Replace(value:GetLineFeed(), "\n")
+        result = result:Replace(value:GetTab(), "\t")
+        return result
+    end
+
+    action Describe(Array<Pair<integer>> matches) returns text
+        text result = "" + matches:GetSize() + " matches"
+        integer i = 0
+        repeat while i < matches:GetSize()
+            Pair<integer> pair = matches:Get(i)
+            result = result + " (" + pair:GetFirstValue() + "," + pair:GetSecondValue() + ")"
+            i = i + 1
+        end
+        return result
+    end
+
+    action FindDefault(text value, text search)
+        check
+            FindReplace finder
+            finder:SetText(value)
+            output "Find(" + search + ") in [" + Show(value) + "] = " + Describe(finder:Find(search))
+        detect e
+            output "Find(" + search + ") in [" + Show(value) + "] unexpected error: " + e:GetErrorMessage()
+        end
+    end
+
+    action Find(text value, text search, boolean wholeWord, boolean matchCase)
+        check
+            FindReplace finder
+            finder:SetText(value)
+            output "Find(" + search + ", wholeWord " + wholeWord + ", matchCase " + matchCase + ") in [" + Show(value) + "] = " + Describe(finder:Find(search, wholeWord, matchCase))
+        detect e
+            output "Find(" + search + ", wholeWord " + wholeWord + ", matchCase " + matchCase + ") in [" + Show(value) + "] unexpected error: " + e:GetErrorMessage()
+        end
+    end
+end

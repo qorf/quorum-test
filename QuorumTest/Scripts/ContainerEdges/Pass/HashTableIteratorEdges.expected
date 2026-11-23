@@ -1,0 +1,11 @@
+HashTable{only:v} key iterator before Next: HasNext() = true, GetCurrent() = undefined
+HashTable{only:v} key iterator Next() = [only], HasNext() = false
+HashTable{only:v} key iterator after Next GetCurrent() = [only]
+HashTable{only:v} key iterator Rewind(): HasNext() = true, Next() = [only]
+HashTable{only:v} value iterator before Next: HasNext() = true, GetCurrent() = undefined
+HashTable{only:v} value iterator Next() = [v], HasNext() = false
+HashTable{only:v} value iterator after Next GetCurrent() = [v]
+HashTable of 20 keys: key iterator visits 20, GetCurrent() equals the key Next() returned 20 times
+HashTable of 20 keys: key iterator visits 20, after Rewind() 20, first and last sorted k0 k9
+HashTable of 20 keys: value iterator visits 20, first and last sorted v0 v9
+HashTable of 20 keys: key iterator Next() past the end fails, as it should

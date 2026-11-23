@@ -1,0 +1,16 @@
+BitCount(0) = 0
+Integer BitCount(0) = 0
+BitCount(1) = 1
+Integer BitCount(1) = 1
+BitCount(3) = 2
+Integer BitCount(3) = 2
+BitCount(255) = 8
+Integer BitCount(255) = 8
+BitCount(-1) = 32
+Integer BitCount(-1) = 32
+BitCount(-20) = 29
+Integer BitCount(-20) = 29
+BitCount(2147483647) = 31
+Integer BitCount(2147483647) = 31
+BitCount(-2147483648) = 1
+Integer BitCount(-2147483648) = 1

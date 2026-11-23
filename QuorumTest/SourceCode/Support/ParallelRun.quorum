@@ -452,6 +452,11 @@ class ParallelRun
         return shards:GetSize()
     end
 
+    /* The process at the index, from 0. */
+    action GetShard(integer index) returns Shard
+        return shards:Get(index)
+    end
+
     action GetPassed returns integer
         integer value = 0
         integer i = 0
@@ -485,18 +490,6 @@ class ParallelRun
         return value
     end
 
-    /* One line per process, for the window. */
-    action GetProcessLines returns Array<text>
-        Array<text> lines
-        integer i = 0
-        repeat while i < shards:GetSize()
-            Shard shard = shards:Get(i)
-            lines:Add(shard:GetLine())
-            i = i + 1
-        end
-        return lines
-    end
-
     /*
         One line per finished tester, in the usual order, from the shards'
         result.json files. Only known once a shard has finished.
@@ -524,11 +517,14 @@ class ParallelRun
         return lines
     end
 
-    /* One line per failed test: the file, the back end and the first line of the reason. */
-    action GetFailureLines returns Array<text>
-        Array<text> lines
-        text lineFeed = ""
-        lineFeed = lineFeed:GetLineFeed()
+    /*
+        Each failed test, numbered, with its tester, such as
+        "1. ContainerEdges/ArrayEmptyFalse": once each however many back
+        ends it failed on, in the usual tester order.
+    */
+    action GetFailureNames returns Array<text>
+        Array<text> names
+        HashTable<text, text> seen
         HashTable<text, JavaScriptObjectNotation> testers = GetFinishedTesters()
         integer i = 0
         repeat while i < catalog:GetSize()
@@ -540,19 +536,31 @@ class ParallelRun
                     integer f = 0
                     repeat while f < failures:GetSize()
                         JavaScriptObjectNotation failure = failures:Get(f)
-                        Array<text> reasonLines = failure:GetValue("reason"):Split(lineFeed)
-                        text reason = ""
-                        if not reasonLines:IsEmpty()
-                            reason = reasonLines:Get(0)
+                        text name = key + "/" + GetTestName(failure:GetValue("file"))
+                        if not seen:HasKey(name)
+                            seen:Add(name, name)
+                            names:Add((names:GetSize() + 1) + ". " + name)
                         end
-                        lines:Add(failure:GetValue("file") + " (" + failure:GetValue("backEnd") + "): " + reason)
                         f = f + 1
                     end
                 end
             end
             i = i + 1
         end
-        return lines
+        return names
+    end
+
+    /* A test's name from its file: Scripts/Text/Pass/TextSplit.quorum gives TextSplit. */
+    private action GetTestName(text file) returns text
+        integer start = file:GetSize()
+        repeat while start > 0 and file:GetCharacter(start - 1) not= "/" and file:GetCharacter(start - 1) not= "\"
+            start = start - 1
+        end
+        text name = file:GetSubtext(start)
+        if name:EndsWith(".quorum")
+            name = name:GetSubtext(0, name:GetSize() - 7)
+        end
+        return name
     end
 
     /*
@@ -658,7 +666,7 @@ class ParallelRun
                     repeat while f < list:GetSize()
                         JavaScriptObjectNotation failure = list:Get(f)
                         failures:Append(failure:GetValue("file") + " (" + failure:GetValue("backEnd") + ")" + lineFeed)
-                        Array<text> reasonLines = failure:GetValue("reason"):Split(lineFeed)
+                        Array<text> reasonLines = json:Decode(failure:GetValue("reason")):Split(lineFeed)
                         integer r = 0
                         repeat while r < reasonLines:GetSize()
                             failures:Append("    " + reasonLines:Get(r) + lineFeed)

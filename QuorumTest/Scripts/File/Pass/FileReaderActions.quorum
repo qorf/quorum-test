@@ -1,0 +1,135 @@
+use Libraries.System.File
+use Libraries.System.FileReader
+use Libraries.System.Blueprints.FileReaderBlueprint
+use Libraries.Containers.Array
+
+/*
+Tests FileReader (OpenForRead, Read, Read(integer), ReadLine, ReadLines,
+IsAtEndOfFile, Close) and File's OpenForRead and Close, inside a scratch
+folder (FileTestsWork/FileReaderActions), deleted at the end. The test file
+holds "alpha", "beta" and "gamma" on three lines, with no line feed after
+the last. As the documentation says: Read(integer) past the end returns only
+what is left; Read and Read(integer) at the end raise an EndOfFileError;
+Read(0) raises an InvalidArgumentError; opening a missing file raises an
+error; File's OpenForRead on a missing file returns undefined.
+*/
+class Main
+    action Main
+        File work
+        work:SetPath("FileTestsWork/FileReaderActions")
+        work:Delete(true)
+        boolean made = work:CreateDirectories()
+        text lf = ""
+        lf = lf:GetLineFeed()
+        File file
+        file:SetPath("FileTestsWork/FileReaderActions/lines.txt")
+        file:Write("alpha" + lf + "beta" + lf + "gamma")
+
+        FileReader reader
+        check
+            reader:OpenForRead(file)
+            output "OpenForRead(lines.txt): IsAtEndOfFile() = " + reader:IsAtEndOfFile()
+            output "ReadLine() first = [" + reader:ReadLine() + "]"
+            output "Read(3) after the first line = [" + reader:Read(3) + "]"
+            output "ReadLine() rest of the second line = [" + reader:ReadLine() + "]"
+            output "Read() rest of the file = [" + reader:Read() + "]"
+            output "IsAtEndOfFile() after Read() = " + reader:IsAtEndOfFile()
+        detect e
+            output "FileReader reading lines.txt unexpected error: " + e:GetErrorMessage()
+        end
+        check
+            text value = reader:Read()
+            output "Read() at the end of the file should fail but returned [" + value + "]"
+        detect e
+            output "Read() at the end of the file fails, as it should"
+        end
+        check
+            text value = reader:Read(2)
+            output "Read(2) at the end of the file should fail but returned [" + value + "]"
+        detect e
+            output "Read(2) at the end of the file fails, as it should"
+        end
+        check
+            reader:Close()
+            output "Close() after reading = done"
+        detect e
+            output "Close() unexpected error: " + e:GetErrorMessage()
+        end
+
+        FileReader whole
+        check
+            whole:OpenForRead(file)
+            text value = whole:Read()
+            output "Read() of the whole file equals what was written = " + (value = "alpha" + lf + "beta" + lf + "gamma")
+            whole:Close()
+        detect e
+            output "Read() of the whole file unexpected error: " + e:GetErrorMessage()
+        end
+
+        FileReader past
+        check
+            past:OpenForRead(file)
+            text first = past:ReadLine()
+            text second = past:ReadLine()
+            text value = past:Read(100)
+            output "Read(100) when 5 characters are left = [" + value + "], size " + value:GetSize()
+            past:Close()
+        detect e
+            output "Read(100) when 5 characters are left unexpected error: " + e:GetErrorMessage()
+        end
+
+        FileReader lines
+        check
+            lines:OpenForRead(file)
+            Array<text> all = lines:ReadLines()
+            output "ReadLines() size = " + all:GetSize()
+            integer i = 0
+            repeat while i < all:GetSize()
+                output "ReadLines() line " + i + " = [" + all:Get(i) + "]"
+                i = i + 1
+            end
+            lines:Close()
+        detect e
+            output "ReadLines() unexpected error: " + e:GetErrorMessage()
+        end
+
+        FileReader zero
+        check
+            zero:OpenForRead(file)
+            text value = zero:Read(0)
+            output "Read(0) should fail but returned [" + value + "]"
+        detect e
+            output "Read(0) fails, as it should"
+        end
+        zero:Close()
+
+        File missing
+        missing:SetPath("FileTestsWork/FileReaderActions/missing.txt")
+        FileReader none
+        check
+            none:OpenForRead(missing)
+            output "FileReader:OpenForRead(missing.txt) should fail but returned normally"
+        detect e
+            output "FileReader:OpenForRead(missing.txt) fails, as it should"
+        end
+        check
+            FileReaderBlueprint nothing = missing:OpenForRead()
+            output "File:OpenForRead(missing.txt) is undefined = " + (nothing = undefined)
+        detect e
+            output "File:OpenForRead(missing.txt) unexpected error: " + e:GetErrorMessage()
+        end
+        check
+            FileReaderBlueprint opened = file:OpenForRead()
+            output "File:OpenForRead(lines.txt) then ReadLine() = [" + opened:ReadLine() + "]"
+            file:Close()
+            output "File:Close() after File:OpenForRead = done"
+        detect e
+            output "File:OpenForRead(lines.txt) unexpected error: " + e:GetErrorMessage()
+        end
+
+        work:Delete(true)
+        File top
+        top:SetPath("FileTestsWork")
+        boolean removed = top:Delete()
+    end
+end

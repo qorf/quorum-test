@@ -1,0 +1,15 @@
+SetRelativePath(images/bar.png): GetPath() = [images/bar.png]
+SetRelativePath(images/bar.png): IsPathRelative() = true
+SetRelativePath(images/bar.png): IsPathAbsolute() = false
+SetRelativePath(../../hello.txt): GetPath() = [../../hello.txt]
+SetRelativePath(../../hello.txt): IsPathRelative() = true
+SetAbsolutePath(/Users/jeff): GetPath() = [/Users/jeff]
+SetAbsolutePath(/Users/jeff): IsPathAbsolute() = true
+SetAbsolutePath(/Users/jeff): IsPathRelative() = false
+SetAbsolutePath(C:/Windows): IsPathAbsolute() = true
+GetPath() with no path set fails, as it should
+IsPathRelative() with no path set fails, as it should
+IsPathAbsolute() with no path set fails, as it should
+SetAbsolutePath(hello.txt) fails, as it should
+SetRelativePath(/Users/jeff) fails, as it should
+SetRelativePath(/Users/jeff) error says not a relative path = true

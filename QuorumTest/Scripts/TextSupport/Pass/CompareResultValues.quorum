@@ -1,0 +1,61 @@
+use Libraries.Language.Support.CompareResult
+use Libraries.Language.Types.Number
+use Libraries.Language.Types.Integer
+use Libraries.Language.Types.Text
+
+/*
+CompareResult's documented constants (LARGER 1, EQUAL 0, SMALLER -1,
+INVALID -2), its result field's starting value (INVALID), and comparisons
+of Number, Integer and Text objects checked against those constants, as in
+the class's documentation example.
+*/
+class Main
+    action Main
+        CompareResult results
+        output "LARGER = " + results:LARGER + ", EQUAL = " + results:EQUAL + ", SMALLER = " + results:SMALLER + ", INVALID = " + results:INVALID + ", result = " + results:result
+
+        check
+            Number one
+            one:SetValue(10.3)
+            Number two
+            two:SetValue(9.6)
+            output "Number 10.3 Compare(9.6) = LARGER is [" + (one:Compare(two) = results:LARGER) + "]"
+            output "Number 9.6 Compare(10.3) = SMALLER is [" + (two:Compare(one) = results:SMALLER) + "]"
+            Number same
+            same:SetValue(10.3)
+            output "Number 10.3 Compare(10.3) = EQUAL is [" + (one:Compare(same) = results:EQUAL) + "]"
+        detect e
+            output "Number comparisons unexpected error: " + e:GetErrorMessage()
+        end
+
+        check
+            Integer three
+            three:SetValue(3)
+            Integer five
+            five:SetValue(5)
+            output "Integer 3 Compare(5) = SMALLER is [" + (three:Compare(five) = results:SMALLER) + "]"
+            output "Integer 5 Compare(3) = LARGER is [" + (five:Compare(three) = results:LARGER) + "]"
+        detect e
+            output "Integer comparisons unexpected error: " + e:GetErrorMessage()
+        end
+
+        check
+            Text apple
+            apple:SetValue("apple")
+            Text banana
+            banana:SetValue("banana")
+            output "Text apple Compare(banana) = SMALLER is [" + (apple:Compare(banana) = results:SMALLER) + "]"
+            output "Text banana Compare(apple) = LARGER is [" + (banana:Compare(apple) = results:LARGER) + "]"
+        detect e
+            output "Text comparisons unexpected error: " + e:GetErrorMessage()
+        end
+
+        check
+            CompareResult other
+            other:result = other:LARGER
+            output "result set to LARGER = " + other:result + ", a new CompareResult's result is still " + results:result
+        detect e
+            output "CompareResult result field unexpected error: " + e:GetErrorMessage()
+        end
+    end
+end

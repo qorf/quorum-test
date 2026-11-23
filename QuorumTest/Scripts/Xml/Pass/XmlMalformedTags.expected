@@ -1,0 +1,14 @@
+Read(<a>) fails, as it should
+Read(<a><b></a>) fails, as it should
+Read(<a></b>) fails, as it should
+Read(</a>) fails, as it should
+Read(<a/><b/>) fails, as it should
+Read() fails, as it should
+Read(hello) fails, as it should
+Read(<a>x) fails, as it should
+Read(<a) fails, as it should
+Read(<a><b>x</a></b>) fails, as it should
+Read(<1a/>) fails, as it should
+Read(<a/>trailing) fails, as it should
+Read(<a><!-- never closed </a>) fails, as it should
+Read(<a><![CDATA[never closed</a>) fails, as it should

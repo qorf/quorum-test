@@ -1,0 +1,16 @@
+TransformWider(factor key, column value) = id=a,b | x=1.5,3.5 | y=2.5,4.5
+TransformWider with no other columns = x=1.5,3.5 | y=2.5
+TransformWider with two (a, x) rows and no resolution fails, as it should
+TransformWider ResolveConflictsWithSum() = id=a | x=4.0 | y=4.0
+TransformWider ResolveConflictsWithMean() = id=a | x=2.0 | y=4.0
+TransformWider ResolveConflictsWithMean() with an x row after the y row = id=a | x=3.0 | y=4.0
+TransformWider ResolveConflictsWithMinimum() = id=a | x=1.5 | y=4.0
+TransformWider ResolveConflictsWithMaximum() = id=a | x=2.5 | y=4.0
+TransformWider ResolveConflictsWithCount() = id=a | x=2.0 | y=1.0
+TransformWider ResolveConflictsWithAppend() on text = id=a | x=hi_yo | y=ok
+TransformWider with no factor fails, as it should
+TransformLonger(columns x, y) = id=a,b,a,b | Names=x,x,y,y | Values=1.5,3.5,2.5,4.5
+TransformLonger SetNamesHeader(key) SetValuesHeader(value) = id=a,b,a,b | key=x,x,y,y | value=1.5,3.5,2.5,4.5 (headers read back: key, value)
+TransformLonger leaves the original frame unchanged = id=a,b | x=1.5,3.5 | y=2.5,4.5
+TransformWider then TransformLonger = id=a,b,a,b | key=x,x,y,y | value=1.5,3.5,2.5,4.5
+TransformLonger with no selected columns fails, as it should

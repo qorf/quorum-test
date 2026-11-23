@@ -1,0 +1,72 @@
+/*
+    Text:Trim removes white space from the start and end only.
+    Text:ToLowerCase and Text:ToUpperCase change letters and leave other
+    characters alone. Each case runs on a text primitive and on a Text
+    object. Tabs and line feeds are named in the labels, not printed.
+*/
+class Main
+    action Main
+        text tab = ""
+        tab = tab:GetTab()
+        text lf = ""
+        lf = lf:GetLineFeed()
+        Trim("  a ", "  a ")
+        Trim("a", "a")
+        Trim("", "")
+        Trim("   ", "   ")
+        Trim("a b", "a b")
+        Trim("  a  b  ", "  a  b  ")
+        Trim(tab + "a" + lf, "tab a line feed")
+        Trim(lf + lf, "line feed line feed")
+        Case("HeLlo ")
+        Case("abc")
+        Case("ABC")
+        Case("")
+        Case("   ")
+        Case("123 !?")
+        Case("a1B2")
+    end
+
+    action Trim(text value, text label)
+        text call = "Trim([" + label + "])"
+        check
+            output call + " = [" + value:Trim() + "]"
+        detect e
+            output call + " unexpected error: " + e:GetErrorMessage()
+        end
+        Text object
+        object:SetValue(value)
+        check
+            output "Text " + call + " = [" + object:Trim() + "]"
+        detect e
+            output "Text " + call + " unexpected error: " + e:GetErrorMessage()
+        end
+    end
+
+    action Case(text value)
+        text lower = "ToLowerCase([" + value + "])"
+        text upper = "ToUpperCase([" + value + "])"
+        check
+            output lower + " = [" + value:ToLowerCase() + "]"
+        detect e
+            output lower + " unexpected error: " + e:GetErrorMessage()
+        end
+        check
+            output upper + " = [" + value:ToUpperCase() + "]"
+        detect e
+            output upper + " unexpected error: " + e:GetErrorMessage()
+        end
+        Text object
+        object:SetValue(value)
+        check
+            output "Text " + lower + " = [" + object:ToLowerCase() + "]"
+        detect e
+            output "Text " + lower + " unexpected error: " + e:GetErrorMessage()
+        end
+        check
+            output "Text " + upper + " = [" + object:ToUpperCase() + "]"
+        detect e
+            output "Text " + upper + " unexpected error: " + e:GetErrorMessage()
+        end
+    end
+end

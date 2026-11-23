@@ -1,0 +1,9 @@
+TransformInHardware, DOUBLE_NUMBER_32, of |1.0E39, 1| |1, 1| by itself: RanInHardware = false
+TransformInHardware, DOUBLE_NUMBER_32, of |1.0E39, 1| |1, 1| by itself: has 2 rows and 2 columns
+TransformInHardware, DOUBLE_NUMBER_32, of |1.0E39, 1| |1, 1| by itself: (0, 0) equals TransformInSoftware's: true
+TransformInHardware, DOUBLE_NUMBER_32, of |1.0E39, 1| |1, 1| by itself: (0, 1) equals TransformInSoftware's: true
+TransformInHardware, DOUBLE_NUMBER_32, of |1.0E39, 1| |1, 1| by itself: (1, 1) = 2.0, hand-worked 2
+TransformInHardware, DOUBLE_NUMBER_32, of the 2 by 2 matrix of 1.0E-20 by itself: RanInHardware = false
+TransformInHardware, DOUBLE_NUMBER_32, of the 2 by 2 matrix of 1.0E-20 by itself: (0, 1) equals TransformInSoftware's: true
+TransformInHardware, DOUBLE_NUMBER_32, of the 2 by 2 matrix of 1.0E-20 by itself: (1, 0) equals TransformInSoftware's: true
+TransformInHardware, DOUBLE_NUMBER_32, of the 2 by 2 matrix of 1.0E-20 by itself: (0, 1) is above 0: true

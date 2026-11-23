@@ -1,0 +1,120 @@
+/*
+    Integer:RotateLeft(n) and RotateRight(n) rotate the 32 bits, so bits
+    pushed off one end come back at the other: RotateLeft(1, 31) is the
+    minimum integer, RotateLeft(minimum, 1) is 1, a rotation by 32 or 0
+    changes nothing, and negative values rotate without sign extension
+    (RotateRight(minimum, 1) = 1073741824). Java's Integer.rotateLeft and
+    rotateRight agree. Rotations by negative amounts are not tested: the
+    documentation does not say what they mean.
+    Each case runs on an integer primitive and on an Integer object.
+*/
+class Main
+    action Main
+        ShowRotateLeft(1, 1)
+        ShowRotateLeft(1, 2)
+        ShowRotateLeft(1, 31)
+        ShowRotateLeft(1, 32)
+        ShowRotateLeft(1, 0)
+        ShowRotateRight(1, 1)
+        ShowRotateRight(1, 2)
+        ShowRotateRight(1, 31)
+        ShowRotateRight(1, 32)
+        ShowRotateRight(1, 0)
+        ShowRotateLeft(3, 1)
+        ShowRotateLeft(3, 2)
+        ShowRotateLeft(3, 31)
+        ShowRotateLeft(3, 32)
+        ShowRotateLeft(3, 0)
+        ShowRotateRight(3, 1)
+        ShowRotateRight(3, 2)
+        ShowRotateRight(3, 31)
+        ShowRotateRight(3, 32)
+        ShowRotateRight(3, 0)
+        ShowRotateLeft(12, 1)
+        ShowRotateLeft(12, 2)
+        ShowRotateLeft(12, 31)
+        ShowRotateLeft(12, 32)
+        ShowRotateLeft(12, 0)
+        ShowRotateRight(12, 1)
+        ShowRotateRight(12, 2)
+        ShowRotateRight(12, 31)
+        ShowRotateRight(12, 32)
+        ShowRotateRight(12, 0)
+        ShowRotateLeft(-1, 1)
+        ShowRotateLeft(-1, 2)
+        ShowRotateLeft(-1, 31)
+        ShowRotateLeft(-1, 32)
+        ShowRotateLeft(-1, 0)
+        ShowRotateRight(-1, 1)
+        ShowRotateRight(-1, 2)
+        ShowRotateRight(-1, 31)
+        ShowRotateRight(-1, 32)
+        ShowRotateRight(-1, 0)
+        ShowRotateLeft(-2147483647 - 1, 1)
+        ShowRotateLeft(-2147483647 - 1, 2)
+        ShowRotateLeft(-2147483647 - 1, 31)
+        ShowRotateLeft(-2147483647 - 1, 32)
+        ShowRotateLeft(-2147483647 - 1, 0)
+        ShowRotateRight(-2147483647 - 1, 1)
+        ShowRotateRight(-2147483647 - 1, 2)
+        ShowRotateRight(-2147483647 - 1, 31)
+        ShowRotateRight(-2147483647 - 1, 32)
+        ShowRotateRight(-2147483647 - 1, 0)
+        ShowRotateLeft(1073741824, 1)
+        ShowRotateLeft(1073741824, 2)
+        ShowRotateLeft(1073741824, 31)
+        ShowRotateLeft(1073741824, 32)
+        ShowRotateLeft(1073741824, 0)
+        ShowRotateRight(1073741824, 1)
+        ShowRotateRight(1073741824, 2)
+        ShowRotateRight(1073741824, 31)
+        ShowRotateRight(1073741824, 32)
+        ShowRotateRight(1073741824, 0)
+        ShowRotateLeft(-8, 1)
+        ShowRotateLeft(-8, 2)
+        ShowRotateLeft(-8, 31)
+        ShowRotateLeft(-8, 32)
+        ShowRotateLeft(-8, 0)
+        ShowRotateRight(-8, 1)
+        ShowRotateRight(-8, 2)
+        ShowRotateRight(-8, 31)
+        ShowRotateRight(-8, 32)
+        ShowRotateRight(-8, 0)
+    end
+
+    action ShowRotateLeft(integer value, integer amount)
+        text call = "RotateLeft(" + value + ", " + amount + ")"
+        check
+            integer result = value:RotateLeft(amount)
+            output call + " = " + result
+        detect e
+            output call + " unexpected error: " + e:GetErrorMessage()
+        end
+        Integer object
+        object:SetValue(value)
+        check
+            integer result = object:RotateLeft(amount)
+            output "Integer " + call + " = " + result
+        detect e
+            output "Integer " + call + " unexpected error: " + e:GetErrorMessage()
+        end
+    end
+
+    action ShowRotateRight(integer value, integer amount)
+        text call = "RotateRight(" + value + ", " + amount + ")"
+        check
+            integer result = value:RotateRight(amount)
+            output call + " = " + result
+        detect e
+            output call + " unexpected error: " + e:GetErrorMessage()
+        end
+        Integer object
+        object:SetValue(value)
+        check
+            integer result = object:RotateRight(amount)
+            output "Integer " + call + " = " + result
+        detect e
+            output "Integer " + call + " unexpected error: " + e:GetErrorMessage()
+        end
+    end
+end

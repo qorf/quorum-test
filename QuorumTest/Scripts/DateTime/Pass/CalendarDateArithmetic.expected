@@ -1,0 +1,28 @@
+AddDays(1) to 2024-02-28 = [2024-02-29]
+AddDays(2) to 2024-02-28 = [2024-03-01]
+AddDays(1) to 2024-12-31 = [2025-01-01]
+AddDays(-1) to 1970-01-01 = [1969-12-31]
+AddDays(-366) to 2024-03-01 = [2023-03-01]
+AddMonths(1) to 2024-01-31 = [2024-02-29]
+AddMonths(1) to 2023-01-31 = [2023-02-28]
+AddMonths(-1) to 2024-03-31 = [2024-02-29]
+AddMonths(2) to 2024-11-15 = [2025-01-15]
+AddMonths(-13) to 2024-01-15 = [2022-12-15]
+AddMonths(12) to 2024-05-31 = [2025-05-31]
+AddYears(1) to 2024-02-29 = [2025-02-28]
+AddYears(4) to 2024-02-29 = [2028-02-29]
+AddYears(-100) to 2024-02-29 = [1924-02-29]
+AddYears(-2026) to 2026-11-12 = [0000-11-12]
+2024-02-29:DaysUntil(2026-11-12) = 987
+2026-11-12:DaysUntil(2024-02-29) = -987
+2024-02-29:DaysUntil(2024-02-29) = 0
+2024-02-29:Compare(2026-11-12) = -1
+2026-11-12:Compare(2024-02-29) = 1
+2024-02-29:Compare(another 2024-02-29) = 0
+2024-02-29:Equals(another 2024-02-29) = true
+2024-02-29:Equals(2026-11-12) = false
+2024-02-29:Equals(the text 2024-02-29) = false
+GetHashCode() of two equal dates is the same = true
+GetHashCode() of 2024-02-29 = 19782
+Copy() of 2024-02-29: ToText() = [2024-02-29], Equals(original) = true
+Copy(), then AddDays(1) on the copy: copy = [2024-03-01], original = [2024-02-29]

@@ -1,0 +1,106 @@
+/*
+    Text:GetSubtext(startIndex) gives the characters from startIndex to the
+    end, and GetSubtext(startIndex, endIndex) the characters from startIndex
+    up to, not including, endIndex.
+
+    Choice where the documentation is silent: a start equal to the size
+    gives "" for the one-parameter form, the same as GetSubtext(size, size)
+    and Java's substring(size). The library's Quorum code alerts an error
+    instead, so those lines differ until that is settled. Negative indexes,
+    indexes past the size and a start after the end fail (Java throws).
+    Each case runs on a text primitive and on a Text object.
+*/
+class Main
+    action Main
+        Show("hello", 0)
+        Show("hello", 1)
+        Show("hello", 4)
+        Show("hello", 5)
+        Show("", 0)
+        Show(" a ", 2)
+        Fail("hello", 6)
+        Fail("hello", -1)
+        Fail("", 1)
+        ShowRange("hello", 0, 5)
+        ShowRange("hello", 0, 0)
+        ShowRange("hello", 1, 3)
+        ShowRange("hello", 4, 5)
+        ShowRange("hello", 5, 5)
+        ShowRange("", 0, 0)
+        ShowRange("hello world", 0, 5)
+        ShowRange("hello world", 5, 6)
+        FailRange("hello", 0, 6)
+        FailRange("hello", -1, 2)
+        FailRange("hello", 3, 2)
+        FailRange("hello", 6, 6)
+        FailRange("", 0, 1)
+    end
+
+    action Show(text value, integer start)
+        text call = "GetSubtext(" + value + ", " + start + ")"
+        check
+            output call + " = [" + value:GetSubtext(start) + "]"
+        detect e
+            output call + " unexpected error: " + e:GetErrorMessage()
+        end
+        Text object
+        object:SetValue(value)
+        check
+            output "Text " + call + " = [" + object:GetSubtext(start) + "]"
+        detect e
+            output "Text " + call + " unexpected error: " + e:GetErrorMessage()
+        end
+    end
+
+    action Fail(text value, integer start)
+        text call = "GetSubtext(" + value + ", " + start + ")"
+        check
+            text result = value:GetSubtext(start)
+            output call + " should fail but returned [" + result + "]"
+        detect e
+            output call + " fails, as it should"
+        end
+        Text object
+        object:SetValue(value)
+        check
+            text result = object:GetSubtext(start)
+            output "Text " + call + " should fail but returned [" + result + "]"
+        detect e
+            output "Text " + call + " fails, as it should"
+        end
+    end
+
+    action ShowRange(text value, integer start, integer finish)
+        text call = "GetSubtext(" + value + ", " + start + ", " + finish + ")"
+        check
+            output call + " = [" + value:GetSubtext(start, finish) + "]"
+        detect e
+            output call + " unexpected error: " + e:GetErrorMessage()
+        end
+        Text object
+        object:SetValue(value)
+        check
+            output "Text " + call + " = [" + object:GetSubtext(start, finish) + "]"
+        detect e
+            output "Text " + call + " unexpected error: " + e:GetErrorMessage()
+        end
+    end
+
+    action FailRange(text value, integer start, integer finish)
+        text call = "GetSubtext(" + value + ", " + start + ", " + finish + ")"
+        check
+            text result = value:GetSubtext(start, finish)
+            output call + " should fail but returned [" + result + "]"
+        detect e
+            output call + " fails, as it should"
+        end
+        Text object
+        object:SetValue(value)
+        check
+            text result = object:GetSubtext(start, finish)
+            output "Text " + call + " should fail but returned [" + result + "]"
+        detect e
+            output "Text " + call + " fails, as it should"
+        end
+    end
+end

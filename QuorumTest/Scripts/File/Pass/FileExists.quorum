@@ -1,0 +1,61 @@
+use Libraries.System.File
+
+/*
+Tests Exists, IsFile, IsDirectory and IsHidden on a folder, a file and a
+missing path, all inside a scratch folder (FileTestsWork/FileExists) that the
+program makes under the current directory and deletes at the end. IsHidden
+is checked only for a plain name, which is never hidden on any system.
+*/
+class Main
+    action Main
+        File work
+        work:SetPath("FileTestsWork/FileExists")
+        work:Delete(true)
+        boolean made = work:CreateDirectories()
+        output "CreateDirectories(FileTestsWork/FileExists) = " + made
+
+        File file
+        file:SetPath("FileTestsWork/FileExists/plain.txt")
+        file:Write("hello")
+
+        File missing
+        missing:SetPath("FileTestsWork/FileExists/missing.txt")
+
+        Report("folder", work)
+        Report("plain.txt", file)
+        Report("missing.txt", missing)
+
+        work:Delete(true)
+        check
+            output "Exists(folder) after Delete(true) = " + work:Exists()
+        detect e
+            output "Exists(folder) after Delete(true) unexpected error: " + e:GetErrorMessage()
+        end
+        File top
+        top:SetPath("FileTestsWork")
+        boolean removed = top:Delete()
+    end
+
+    action Report(text name, File file)
+        check
+            output "Exists(" + name + ") = " + file:Exists()
+        detect e
+            output "Exists(" + name + ") unexpected error: " + e:GetErrorMessage()
+        end
+        check
+            output "IsFile(" + name + ") = " + file:IsFile()
+        detect e
+            output "IsFile(" + name + ") unexpected error: " + e:GetErrorMessage()
+        end
+        check
+            output "IsDirectory(" + name + ") = " + file:IsDirectory()
+        detect e
+            output "IsDirectory(" + name + ") unexpected error: " + e:GetErrorMessage()
+        end
+        check
+            output "IsHidden(" + name + ") = " + file:IsHidden()
+        detect e
+            output "IsHidden(" + name + ") unexpected error: " + e:GetErrorMessage()
+        end
+    end
+end

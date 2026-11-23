@@ -1,0 +1,218 @@
+use Libraries.Compute.Statistics.DataFrame
+use Libraries.Compute.Statistics.DataFrameColumn
+use Libraries.Compute.Statistics.DataFrameSelection
+use Libraries.Compute.Statistics.Inputs.ColumnInput
+use Libraries.Compute.Statistics.Inputs.FactorInput
+use Libraries.Compute.Statistics.Inputs.RowInput
+use Libraries.Compute.Statistics.Inputs.CellInput
+use Libraries.Containers.Iterator
+use Libraries.Containers.Support.Pair
+
+/*
+Tests the inputs (ColumnInput, FactorInput, RowInput, CellInput), which
+hold the indices a calculation works on, DataFrameSelection, which is all
+four, and the DataFrame actions that select columns and factors by index,
+by inclusive range and by header names. Lists of indices are printed in
+order, separated by commas.
+*/
+class Main
+    action Main
+        check
+            ColumnInput columns
+            columns:AddColumn(3)
+            columns:AddColumn(1)
+            columns:AddColumn(3)
+            output "ColumnInput AddColumn(3, 1, 3) = " + Columns(columns) + " size " + columns:GetColumnSize() + " GetColumn(1) " + columns:GetColumn(1)
+            output "ColumnInput RemoveColumn(3) = " + columns:RemoveColumn(3) + " leaves " + Columns(columns)
+            output "ColumnInput RemoveColumn(9) = " + columns:RemoveColumn(9)
+            columns:RemoveColumnAt(0)
+            output "ColumnInput RemoveColumnAt(0) leaves " + Columns(columns)
+            columns:EmptyColumns()
+            output "ColumnInput EmptyColumns() IsEmptyColumns() = " + columns:IsEmptyColumns()
+        detect e
+            output "ColumnInput unexpected error: " + e:GetErrorMessage()
+        end
+        check
+            FactorInput factors
+            factors:AddFactor(2)
+            factors:AddFactor(0)
+            output "FactorInput AddFactor(2, 0) GetFactor(0) GetFactor(1) size = " + factors:GetFactor(0) + " " + factors:GetFactor(1) + " " + factors:GetFactorSize()
+            output "FactorInput RemoveFactor(2) = " + factors:RemoveFactor(2) + " then GetFactor(0) = " + factors:GetFactor(0)
+            factors:RemoveFactorAt(0)
+            output "FactorInput RemoveFactorAt(0) IsEmptyFactors() = " + factors:IsEmptyFactors()
+        detect e
+            output "FactorInput unexpected error: " + e:GetErrorMessage()
+        end
+        check
+            RowInput rows
+            rows:AddRow(5)
+            rows:AddRow(6)
+            output "RowInput AddRow(5, 6) GetRow(1) size = " + rows:GetRow(1) + " " + rows:GetRowSize()
+            output "RowInput RemoveRow(5) = " + rows:RemoveRow(5) + ", RemoveRow(5) again = " + rows:RemoveRow(5)
+            rows:EmptyRows()
+            output "RowInput EmptyRows() IsEmptyRows() = " + rows:IsEmptyRows()
+        detect e
+            output "RowInput unexpected error: " + e:GetErrorMessage()
+        end
+        check
+            CellInput cells
+            cells:AddCell(1, 2)
+            Pair<integer> cell
+            cell:Set(3, 4)
+            cells:AddCell(cell)
+            Pair<integer> first = cells:GetCell(0)
+            output "CellInput AddCell(1, 2) and AddCell(pair 3, 4) GetCell(0) size = " + first:GetFirstValue() + "," + first:GetSecondValue() + " " + cells:GetCellSize()
+            output "CellInput RemoveCell(the same pair) = " + cells:RemoveCell(cell) + " size " + cells:GetCellSize()
+            cells:RemoveCellAt(0)
+            output "CellInput RemoveCellAt(0) IsEmptyCells() = " + cells:IsEmptyCells()
+        detect e
+            output "CellInput unexpected error: " + e:GetErrorMessage()
+        end
+
+        text data = "a,b,c,d;1.5,x,2.5,y"
+        check
+            DataFrame frame = Frame(data)
+            frame:AddSelectedColumnRange(1, 3)
+            output "AddSelectedColumnRange(1, 3) (inclusive) = " + Columns(frame:GetSelection()) + " size " + frame:GetSelectedColumnSize()
+        detect e
+            output "AddSelectedColumnRange unexpected error: " + e:GetErrorMessage()
+        end
+        check
+            DataFrame frame = Frame(data)
+            frame:AddSelectedColumnRange(1, 3)
+            frame:SetSelectedColumnRange(0, 1)
+            output "SetSelectedColumnRange(0, 1) after another range = " + Columns(frame:GetSelection())
+        detect e
+            output "SetSelectedColumnRange unexpected error: " + e:GetErrorMessage()
+        end
+        check
+            DataFrame frame = Frame(data)
+            frame:SelectAllColumns()
+            frame:RemoveSelectedColumnRange(1, 2)
+            output "SelectAllColumns() then RemoveSelectedColumnRange(1, 2) = " + Columns(frame:GetSelection())
+        detect e
+            output "RemoveSelectedColumnRange unexpected error: " + e:GetErrorMessage()
+        end
+        check
+            DataFrame frame = Frame(data)
+            frame:SetSelectedColumns("d,b")
+            output "SetSelectedColumns(d,b) = " + Columns(frame:GetSelection())
+            frame:RemoveSelectedColumns("d")
+            output "RemoveSelectedColumns(d) leaves " + Columns(frame:GetSelection())
+            frame:AddSelectedColumns("a")
+            output "AddSelectedColumns(a) gives " + Columns(frame:GetSelection())
+        detect e
+            output "selecting columns by header unexpected error: " + e:GetErrorMessage()
+        end
+        check
+            DataFrame frame = Frame(data)
+            frame:AddSelectedFactors("b,d")
+            DataFrameSelection selection = frame:GetSelection()
+            output "AddSelectedFactors(b,d) = " + selection:GetFactor(0) + "," + selection:GetFactor(1) + " size " + frame:GetSelectedFactorSize()
+            frame:RemoveSelectedFactor(1)
+            output "RemoveSelectedFactor(1) leaves size " + frame:GetSelectedFactorSize() + " first " + selection:GetFactor(0)
+        detect e
+            output "selecting factors unexpected error: " + e:GetErrorMessage()
+        end
+        check
+            DataFrame frame = Frame(data)
+            frame:AddSelectedColumn(0)
+            frame:AddSelectedColumn(2)
+            DataFrame copy = frame:CopySelectedColumns()
+            output "CopySelectedColumns() of columns 0 and 2 = " + Show(copy)
+        detect e
+            output "CopySelectedColumns unexpected error: " + e:GetErrorMessage()
+        end
+        check
+            DataFrame frame = Frame(data)
+            frame:AddSelectedRow(0)
+            frame:AddSelectedCell(1, 0)
+            DataFrameSelection selection = frame:GetSelection()
+            output "AddSelectedRow(0) AddSelectedCell(1, 0) row and cell sizes = " + selection:GetRowSize() + " " + selection:GetCellSize()
+            frame:EmptySelectedRows()
+            frame:EmptySelectedCells()
+            output "EmptySelectedRows() EmptySelectedCells() = " + selection:IsEmptyRows() + " " + selection:IsEmptyCells()
+        detect e
+            output "selecting rows and cells unexpected error: " + e:GetErrorMessage()
+        end
+        check
+            DataFrame frame = Frame(data)
+            frame:AddSelectedColumn(1)
+            frame:AddSelectedFactor(3)
+            ColumnInput columns
+            FactorInput factors
+            DataFrameSelection selection = frame:GetSelection()
+            selection:CopyTo(columns)
+            selection:CopyTo(factors)
+            output "DataFrameSelection CopyTo(ColumnInput) and CopyTo(FactorInput) = " + Columns(columns) + " and " + factors:GetFactor(0)
+        detect e
+            output "DataFrameSelection CopyTo unexpected error: " + e:GetErrorMessage()
+        end
+        check
+            DataFrame frame = Frame(data)
+            frame:AddSelectedColumn(0)
+            DataFrameSelection selection = frame:GetSelection()
+            output "DataFrameSelection GetFrame() is the frame = " + (selection:GetFrame() = frame)
+        detect e
+            output "DataFrameSelection GetFrame unexpected error: " + e:GetErrorMessage()
+        end
+        check
+            DataFrame frame = Frame(data)
+            DataFrameSelection chosen
+            chosen:AddColumn(2)
+            frame:SetSelection(chosen)
+            output "SetSelection then GetSelectedColumnSize() and GetSelection():GetColumn(0) = " + frame:GetSelectedColumnSize() + " " + frame:GetSelection():GetColumn(0)
+        detect e
+            output "SetSelection unexpected error: " + e:GetErrorMessage()
+        end
+    end
+
+    /* The column indices of a ColumnInput (or a selection), in order. */
+    action Columns(ColumnInput source) returns text
+        text result = ""
+        Iterator<integer> iterator = source:GetColumnIterator()
+        repeat while iterator:HasNext()
+            if result not= ""
+                result = result + ","
+            end
+            result = result + iterator:Next()
+        end
+        return result
+    end
+
+    /* A frame as one line: each column's header, then its values; NA for undefined. */
+    action Show(DataFrame frame) returns text
+        text result = ""
+        integer i = 0
+        repeat while i < frame:GetSize()
+            DataFrameColumn column = frame:GetColumn(i)
+            if i > 0
+                result = result + " | "
+            end
+            result = result + column:GetHeader() + "="
+            integer j = 0
+            repeat while j < column:GetSize()
+                if j > 0
+                    result = result + ","
+                end
+                if column:IsUndefined(j)
+                    result = result + "NA"
+                else
+                    result = result + column:GetAsText(j)
+                end
+                j = j + 1
+            end
+            i = i + 1
+        end
+        return result
+    end
+
+    /* Makes a frame from comma separated text whose rows are separated by ; */
+    action Frame(text rows) returns DataFrame
+        text lf = ""
+        lf = lf:GetLineFeed()
+        DataFrame frame
+        frame:LoadFromCommaSeparatedValue(rows:Replace(";", lf))
+        return frame
+    end
+end

@@ -1,0 +1,7 @@
+Read(<a x='1'/>) events: Start(a x=[1]) End(a)
+Read(<a x='1' y='2'></a>) events: Start(a x=[1] y=[2]) End(a)
+Read(<a x=''/>) events: Start(a x=[]) End(a)
+Read(<a x='1' y="2"/>) events: Start(a x=[1] y=[2]) End(a)
+Read(<a x='say "hi"'/>) events: Start(a x=[say "hi"]) End(a)
+Read(<a x="it's" y='ok'/>) events: Start(a x=[it's] y=[ok]) End(a)
+Read(<a x='a b c'>t</a>) events: Start(a x=[a b c]) Value[t] End(a)

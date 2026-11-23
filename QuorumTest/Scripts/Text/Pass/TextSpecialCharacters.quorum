@@ -1,0 +1,94 @@
+/*
+    GetLineFeed, GetCarriageReturn, GetTab and GetDoubleQuote each give one
+    character, checked by size and unicode value (10, 13, 9, 34).
+    GetUnicodeValue(code) gives the character with that code, and
+    GetUnicodeInteger(index) gives the code of the character at index; an
+    index outside the text fails (Java's charAt throws). Each action runs
+    on a text primitive and on a Text object.
+*/
+class Main
+    action Main
+        text value = "abc"
+        Text object
+        object:SetValue("abc")
+        text lf = value:GetLineFeed()
+        Show("GetLineFeed", lf)
+        Show("Text GetLineFeed", object:GetLineFeed())
+        Show("GetCarriageReturn", value:GetCarriageReturn())
+        Show("Text GetCarriageReturn", object:GetCarriageReturn())
+        Show("GetTab", value:GetTab())
+        Show("Text GetTab", object:GetTab())
+        text quote = value:GetDoubleQuote()
+        Show("GetDoubleQuote", quote)
+        Show("Text GetDoubleQuote", object:GetDoubleQuote())
+        output "GetDoubleQuote printed = [" + quote + "]"
+        UnicodeValue(65)
+        UnicodeValue(97)
+        UnicodeValue(32)
+        UnicodeValue(48)
+        UnicodeInteger("abc", 0)
+        UnicodeInteger("abc", 2)
+        UnicodeInteger("A", 0)
+        UnicodeInteger(" ", 0)
+        UnicodeIntegerFail("abc", 3)
+        UnicodeIntegerFail("abc", -1)
+        UnicodeIntegerFail("", 0)
+    end
+
+    action Show(text call, text result)
+        check
+            output call + " has size " + result:GetSize() + " and unicode value " + result:GetUnicodeInteger(0)
+        detect e
+            output call + " unexpected error: " + e:GetErrorMessage()
+        end
+    end
+
+    action UnicodeValue(integer code)
+        text value = ""
+        check
+            output "GetUnicodeValue(" + code + ") = [" + value:GetUnicodeValue(code) + "]"
+        detect e
+            output "GetUnicodeValue(" + code + ") unexpected error: " + e:GetErrorMessage()
+        end
+        Text object
+        check
+            output "Text GetUnicodeValue(" + code + ") = [" + object:GetUnicodeValue(code) + "]"
+        detect e
+            output "Text GetUnicodeValue(" + code + ") unexpected error: " + e:GetErrorMessage()
+        end
+    end
+
+    action UnicodeInteger(text value, integer index)
+        text call = "GetUnicodeInteger(" + value + ", " + index + ")"
+        check
+            output call + " = " + value:GetUnicodeInteger(index)
+        detect e
+            output call + " unexpected error: " + e:GetErrorMessage()
+        end
+        Text object
+        object:SetValue(value)
+        check
+            output "Text " + call + " = " + object:GetUnicodeInteger(index)
+        detect e
+            output "Text " + call + " unexpected error: " + e:GetErrorMessage()
+        end
+    end
+
+    action UnicodeIntegerFail(text value, integer index)
+        text call = "GetUnicodeInteger(" + value + ", " + index + ")"
+        check
+            integer result = value:GetUnicodeInteger(index)
+            output call + " should fail but returned " + result
+        detect e
+            output call + " fails, as it should"
+        end
+        Text object
+        object:SetValue(value)
+        check
+            integer result = object:GetUnicodeInteger(index)
+            output "Text " + call + " should fail but returned " + result
+        detect e
+            output "Text " + call + " fails, as it should"
+        end
+    end
+end

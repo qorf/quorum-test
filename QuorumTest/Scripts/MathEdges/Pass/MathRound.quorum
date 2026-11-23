@@ -1,0 +1,36 @@
+use Libraries.Compute.Math
+
+/*
+Math:Round(value) with positives, negatives and midpoints. The documentation
+says a midpoint rounds up, which is toward positive infinity (Java's
+Math.round agrees: -2.5 rounds to -2). The answer is a number, so it prints
+with a decimal point, and rounding a small negative gives zero, not -0.0.
+*/
+class Main
+    Math math
+
+    action Main
+        Show(2.4)
+        Show(2.5)
+        Show(2.6)
+        Show(3.5)
+        Show(0.5)
+        Show(1.5)
+        Show(-2.4)
+        Show(-2.5)
+        Show(-2.6)
+        Show(-3.5)
+        Show(-0.4)
+        Show(0.0)
+        Show(1000000.5)
+        Show(-1000000.5)
+    end
+
+    action Show(number value)
+        check
+            output "Round(" + value + ") = " + math:Round(value)
+        detect e
+            output "Round(" + value + ") unexpected error: " + e:GetErrorMessage()
+        end
+    end
+end

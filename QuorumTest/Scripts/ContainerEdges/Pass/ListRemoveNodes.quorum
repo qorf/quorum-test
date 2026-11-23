@@ -1,0 +1,197 @@
+use Libraries.Containers.List
+
+/*
+    The List's node actions (RemoveNode, GetNodeAtLocation, GetFirstNode) are
+    private, so this test reaches them through the public actions that use
+    them: removing the head, the tail, a middle node and the only node, runs
+    of equal items, and adding after removals. After each change the list is
+    read forward (Get) and backward (GetLastLocation walks the previous
+    links from the tail), so a broken link in either direction shows up.
+*/
+class Main
+    action Show(text value) returns text
+        if value = undefined
+            return "undefined"
+        end
+        return "[" + value + "]"
+    end
+
+    action Describe(List<text> list) returns text
+        text result = "["
+        integer i = 0
+        repeat while i < list:GetSize()
+            if i > 0
+                result = result + ","
+            end
+            text value = list:Get(i)
+            if value = undefined
+                result = result + "undefined"
+            else
+                result = result + value
+            end
+            i = i + 1
+        end
+        return result + "]"
+    end
+
+    // For lists of distinct items: each item's GetLastLocation must be its index.
+    action Links(List<text> list) returns text
+        integer i = 0
+        repeat while i < list:GetSize()
+            text value = list:Get(i)
+            integer last = list:GetLastLocation(value)
+            if last not= i
+                return "backward links broken: GetLastLocation(" + value + ") = " + last + ", expected " + i
+            end
+            i = i + 1
+        end
+        text front = "none"
+        text back = "none"
+        if list:GetFromFront() not= undefined
+            front = list:GetFromFront()
+        end
+        if list:GetFromEnd() not= undefined
+            back = list:GetFromEnd()
+        end
+        return "links ok, front " + front + ", end " + back
+    end
+
+    action Make returns List<text>
+        List<text> list
+        list:Add("a")
+        list:Add("b")
+        list:Add("c")
+        list:Add("d")
+        return list
+    end
+
+    action Main
+        List<text> one = Make()
+        check
+            boolean removed = one:Remove("a")
+            output "List[a,b,c,d] Remove(a) (the head) = " + removed + ", gives " + Describe(one) + ", " + Links(one)
+        detect e
+            output "List[a,b,c,d] Remove(a) unexpected error: " + e:GetErrorMessage()
+        end
+        check
+            boolean removed = one:Remove("d")
+            output "List[b,c,d] Remove(d) (the tail) = " + removed + ", gives " + Describe(one) + ", " + Links(one)
+        detect e
+            output "List[b,c,d] Remove(d) unexpected error: " + e:GetErrorMessage()
+        end
+        check
+            one:Add("e")
+            one:AddToFront("z")
+            output "List[b,c] Add(e), AddToFront(z) gives " + Describe(one) + ", " + Links(one)
+        detect e
+            output "List[b,c] Add(e), AddToFront(z) unexpected error: " + e:GetErrorMessage()
+        end
+
+        List<text> two = Make()
+        check
+            text value = two:RemoveAt(2)
+            output "List[a,b,c,d] RemoveAt(2) (a middle node) = " + Show(value) + ", gives " + Describe(two) + ", " + Links(two)
+        detect e
+            output "List[a,b,c,d] RemoveAt(2) unexpected error: " + e:GetErrorMessage()
+        end
+        check
+            text value = two:RemoveAt(2)
+            output "List[a,b,d] RemoveAt(2) (the tail) = " + Show(value) + ", gives " + Describe(two) + ", " + Links(two)
+        detect e
+            output "List[a,b,d] RemoveAt(2) unexpected error: " + e:GetErrorMessage()
+        end
+        check
+            two:Add("x")
+            output "List[a,b] Add(x) gives " + Describe(two) + ", " + Links(two)
+        detect e
+            output "List[a,b] Add(x) unexpected error: " + e:GetErrorMessage()
+        end
+        check
+            text value = two:RemoveAt(0)
+            output "List[a,b,x] RemoveAt(0) (the head) = " + Show(value) + ", gives " + Describe(two) + ", " + Links(two)
+        detect e
+            output "List[a,b,x] RemoveAt(0) unexpected error: " + e:GetErrorMessage()
+        end
+
+        List<text> three
+        three:Add("only")
+        check
+            boolean removed = three:Remove("only")
+            output "List[only] Remove(only) = " + removed + ", size " + three:GetSize() + ", IsEmpty() = " + three:IsEmpty() + ", " + Links(three)
+        detect e
+            output "List[only] Remove(only) unexpected error: " + e:GetErrorMessage()
+        end
+        check
+            three:Add("again")
+            output "List emptied by Remove then Add(again) gives " + Describe(three) + ", " + Links(three)
+        detect e
+            output "List emptied by Remove then Add(again) unexpected error: " + e:GetErrorMessage()
+        end
+
+        List<text> four
+        four:Add("x")
+        four:Add("x")
+        four:Add("y")
+        four:Add("x")
+        four:Add("x")
+        check
+            boolean removed = four:RemoveAll("x")
+            output "List[x,x,y,x,x] RemoveAll(x) = " + removed + ", gives " + Describe(four) + ", size " + four:GetSize() + ", " + Links(four)
+        detect e
+            output "List[x,x,y,x,x] RemoveAll(x) unexpected error: " + e:GetErrorMessage()
+        end
+        check
+            four:Add("w")
+            four:AddToFront("v")
+            output "List[y] Add(w), AddToFront(v) gives " + Describe(four) + ", " + Links(four)
+        detect e
+            output "List[y] Add(w), AddToFront(v) unexpected error: " + e:GetErrorMessage()
+        end
+
+        List<text> five
+        five:Add("x")
+        five:Add("x")
+        five:Add("x")
+        check
+            boolean removed = five:RemoveAll("x")
+            output "List[x,x,x] RemoveAll(x) = " + removed + ", size " + five:GetSize() + ", IsEmpty() = " + five:IsEmpty() + ", " + Links(five)
+        detect e
+            output "List[x,x,x] RemoveAll(x) unexpected error: " + e:GetErrorMessage()
+        end
+
+        List<text> six = Make()
+        check
+            text removed = ""
+            repeat while not six:IsEmpty()
+                removed = removed + six:RemoveFromFront()
+            end
+            six:Add("n")
+            output "List[a,b,c,d] RemoveFromFront() until empty removed " + removed + ", then Add(n) gives " + Describe(six) + ", " + Links(six)
+        detect e
+            output "List[a,b,c,d] RemoveFromFront() until empty unexpected error: " + e:GetErrorMessage()
+        end
+
+        List<text> seven = Make()
+        check
+            text removed = ""
+            repeat while not seven:IsEmpty()
+                removed = removed + seven:RemoveFromEnd()
+            end
+            seven:AddToFront("n")
+            output "List[a,b,c,d] RemoveFromEnd() until empty removed " + removed + ", then AddToFront(n) gives " + Describe(seven) + ", " + Links(seven)
+        detect e
+            output "List[a,b,c,d] RemoveFromEnd() until empty unexpected error: " + e:GetErrorMessage()
+        end
+
+        List<text> eight = Make()
+        check
+            eight:Add(1, "p")
+            eight:Remove("p")
+            eight:Add(3, "q")
+            eight:Remove("b")
+            output "List[a,b,c,d] Add(1, p), Remove(p), Add(3, q), Remove(b) gives " + Describe(eight) + ", " + Links(eight)
+        detect e
+            output "List[a,b,c,d] Add/Remove mix unexpected error: " + e:GetErrorMessage()
+        end
+    end
+end

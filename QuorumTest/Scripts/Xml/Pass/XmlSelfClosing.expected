@@ -1,0 +1,8 @@
+Read(<a/>) events: Start(a) End(a)
+Read(<a />) events: Start(a) End(a)
+Read(<a x='1'/>) events: Start(a x=[1]) End(a)
+Read(<a x='1' />) events: Start(a x=[1]) End(a)
+Read(<a href='x/y'/>) events: Start(a href=[x/y]) End(a)
+Read(<a href='x/y'>t</a>) events: Start(a href=[x/y]) Value[t] End(a)
+Read(<a><b/><c/></a>) events: Start(a) Start(b) End(b) Start(c) End(c) End(a)
+Read(<a><b/>t</a>) events: Start(a) Start(b) End(b) Value[t] End(a)

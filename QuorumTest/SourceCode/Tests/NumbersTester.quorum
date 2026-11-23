@@ -1,0 +1,56 @@
+package Libraries.Language.Compile.Test
+
+use Libraries.Testing.QuorumTest
+use Libraries.Testing.ScriptCheck
+
+/*
+    Every public action of Number, Integer and Boolean, on all three back
+    ends (bytecode, JavaScript and Python), because each back end has its
+    own plugin for these types. Each case runs on a primitive and on an
+    object, since the two compile to different plugin code. Expected files
+    hold the documented behavior, so a script fails where a plugin is wrong.
+    IntegerHighestOneBitNegative runs last: the JavaScript plugin can loop
+    forever on negative values, and a hang there should affect only that
+    script.
+*/
+class NumbersTester
+    QuorumTest suite = undefined
+    ScriptCheck scripts
+    text path = "Scripts/Numbers/Pass/"
+
+    action Test
+        scripts:SetSuite(suite)
+        scripts:CheckEverywhere(path + "NumberLimits")
+        scripts:CheckEverywhere(path + "NumberInfiniteNaN")
+        scripts:CheckEverywhere(path + "NumberConversions")
+        scripts:CheckEverywhere(path + "NumberHex")
+        scripts:CheckEverywhere(path + "NumberCompare")
+        scripts:CheckEverywhere(path + "NumberHashCode")
+        scripts:CheckEverywhere(path + "IntegerValues")
+        scripts:CheckEverywhere(path + "IntegerCompare")
+        scripts:CheckEverywhere(path + "IntegerBitCount")
+        scripts:CheckEverywhere(path + "IntegerHighestOneBit")
+        scripts:CheckEverywhere(path + "IntegerLowestOneBit")
+        scripts:CheckEverywhere(path + "IntegerLeadingZeros")
+        scripts:CheckEverywhere(path + "IntegerTrailingZeros")
+        scripts:CheckEverywhere(path + "IntegerReverse")
+        scripts:CheckEverywhere(path + "IntegerRotate")
+        scripts:CheckEverywhere(path + "IntegerBinary")
+        scripts:CheckEverywhere(path + "IntegerHex")
+        scripts:CheckEverywhere(path + "IntegerOctal")
+        scripts:CheckEverywhere(path + "BooleanValues")
+        scripts:CheckEverywhere(path + "IntegerHighestOneBitNegative")
+    end
+
+    action GetName returns text
+        return "Number Tests"
+    end
+
+    action GetCompilerTestSuite returns QuorumTest
+        return suite
+    end
+
+    action SetCompilerTestSuite(QuorumTest suite)
+        me:suite = suite
+    end
+end

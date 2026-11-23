@@ -1,0 +1,42 @@
+use Libraries.System.DateTime
+
+/*
+Tests GetMonthName, GetShortMonthName and GetDayOfWeekName for every month
+and weekday, on parsed dates (the same in every time zone). The names are
+English; the Java plugin uses the machine's language, so this expects an
+English one. GetShortDayofWeekName is tested on its own in
+DateTimeShortDayName.
+*/
+class Main
+    action Main
+        integer month = 1
+        repeat while month <= 12
+            text two = "" + month
+            if month < 10
+                two = "0" + two
+            end
+            text value = "2023-" + two + "-15"
+            DateTime date
+            check
+                date:ParseDate(value)
+                output "ParseDate(" + value + "): GetMonthName() = [" + date:GetMonthName() + "], GetShortMonthName() = [" + date:GetShortMonthName() + "]"
+            detect e
+                output "ParseDate(" + value + ") month names unexpected error: " + e:GetErrorMessage()
+            end
+            month = month + 1
+        end
+        // January 1 to 7, 2024 were Monday to Sunday.
+        integer day = 1
+        repeat while day <= 7
+            text value = "2024-01-0" + day
+            DateTime date
+            check
+                date:ParseDate(value)
+                output "ParseDate(" + value + "): GetDayOfWeek() = " + date:GetDayOfWeek() + ", GetDayOfWeekName() = [" + date:GetDayOfWeekName() + "]"
+            detect e
+                output "ParseDate(" + value + ") weekday name unexpected error: " + e:GetErrorMessage()
+            end
+            day = day + 1
+        end
+    end
+end

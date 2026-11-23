@@ -1,0 +1,126 @@
+use Libraries.Web.Page.Figure
+use Libraries.Web.Page.HeadingGroup
+use Libraries.Web.Page.Image
+use Libraries.Web.Page.Menu
+use Libraries.Web.Page.PlainText
+use Libraries.Web.Page.Ruby
+
+/*
+Tests WebTag's nesting: AddNestedTag, AddText, GetNumberOfNestedTags,
+GetTag, Remove, GenerateNestedTags and ToText, and that each tag has its
+own hash code (WebTagNumbers) so different tags are never equal.
+*/
+class Main
+    action Main
+        check
+            Figure f
+            Image i
+            f:AddNestedTag(i)
+            output "Figure AddNestedTag(Image) GetNumberOfNestedTags() = " + f:GetNumberOfNestedTags()
+        detect e
+            output "Figure AddNestedTag(Image) GetNumberOfNestedTags() unexpected error: " + e:GetErrorMessage()
+        end
+        check
+            Figure f
+            f:AddText("a")
+            f:AddText("b")
+            output "Figure AddText(a) AddText(b) Generate() = [" + Flat(f:Generate()) + "]"
+        detect e
+            output "Figure AddText(a) AddText(b) Generate() unexpected error: " + e:GetErrorMessage()
+        end
+        check
+            Figure f
+            f:AddText("a")
+            Image i
+            i:SetAlternate("x")
+            f:AddNestedTag(i)
+            output "Figure GenerateNestedTags() with text and an Image = [" + Flat(f:GenerateNestedTags()) + "]"
+        detect e
+            output "Figure GenerateNestedTags() with text and an Image unexpected error: " + e:GetErrorMessage()
+        end
+        check
+            Figure f
+            f:AddText("a")
+            Image i
+            f:AddNestedTag(i)
+            output "Figure GetTag(1) is the second nested tag = " + (f:GetTag(1):Equals(i))
+        detect e
+            output "Figure GetTag(1) is the second nested tag unexpected error: " + e:GetErrorMessage()
+        end
+        check
+            Figure f
+            f:AddText("a")
+            Image i
+            f:AddNestedTag(i)
+            f:Remove(i)
+            output "Figure Remove(Image) Generate() = [" + Flat(f:Generate() + " count " + f:GetNumberOfNestedTags()) + "]"
+        detect e
+            output "Figure Remove(Image) Generate() unexpected error: " + e:GetErrorMessage()
+        end
+        check
+            Figure f
+            f:AddText("a")
+            output "Figure ToText() equals Generate() = " + (f:ToText() = f:Generate())
+        detect e
+            output "Figure ToText() equals Generate() unexpected error: " + e:GetErrorMessage()
+        end
+        check
+            Ruby r
+            Menu m
+            HeadingGroup h
+            h:AddText("x")
+            m:AddNestedTag(h)
+            r:AddNestedTag(m)
+            output "Ruby nested three deep Generate() = [" + Flat(r:Generate()) + "]"
+        detect e
+            output "Ruby nested three deep Generate() unexpected error: " + e:GetErrorMessage()
+        end
+        check
+            Figure a
+            Figure b
+            output "two new elements have different GetHashCode() = " + (a:GetHashCode() not= b:GetHashCode())
+        detect e
+            output "two new elements have different GetHashCode() unexpected error: " + e:GetErrorMessage()
+        end
+        check
+            Figure a
+            Figure b
+            output "two new elements are not Equals = " + a:Equals(b)
+        detect e
+            output "two new elements are not Equals unexpected error: " + e:GetErrorMessage()
+        end
+        check
+            Figure a
+            output "an element Equals itself = " + a:Equals(a)
+        detect e
+            output "an element Equals itself unexpected error: " + e:GetErrorMessage()
+        end
+        check
+            PlainText p
+            p:SetText("hi")
+            output "PlainText SetText(hi) Generate() = [" + Flat(p:Generate()) + "]"
+        detect e
+            output "PlainText SetText(hi) Generate() unexpected error: " + e:GetErrorMessage()
+        end
+        check
+            Figure f
+            f:AddText("a")
+            output "Figure GetTag(5) with one tag should fail but returned [" + f:GetTag(5):Generate() + "]"
+        detect e
+            output "Figure GetTag(5) with one tag fails, as it should"
+        end
+    end
+
+    /* Shows line breaks as the two characters \n and double quotes as ', so each case is one line. */
+    action Flat(text value) returns text
+        text lf = ""
+        lf = lf:GetLineFeed()
+        text cr = ""
+        cr = cr:GetCarriageReturn()
+        text quote = ""
+        quote = quote:GetDoubleQuote()
+        text result = value:Replace(cr, "")
+        result = result:Replace(lf, "\n")
+        return result:Replace(quote, "'")
+    end
+end

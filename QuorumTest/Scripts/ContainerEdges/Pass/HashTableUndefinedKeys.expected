@@ -1,0 +1,10 @@
+HashTable{a:1} Add(undefined, 2): size 1, keys [a]
+HashTable{a:1} Set(undefined, 3): size 1, keys [a]
+HashTable{a:1} GetValue(undefined) = undefined
+HashTable{a:1} HasKey(undefined) = false
+HashTable{a:1} RemoveKey(undefined) = undefined, size 1
+HashTable{a:1} RemoveAllKeys(undefined) = false, size 1
+HashTable{} Add(k, undefined): size 1, HasKey(k) = true, GetValue(k) = undefined
+HashTable{k:undefined, j:v} HasValue(v) = true, GetKey(v) = [j]
+HashTable{k:undefined, j:v} HasValue(w) = false
+HashTable{k:undefined, j:v} RemoveKey(k) = undefined, size 1, HasKey(k) = false

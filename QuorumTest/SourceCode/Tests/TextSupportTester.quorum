@@ -1,0 +1,38 @@
+package Libraries.Language.Compile.Test
+
+use Libraries.Testing.QuorumTest
+use Libraries.Testing.ScriptCheck
+
+/*
+Tests the text support classes in Libraries.Language.Support: TextBuilder,
+FindReplace and CompareResult.
+
+Back ends: FindReplace and CompareResult are pure Quorum and run everywhere.
+TextBuilder is a system class: it runs on bytecode and JavaScript (whose
+plugin has no GetSize, so that run is expected to fail), not Python (its
+Python plugin folder holds only a JavaScript file).
+*/
+class TextSupportTester
+    QuorumTest suite = undefined
+    ScriptCheck scripts
+    text path = "Scripts/TextSupport/Pass/"
+
+    action Test
+        scripts:SetSuite(suite)
+        scripts:Check(path + "TextBuilderActions", true, false)
+        scripts:CheckEverywhere(path + "FindReplaceActions")
+        scripts:CheckEverywhere(path + "CompareResultValues")
+    end
+
+    action GetName returns text
+        return "Text Support Tests"
+    end
+
+    action GetCompilerTestSuite returns QuorumTest
+        return suite
+    end
+
+    action SetCompilerTestSuite(QuorumTest suite)
+        me:suite = suite
+    end
+end

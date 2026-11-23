@@ -1,0 +1,152 @@
+use Libraries.Compute.Statistics.DataFrame
+use Libraries.Compute.Statistics.DataFrameColumn
+use Libraries.Compute.Statistics.Clustering.ClusterByMeans
+use Libraries.Compute.Statistics.Clustering.ClusterResult
+use Libraries.Compute.Statistics.Clustering.Cluster
+use Libraries.Compute.Statistics.Columns.IntegerColumn
+use Libraries.Compute.Vector
+use Libraries.Compute.Math
+use Libraries.Containers.Array
+
+/*
+Tests ClusterByMeans, Cluster and ClusterResult on two well separated
+groups of three points, (1, 2), (1.2, 2.2), (0.8, 1.8) and (10, 20),
+(10.2, 20.2), (9.8, 19.8), with a set seed. Any correct k-means puts each
+group in its own cluster, with centers (1, 2) and (10, 20), whichever
+cluster number each group gets, so only those facts are printed. The
+documentation says the number of clusters must be above 0 and strictly
+less than the number of rows.
+*/
+class Main
+    action Main
+        text points = "x,y;1.0,2.0;1.2,2.2;0.8,1.8;10.0,20.0;10.2,20.2;9.8,19.8"
+        check
+            ClusterByMeans means
+            output "ClusterByMeans default GetClustersSize() = " + means:GetClustersSize()
+            means:SetClustersSize(2)
+            output "ClusterByMeans SetClustersSize(2) GetClustersSize() = " + means:GetClustersSize()
+        detect e
+            output "ClusterByMeans clusters size unexpected error: " + e:GetErrorMessage()
+        end
+        check
+            DataFrame frame = Frame(points)
+            frame:AddSelectedColumnRange(0, 1)
+            ClusterByMeans means
+            means:SetClustersSize(2)
+            ClusterResult result = means:Cluster(frame, 42)
+            IntegerColumn labels = result:GetClusterIndices()
+            boolean firstGroup = labels:GetAsInteger(0) = labels:GetAsInteger(1) and labels:GetAsInteger(1) = labels:GetAsInteger(2)
+            boolean secondGroup = labels:GetAsInteger(3) = labels:GetAsInteger(4) and labels:GetAsInteger(4) = labels:GetAsInteger(5)
+            output "Cluster(frame, 42) labels: rows 0-2 together = " + firstGroup + ", rows 3-5 together = " + secondGroup + ", the groups apart = " + (labels:GetAsInteger(0) not= labels:GetAsInteger(3)) + ", label count = " + labels:GetSize()
+        detect e
+            output "Cluster(frame, 42) labels unexpected error: " + e:GetErrorMessage()
+        end
+        check
+            DataFrame frame = Frame(points)
+            frame:AddSelectedColumnRange(0, 1)
+            ClusterByMeans means
+            means:SetClustersSize(2)
+            ClusterResult result = means:Cluster(frame, 42)
+            Array<Cluster> clusters = result:GetClusters()
+            Cluster a = clusters:Get(0)
+            Cluster b = clusters:Get(1)
+            Vector low = a:GetCenter()
+            Vector high = b:GetCenter()
+            if low:Get(0) > high:Get(0)
+                low = b:GetCenter()
+                high = a:GetCenter()
+            end
+            Math math
+            output "Cluster(frame, 42) clusters = " + clusters:GetSize() + ", sizes = " + a:GetSize() + " and " + b:GetSize() + ", centers = (" + math:Round(low:Get(0), 6) + ", " + math:Round(low:Get(1), 6) + ") and (" + math:Round(high:Get(0), 6) + ", " + math:Round(high:Get(1), 6) + ")"
+        detect e
+            output "Cluster(frame, 42) clusters unexpected error: " + e:GetErrorMessage()
+        end
+        check
+            DataFrame frame = Frame(points)
+            frame:AddSelectedColumnRange(0, 1)
+            ClusterByMeans means
+            means:SetClustersSize(6)
+            ClusterResult result = means:Cluster(frame, 42)
+            output "Cluster with 6 clusters for 6 rows should fail but returned " + result:GetClusters():GetSize() + " clusters"
+        detect e
+            output "Cluster with 6 clusters for 6 rows fails, as it should"
+        end
+        check
+            DataFrame frame = Frame(points)
+            frame:AddSelectedColumnRange(0, 1)
+            ClusterByMeans means
+            means:SetClustersSize(0)
+            ClusterResult result = means:Cluster(frame)
+            output "Cluster with 0 clusters should fail but returned a result"
+        detect e
+            output "Cluster with 0 clusters fails, as it should"
+        end
+        check
+            DataFrame frame = Frame("w,x;hi,1.5;yo,2.5;ok,3.5")
+            frame:AddSelectedColumnRange(0, 1)
+            ClusterByMeans means
+            means:SetClustersSize(2)
+            ClusterResult result = means:Cluster(frame)
+            output "Cluster on a text column should fail but returned a result"
+        detect e
+            output "Cluster on a text column fails, as it should"
+        end
+        check
+            Cluster cluster
+            Vector p
+            p:SetSize(2)
+            p:Set(0, 1.0)
+            p:Set(1, 4.0)
+            Vector q
+            q:SetSize(2)
+            q:Set(0, 3.0)
+            q:Set(1, 8.0)
+            cluster:Add(p)
+            cluster:Add(q)
+            Vector centroid = cluster:CalculateCentroid()
+            output "Cluster of (1, 4) and (3, 8) GetSize() and CalculateCentroid() = " + cluster:GetSize() + " (" + centroid:Get(0) + ", " + centroid:Get(1) + ")"
+            Vector removed = cluster:RemoveAt(0)
+            output "Cluster RemoveAt(0) gives (" + removed:Get(0) + ", " + removed:Get(1) + ") and leaves " + cluster:GetSize()
+            cluster:Empty()
+            output "Cluster Empty() IsEmpty() = " + cluster:IsEmpty()
+        detect e
+            output "Cluster unexpected error: " + e:GetErrorMessage()
+        end
+    end
+
+    /* A frame as one line: each column's header, then its values; NA for undefined. */
+    action Show(DataFrame frame) returns text
+        text result = ""
+        integer i = 0
+        repeat while i < frame:GetSize()
+            DataFrameColumn column = frame:GetColumn(i)
+            if i > 0
+                result = result + " | "
+            end
+            result = result + column:GetHeader() + "="
+            integer j = 0
+            repeat while j < column:GetSize()
+                if j > 0
+                    result = result + ","
+                end
+                if column:IsUndefined(j)
+                    result = result + "NA"
+                else
+                    result = result + column:GetAsText(j)
+                end
+                j = j + 1
+            end
+            i = i + 1
+        end
+        return result
+    end
+
+    /* Makes a frame from comma separated text whose rows are separated by ; */
+    action Frame(text rows) returns DataFrame
+        text lf = ""
+        lf = lf:GetLineFeed()
+        DataFrame frame
+        frame:LoadFromCommaSeparatedValue(rows:Replace(";", lf))
+        return frame
+    end
+end

@@ -1,0 +1,6 @@
+HighestOneBit(-1) = -2147483648
+Integer HighestOneBit(-1) = -2147483648
+HighestOneBit(-8) = -2147483648
+Integer HighestOneBit(-8) = -2147483648
+HighestOneBit(-2147483648) = -2147483648
+Integer HighestOneBit(-2147483648) = -2147483648

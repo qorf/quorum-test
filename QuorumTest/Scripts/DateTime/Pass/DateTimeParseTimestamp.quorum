@@ -1,0 +1,48 @@
+use Libraries.System.DateTime
+
+/*
+Tests ParseTimestamp and the Get actions that read the parsed date and time:
+GetYear, GetMonth, GetDayOfMonth, GetDayOfWeek (1 is Monday, 7 is Sunday),
+GetHour, GetMinute and GetSecond. A parsed timestamp is a clock time with no
+time zone, so these values are the same in every time zone (the dates are
+far from any daylight saving change). The timestamp is ISO 8601, with a T
+or a space between the date and the time, as the Java plugin reads it;
+text that is not a timestamp raises an error.
+*/
+class Main
+    action Main
+        Show("2024-03-15T13:45:30")
+        Show("1999-12-31 23:59:59")
+        Show("2000-02-29T00:00:00")
+        DateTime bad
+        check
+            bad:ParseTimestamp("not a timestamp")
+            output "ParseTimestamp(not a timestamp) should fail but returned normally"
+        detect e
+            output "ParseTimestamp(not a timestamp) fails, as it should"
+        end
+        DateTime badMonth
+        check
+            badMonth:ParseTimestamp("2024-13-01T10:00:00")
+            output "ParseTimestamp(2024-13-01T10:00:00) should fail but returned normally"
+        detect e
+            output "ParseTimestamp(2024-13-01T10:00:00) fails, as it should"
+        end
+    end
+
+    action Show(text value)
+        DateTime time
+        check
+            time:ParseTimestamp(value)
+            output "ParseTimestamp(" + value + "): GetYear() = " + time:GetYear()
+            output "ParseTimestamp(" + value + "): GetMonth() = " + time:GetMonth()
+            output "ParseTimestamp(" + value + "): GetDayOfMonth() = " + time:GetDayOfMonth()
+            output "ParseTimestamp(" + value + "): GetDayOfWeek() = " + time:GetDayOfWeek()
+            output "ParseTimestamp(" + value + "): GetHour() = " + time:GetHour()
+            output "ParseTimestamp(" + value + "): GetMinute() = " + time:GetMinute()
+            output "ParseTimestamp(" + value + "): GetSecond() = " + time:GetSecond()
+        detect e
+            output "ParseTimestamp(" + value + ") unexpected error: " + e:GetErrorMessage()
+        end
+    end
+end

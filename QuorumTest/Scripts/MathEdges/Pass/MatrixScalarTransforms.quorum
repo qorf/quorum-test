@@ -1,0 +1,93 @@
+use Libraries.Compute.Matrix
+use Libraries.Compute.MatrixTransform.AddScalar
+use Libraries.Compute.MatrixTransform.SubtractScalar
+use Libraries.Compute.MatrixTransform.MultiplyScalar
+use Libraries.Compute.MatrixTransform.DivideScalar
+
+/*
+The scalar matrix transforms AddScalar, SubtractScalar, MultiplyScalar and
+DivideScalar, set both from a single value and from a matrix of values,
+along with GetValue and GetValueMatrix. The input is the 2 by 2 matrix
+|1, 2| |3, 4|. Dividing by zero follows number arithmetic and gives
+Infinity, since these are decimal numbers.
+*/
+class Main
+    action Main
+        Matrix matrix
+        matrix:SetSize(2, 2)
+        matrix:Set(0, 0, 1)
+        matrix:Set(0, 1, 2)
+        matrix:Set(1, 0, 3)
+        matrix:Set(1, 1, 4)
+
+        Matrix values
+        values:SetSize(2, 2)
+        values:Set(0, 0, 10)
+        values:Set(0, 1, 20)
+        values:Set(1, 0, 30)
+        values:Set(1, 1, 40)
+
+        check
+            AddScalar add
+            add:SetValue(matrix, 10.0)
+            output "AddScalar GetValue after SetValue(matrix, 10) = " + add:GetValue()
+            Show("AddScalar 10", add:Transform(matrix))
+            add:SetValue(values)
+            Show("AddScalar GetValueMatrix after SetValue(values)", add:GetValueMatrix())
+            Show("AddScalar values", add:Transform(matrix))
+        detect e
+            output "AddScalar unexpected error: " + e:GetErrorMessage()
+        end
+        check
+            SubtractScalar subtract
+            subtract:SetValue(matrix, 1.5)
+            output "SubtractScalar GetValue after SetValue(matrix, 1.5) = " + subtract:GetValue()
+            Show("SubtractScalar 1.5", subtract:Transform(matrix))
+            subtract:SetValue(values)
+            Show("SubtractScalar values", subtract:Transform(matrix))
+        detect e
+            output "SubtractScalar unexpected error: " + e:GetErrorMessage()
+        end
+        check
+            MultiplyScalar multiply
+            multiply:SetValue(matrix, -2.0)
+            output "MultiplyScalar GetValue after SetValue(matrix, -2) = " + multiply:GetValue()
+            Show("MultiplyScalar -2", multiply:Transform(matrix))
+            multiply:SetValue(values)
+            Show("MultiplyScalar values", multiply:Transform(matrix))
+        detect e
+            output "MultiplyScalar unexpected error: " + e:GetErrorMessage()
+        end
+        check
+            DivideScalar divide
+            divide:SetValue(matrix, 4.0)
+            output "DivideScalar GetValue after SetValue(matrix, 4) = " + divide:GetValue()
+            Show("DivideScalar 4", divide:Transform(matrix))
+            divide:SetValue(values)
+            Show("DivideScalar values", divide:Transform(matrix))
+            divide:SetValue(matrix, 0.0)
+            Show("DivideScalar 0", divide:Transform(matrix))
+        detect e
+            output "DivideScalar unexpected error: " + e:GetErrorMessage()
+        end
+        Show("the input matrix afterwards, which must be unchanged,", matrix)
+    end
+
+    action Show(text label, Matrix result)
+        output label + " gives a " + result:GetRows() + " by " + result:GetColumns() + " matrix:"
+        integer row = 0
+        repeat while row < result:GetRows()
+            text line = "|"
+            integer column = 0
+            repeat while column < result:GetColumns()
+                line = line + result:Get(row, column)
+                if column < result:GetColumns() - 1
+                    line = line + ", "
+                end
+                column = column + 1
+            end
+            output line + "|"
+            row = row + 1
+        end
+    end
+end

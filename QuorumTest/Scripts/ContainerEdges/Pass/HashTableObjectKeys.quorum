@@ -1,0 +1,129 @@
+use Libraries.Containers.HashTable
+
+/*
+    Object keys. Main doubles as the key class (a test is one class): two
+    keys with the same id are Equal and have the same hash code, so either
+    one finds the value. With constant hash codes every key lands in one
+    bucket and the table must still find, replace and remove each key.
+    Plain Objects compare by identity.
+*/
+class Main
+    integer id = 0
+    boolean constantHash = false
+
+    action Setup(integer newId, boolean sameHash)
+        id = newId
+        constantHash = sameHash
+    end
+
+    action GetId returns integer
+        return id
+    end
+
+    action Equals(Object object) returns boolean
+        if object = undefined or not (object is Main)
+            return false
+        end
+        Main other = cast(Main, object)
+        return other:GetId() = id
+    end
+
+    action GetHashCode returns integer
+        if constantHash
+            return 7
+        end
+        return id * 31 + 5
+    end
+
+    action Show(text value) returns text
+        if value = undefined
+            return "undefined"
+        end
+        return "[" + value + "]"
+    end
+    action Key(integer newId, boolean sameHash) returns Main
+        Main key
+        key:Setup(newId, sameHash)
+        return key
+    end
+
+    // True when value is defined and equals expected (undefined never crashes the count).
+    action Same(text value, text expected) returns boolean
+        if value = undefined
+            return false
+        end
+        return value = expected
+    end
+
+    action Main
+        HashTable<Main, text> table
+        check
+            table:Add(Key(1, false), "one")
+            table:Add(Key(2, false), "two")
+            output "HashTable Add(key 1, one), Add(key 2, two) then GetValue(a new key 1) = " + Show(table:GetValue(Key(1, false))) + ", size " + table:GetSize()
+        detect e
+            output "HashTable object keys unexpected error: " + e:GetErrorMessage()
+        end
+        check
+            table:Add(Key(1, false), "uno")
+            output "HashTable Add(another key 1, uno): size " + table:GetSize() + ", GetValue(key 1) = " + Show(table:GetValue(Key(1, false)))
+        detect e
+            output "HashTable Add(another key 1, uno) unexpected error: " + e:GetErrorMessage()
+        end
+        check
+            output "HashTable RemoveKey(a new key 2) = " + Show(table:RemoveKey(Key(2, false))) + ", size " + table:GetSize() + ", HasKey(key 2) = " + table:HasKey(Key(2, false))
+        detect e
+            output "HashTable RemoveKey(key 2) unexpected error: " + e:GetErrorMessage()
+        end
+
+        HashTable<Main, text> collide
+        check
+            integer i = 0
+            repeat 60 times
+                collide:Add(Key(i, true), "c" + i)
+                i = i + 1
+            end
+            integer found = 0
+            i = 0
+            repeat 60 times
+                if Same(collide:GetValue(Key(i, true)), "c" + i)
+                    found = found + 1
+                end
+                i = i + 1
+            end
+            output "HashTable 60 keys that all have hash code 7: size " + collide:GetSize() + ", GetValue right for " + found + " of 60"
+        detect e
+            output "HashTable 60 colliding keys unexpected error: " + e:GetErrorMessage()
+        end
+        check
+            collide:Set(Key(30, true), "replaced")
+            text first = collide:RemoveKey(Key(0, true))
+            text middle = collide:RemoveKey(Key(31, true))
+            text last = collide:RemoveKey(Key(59, true))
+            output "Colliding keys Set(key 30, replaced), RemoveKey(0) = " + Show(first) + ", RemoveKey(31) = " + Show(middle) + ", RemoveKey(59) = " + Show(last) + ", size " + collide:GetSize() + ", GetValue(key 30) = " + Show(collide:GetValue(Key(30, true))) + ", HasKey(31) = " + collide:HasKey(Key(31, true)) + ", HasKey(32) = " + collide:HasKey(Key(32, true))
+        detect e
+            output "Colliding keys Set/RemoveKey unexpected error: " + e:GetErrorMessage()
+        end
+
+        HashTable<Object, text> identity
+        Object first = undefined
+        Object second = undefined
+        check
+            Object a
+            Object b
+            first = a
+            second = b
+            identity:Add(a, "a")
+            identity:Add(b, "b")
+            output "HashTable with two plain Objects as keys: size " + identity:GetSize() + ", GetValue(first) = " + Show(identity:GetValue(first)) + ", GetValue(second) = " + Show(identity:GetValue(second))
+        detect e
+            output "HashTable plain Object keys unexpected error: " + e:GetErrorMessage()
+        end
+        check
+            Object c
+            output "HashTable with two plain Objects: HasKey(a third Object) = " + identity:HasKey(c)
+        detect e
+            output "HashTable plain Object keys HasKey unexpected error: " + e:GetErrorMessage()
+        end
+    end
+end

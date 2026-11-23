@@ -1,0 +1,51 @@
+package Libraries.Language.Compile.Test
+
+use Libraries.Testing.QuorumTest
+use Libraries.Testing.ScriptCheck
+
+/*
+Tests parts of Libraries.Compute.Statistics that the Science tests don't:
+CrossTab, TransformWider and TransformLonger, CombineFramesTransform,
+column filtering and rounding, ColumnSplitter, the covariance and
+correlation matrices, Boolean, BigInteger and DateTime columns, the date
+parsers, the comma separated loader and saver (with a scratch folder the
+script makes and deletes), the inputs and DataFrameSelection, ClusterByMeans
+and the windowing actions. Frames are built in code from small comma
+separated text.
+
+Bytecode and JavaScript only: DataFrame pulls in about 2,000 classes, which
+is very slow on Python. CommaSeparatedFiles writes files, so it runs on
+bytecode only.
+*/
+class StatisticsTester
+    QuorumTest suite = undefined
+    ScriptCheck scripts
+    text path = "Scripts/Statistics/Pass/"
+
+    action Test
+        scripts:SetSuite(suite)
+        scripts:Check(path + "ClusterByMeans", true, false)
+        scripts:Check(path + "ColumnSplitter", true, false)
+        scripts:Check(path + "ColumnTypes", true, false)
+        scripts:Check(path + "CombineFilterRound", true, false)
+        scripts:Check(path + "CommaSeparatedFiles", false, false)
+        scripts:Check(path + "CovarianceCorrelation", true, false)
+        scripts:Check(path + "CrossTab", true, false)
+        scripts:Check(path + "DateTimeParsers", true, false)
+        scripts:Check(path + "SelectionAndInputs", true, false)
+        scripts:Check(path + "TransformWiderLonger", true, false)
+        scripts:Check(path + "WindowingActions", true, false)
+    end
+
+    action GetName returns text
+        return "Statistics Tests"
+    end
+
+    action GetCompilerTestSuite returns QuorumTest
+        return suite
+    end
+
+    action SetCompilerTestSuite(QuorumTest suite)
+        me:suite = suite
+    end
+end

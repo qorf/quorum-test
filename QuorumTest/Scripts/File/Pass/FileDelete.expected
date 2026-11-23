@@ -1,0 +1,11 @@
+Delete(single.txt) = true
+Exists(single.txt) after Delete() = false
+Delete(single.txt) again, when missing = false
+Delete(empty folder) = true
+Delete() on a folder with contents = false
+Delete(false) on a folder with contents, then Exists(full) = true
+Exists(full/inside.txt) after Delete(false) = true
+Exists(full/nested/deeper.txt) after Delete(false) = true
+Delete(true) on a folder with contents, then Exists(full) = false
+Exists(full/nested/deeper.txt) after Delete(true) = false
+Delete(true) on a file, then Exists(plain.txt) = false

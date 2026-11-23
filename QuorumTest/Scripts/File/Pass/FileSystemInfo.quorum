@@ -1,0 +1,60 @@
+use Libraries.System.File
+use Libraries.System.DateTime
+
+/*
+Tests the File actions whose values depend on the machine:
+GetFreeDiskSpace, GetTotalDiskSpace, GetLastModifiedDate and SetExecutable,
+inside a scratch folder (FileTestsWork/FileSystemInfo), deleted at the end.
+Only facts true on every machine are printed: the disk sizes are positive and the free space is at most the total; a file just written
+was modified in 2025 or later; a missing file has no date (undefined, as the
+documentation says).
+*/
+class Main
+    action Main
+        File work
+        work:SetPath("FileTestsWork/FileSystemInfo")
+        work:Delete(true)
+        boolean made = work:CreateDirectories()
+        File file
+        file:SetPath("FileTestsWork/FileSystemInfo/info.txt")
+        file:Write("info")
+
+        check
+            number free = file:GetFreeDiskSpace()
+            number total = file:GetTotalDiskSpace()
+            output "GetFreeDiskSpace() is more than 0 = " + (free > 0)
+            output "GetTotalDiskSpace() is more than 0 = " + (total > 0)
+            output "GetFreeDiskSpace() is at most GetTotalDiskSpace() = " + (free <= total)
+        detect e
+            output "Disk space unexpected error: " + e:GetErrorMessage()
+        end
+        check
+            DateTime date = file:GetLastModifiedDate()
+            output "GetLastModifiedDate(info.txt) is defined = " + (date not= undefined)
+            output "GetLastModifiedDate(info.txt): GetYear() is 2025 or later = " + (date:GetYear() >= 2025)
+        detect e
+            output "GetLastModifiedDate(info.txt) unexpected error: " + e:GetErrorMessage()
+        end
+        File missing
+        missing:SetPath("FileTestsWork/FileSystemInfo/missing.txt")
+        check
+            DateTime none = missing:GetLastModifiedDate()
+            output "GetLastModifiedDate(missing.txt) is undefined = " + (none = undefined)
+        detect e
+            output "GetLastModifiedDate(missing.txt) unexpected error: " + e:GetErrorMessage()
+        end
+        check
+            file:SetExecutable(true)
+            output "SetExecutable(true) on info.txt, then Exists() = " + file:Exists()
+            file:SetExecutable(false)
+            output "SetExecutable(false) on info.txt, then Read() = [" + file:Read() + "]"
+        detect e
+            output "SetExecutable unexpected error: " + e:GetErrorMessage()
+        end
+
+        work:Delete(true)
+        File top
+        top:SetPath("FileTestsWork")
+        boolean removed = top:Delete()
+    end
+end

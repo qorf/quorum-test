@@ -1,0 +1,131 @@
+use Libraries.Containers.MultipleLineText
+
+/*
+    The text actions of MultipleLineText on single-line texts (the line
+    actions are in MultipleLineTextLines). Insert, Delete and Concatenate
+    return a new tree and leave the original unchanged. The index ranges
+    follow the documentation: start inclusive, end exclusive, and Insert
+    accepts 0 through GetSize().
+*/
+class Main
+    action Main
+        MultipleLineText tree
+        tree:Initialize("Hello world!")
+        check
+            output "MultipleLineText(Hello world!) GetText() = [" + tree:GetText() + "], GetSize() = " + tree:GetSize() + ", GetLineCount() = " + tree:GetLineCount() + ", GetWidth() as an integer = " + cast(integer, tree:GetWidth())
+        detect e
+            output "MultipleLineText(Hello world!) GetText() unexpected error: " + e:GetErrorMessage()
+        end
+        check
+            text all = ""
+            integer i = 0
+            repeat tree:GetSize() times
+                all = all + tree:GetCharacter(i)
+                i = i + 1
+            end
+            output "MultipleLineText(Hello world!) GetCharacter(0..11) = [" + all + "]"
+        detect e
+            output "MultipleLineText(Hello world!) GetCharacter unexpected error: " + e:GetErrorMessage()
+        end
+        check
+            text value = tree:GetCharacter(12)
+            output "MultipleLineText(Hello world!) GetCharacter(12) should fail but returned [" + value + "]"
+        detect e
+            output "MultipleLineText(Hello world!) GetCharacter(12) fails, as it should"
+        end
+        check
+            output "MultipleLineText(Hello world!) GetText(1, 10) = [" + tree:GetText(1, 10) + "], GetText(0, 12) = [" + tree:GetText(0, 12) + "], GetText(4, 4) = [" + tree:GetText(4, 4) + "], GetText(11, 12) = [" + tree:GetText(11, 12) + "]"
+        detect e
+            output "MultipleLineText(Hello world!) GetText ranges unexpected error: " + e:GetErrorMessage()
+        end
+        check
+            text value = tree:GetText(-1, 3)
+            output "MultipleLineText(Hello world!) GetText(-1, 3) should fail but returned [" + value + "]"
+        detect e
+            output "MultipleLineText(Hello world!) GetText(-1, 3) fails, as it should"
+        end
+        check
+            text value = tree:GetText(0, 13)
+            output "MultipleLineText(Hello world!) GetText(0, 13) should fail but returned [" + value + "]"
+        detect e
+            output "MultipleLineText(Hello world!) GetText(0, 13) fails, as it should"
+        end
+        check
+            MultipleLineText inserted = tree:Insert(11, " of tomorrow")
+            MultipleLineText front = tree:Insert(0, ">> ")
+            MultipleLineText back = tree:Insert(12, " <<")
+            output "MultipleLineText(Hello world!) Insert(11, ' of tomorrow') = [" + inserted:GetText() + "], Insert(0, '>> ') = [" + front:GetText() + "], Insert(12, ' <<') = [" + back:GetText() + "], original [" + tree:GetText() + "]"
+        detect e
+            output "MultipleLineText(Hello world!) Insert unexpected error: " + e:GetErrorMessage()
+        end
+        check
+            MultipleLineText bad = tree:Insert(-1, "x")
+            output "MultipleLineText(Hello world!) Insert(-1, x) should fail but gave [" + bad:GetText() + "]"
+        detect e
+            output "MultipleLineText(Hello world!) Insert(-1, x) fails, as it should"
+        end
+        check
+            MultipleLineText bad = tree:Insert(13, "x")
+            output "MultipleLineText(Hello world!) Insert(13, x) should fail but gave [" + bad:GetText() + "]"
+        detect e
+            output "MultipleLineText(Hello world!) Insert(13, x) fails, as it should"
+        end
+        check
+            MultipleLineText deleted = tree:Delete(5, 11)
+            MultipleLineText all = tree:Delete(0, 12)
+            MultipleLineText none = tree:Delete(3, 3)
+            output "MultipleLineText(Hello world!) Delete(5, 11) = [" + deleted:GetText() + "], Delete(0, 12) = [" + all:GetText() + "] length " + all:GetSize() + ", Delete(3, 3) = [" + none:GetText() + "], original [" + tree:GetText() + "]"
+        detect e
+            output "MultipleLineText(Hello world!) Delete unexpected error: " + e:GetErrorMessage()
+        end
+        check
+            MultipleLineText bad = tree:Delete(-1, 2)
+            output "MultipleLineText(Hello world!) Delete(-1, 2) should fail but gave [" + bad:GetText() + "]"
+        detect e
+            output "MultipleLineText(Hello world!) Delete(-1, 2) fails, as it should"
+        end
+        check
+            MultipleLineText bad = tree:Delete(2, 13)
+            output "MultipleLineText(Hello world!) Delete(2, 13) should fail but gave [" + bad:GetText() + "]"
+        detect e
+            output "MultipleLineText(Hello world!) Delete(2, 13) fails, as it should"
+        end
+        check
+            MultipleLineText joined = tree:Concatenate(" Bye.")
+            MultipleLineText other
+            other:Initialize(" Again!")
+            MultipleLineText both = joined:Concatenate(other)
+            output "MultipleLineText(Hello world!) Concatenate(' Bye.') then Concatenate(MultipleLineText( Again!)) = [" + both:GetText() + "] length " + both:GetSize() + ", original [" + tree:GetText() + "], other [" + other:GetText() + "]"
+        detect e
+            output "MultipleLineText Concatenate unexpected error: " + e:GetErrorMessage()
+        end
+        check
+            MultipleLineText balanced = tree:Balance()
+            output "MultipleLineText(Hello world!) Balance(): [" + balanced:GetText() + "], NeedsBalancing() = " + balanced:NeedsBalancing()
+        detect e
+            output "MultipleLineText Balance unexpected error: " + e:GetErrorMessage()
+        end
+
+        MultipleLineText empty
+        check
+            empty:Initialize("")
+            output "MultipleLineText() GetText() = [" + empty:GetText() + "], GetSize() = " + empty:GetSize()
+        detect e
+            output "MultipleLineText() unexpected error: " + e:GetErrorMessage()
+        end
+        check
+            MultipleLineText filled = empty:Insert(0, "abc")
+            MultipleLineText joined = empty:Concatenate("xyz")
+            output "MultipleLineText() Insert(0, abc) = [" + filled:GetText() + "], Concatenate(xyz) = [" + joined:GetText() + "]"
+        detect e
+            output "MultipleLineText() Insert/Concatenate unexpected error: " + e:GetErrorMessage()
+        end
+
+        MultipleLineText fresh
+        check
+            output "MultipleLineText new GetLineSeparator() equals GetDefaultLineSeparator(): " + (fresh:GetLineSeparator() = fresh:GetDefaultLineSeparator())
+        detect e
+            output "MultipleLineText line separators unexpected error: " + e:GetErrorMessage()
+        end
+    end
+end

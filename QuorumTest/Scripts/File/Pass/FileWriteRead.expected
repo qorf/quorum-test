@@ -1,0 +1,9 @@
+Write(hello world) then Read() = [hello world]
+GetFileSize(note.txt with hello world) = 11
+Write(short) over hello world then Read() = [short]
+GetFileSize(note.txt with short) = 5
+Write(two lines) then Read() has a line feed between them = true
+Write(empty) then GetFileSize() = 0
+GetFileSize(folder) = 0
+GetFileSize(missing.txt) = 0
+Read(missing.txt) fails, as it should

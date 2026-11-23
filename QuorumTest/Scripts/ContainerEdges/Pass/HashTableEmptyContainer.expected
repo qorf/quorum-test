@@ -1,0 +1,14 @@
+HashTable{} GetSize() = 0, IsEmpty() = true
+HashTable{} GetValue(a) = undefined
+HashTable{} HasKey(a) = false
+HashTable{} HasValue(v) = false
+HashTable{} GetKey(v) = undefined
+HashTable{} RemoveKey(a) = undefined
+HashTable{} RemoveValue(v) = undefined
+HashTable{} RemoveAllKeys(a) = false, RemoveAllValues(v) = false
+HashTable{} GetKeyIterator() HasNext() = false, GetValueIterator() HasNext() = false
+HashTable{} CopyToKeyArray() size 0, CopyToValueArray() size 0
+HashTable{} Copy() size 0, IsEmpty() = true
+HashTable{} Empty() leaves size 0
+HashTable{} then Add(a, 1): size 1, GetValue(a) = [1]
+HashTable{a:1} Empty(): size 0, IsEmpty() = true, HasKey(a) = false, keys []

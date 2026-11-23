@@ -1,0 +1,49 @@
+/*
+    Number:IsInfinite is true only for positive and negative infinity; NaN
+    is not infinite. Number:IsNotANumber is true only for NaN, including a
+    NaN made by arithmetic (infinity minus infinity). Each case runs on a
+    number primitive and on a Number object.
+*/
+class Main
+    action Main
+        number helper = 0.0
+        number positiveInfinity = helper:GetPositiveInfinityValue()
+        number negativeInfinity = helper:GetNegativeInfinityValue()
+        number nan = helper:GetNotANumberValue()
+        Show("1.5", 1.5)
+        Show("0", 0.0)
+        Show("-2.5", -2.5)
+        Show("maximum", helper:GetMaximumValue())
+        Show("minimum", helper:GetMinimumValue())
+        Show("positive infinity", positiveInfinity)
+        Show("negative infinity", negativeInfinity)
+        Show("NaN", nan)
+        Show("infinity - infinity", positiveInfinity - positiveInfinity)
+        Show("-infinity * 2", negativeInfinity * 2.0)
+    end
+
+    action Show(text label, number value)
+        check
+            output "IsInfinite(" + label + ") = " + value:IsInfinite()
+        detect e
+            output "IsInfinite(" + label + ") unexpected error: " + e:GetErrorMessage()
+        end
+        check
+            output "IsNotANumber(" + label + ") = " + value:IsNotANumber()
+        detect e
+            output "IsNotANumber(" + label + ") unexpected error: " + e:GetErrorMessage()
+        end
+        Number object
+        object:SetValue(value)
+        check
+            output "Number IsInfinite(" + label + ") = " + object:IsInfinite()
+        detect e
+            output "Number IsInfinite(" + label + ") unexpected error: " + e:GetErrorMessage()
+        end
+        check
+            output "Number IsNotANumber(" + label + ") = " + object:IsNotANumber()
+        detect e
+            output "Number IsNotANumber(" + label + ") unexpected error: " + e:GetErrorMessage()
+        end
+    end
+end

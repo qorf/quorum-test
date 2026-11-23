@@ -1,0 +1,89 @@
+use Libraries.Containers.Array
+
+/*
+    SetMaxSize documents: "The max size can only be increased, any value that
+    is lower will leave the array with the same max size it had." So a lower
+    value changes neither the max size nor the items.
+*/
+class Main
+    action Show(text value) returns text
+        if value = undefined
+            return "undefined"
+        end
+        return "[" + value + "]"
+    end
+
+    action Describe(Array<text> array) returns text
+        text result = "["
+        integer i = 0
+        repeat while i < array:GetSize()
+            if i > 0
+                result = result + ","
+            end
+            text value = array:Get(i)
+            if value = undefined
+                result = result + "undefined"
+            else
+                result = result + value
+            end
+            i = i + 1
+        end
+        return result + "]"
+    end
+    action Main
+        Array<text> array
+        array:Add("a")
+        array:Add("b")
+        array:Add("c")
+        check
+            array:SetMaxSize(20)
+            output "Array[a,b,c] SetMaxSize(20): GetMaxSize() = " + array:GetMaxSize() + ", items " + Describe(array)
+        detect e
+            output "Array[a,b,c] SetMaxSize(20) unexpected error: " + e:GetErrorMessage()
+        end
+        check
+            array:SetMaxSize(5)
+            output "Array[a,b,c] max 20 SetMaxSize(5): GetMaxSize() = " + array:GetMaxSize() + ", items " + Describe(array)
+        detect e
+            output "Array[a,b,c] max 20 SetMaxSize(5) unexpected error: " + e:GetErrorMessage()
+        end
+        check
+            array:SetMaxSize(2)
+            output "Array[a,b,c] max 20 SetMaxSize(2): GetMaxSize() = " + array:GetMaxSize() + ", items " + Describe(array)
+        detect e
+            output "Array[a,b,c] max 20 SetMaxSize(2) unexpected error: " + e:GetErrorMessage()
+        end
+        check
+            array:SetMaxSize(0)
+            output "Array[a,b,c] max 20 SetMaxSize(0): GetMaxSize() = " + array:GetMaxSize() + ", items " + Describe(array)
+        detect e
+            output "Array[a,b,c] max 20 SetMaxSize(0) unexpected error: " + e:GetErrorMessage()
+        end
+
+        Array<text> fixed
+        fixed:SetAutoResize(false)
+        check
+            fixed:SetMaxSize(3)
+            output "Array auto-resize off, default max 10, SetMaxSize(3): GetMaxSize() = " + fixed:GetMaxSize()
+        detect e
+            output "Array auto-resize off SetMaxSize(3) unexpected error: " + e:GetErrorMessage()
+        end
+        check
+            fixed:SetMaxSize(12)
+            integer i = 0
+            repeat 12 times
+                fixed:Add("i" + i)
+                i = i + 1
+            end
+            output "Array auto-resize off SetMaxSize(12) then 12 x Add: size " + fixed:GetSize()
+        detect e
+            output "Array auto-resize off SetMaxSize(12) then 12 x Add unexpected error: " + e:GetErrorMessage()
+        end
+        check
+            fixed:Add("extra")
+            output "Array auto-resize off, 12 of 12, Add(extra) should fail but gave size " + fixed:GetSize()
+        detect e
+            output "Array auto-resize off, 12 of 12, Add(extra) fails, as it should"
+        end
+    end
+end

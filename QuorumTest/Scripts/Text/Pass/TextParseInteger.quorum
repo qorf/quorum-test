@@ -1,0 +1,67 @@
+/*
+    Text:ParseInteger gives the integer in the text, and alerts an error
+    when the text is not a valid integer. The whole text must be the
+    integer: trailing letters, spaces, a decimal point, an underscore or a
+    value outside the 32-bit integer range all fail (Java's parseInt
+    agrees). A leading plus sign is accepted, as in Java.
+    Each case runs on a text primitive and on a Text object.
+*/
+class Main
+    action Main
+        Show("12")
+        Show("-7")
+        Show("0")
+        Show("-0")
+        Show("007")
+        Show("+5")
+        Show("2147483647")
+        Show("-2147483648")
+        Fail("2147483648")
+        Fail("-2147483649")
+        Fail("12abc")
+        Fail("abc")
+        Fail("")
+        Fail(" ")
+        Fail(" 12 ")
+        Fail("12 ")
+        Fail("1_000")
+        Fail("12.5")
+        Fail("1,000")
+        Fail("-")
+        Fail("0x10")
+    end
+
+    action Show(text value)
+        text call = "ParseInteger([" + value + "])"
+        check
+            output call + " = " + value:ParseInteger()
+        detect e
+            output call + " unexpected error: " + e:GetErrorMessage()
+        end
+        Text object
+        object:SetValue(value)
+        check
+            output "Text " + call + " = " + object:ParseInteger()
+        detect e
+            output "Text " + call + " unexpected error: " + e:GetErrorMessage()
+        end
+    end
+
+    action Fail(text value)
+        text call = "ParseInteger([" + value + "])"
+        check
+            integer result = value:ParseInteger()
+            output call + " should fail but returned " + result
+        detect e
+            output call + " fails, as it should"
+        end
+        Text object
+        object:SetValue(value)
+        check
+            integer result = object:ParseInteger()
+            output "Text " + call + " should fail but returned " + result
+        detect e
+            output "Text " + call + " fails, as it should"
+        end
+    end
+end

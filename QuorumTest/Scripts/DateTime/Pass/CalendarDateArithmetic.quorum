@@ -1,0 +1,110 @@
+use Libraries.System.CalendarDate
+
+/*
+Tests AddDays, AddMonths, AddYears, DaysUntil, Compare, Equals, GetHashCode
+and Copy. As the documentation says, a month added to a day the new month
+lacks gives the new month's last day, and February 29 moved to a year that
+is not a leap year becomes February 28.
+*/
+class Main
+    action Main
+        Days(2024, 2, 28, 1)
+        Days(2024, 2, 28, 2)
+        Days(2024, 12, 31, 1)
+        Days(1970, 1, 1, -1)
+        Days(2024, 3, 1, -366)
+        Months(2024, 1, 31, 1)
+        Months(2023, 1, 31, 1)
+        Months(2024, 3, 31, -1)
+        Months(2024, 11, 15, 2)
+        Months(2024, 1, 15, -13)
+        Months(2024, 5, 31, 12)
+        Years(2024, 2, 29, 1)
+        Years(2024, 2, 29, 4)
+        Years(2024, 2, 29, -100)
+        Years(2026, 11, 12, -2026)
+
+        CalendarDate first
+        CalendarDate second
+        CalendarDate twin
+        boolean valid = first:SetDate(2024, 2, 29)
+        valid = second:SetDate(2026, 11, 12)
+        valid = twin:SetDate(2024, 2, 29)
+        check
+            output "2024-02-29:DaysUntil(2026-11-12) = " + first:DaysUntil(second)
+            output "2026-11-12:DaysUntil(2024-02-29) = " + second:DaysUntil(first)
+            output "2024-02-29:DaysUntil(2024-02-29) = " + first:DaysUntil(twin)
+        detect e
+            output "DaysUntil unexpected error: " + e:GetErrorMessage()
+        end
+        check
+            output "2024-02-29:Compare(2026-11-12) = " + first:Compare(second)
+            output "2026-11-12:Compare(2024-02-29) = " + second:Compare(first)
+            output "2024-02-29:Compare(another 2024-02-29) = " + first:Compare(twin)
+        detect e
+            output "Compare unexpected error: " + e:GetErrorMessage()
+        end
+        check
+            output "2024-02-29:Equals(another 2024-02-29) = " + first:Equals(twin)
+            output "2024-02-29:Equals(2026-11-12) = " + first:Equals(second)
+            Text word
+            word:SetValue("2024-02-29")
+            output "2024-02-29:Equals(the text 2024-02-29) = " + first:Equals(word)
+        detect e
+            output "Equals unexpected error: " + e:GetErrorMessage()
+        end
+        check
+            output "GetHashCode() of two equal dates is the same = " + (first:GetHashCode() = twin:GetHashCode())
+            output "GetHashCode() of 2024-02-29 = " + first:GetHashCode()
+        detect e
+            output "GetHashCode unexpected error: " + e:GetErrorMessage()
+        end
+        check
+            CalendarDate copy = first:Copy()
+            output "Copy() of 2024-02-29: ToText() = [" + copy:ToText() + "], Equals(original) = " + copy:Equals(first)
+            copy:AddDays(1)
+            output "Copy(), then AddDays(1) on the copy: copy = [" + copy:ToText() + "], original = [" + first:ToText() + "]"
+        detect e
+            output "Copy unexpected error: " + e:GetErrorMessage()
+        end
+    end
+
+    action Start(integer year, integer month, integer day) returns CalendarDate
+        CalendarDate date
+        boolean valid = date:SetDate(year, month, day)
+        return date
+    end
+
+    action Days(integer year, integer month, integer day, integer amount)
+        CalendarDate date = Start(year, month, day)
+        text before = date:ToText()
+        check
+            date:AddDays(amount)
+            output "AddDays(" + amount + ") to " + before + " = [" + date:ToText() + "]"
+        detect e
+            output "AddDays(" + amount + ") to " + before + " unexpected error: " + e:GetErrorMessage()
+        end
+    end
+
+    action Months(integer year, integer month, integer day, integer amount)
+        CalendarDate date = Start(year, month, day)
+        text before = date:ToText()
+        check
+            date:AddMonths(amount)
+            output "AddMonths(" + amount + ") to " + before + " = [" + date:ToText() + "]"
+        detect e
+            output "AddMonths(" + amount + ") to " + before + " unexpected error: " + e:GetErrorMessage()
+        end
+    end
+
+    action Years(integer year, integer month, integer day, integer amount)
+        CalendarDate date = Start(year, month, day)
+        text before = date:ToText()
+        check
+            date:AddYears(amount)
+            output "AddYears(" + amount + ") to " + before + " = [" + date:ToText() + "]"
+        detect e
+            output "AddYears(" + amount + ") to " + before + " unexpected error: " + e:GetErrorMessage()
+        end
+    end
+end

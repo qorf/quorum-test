@@ -1,0 +1,80 @@
+use Libraries.Compute.Matrix
+use Libraries.Compute.MatrixTransform.Flip
+use Libraries.Compute.MatrixTransform.Rotation
+
+/*
+The Flip and Rotation matrix transforms on the 2 by 3 matrix |1, 2, 3|
+|4, 5, 6|. FlipVertical reverses the order of the rows, FlipHorizontal the
+order of the columns. Rotation Right turns the matrix a quarter turn
+clockwise and Left a quarter turn counterclockwise, so a 2 by 3 matrix
+becomes 3 by 2, and turning right then left gives back the original.
+*/
+class Main
+    action Main
+        Matrix matrix
+        matrix:SetSize(2, 3)
+        matrix:Set(0, 0, 1)
+        matrix:Set(0, 1, 2)
+        matrix:Set(0, 2, 3)
+        matrix:Set(1, 0, 4)
+        matrix:Set(1, 1, 5)
+        matrix:Set(1, 2, 6)
+        check
+            Flip flip
+            flip:FlipVertical()
+            Show("Flip FlipVertical", flip:Transform(matrix))
+        detect e
+            output "Flip FlipVertical unexpected error: " + e:GetErrorMessage()
+        end
+        check
+            Flip flip
+            flip:FlipHorizontal()
+            Show("Flip FlipHorizontal", flip:Transform(matrix))
+        detect e
+            output "Flip FlipHorizontal unexpected error: " + e:GetErrorMessage()
+        end
+        check
+            Rotation rotation
+            rotation:Right()
+            Show("Rotation Right", rotation:Transform(matrix))
+        detect e
+            output "Rotation Right unexpected error: " + e:GetErrorMessage()
+        end
+        check
+            Rotation rotation
+            rotation:Left()
+            Show("Rotation Left", rotation:Transform(matrix))
+        detect e
+            output "Rotation Left unexpected error: " + e:GetErrorMessage()
+        end
+        check
+            Rotation right
+            right:Right()
+            Rotation left
+            left:Left()
+            Matrix turned = right:Transform(matrix)
+            Show("Rotation Right then Left", left:Transform(turned))
+        detect e
+            output "Rotation Right then Left unexpected error: " + e:GetErrorMessage()
+        end
+        Show("the input matrix afterwards, which must be unchanged,", matrix)
+    end
+
+    action Show(text label, Matrix result)
+        output label + " gives a " + result:GetRows() + " by " + result:GetColumns() + " matrix:"
+        integer row = 0
+        repeat while row < result:GetRows()
+            text line = "|"
+            integer column = 0
+            repeat while column < result:GetColumns()
+                line = line + result:Get(row, column)
+                if column < result:GetColumns() - 1
+                    line = line + ", "
+                end
+                column = column + 1
+            end
+            output line + "|"
+            row = row + 1
+        end
+    end
+end

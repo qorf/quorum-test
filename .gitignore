@@ -40,3 +40,7 @@ Tools/
 
 # Each tester's time on this machine, used to split runs
 QuorumTest/Timings.json
+
+# The back ends and testers chosen for the last run
+QuorumTest/Selections.json
+QuorumTest/Selections.json.tmp

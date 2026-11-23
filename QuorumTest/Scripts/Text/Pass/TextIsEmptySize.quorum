@@ -1,0 +1,47 @@
+/*
+    Text:IsEmpty is true only for a text with no characters; spaces and
+    tabs are characters, so "   " is not empty. Text:GetSize counts
+    characters. Each case runs on a text primitive and on a Text object.
+*/
+class Main
+    action Main
+        text tab = ""
+        tab = tab:GetTab()
+        text lf = ""
+        lf = lf:GetLineFeed()
+        Show("", "")
+        Show("a", "a")
+        Show(" ", " ")
+        Show("   ", "   ")
+        Show(tab, "tab")
+        Show(lf, "line feed")
+        Show(tab + lf, "tab line feed")
+        Show("hello world", "hello world")
+    end
+
+    action Show(text value, text label)
+        text name = "[" + label + "]"
+        check
+            output "IsEmpty(" + name + ") = " + value:IsEmpty()
+        detect e
+            output "IsEmpty(" + name + ") unexpected error: " + e:GetErrorMessage()
+        end
+        check
+            output "GetSize(" + name + ") = " + value:GetSize()
+        detect e
+            output "GetSize(" + name + ") unexpected error: " + e:GetErrorMessage()
+        end
+        Text object
+        object:SetValue(value)
+        check
+            output "Text IsEmpty(" + name + ") = " + object:IsEmpty()
+        detect e
+            output "Text IsEmpty(" + name + ") unexpected error: " + e:GetErrorMessage()
+        end
+        check
+            output "Text GetSize(" + name + ") = " + object:GetSize()
+        detect e
+            output "Text GetSize(" + name + ") unexpected error: " + e:GetErrorMessage()
+        end
+    end
+end

@@ -1,0 +1,28 @@
+ColumnInput AddColumn(3, 1, 3) = 3,1,3 size 3 GetColumn(1) 1
+ColumnInput RemoveColumn(3) = true leaves 1,3
+ColumnInput RemoveColumn(9) = false
+ColumnInput RemoveColumnAt(0) leaves 3
+ColumnInput EmptyColumns() IsEmptyColumns() = true
+FactorInput AddFactor(2, 0) GetFactor(0) GetFactor(1) size = 2 0 2
+FactorInput RemoveFactor(2) = true then GetFactor(0) = 0
+FactorInput RemoveFactorAt(0) IsEmptyFactors() = true
+RowInput AddRow(5, 6) GetRow(1) size = 6 2
+RowInput RemoveRow(5) = true, RemoveRow(5) again = false
+RowInput EmptyRows() IsEmptyRows() = true
+CellInput AddCell(1, 2) and AddCell(pair 3, 4) GetCell(0) size = 1,2 2
+CellInput RemoveCell(the same pair) = true size 1
+CellInput RemoveCellAt(0) IsEmptyCells() = true
+AddSelectedColumnRange(1, 3) (inclusive) = 1,2,3 size 3
+SetSelectedColumnRange(0, 1) after another range = 0,1
+SelectAllColumns() then RemoveSelectedColumnRange(1, 2) = 0,3
+SetSelectedColumns(d,b) = 3,1
+RemoveSelectedColumns(d) leaves 1
+AddSelectedColumns(a) gives 1,0
+AddSelectedFactors(b,d) = 1,3 size 2
+RemoveSelectedFactor(1) leaves size 1 first 3
+CopySelectedColumns() of columns 0 and 2 = a=1.5 | c=2.5
+AddSelectedRow(0) AddSelectedCell(1, 0) row and cell sizes = 1 1
+EmptySelectedRows() EmptySelectedCells() = true true
+DataFrameSelection CopyTo(ColumnInput) and CopyTo(FactorInput) = 1 and 3
+DataFrameSelection GetFrame() is the frame = true
+SetSelection then GetSelectedColumnSize() and GetSelection():GetColumn(0) = 1 2

@@ -1,0 +1,40 @@
+use Libraries.Compute.Math
+
+/*
+Math:SquareRoot. The square root of a negative number has no real answer and
+gives NaN, as Java's Math.sqrt does; it is not an error. Perfect squares
+give exact answers.
+*/
+class Main
+    Math math
+
+    action Main
+        Show(0.0)
+        Show(1.0)
+        Show(4.0)
+        Show(0.25)
+        Show(1000000.0)
+        Show(-1.0)
+        Show(-4.0)
+        check
+            output "SquareRoot(2) rounded to 10 places = " + math:Round(math:SquareRoot(2), 10)
+        detect e
+            output "SquareRoot(2) unexpected error: " + e:GetErrorMessage()
+        end
+        check
+            number zero = 0.0
+            number infinity = 1.0 / zero
+            output "SquareRoot(Infinity) = " + math:SquareRoot(infinity)
+        detect e
+            output "SquareRoot(Infinity) unexpected error: " + e:GetErrorMessage()
+        end
+    end
+
+    action Show(number value)
+        check
+            output "SquareRoot(" + value + ") = " + math:SquareRoot(value)
+        detect e
+            output "SquareRoot(" + value + ") unexpected error: " + e:GetErrorMessage()
+        end
+    end
+end

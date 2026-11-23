@@ -1,0 +1,17 @@
+SetEpochTime(1700000000000), GetEpochTime() is 1700000000000 = true
+SetEpochTime(1700000000000 + 183845000), GetEpochTime() minus 1700000000000 = 183845000
+GetMillisecondDifference(later minus earlier) = 183845000
+GetMillisecondDifference(earlier minus later) = -183845000
+GetSecondDifference(later minus earlier) = 183845
+GetMinuteDifference(later minus earlier) rounded = 3064.083
+GetHourDifference(later minus earlier) rounded = 51.068
+GetDayDifference(later minus earlier) rounded = 2.128
+GetDayDifference(earlier minus later) rounded = -2.128
+GetDayDifference(same time) = 0
+GetMonthDifference(30.417 days later) rounded = 1
+SetEpochTime 7 days apart: same GetDayOfWeek() = true
+SetEpochTime 7 days apart: same GetHour() and GetMinute() = true
+SetEpochTime 7 days apart: GetSecond() = 20
+SetEpochTime(0), GetEpochTime() = 0
+SetEpochTime(0), GetDayDifference to 1700000000000 rounded = 19675.926
+SetEpochTime(-86400000), GetDayDifference from 0 = -1

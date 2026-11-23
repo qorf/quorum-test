@@ -1,0 +1,175 @@
+use Libraries.Containers.Array
+use Libraries.Containers.Support.Comparison
+
+/*
+    Sort with a custom Comparison (Libraries.Containers.Support.Comparison;
+    Main is the Comparison, since a test is one file with one class):
+    descending integers, texts by length (merge sort is stable, so equal
+    lengths keep their order), the empty and one-item cases, and the
+    Sort(comparison, temp) version with a temporary Array of the same size.
+*/
+class Main is Comparison
+    // 0 = descending integers, 1 = texts by length
+    integer mode = 0
+
+    action Compare(Object left, Object right) returns integer
+        if mode = 0
+            Integer l = cast(Integer, left)
+            Integer r = cast(Integer, right)
+            if l:GetValue() > r:GetValue()
+                return parent:Comparison:SMALLER
+            elseif l:GetValue() < r:GetValue()
+                return parent:Comparison:LARGER
+            end
+            return parent:Comparison:EQUAL
+        end
+        Text lt = cast(Text, left)
+        Text rt = cast(Text, right)
+        integer leftSize = lt:GetValue():GetSize()
+        integer rightSize = rt:GetValue():GetSize()
+        if leftSize < rightSize
+            return parent:Comparison:SMALLER
+        elseif leftSize > rightSize
+            return parent:Comparison:LARGER
+        end
+        return parent:Comparison:EQUAL
+    end
+
+    action Show(text value) returns text
+        if value = undefined
+            return "undefined"
+        end
+        return "[" + value + "]"
+    end
+
+    action Describe(Array<text> array) returns text
+        text result = "["
+        integer i = 0
+        repeat while i < array:GetSize()
+            if i > 0
+                result = result + ","
+            end
+            text value = array:Get(i)
+            if value = undefined
+                result = result + "undefined"
+            else
+                result = result + value
+            end
+            i = i + 1
+        end
+        return result + "]"
+    end
+    action DescribeNumbers(Array<integer> array) returns text
+        text result = "["
+        integer i = 0
+        repeat while i < array:GetSize()
+            if i > 0
+                result = result + ","
+            end
+            result = result + array:Get(i)
+            i = i + 1
+        end
+        return result + "]"
+    end
+
+    action Main
+
+        Array<integer> numbers
+        numbers:Add(3)
+        numbers:Add(9)
+        numbers:Add(1)
+        numbers:Add(9)
+        numbers:Add(-4)
+        numbers:Add(0)
+        numbers:Add(7)
+        check
+            mode = 0
+            numbers:Sort(me)
+            output "Array[3,9,1,9,-4,0,7] Sort(Descending) gives " + DescribeNumbers(numbers)
+        detect e
+            output "Array[3,9,1,9,-4,0,7] Sort(Descending) unexpected error: " + e:GetErrorMessage()
+        end
+
+        Array<text> words
+        words:Add("ccc")
+        words:Add("a")
+        words:Add("bb")
+        words:Add("x")
+        words:Add("dd")
+        words:Add("e")
+        check
+            mode = 1
+            words:Sort(me)
+            output "Array[ccc,a,bb,x,dd,e] Sort(ByLength) gives " + Describe(words)
+        detect e
+            output "Array[ccc,a,bb,x,dd,e] Sort(ByLength) unexpected error: " + e:GetErrorMessage()
+        end
+
+        Array<text> empty
+        check
+            mode = 1
+            empty:Sort(me)
+            output "Array[] Sort(ByLength) gives " + Describe(empty)
+        detect e
+            output "Array[] Sort(ByLength) unexpected error: " + e:GetErrorMessage()
+        end
+
+        Array<text> one
+        one:Add("only")
+        check
+            mode = 1
+            one:Sort(me)
+            output "Array[only] Sort(ByLength) gives " + Describe(one)
+        detect e
+            output "Array[only] Sort(ByLength) unexpected error: " + e:GetErrorMessage()
+        end
+
+        Array<integer> two
+        two:Add(1)
+        two:Add(2)
+        check
+            mode = 0
+            two:Sort(me)
+            output "Array[1,2] Sort(Descending) gives " + DescribeNumbers(two)
+        detect e
+            output "Array[1,2] Sort(Descending) unexpected error: " + e:GetErrorMessage()
+        end
+
+        Array<integer> many
+        integer i = 0
+        repeat 100 times
+            many:Add((i * 37) mod 100)
+            i = i + 1
+        end
+        Array<integer> temp
+        temp:SetSize(100)
+        check
+            mode = 0
+            many:Sort(me, temp)
+            boolean ordered = true
+            i = 1
+            repeat while i < many:GetSize()
+                if many:Get(i - 1) < many:Get(i)
+                    ordered = false
+                end
+                i = i + 1
+            end
+            output "Array of 0..99 shuffled Sort(Descending, temp of 100): size " + many:GetSize() + ", first " + many:Get(0) + ", last " + many:Get(99) + ", in order = " + ordered
+        detect e
+            output "Array of 100 Sort(Descending, temp) unexpected error: " + e:GetErrorMessage()
+        end
+
+        Array<integer> fixed
+        fixed:SetAutoResize(false)
+        fixed:Add(1)
+        fixed:Add(5)
+        fixed:Add(3)
+        check
+            mode = 0
+            fixed:Sort(me)
+            output "Array[1,5,3] auto-resize off Sort(Descending) gives " + DescribeNumbers(fixed)
+        detect e
+            output "Array[1,5,3] auto-resize off Sort(Descending) unexpected error: " + e:GetErrorMessage()
+        end
+    end
+end

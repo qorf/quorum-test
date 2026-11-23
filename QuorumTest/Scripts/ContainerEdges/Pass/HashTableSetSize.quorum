@@ -1,0 +1,121 @@
+use Libraries.Containers.HashTable
+use Libraries.Containers.Array
+
+/*
+    HashTable SetSize documents that it sets the size of the table, and on a
+    table that has entries "forces it to resize, manually rehashing all
+    objects". Whatever size is chosen, before or after adding, every key must
+    still be found and the number of items (GetSize) must not change.
+*/
+class Main
+    action Show(text value) returns text
+        if value = undefined
+            return "undefined"
+        end
+        return "[" + value + "]"
+    end
+
+    action Describe(Array<text> array) returns text
+        text result = "["
+        integer i = 0
+        repeat while i < array:GetSize()
+            if i > 0
+                result = result + ","
+            end
+            text value = array:Get(i)
+            if value = undefined
+                result = result + "undefined"
+            else
+                result = result + value
+            end
+            i = i + 1
+        end
+        return result + "]"
+    end
+
+    // The keys sorted, so the output does not depend on hash order.
+    action SortedKeys(HashTable<text, text> table) returns text
+        Array<text> keys = table:CopyToKeyArray()
+        keys:Sort()
+        return Describe(keys)
+    end
+
+    action CountFound(HashTable<text, text> table, integer count) returns integer
+        integer found = 0
+        integer i = 0
+        repeat count times
+            text value = table:GetValue("k" + i)
+            if value not= undefined
+                if value = "v" + i
+                    found = found + 1
+                end
+            end
+            i = i + 1
+        end
+        return found
+    end
+
+    action Main
+        HashTable<text, text> early
+        check
+            early:SetSize(64)
+            output "HashTable{} SetSize(64): GetSize() = " + early:GetSize() + ", IsEmpty() = " + early:IsEmpty()
+        detect e
+            output "HashTable{} SetSize(64) unexpected error: " + e:GetErrorMessage()
+        end
+        check
+            integer i = 0
+            repeat 100 times
+                early:Add("k" + i, "v" + i)
+                i = i + 1
+            end
+            output "HashTable SetSize(64) then 100 Adds: size " + early:GetSize() + ", found " + CountFound(early, 100) + " of 100"
+        detect e
+            output "HashTable SetSize(64) then 100 Adds unexpected error: " + e:GetErrorMessage()
+        end
+
+        HashTable<text, text> table
+        integer i = 0
+        repeat 10 times
+            table:Add("k" + i, "v" + i)
+            i = i + 1
+        end
+        check
+            table:SetSize(3)
+            output "HashTable of 10 SetSize(3): size " + table:GetSize() + ", found " + CountFound(table, 10) + " of 10"
+        detect e
+            output "HashTable of 10 SetSize(3) unexpected error: " + e:GetErrorMessage()
+        end
+        check
+            i = 10
+            repeat 10 times
+                table:Add("k" + i, "v" + i)
+                i = i + 1
+            end
+            output "HashTable SetSize(3) then 10 more Adds: size " + table:GetSize() + ", found " + CountFound(table, 20) + " of 20"
+        detect e
+            output "HashTable SetSize(3) then 10 more Adds unexpected error: " + e:GetErrorMessage()
+        end
+        check
+            table:SetSize(1)
+            output "HashTable of 20 SetSize(1): size " + table:GetSize() + ", found " + CountFound(table, 20) + " of 20"
+        detect e
+            output "HashTable of 20 SetSize(1) unexpected error: " + e:GetErrorMessage()
+        end
+        check
+            table:SetSize(100)
+            table:RemoveKey("k5")
+            output "HashTable of 20 SetSize(100), RemoveKey(k5): size " + table:GetSize() + ", found " + CountFound(table, 20) + " of 20, CopyToKeyArray() size " + table:CopyToKeyArray():GetSize()
+        detect e
+            output "HashTable of 20 SetSize(100) unexpected error: " + e:GetErrorMessage()
+        end
+        check
+            table:Empty()
+            table:SetSize(16)
+            table:Add("x", "y")
+            output "HashTable Empty(), SetSize(16), Add(x, y): size " + table:GetSize() + ", keys " + SortedKeys(table)
+        detect e
+            output "HashTable Empty(), SetSize(16), Add(x, y) unexpected error: " + e:GetErrorMessage()
+        end
+    end
+end

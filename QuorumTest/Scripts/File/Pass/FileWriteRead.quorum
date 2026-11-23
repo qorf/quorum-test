@@ -1,0 +1,78 @@
+use Libraries.System.File
+
+/*
+Tests File's Write, Read and GetFileSize inside a scratch folder
+(FileTestsWork/FileWriteRead), which is deleted at the end. Write replaces
+what the file held before. GetFileSize is 0 for a folder or a missing file.
+Reading a missing file raises an error, as Read's documentation says.
+*/
+class Main
+    action Main
+        File work
+        work:SetPath("FileTestsWork/FileWriteRead")
+        work:Delete(true)
+        boolean made = work:CreateDirectories()
+        text lf = ""
+        lf = lf:GetLineFeed()
+
+        File file
+        file:SetPath("FileTestsWork/FileWriteRead/note.txt")
+        check
+            file:Write("hello world")
+            output "Write(hello world) then Read() = [" + file:Read() + "]"
+        detect e
+            output "Write(hello world) then Read() unexpected error: " + e:GetErrorMessage()
+        end
+        check
+            output "GetFileSize(note.txt with hello world) = " + cast(integer, file:GetFileSize())
+        detect e
+            output "GetFileSize(note.txt with hello world) unexpected error: " + e:GetErrorMessage()
+        end
+        check
+            file:Write("short")
+            output "Write(short) over hello world then Read() = [" + file:Read() + "]"
+        detect e
+            output "Write(short) over hello world then Read() unexpected error: " + e:GetErrorMessage()
+        end
+        check
+            output "GetFileSize(note.txt with short) = " + cast(integer, file:GetFileSize())
+        detect e
+            output "GetFileSize(note.txt with short) unexpected error: " + e:GetErrorMessage()
+        end
+        check
+            file:Write("line one" + lf + "line two")
+            text content = file:Read()
+            output "Write(two lines) then Read() has a line feed between them = " + (content = "line one" + lf + "line two")
+        detect e
+            output "Write(two lines) then Read() unexpected error: " + e:GetErrorMessage()
+        end
+        check
+            file:Write("")
+            output "Write(empty) then GetFileSize() = " + cast(integer, file:GetFileSize())
+        detect e
+            output "Write(empty) then GetFileSize() unexpected error: " + e:GetErrorMessage()
+        end
+        check
+            output "GetFileSize(folder) = " + cast(integer, work:GetFileSize())
+        detect e
+            output "GetFileSize(folder) unexpected error: " + e:GetErrorMessage()
+        end
+        File missing
+        missing:SetPath("FileTestsWork/FileWriteRead/missing.txt")
+        check
+            output "GetFileSize(missing.txt) = " + cast(integer, missing:GetFileSize())
+        detect e
+            output "GetFileSize(missing.txt) unexpected error: " + e:GetErrorMessage()
+        end
+        check
+            text value = missing:Read()
+            output "Read(missing.txt) should fail but returned [" + value + "]"
+        detect e
+            output "Read(missing.txt) fails, as it should"
+        end
+        work:Delete(true)
+        File top
+        top:SetPath("FileTestsWork")
+        boolean removed = top:Delete()
+    end
+end

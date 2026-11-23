@@ -1,0 +1,48 @@
+IndexOf(hello, l) = 2
+Text IndexOf(hello, l) = 2
+IndexOf(hello, h) = 0
+Text IndexOf(hello, h) = 0
+IndexOf(hello, o) = 4
+Text IndexOf(hello, o) = 4
+IndexOf(hello, lo) = 3
+Text IndexOf(hello, lo) = 3
+IndexOf(hello, hello) = 0
+Text IndexOf(hello, hello) = 0
+IndexOf(hello, x) = -1
+Text IndexOf(hello, x) = -1
+IndexOf(hello, L) = -1
+Text IndexOf(hello, L) = -1
+IndexOf(hello, ) = 0
+Text IndexOf(hello, ) = 0
+IndexOf(, a) = -1
+Text IndexOf(, a) = -1
+IndexOf(, ) = 0
+Text IndexOf(, ) = 0
+IndexOf(a, a) = 0
+Text IndexOf(a, a) = 0
+IndexOf(  a,  ) = 0
+Text IndexOf(  a,  ) = 0
+IndexOf(hello, l, 0) = 2
+Text IndexOf(hello, l, 0) = 2
+IndexOf(hello, l, 3) = 3
+Text IndexOf(hello, l, 3) = 3
+IndexOf(hello, l, 4) = -1
+Text IndexOf(hello, l, 4) = -1
+IndexOf(hello, h, 0) = 0
+Text IndexOf(hello, h, 0) = 0
+IndexOf(hello, h, 1) = -1
+Text IndexOf(hello, h, 1) = -1
+IndexOf(hello, o, 4) = 4
+Text IndexOf(hello, o, 4) = 4
+IndexOf(abcabc, abc, 1) = 3
+Text IndexOf(abcabc, abc, 1) = 3
+IndexOf(abcabc, , 2) = 2
+Text IndexOf(abcabc, , 2) = 2
+IndexOf(hello, l, 5) fails, as it should
+Text IndexOf(hello, l, 5) fails, as it should
+IndexOf(hello, l, 6) fails, as it should
+Text IndexOf(hello, l, 6) fails, as it should
+IndexOf(hello, l, -1) fails, as it should
+Text IndexOf(hello, l, -1) fails, as it should
+IndexOf(, a, 0) fails, as it should
+Text IndexOf(, a, 0) fails, as it should

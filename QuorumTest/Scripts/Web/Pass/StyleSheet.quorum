@@ -1,0 +1,101 @@
+use Libraries.Web.Styles.StyleSheet
+
+/*
+Tests StyleSheet: plain, state, width and script rules, the order they
+are written in (sorted by class name, widths narrowest first, script
+rules in the order added), the reset, and that a class name can have only
+one rule. Widths are written in rem, 16 pixels each.
+*/
+class Main
+    action Main
+        check
+            StyleSheet sheet
+            output "empty StyleSheet Generate() = [" + Flat(sheet:Generate()) + "]"
+        detect e
+            output "empty StyleSheet Generate() unexpected error: " + e:GetErrorMessage()
+        end
+        check
+            StyleSheet sheet
+            sheet:AddRule("b", "color:red;")
+            sheet:AddRule("a", "margin:0;")
+            output "AddRule(b, color:red;) then AddRule(a, margin:0;) Generate() sorts by name = [" + Flat(sheet:Generate()) + "]"
+        detect e
+            output "AddRule(b, color:red;) then AddRule(a, margin:0;) Generate() sorts by name unexpected error: " + e:GetErrorMessage()
+        end
+        check
+            StyleSheet sheet
+            sheet:AddStateRule("q1", "color:blue;", ":hover")
+            output "AddStateRule(q1, color:blue;, :hover) Generate() = [" + Flat(sheet:Generate()) + "]"
+        detect e
+            output "AddStateRule(q1, color:blue;, :hover) Generate() unexpected error: " + e:GetErrorMessage()
+        end
+        check
+            StyleSheet sheet
+            sheet:AddStateRule("q2", "opacity:0.5;", ":disabled ")
+            output "AddStateRule with a surroundings state (:disabled with a space) Generate() = [" + Flat(sheet:Generate()) + "]"
+        detect e
+            output "AddStateRule with a surroundings state (:disabled with a space) Generate() unexpected error: " + e:GetErrorMessage()
+        end
+        check
+            StyleSheet sheet
+            sheet:AddWidthRule("w1", "display:none;", 1024)
+            sheet:AddWidthRule("w2", "display:block;", 640)
+            output "AddWidthRule at 1024 and 640 Generate() orders widths narrowest first = [" + Flat(sheet:Generate()) + "]"
+        detect e
+            output "AddWidthRule at 1024 and 640 Generate() orders widths narrowest first unexpected error: " + e:GetErrorMessage()
+        end
+        check
+            StyleSheet sheet
+            sheet:AddWidthRule("x", "a:1;", 640)
+            sheet:AddWidthRule("y", "b:2;", 640)
+            output "two AddWidthRule at the same width share one media block = [" + Flat(sheet:Generate()) + "]"
+        detect e
+            output "two AddWidthRule at the same width share one media block unexpected error: " + e:GetErrorMessage()
+        end
+        check
+            StyleSheet sheet
+            sheet:AddScriptRule("z", "c:3;")
+            sheet:AddScriptRule("m", "d:4;")
+            sheet:AddRule("p", "e:5;")
+            output "AddScriptRule keeps the order added, after plain rules = [" + Flat(sheet:Generate()) + "]"
+        detect e
+            output "AddScriptRule keeps the order added, after plain rules unexpected error: " + e:GetErrorMessage()
+        end
+        check
+            StyleSheet sheet
+            sheet:SetReset(true)
+            output "SetReset(true) Generate() starts with the reset = " + sheet:Generate():StartsWith("*,::before,::after{box-sizing:border-box;}")
+        detect e
+            output "SetReset(true) Generate() starts with the reset unexpected error: " + e:GetErrorMessage()
+        end
+        check
+            StyleSheet sheet
+            sheet:AddRule("a", "x:1;")
+            sheet:AddRule("a", "x:2;")
+            output "AddRule(a) twice should fail but returned [" + sheet:Generate() + "]"
+        detect e
+            output "AddRule(a) twice fails, as it should"
+        end
+        check
+            StyleSheet sheet
+            sheet:AddRule("a", "x:1;")
+            sheet:AddStateRule("a", "x:2;", ":hover")
+            output "AddRule(a) then AddStateRule(a) should fail but returned [" + sheet:Generate() + "]"
+        detect e
+            output "AddRule(a) then AddStateRule(a) fails, as it should"
+        end
+    end
+
+    /* Shows line breaks as the two characters \n and double quotes as ', so each case is one line. */
+    action Flat(text value) returns text
+        text lf = ""
+        lf = lf:GetLineFeed()
+        text cr = ""
+        cr = cr:GetCarriageReturn()
+        text quote = ""
+        quote = quote:GetDoubleQuote()
+        text result = value:Replace(cr, "")
+        result = result:Replace(lf, "\n")
+        return result:Replace(quote, "'")
+    end
+end

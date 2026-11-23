@@ -1,0 +1,12 @@
+Figure AddNestedTag(Image) GetNumberOfNestedTags() = 1
+Figure AddText(a) AddText(b) Generate() = [<figure >ab</figure>]
+Figure GenerateNestedTags() with text and an Image = [a<img alt= 'x' >]
+Figure GetTag(1) is the second nested tag = true
+Figure Remove(Image) Generate() = [<figure >a</figure> count 1]
+Figure ToText() equals Generate() = true
+Ruby nested three deep Generate() = [<ruby ><menu ><hgroup >x</hgroup></menu></ruby>]
+two new elements have different GetHashCode() = true
+two new elements are not Equals = false
+an element Equals itself = true
+PlainText SetText(hi) Generate() = [hi]
+Figure GetTag(5) with one tag fails, as it should

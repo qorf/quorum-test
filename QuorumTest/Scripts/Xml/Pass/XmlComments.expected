@@ -1,0 +1,8 @@
+Read(<!--c--><a/>) events: Start(a) End(a)
+Read(<a><!-- c --></a>) events: Start(a) End(a)
+Read(<a><!-- <b>x</b> --></a>) events: Start(a) End(a)
+Read(<a>x<!--c-->y</a>) events: Start(a) Value[x] Value[y] End(a)
+Read(<a/><!--after-->) events: Start(a) End(a)
+Read(<a><!-- a-b --><b/></a>) events: Start(a) Start(b) End(b) End(a)
+Read(<a><!-- it's "q" & > --></a>) events: Start(a) End(a)
+Read(<a><!----></a>) events: Start(a) End(a)

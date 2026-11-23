@@ -1,0 +1,83 @@
+use Libraries.System.Path
+
+/*
+Tests the Path class: SetRelativePath, SetAbsolutePath, IsPathRelative,
+IsPathAbsolute and GetPath, and the InvalidPathError each raises when no
+path is set or the wrong kind of path is given. Only forward slashes are
+used, so no separator is changed on Mac or Linux. SetRelativePath given an
+absolute path must say the path is not a relative path (its message is
+checked for that wording).
+*/
+class Main
+    action Main
+        Path relative
+        check
+            relative:SetRelativePath("images/bar.png")
+            output "SetRelativePath(images/bar.png): GetPath() = [" + relative:GetPath() + "]"
+            output "SetRelativePath(images/bar.png): IsPathRelative() = " + relative:IsPathRelative()
+            output "SetRelativePath(images/bar.png): IsPathAbsolute() = " + relative:IsPathAbsolute()
+        detect e
+            output "SetRelativePath(images/bar.png) unexpected error: " + e:GetErrorMessage()
+        end
+        Path dotted
+        check
+            dotted:SetRelativePath("../../hello.txt")
+            output "SetRelativePath(../../hello.txt): GetPath() = [" + dotted:GetPath() + "]"
+            output "SetRelativePath(../../hello.txt): IsPathRelative() = " + dotted:IsPathRelative()
+        detect e
+            output "SetRelativePath(../../hello.txt) unexpected error: " + e:GetErrorMessage()
+        end
+        Path absolute
+        check
+            absolute:SetAbsolutePath("/Users/jeff")
+            output "SetAbsolutePath(/Users/jeff): GetPath() = [" + absolute:GetPath() + "]"
+            output "SetAbsolutePath(/Users/jeff): IsPathAbsolute() = " + absolute:IsPathAbsolute()
+            output "SetAbsolutePath(/Users/jeff): IsPathRelative() = " + absolute:IsPathRelative()
+        detect e
+            output "SetAbsolutePath(/Users/jeff) unexpected error: " + e:GetErrorMessage()
+        end
+        Path drive
+        check
+            drive:SetAbsolutePath("C:/Windows")
+            output "SetAbsolutePath(C:/Windows): IsPathAbsolute() = " + drive:IsPathAbsolute()
+        detect e
+            output "SetAbsolutePath(C:/Windows) unexpected error: " + e:GetErrorMessage()
+        end
+
+        Path empty
+        check
+            text value = empty:GetPath()
+            output "GetPath() with no path set should fail but returned [" + value + "]"
+        detect e
+            output "GetPath() with no path set fails, as it should"
+        end
+        check
+            boolean value = empty:IsPathRelative()
+            output "IsPathRelative() with no path set should fail but returned " + value
+        detect e
+            output "IsPathRelative() with no path set fails, as it should"
+        end
+        check
+            boolean value = empty:IsPathAbsolute()
+            output "IsPathAbsolute() with no path set should fail but returned " + value
+        detect e
+            output "IsPathAbsolute() with no path set fails, as it should"
+        end
+        Path wrongAbsolute
+        check
+            wrongAbsolute:SetAbsolutePath("hello.txt")
+            output "SetAbsolutePath(hello.txt) should fail but returned normally"
+        detect e
+            output "SetAbsolutePath(hello.txt) fails, as it should"
+        end
+        Path wrongRelative
+        check
+            wrongRelative:SetRelativePath("/Users/jeff")
+            output "SetRelativePath(/Users/jeff) should fail but returned normally"
+        detect e
+            output "SetRelativePath(/Users/jeff) fails, as it should"
+            text message = e:GetErrorMessage()
+            output "SetRelativePath(/Users/jeff) error says not a relative path = " + message:Contains("is not a relative path")
+        end
+    end
+end

@@ -1,0 +1,128 @@
+use Libraries.Compute.Noise.PerlinNoise
+use Libraries.Compute.Math
+
+/*
+PerlinNoise properties that follow from its documentation: the noise is
+exactly zero at every lattice crossing, stays between -1 and 1, is the
+same every time a position is asked about (whatever was asked before),
+and the same seed always gives the same noise. Additive, multiplicative
+and ridged noise are checked against the formulas in their documentation,
+built from GetNoise. Comparisons allow a difference of 1E-12.
+*/
+class Main
+    Math math
+
+    action Main
+        PerlinNoise noise
+        noise:SetSeed(1979)
+        check
+            output "GetNoise(0, 0) is zero = " + (noise:GetNoise(0, 0) = 0)
+            output "GetNoise(3, 7) is zero = " + (noise:GetNoise(3, 7) = 0)
+            output "GetNoise(-2, 5) is zero = " + (noise:GetNoise(-2, 5) = 0)
+            output "GetNoise(300, -41) is zero = " + (noise:GetNoise(300, -41) = 0)
+        detect e
+            output "lattice zero unexpected error: " + e:GetErrorMessage()
+        end
+        check
+            boolean inside = true
+            boolean someNonZero = false
+            integer i = 0
+            repeat while i < 400
+                number x = i * 0.137 - 20
+                number y = i * 0.291 - 50
+                number value = noise:GetNoise(x, y)
+                if value < -1 or value > 1
+                    inside = false
+                end
+                if value not= 0
+                    someNonZero = true
+                end
+                i = i + 1
+            end
+            output "GetNoise stays between -1 and 1 over 400 positions = " + inside
+            output "GetNoise is not zero everywhere off the lattice = " + someNonZero
+        detect e
+            output "range unexpected error: " + e:GetErrorMessage()
+        end
+        check
+            number first = noise:GetNoise(12.3, 45.6)
+            number other = noise:GetNoise(-7.1, 2.2)
+            number again = noise:GetNoise(12.3, 45.6)
+            output "GetNoise(12.3, 45.6) is the same after asking about another position = " + (first = again)
+        detect e
+            output "repeat unexpected error: " + e:GetErrorMessage()
+        end
+        check
+            PerlinNoise twin
+            twin:SetSeed(1979)
+            output "a second PerlinNoise with seed 1979 gives the same GetNoise(12.3, 45.6) = " + (twin:GetNoise(12.3, 45.6) = noise:GetNoise(12.3, 45.6))
+            PerlinNoise stranger
+            stranger:SetSeed(42)
+            boolean differs = false
+            integer i = 0
+            repeat while i < 50
+                if stranger:GetNoise(i * 0.37 + 0.1, i * 0.53 + 0.2) not= noise:GetNoise(i * 0.37 + 0.1, i * 0.53 + 0.2)
+                    differs = true
+                end
+                i = i + 1
+            end
+            output "seed 42 gives different noise from seed 1979 = " + differs
+        detect e
+            output "seed unexpected error: " + e:GetErrorMessage()
+        end
+        check
+            noise:SetFrequency(0.1)
+            noise:SetOctaves(2)
+            noise:SetPersistence(0.5)
+            noise:SetLacunarity(2)
+            number x = 13.7
+            number y = -8.2
+            number low = noise:GetNoise(x * 0.1, y * 0.1)
+            number high = noise:GetNoise(x * 0.2, y * 0.2)
+            number additive = (low + 0.5 * high) / 1.5
+            output "GetAdditiveNoise matches (n1 + 0.5 n2) / 1.5 = " + math:Equals(noise:GetAdditiveNoise(x, y), additive, 0.000000000001)
+            number multiplicative = ((low + 1) / 2) * ((high + 1) / 2) * 2 - 1
+            output "GetMultiplicativeNoise matches its formula = " + math:Equals(noise:GetMultiplicativeNoise(x, y), multiplicative, 0.000000000001)
+            noise:SetOctaves(1)
+            number folded = 1 - math:AbsoluteValue(low)
+            output "GetRidgedNoise with one octave matches (1 - |n|)^2 * 2 - 1 = " + math:Equals(noise:GetRidgedNoise(x, y), folded * folded * 2 - 1, 0.000000000001)
+            number ridge = 1 - folded * folded
+            output "GetRidgedMultifractalNoise with one octave matches (1 - (1 - |n|)^2) * 2 - 1 = " + math:Equals(noise:GetRidgedMultifractalNoise(x, y), ridge * 2 - 1, 0.000000000001)
+        detect e
+            output "formula unexpected error: " + e:GetErrorMessage()
+        end
+        check
+            noise:SetWarpStrength(0)
+            output "GetWarpedX(5.5, 6.5) with warp strength 0 = " + noise:GetWarpedX(5.5, 6.5)
+            output "GetWarpedY(5.5, 6.5) with warp strength 0 = " + noise:GetWarpedY(5.5, 6.5)
+        detect e
+            output "warp unexpected error: " + e:GetErrorMessage()
+        end
+        check
+            noise:SetOctaves(4)
+            noise:SetFrequency(0.02)
+            noise:SetWarpStrength(40)
+            boolean inside = true
+            integer i = 0
+            repeat while i < 100
+                number x = i * 3.7
+                number y = i * 1.9
+                number additive = noise:GetAdditiveNoise(x, y)
+                number multiplicative = noise:GetMultiplicativeNoise(x, y)
+                number ridged = noise:GetRidgedNoise(x, y)
+                number canyon = noise:GetRidgedMultifractalNoise(x, y)
+                number worn = noise:GetSlopeWeightedNoise(x, y)
+                if additive < -1 or additive > 1 or multiplicative < -1 or multiplicative > 1
+                    inside = false
+                end
+                if ridged < -1 or ridged > 1 or canyon < -1 or canyon > 1 or worn < -1 or worn > 1
+                    inside = false
+                end
+                i = i + 1
+            end
+            output "every combined noise stays between -1 and 1 over 100 positions = " + inside
+        detect e
+            output "combined range unexpected error: " + e:GetErrorMessage()
+        end
+    end
+end

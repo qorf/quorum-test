@@ -1,0 +1,9 @@
+Spanish names, EEEE d 'de' MMMM 'de' yyyy: ToText(2026-11-03) = [martes 3 de noviembre de 2026]
+Spanish names, EEE d MMM: ToText(2026-11-03) = [mar 3 nov]
+Spanish names: Parse(15 de AGOSTO de 2025) = [2025-08-15]
+Spanish names: Parse(15 de ago de 2025) = [2025-08-15]
+Spanish names: Parse(15 de August de 2025) is undefined = true
+After SetMonthNames(11 names), SetMonthNames(undefined), SetDayNames(6 names), SetDayNames(undefined): ToText(2026-11-03) = [martes noviembre]
+After changing the original array: ToText(2026-11-03) = [martes noviembre]
+GetLongFormat() of the Spanish format: ToText(2026-11-03) = [noviembre 3, 2026]
+GetISOFormat() of the Spanish format: ToText(2026-11-03) = [2026-11-03]

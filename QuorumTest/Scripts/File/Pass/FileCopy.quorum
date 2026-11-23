@@ -1,0 +1,117 @@
+use Libraries.System.File
+
+/*
+Tests Copy(File) and Copy(File, boolean) inside a scratch folder
+(FileTestsWork/FileCopy), deleted at the end. Copy returns true when it
+succeeds and false otherwise, as the documentation says. A recursive copy of
+a folder copies its files and subfolders. When part of a recursive copy
+fails, here because the destination is a file, so nothing can be copied into
+it, the copy did not succeed, so it must return false.
+*/
+class Main
+    action Main
+        File work
+        work:SetPath("FileTestsWork/FileCopy")
+        work:Delete(true)
+        boolean made = work:CreateDirectories()
+
+        File source
+        source:SetPath("FileTestsWork/FileCopy/source.txt")
+        source:Write("original")
+        File copy
+        copy:SetPath("FileTestsWork/FileCopy/copy.txt")
+        check
+            output "Copy(source.txt to copy.txt) = " + source:Copy(copy)
+        detect e
+            output "Copy(source.txt to copy.txt) unexpected error: " + e:GetErrorMessage()
+        end
+        check
+            output "Read(copy.txt) = [" + copy:Read() + "]"
+        detect e
+            output "Read(copy.txt) unexpected error: " + e:GetErrorMessage()
+        end
+        check
+            output "Read(source.txt) after Copy = [" + source:Read() + "]"
+        detect e
+            output "Read(source.txt) unexpected error: " + e:GetErrorMessage()
+        end
+        check
+            source:Write("changed")
+            output "Copy(source.txt over an existing copy.txt) = " + source:Copy(copy)
+            output "Read(copy.txt) after copying over it = [" + copy:Read() + "]"
+        detect e
+            output "Copy(source.txt over copy.txt) unexpected error: " + e:GetErrorMessage()
+        end
+        File second
+        second:SetPath("FileTestsWork/FileCopy/second.txt")
+        check
+            output "Copy(source.txt to second.txt, false) = " + source:Copy(second, false)
+            output "Read(second.txt) = [" + second:Read() + "]"
+        detect e
+            output "Copy(source.txt, false) unexpected error: " + e:GetErrorMessage()
+        end
+
+        File missing
+        missing:SetPath("FileTestsWork/FileCopy/missing.txt")
+        File target
+        target:SetPath("FileTestsWork/FileCopy/target.txt")
+        check
+            output "Copy(missing.txt to target.txt) = " + missing:Copy(target)
+        detect e
+            output "Copy(missing.txt) unexpected error: " + e:GetErrorMessage()
+        end
+        check
+            output "Copy(missing.txt to target.txt, true) = " + missing:Copy(target, true)
+        detect e
+            output "Copy(missing.txt, true) unexpected error: " + e:GetErrorMessage()
+        end
+
+        File tree
+        tree:SetPath("FileTestsWork/FileCopy/tree")
+        made = tree:CreateDirectory()
+        File leaf
+        leaf:SetPath("FileTestsWork/FileCopy/tree/leaf.txt")
+        leaf:Write("leaf")
+        File branch
+        branch:SetPath("FileTestsWork/FileCopy/tree/branch")
+        made = branch:CreateDirectory()
+        File twig
+        twig:SetPath("FileTestsWork/FileCopy/tree/branch/twig.txt")
+        twig:Write("twig")
+
+        File treeCopy
+        treeCopy:SetPath("FileTestsWork/FileCopy/treeCopy")
+        check
+            output "Copy(folder tree to treeCopy, true) = " + tree:Copy(treeCopy, true)
+        detect e
+            output "Copy(folder tree, true) unexpected error: " + e:GetErrorMessage()
+        end
+        File copiedLeaf
+        copiedLeaf:SetPath("FileTestsWork/FileCopy/treeCopy/leaf.txt")
+        check
+            output "Read(treeCopy/leaf.txt) = [" + copiedLeaf:Read() + "]"
+        detect e
+            output "Read(treeCopy/leaf.txt) unexpected error: " + e:GetErrorMessage()
+        end
+        File copiedTwig
+        copiedTwig:SetPath("FileTestsWork/FileCopy/treeCopy/branch/twig.txt")
+        check
+            output "Read(treeCopy/branch/twig.txt) = [" + copiedTwig:Read() + "]"
+        detect e
+            output "Read(treeCopy/branch/twig.txt) unexpected error: " + e:GetErrorMessage()
+        end
+
+        File blocker
+        blocker:SetPath("FileTestsWork/FileCopy/blocker.txt")
+        blocker:Write("a file, not a folder")
+        check
+            output "Copy(folder tree into the file blocker.txt, true) = " + tree:Copy(blocker, true)
+        detect e
+            output "Copy(folder tree into blocker.txt, true) fails, as it should"
+        end
+        work:Delete(true)
+        File top
+        top:SetPath("FileTestsWork")
+        boolean removed = top:Delete()
+    end
+end

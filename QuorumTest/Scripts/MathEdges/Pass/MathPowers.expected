@@ -1,0 +1,16 @@
+RaiseNaturalNumberToPower(0) = 1.0
+RaiseNaturalNumberToPower(1) rounded to 10 places = 2.7182818285
+RaiseNaturalNumberToPower(-1) rounded to 10 places = 0.3678794412
+RaiseNaturalNumberToPower(2) rounded to 10 places = 7.3890560989
+RaiseNaturalNumberToPower(NaturalLogarithm(5)) rounded to 10 places = 5.0
+RaiseToPower(0.0, 0.0) = 1.0
+RaiseToPower(5.0, 0.0) = 1.0
+RaiseToPower(2.0, 10.0) = 1024.0
+RaiseToPower(2.0, -1.0) = 0.5
+RaiseToPower(-2.0, 3.0) = -8.0
+RaiseToPower(-2.0, 2.0) = 4.0
+RaiseToPower(9.0, 0.5) = 3.0
+RaiseToPower(-8.0, 0.5) = NaN
+RaiseToPower(0.0, -1.0) = Infinity
+RaiseToPower(10.0, 300.0) = 1.0E300
+RaiseToPower(10.0, 400.0) = Infinity

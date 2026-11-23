@@ -1,0 +1,3 @@
+GetShortDayofWeekName test starts
+ParseDate(2024-01-01): GetShortDayofWeekName() = [Mon]
+ParseDate(2024-01-07): GetShortDayofWeekName() = [Sun]

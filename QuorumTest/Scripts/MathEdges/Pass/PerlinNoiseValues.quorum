@@ -1,0 +1,49 @@
+use Libraries.Compute.Noise.PerlinNoise
+use Libraries.Compute.Math
+
+/*
+PerlinNoise values for a fixed seed, rounded to 4 places. The noise is
+built from Libraries.Compute.Random, which is written in Quorum, so the
+same seed must give the same values on every back end. These expected
+values are the Java back end's output (there is no independent way to
+work them out by hand); the PerlinNoiseProperties test checks the values'
+documented properties instead. A difference here on another back end means
+its noise, and so any terrain built from it, differs from Java's.
+*/
+class Main
+    Math math
+
+    action Main
+        PerlinNoise noise
+        noise:SetSeed(1979)
+        Show(noise, 0.5, 0.5)
+        Show(noise, 1.25, 2.75)
+        Show(noise, -3.3, 4.1)
+        Show(noise, 100.7, -250.2)
+        noise:SetFrequency(0.02)
+        noise:SetOctaves(6)
+        check
+            output "GetAdditiveNoise(40, 90) = " + math:Round(noise:GetAdditiveNoise(40, 90), 4)
+            output "GetMultiplicativeNoise(40, 90) = " + math:Round(noise:GetMultiplicativeNoise(40, 90), 4)
+            output "GetRidgedNoise(40, 90) = " + math:Round(noise:GetRidgedNoise(40, 90), 4)
+            output "GetRidgedMultifractalNoise(40, 90) = " + math:Round(noise:GetRidgedMultifractalNoise(40, 90), 4)
+            output "GetSlopeWeightedNoise(40, 90) = " + math:Round(noise:GetSlopeWeightedNoise(40, 90), 4)
+            output "GetWarpedX(40, 90) = " + math:Round(noise:GetWarpedX(40, 90), 4)
+            output "GetWarpedY(40, 90) = " + math:Round(noise:GetWarpedY(40, 90), 4)
+        detect e
+            output "combined noise unexpected error: " + e:GetErrorMessage()
+        end
+        PerlinNoise other
+        other:SetSeed(5)
+        Show(other, 0.5, 0.5)
+        Show(other, 7.77, 3.33)
+    end
+
+    action Show(PerlinNoise noise, number x, number y)
+        check
+            output "seed " + noise:GetSeed() + " GetNoise(" + x + ", " + y + ") = " + math:Round(noise:GetNoise(x, y), 4)
+        detect e
+            output "seed " + noise:GetSeed() + " GetNoise(" + x + ", " + y + ") unexpected error: " + e:GetErrorMessage()
+        end
+    end
+end

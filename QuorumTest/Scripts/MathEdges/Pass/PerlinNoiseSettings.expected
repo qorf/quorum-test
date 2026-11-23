@@ -1,0 +1,23 @@
+default GetSeed = 0.0
+default GetFrequency = 0.01
+default GetOctaves = 4
+default GetLacunarity = 2.0
+default GetPersistence = 0.5
+default GetRidgeGain = 2.0
+default GetSlopeAlpha = 0.15
+default GetSlopeSpacing = 1.0
+default GetWarpFrequency = 0.004
+default GetWarpStrength = 40.0
+after setting: seed 77.0, frequency 0.5, octaves 6, lacunarity 3.0, persistence 0.25
+after setting: ridge gain 1.5, slope alpha 0.3, slope spacing 2.0, warp frequency 0.01, warp strength 10.0
+SetOctaves(0) then GetOctaves = 1
+SetOctaves(-5) then GetOctaves = 1
+ToUnitRange(-1.0) = 0.0
+ToUnitRange(0.0) = 0.5
+ToUnitRange(1.0) = 1.0
+ToUnitRange(0.5) = 0.75
+ToUnitRange(2.0) = 1.0
+ToUnitRange(-3.0) = 0.0
+WeightBySlope(0.5, 0, 0) = 0.5
+WeightBySlope(1, 3, 4) rounded to 4 places = 0.4724
+WeightBySlope(-0.8, -3, 4) rounded to 4 places = -0.3779

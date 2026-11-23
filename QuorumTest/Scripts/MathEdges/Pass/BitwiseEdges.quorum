@@ -1,0 +1,106 @@
+use Libraries.Compute.BitwiseOperations
+
+/*
+BitwiseOperations at the edges of a 32 bit integer. Integers are 32 bit two's
+complement, so ShiftLeft discards the bits that leave the left end (the
+documentation says so) and can change the sign, ShiftRight keeps the sign
+bit, and ShiftRightPositive shifts in zeros. Shifting by 0 leaves the value
+alone. Shift amounts of 32 or more are left out: the documentation doesn't
+say what they do.
+*/
+class Main
+    BitwiseOperations bits
+
+    action Main
+        integer maximum = 2147483647
+        integer minimum = -2147483647 - 1
+        check
+            output "And(-1, 12345) = " + bits:And(-1, 12345)
+        detect e
+            output "And(-1, 12345) unexpected error: " + e:GetErrorMessage()
+        end
+        check
+            output "And(-2147483648, -1) = " + bits:And(minimum, -1)
+        detect e
+            output "And(-2147483648, -1) unexpected error: " + e:GetErrorMessage()
+        end
+        check
+            output "Or(-2147483648, 1) = " + bits:Or(minimum, 1)
+        detect e
+            output "Or(-2147483648, 1) unexpected error: " + e:GetErrorMessage()
+        end
+        check
+            output "Or(2147483647, -2147483648) = " + bits:Or(maximum, minimum)
+        detect e
+            output "Or(2147483647, -2147483648) unexpected error: " + e:GetErrorMessage()
+        end
+        check
+            output "ExclusiveOr(-1, 0) = " + bits:ExclusiveOr(-1, 0)
+        detect e
+            output "ExclusiveOr(-1, 0) unexpected error: " + e:GetErrorMessage()
+        end
+        check
+            output "ExclusiveOr(-1, 2147483647) = " + bits:ExclusiveOr(-1, maximum)
+        detect e
+            output "ExclusiveOr(-1, 2147483647) unexpected error: " + e:GetErrorMessage()
+        end
+        check
+            output "Negate(0) = " + bits:Negate(0)
+        detect e
+            output "Negate(0) unexpected error: " + e:GetErrorMessage()
+        end
+        check
+            output "Negate(2147483647) = " + bits:Negate(maximum)
+        detect e
+            output "Negate(2147483647) unexpected error: " + e:GetErrorMessage()
+        end
+        check
+            output "Negate(-2147483648) = " + bits:Negate(minimum)
+        detect e
+            output "Negate(-2147483648) unexpected error: " + e:GetErrorMessage()
+        end
+        ShowLeft(1, 30)
+        ShowLeft(1, 31)
+        ShowLeft(3, 31)
+        ShowLeft(-1, 1)
+        ShowLeft(1073741824, 1)
+        ShowLeft(maximum, 1)
+        ShowLeft(5, 0)
+        ShowRight(-1, 31)
+        ShowRight(-8, 1)
+        ShowRight(-7, 1)
+        ShowRight(minimum, 31)
+        ShowRight(maximum, 30)
+        ShowRight(-5, 0)
+        ShowPositive(-1, 0)
+        ShowPositive(-1, 1)
+        ShowPositive(-1, 31)
+        ShowPositive(-8, 1)
+        ShowPositive(minimum, 31)
+        ShowPositive(16, 2)
+    end
+
+    action ShowLeft(integer value, integer amount)
+        check
+            output "ShiftLeft(" + value + ", " + amount + ") = " + bits:ShiftLeft(value, amount)
+        detect e
+            output "ShiftLeft(" + value + ", " + amount + ") unexpected error: " + e:GetErrorMessage()
+        end
+    end
+
+    action ShowRight(integer value, integer amount)
+        check
+            output "ShiftRight(" + value + ", " + amount + ") = " + bits:ShiftRight(value, amount)
+        detect e
+            output "ShiftRight(" + value + ", " + amount + ") unexpected error: " + e:GetErrorMessage()
+        end
+    end
+
+    action ShowPositive(integer value, integer amount)
+        check
+            output "ShiftRightPositive(" + value + ", " + amount + ") = " + bits:ShiftRightPositive(value, amount)
+        detect e
+            output "ShiftRightPositive(" + value + ", " + amount + ") unexpected error: " + e:GetErrorMessage()
+        end
+    end
+end

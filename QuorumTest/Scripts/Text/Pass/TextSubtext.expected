@@ -1,0 +1,44 @@
+GetSubtext(hello, 0) = [hello]
+Text GetSubtext(hello, 0) = [hello]
+GetSubtext(hello, 1) = [ello]
+Text GetSubtext(hello, 1) = [ello]
+GetSubtext(hello, 4) = [o]
+Text GetSubtext(hello, 4) = [o]
+GetSubtext(hello, 5) = []
+Text GetSubtext(hello, 5) = []
+GetSubtext(, 0) = []
+Text GetSubtext(, 0) = []
+GetSubtext( a , 2) = [ ]
+Text GetSubtext( a , 2) = [ ]
+GetSubtext(hello, 6) fails, as it should
+Text GetSubtext(hello, 6) fails, as it should
+GetSubtext(hello, -1) fails, as it should
+Text GetSubtext(hello, -1) fails, as it should
+GetSubtext(, 1) fails, as it should
+Text GetSubtext(, 1) fails, as it should
+GetSubtext(hello, 0, 5) = [hello]
+Text GetSubtext(hello, 0, 5) = [hello]
+GetSubtext(hello, 0, 0) = []
+Text GetSubtext(hello, 0, 0) = []
+GetSubtext(hello, 1, 3) = [el]
+Text GetSubtext(hello, 1, 3) = [el]
+GetSubtext(hello, 4, 5) = [o]
+Text GetSubtext(hello, 4, 5) = [o]
+GetSubtext(hello, 5, 5) = []
+Text GetSubtext(hello, 5, 5) = []
+GetSubtext(, 0, 0) = []
+Text GetSubtext(, 0, 0) = []
+GetSubtext(hello world, 0, 5) = [hello]
+Text GetSubtext(hello world, 0, 5) = [hello]
+GetSubtext(hello world, 5, 6) = [ ]
+Text GetSubtext(hello world, 5, 6) = [ ]
+GetSubtext(hello, 0, 6) fails, as it should
+Text GetSubtext(hello, 0, 6) fails, as it should
+GetSubtext(hello, -1, 2) fails, as it should
+Text GetSubtext(hello, -1, 2) fails, as it should
+GetSubtext(hello, 3, 2) fails, as it should
+Text GetSubtext(hello, 3, 2) fails, as it should
+GetSubtext(hello, 6, 6) fails, as it should
+Text GetSubtext(hello, 6, 6) fails, as it should
+GetSubtext(, 0, 1) fails, as it should
+Text GetSubtext(, 0, 1) fails, as it should

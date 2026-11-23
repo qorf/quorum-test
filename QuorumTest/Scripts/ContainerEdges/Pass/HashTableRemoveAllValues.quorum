@@ -1,0 +1,64 @@
+use Libraries.Containers.HashTable
+use Libraries.Containers.Array
+
+/*
+    RemoveAllValues with a value stored under several keys. The HashTable
+    does not require unique values (Add accepts the same value under
+    different keys), and the action's name and its own description ("removes
+    all instances of a key-value pair") say every pair with that value goes.
+    Its description also claims values are unique and "this only removes at
+    most one value"; that claim is false for this class, so this test follows
+    the name. A judgment call: drop it if "at most one" is the intent.
+*/
+class Main
+    action Show(text value) returns text
+        if value = undefined
+            return "undefined"
+        end
+        return "[" + value + "]"
+    end
+
+    action Describe(Array<text> array) returns text
+        text result = "["
+        integer i = 0
+        repeat while i < array:GetSize()
+            if i > 0
+                result = result + ","
+            end
+            text value = array:Get(i)
+            if value = undefined
+                result = result + "undefined"
+            else
+                result = result + value
+            end
+            i = i + 1
+        end
+        return result + "]"
+    end
+
+    // The keys sorted, so the output does not depend on hash order.
+    action SortedKeys(HashTable<text, text> table) returns text
+        Array<text> keys = table:CopyToKeyArray()
+        keys:Sort()
+        return Describe(keys)
+    end
+
+    action Main
+        HashTable<text, text> table
+        table:Add("a", "same")
+        table:Add("b", "other")
+        table:Add("c", "same")
+        table:Add("d", "same")
+        check
+            boolean removed = table:RemoveAllValues("same")
+            output "HashTable{a:same,b:other,c:same,d:same} RemoveAllValues(same) = " + removed + ", size " + table:GetSize() + ", keys " + SortedKeys(table) + ", HasValue(same) = " + table:HasValue("same")
+        detect e
+            output "HashTable RemoveAllValues(same) unexpected error: " + e:GetErrorMessage()
+        end
+        check
+            output "HashTable{b:other} RemoveAllValues(same) again = " + table:RemoveAllValues("same") + ", size " + table:GetSize()
+        detect e
+            output "HashTable RemoveAllValues(same) again unexpected error: " + e:GetErrorMessage()
+        end
+    end
+end

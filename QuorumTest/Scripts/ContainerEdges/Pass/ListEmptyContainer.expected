@@ -1,0 +1,16 @@
+List[] GetSize() = 0, IsEmpty() = true
+List[] Get(0) fails, as it should
+List[] RemoveAt(0) fails, as it should
+List[] GetFromFront() = undefined
+List[] GetFromEnd() = undefined
+List[] RemoveFromFront() = undefined
+List[] RemoveFromEnd() = undefined
+List[] GetFirstLocation(a) = -1, GetLastLocation(a) = -1
+List[] Has(a) = false, Remove(a) = false, RemoveAll(a) = false
+List[] Sort() leaves size 0
+List[] Copy() has size 0, CopyToArray() has size 0
+List[] GetIterator() HasNext() = false
+List[] GetIterator() GetCurrent() = undefined
+List[] Empty() leaves size 0
+List[] AddToFront(b), AddToEnd(c), Add(0, a) gives [a,b,c], GetFromEnd() = [c]
+List[a,b,c] Empty() then Add(x) gives [x], GetFromFront() = [x], GetFromEnd() = [x]

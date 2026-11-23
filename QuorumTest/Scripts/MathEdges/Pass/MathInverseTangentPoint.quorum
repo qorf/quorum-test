@@ -1,0 +1,46 @@
+use Libraries.Compute.Math
+
+/*
+Math:InverseTangent(x, y) and Math:InverseTangent2(x, y), the angle of the
+point (x, y) measured from the positive x axis, in radians from -pi to pi.
+InverseTangent(x, y) is documented as the inverse tangent of the cartesian
+point (x, y). InverseTangent2 has no documentation, but takes parameters
+named x and y in the same order, so it is expected to give the same angle
+for the same point. The point (0, 0) has no angle; InverseTangent2 raises
+an error for it on purpose, so that failure is the expected result.
+Answers are rounded to 10 places.
+*/
+class Main
+    Math math
+
+    action Main
+        Show(1, 1)
+        Show(1, 0)
+        Show(0, 1)
+        Show(-1, 0)
+        Show(0, -1)
+        Show(-1, -1)
+        Show(1, -1)
+        Show(-1, 1)
+        Show(2, 3)
+        check
+            number result = math:InverseTangent2(0, 0)
+            output "InverseTangent2(0, 0) should fail but returned " + result
+        detect e
+            output "InverseTangent2(0, 0) fails, as it should"
+        end
+    end
+
+    action Show(number x, number y)
+        check
+            output "InverseTangent(" + x + ", " + y + ") = " + math:Round(math:InverseTangent(x, y), 10)
+        detect e
+            output "InverseTangent(" + x + ", " + y + ") unexpected error: " + e:GetErrorMessage()
+        end
+        check
+            output "InverseTangent2(" + x + ", " + y + ") = " + math:Round(math:InverseTangent2(x, y), 10)
+        detect e
+            output "InverseTangent2(" + x + ", " + y + ") unexpected error: " + e:GetErrorMessage()
+        end
+    end
+end

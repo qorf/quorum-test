@@ -1,0 +1,64 @@
+use Libraries.Data.Formats.JavaScriptObjectNotation
+
+/*
+JavaScriptObjectNotation:Read must turn the escapes of RFC 8259 section 7
+into the characters they stand for: \" \\ \/ \n \t \r \b \f and \u0041.
+Each case reads {"k": "..."} and prints GetValue("k"). Control characters
+in the result are shown as <LF>, <TAB>, <CR>, <BS> (backspace) and <FF>
+(form feed). The case's JSON is printed as it was read.
+*/
+class Main
+    action Main
+        ReadValue("plain")
+        ReadValue("a\`b")
+        ReadValue("a\\b")
+        ReadValue("a\/b")
+        ReadValue("a\nb")
+        ReadValue("a\tb")
+        ReadValue("a\rb")
+        ReadValue("a\bb")
+        ReadValue("a\fb")
+        ReadValue("\u0041\u00e9")
+        ReadValue("end\\")
+        ReadKey("k\`ey")
+    end
+
+    action Show(text value) returns text
+        text result = value:Replace(value:GetCarriageReturn(), "<CR>")
+        result = result:Replace(value:GetLineFeed(), "<LF>")
+        result = result:Replace(value:GetTab(), "<TAB>")
+        result = result:Replace(value:GetUnicodeValue(8), "<BS>")
+        result = result:Replace(value:GetUnicodeValue(12), "<FF>")
+        result = result:Replace(value:GetUnicodeValue(233), "<e-acute>")
+        return result
+    end
+
+    action ReadValue(text raw)
+        text dq = ""
+        dq = dq:GetDoubleQuote()
+        text escaped = raw:Replace("`", dq)
+        text json = "{" + dq + "k" + dq + ": " + dq + escaped + dq + "}"
+        check
+            JavaScriptObjectNotation object
+            object:Read(json)
+            output "Read(" + json + ") GetValue(k) = [" + Show(object:GetValue("k")) + "]"
+        detect e
+            output "Read(" + json + ") unexpected error: " + e:GetErrorMessage()
+        end
+    end
+
+    action ReadKey(text raw)
+        text dq = ""
+        dq = dq:GetDoubleQuote()
+        text escaped = raw:Replace("`", dq)
+        text json = "{" + dq + escaped + dq + ": " + dq + "v" + dq + "}"
+        check
+            JavaScriptObjectNotation object
+            object:Read(json)
+            JavaScriptObjectNotation child = object:Get(0)
+            output "Read(" + json + ") Get(0):GetKey() = [" + Show(child:GetKey()) + "]"
+        detect e
+            output "Read(" + json + ") unexpected error: " + e:GetErrorMessage()
+        end
+    end
+end

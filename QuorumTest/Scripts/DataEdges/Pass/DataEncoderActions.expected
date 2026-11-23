@@ -1,0 +1,6 @@
+EncodeImageAsDataURI(text a.png holding abc) = [data:image/png;base64,YWJj]
+EncodeImageAsDataURI(File b.gif holding hello) = [data:image/gif;base64,aGVsbG8=]
+EncodeImageAsDataURI(text c.jpg holding abc) = [data:image/jpeg;base64,YWJj]
+EncodeImageAsDataURI(text d.svg holding abc) = [data:image/svg+xml;base64,YWJj]
+EncodeImageAsDataURI(text missing.png) fails, as it should
+scratch folder removed = [true]

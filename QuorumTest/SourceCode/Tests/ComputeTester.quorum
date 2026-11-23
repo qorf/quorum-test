@@ -1,0 +1,46 @@
+package Libraries.Language.Compile.Test
+
+use Libraries.Testing.QuorumTest
+use Libraries.Testing.ScriptCheck
+
+/*
+ComputeTester runs the matrix multiply scripts in Scripts/Compute/Pass,
+brought over from the compute shader project's CpuMultiplyTest and
+HardwareMultiplyFallbackTest. Only the checks that a CPU can answer are
+here; the tests that need a graphics card are not.
+
+Back ends:
+CpuMultiply uses Multiply:Transform and TransformInSoftware, plain CPU
+code, so it runs on bytecode, JavaScript and Python. Multiply creates
+shader code only for the graphics card, and its comment notes that Python
+has no graphics card support, so the CPU path is meant to work everywhere.
+
+MultiplyFallback calls TransformInHardware, which asks GameStateManager
+for a compute device. On bytecode that looks for Vulkan, and the range
+check sends these numbers to the CPU whether or not a card is found. In a
+web browser GetComputeDevice finds no device, so JavaScript uses the CPU
+too. Python can't look for a Vulkan device, so it is not run there.
+*/
+class ComputeTester
+    QuorumTest suite = undefined
+    ScriptCheck scripts
+    text path = "Scripts/Compute/Pass/"
+
+    action Test
+        scripts:SetSuite(suite)
+        scripts:Check(path + "CpuMultiply", true, true)
+        scripts:Check(path + "MultiplyFallback", true, false)
+    end
+
+    action GetName returns text
+        return "Compute Tests"
+    end
+
+    action GetCompilerTestSuite returns QuorumTest
+        return suite
+    end
+
+    action SetCompilerTestSuite(QuorumTest suite)
+        me:suite = suite
+    end
+end

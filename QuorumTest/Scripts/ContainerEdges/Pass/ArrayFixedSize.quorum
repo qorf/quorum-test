@@ -1,0 +1,129 @@
+use Libraries.Containers.Array
+
+/*
+    An Array with auto-resize off holds exactly GetMaxSize() items (10 by
+    default). Every way of adding must accept items until the Array is full and
+    fail only after that: Add(value), Add(location, value), AddToFront and
+    AddToEnd.
+*/
+class Main
+    action Show(text value) returns text
+        if value = undefined
+            return "undefined"
+        end
+        return "[" + value + "]"
+    end
+
+    action Describe(Array<text> array) returns text
+        text result = "["
+        integer i = 0
+        repeat while i < array:GetSize()
+            if i > 0
+                result = result + ","
+            end
+            text value = array:Get(i)
+            if value = undefined
+                result = result + "undefined"
+            else
+                result = result + value
+            end
+            i = i + 1
+        end
+        return result + "]"
+    end
+    action Fill(Array<text> array, integer kind) returns text
+        // kind 0 = Add(value), 1 = Add(location, value) at the end,
+        // 2 = Add(0, value), 3 = AddToFront, 4 = AddToEnd, 5 = Add(1, value) in the middle
+        integer added = 0
+        integer i = 0
+        repeat 10 times
+            check
+                if kind = 0
+                    array:Add("i" + i)
+                elseif kind = 1
+                    array:Add(array:GetSize(), "i" + i)
+                elseif kind = 2
+                    array:Add(0, "i" + i)
+                elseif kind = 3
+                    array:AddToFront("i" + i)
+                elseif kind = 4
+                    array:AddToEnd("i" + i)
+                else
+                    if array:GetSize() = 0
+                        array:Add("i" + i)
+                    else
+                        array:Add(1, "i" + i)
+                    end
+                end
+                added = added + 1
+            detect e
+                return "failed on item " + (i + 1) + " of 10: " + e:GetErrorMessage()
+            end
+            i = i + 1
+        end
+        return "accepted all " + added + " items, size " + array:GetSize()
+    end
+
+    action Main
+        text names = ""
+        integer kind = 0
+        repeat 6 times
+            Array<text> array
+            array:SetAutoResize(false)
+            text name = ""
+            if kind = 0
+                name = "Add(value)"
+            elseif kind = 1
+                name = "Add(GetSize(), value)"
+            elseif kind = 2
+                name = "Add(0, value)"
+            elseif kind = 3
+                name = "AddToFront(value)"
+            elseif kind = 4
+                name = "AddToEnd(value)"
+            else
+                name = "Add(1, value)"
+            end
+            check
+                output "Array auto-resize off, max " + array:GetMaxSize() + ", 10 x " + name + ": " + Fill(array, kind)
+            detect e
+                output "Array auto-resize off, 10 x " + name + " unexpected error: " + e:GetErrorMessage()
+            end
+            check
+                array:Add("extra")
+                output "Array full (auto-resize off) after " + name + ", Add(extra) should fail but gave size " + array:GetSize()
+            detect e
+                output "Array full (auto-resize off) Add(extra) fails, as it should"
+            end
+            check
+                array:Add(0, "extra")
+                output "Array full (auto-resize off) Add(0, extra) should fail but gave size " + array:GetSize()
+            detect e
+                output "Array full (auto-resize off) Add(0, extra) fails, as it should"
+            end
+            check
+                output "Array full (auto-resize off) GetMaxSize() = " + array:GetMaxSize()
+            detect e
+                output "Array full (auto-resize off) GetMaxSize() unexpected error: " + e:GetErrorMessage()
+            end
+            kind = kind + 1
+        end
+
+        Array<text> small
+        check
+            small:SetAutoResize(false)
+            small:SetSize(3)
+            small:Set(2, "c")
+            output "Array auto-resize off SetSize(3), Set(2, c) gives " + Describe(small)
+        detect e
+            output "Array auto-resize off SetSize(3), Set(2, c) unexpected error: " + e:GetErrorMessage()
+        end
+        check
+            small:RemoveAt(0)
+            small:Add("d")
+            output "Array auto-resize off then RemoveAt(0), Add(d) gives " + Describe(small)
+        detect e
+            output "Array auto-resize off then RemoveAt(0), Add(d) unexpected error: " + e:GetErrorMessage()
+        end
+    end
+end

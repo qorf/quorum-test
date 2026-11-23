@@ -1,0 +1,107 @@
+use Libraries.Compute.Matrix
+use Libraries.Compute.Math
+use Libraries.Containers.Array
+use Libraries.Compute.MatrixTransform.TridiagonalDecomposition
+
+/*
+TridiagonalDecomposition, which writes a symmetric matrix A as Q T Q
+transposed with Q orthogonal and T tridiagonal. For |4, 1, 2| |1, 2, 0|
+|2, 0, 3| one Householder reflection gives the diagonal 4, 2.8, 2.2 and
+the subdiagonal -2.2361 (minus the square root of 5) and -0.4, worked out
+by hand with the reflection that sends the column below the first entry
+to minus its length. A 2 by 2 symmetric matrix is already tridiagonal, so
+T is the matrix itself and Q must still be orthogonal with Q T Q
+transposed equal to A. A matrix that isn't symmetric must fail. Entries
+are rounded to 4 places.
+*/
+class Main
+    Math math
+
+    action Main
+        Matrix matrix
+        matrix:SetSize(3, 3)
+        matrix:Set(0, 0, 4)
+        matrix:Set(0, 1, 1)
+        matrix:Set(0, 2, 2)
+        matrix:Set(1, 0, 1)
+        matrix:Set(1, 1, 2)
+        matrix:Set(1, 2, 0)
+        matrix:Set(2, 0, 2)
+        matrix:Set(2, 1, 0)
+        matrix:Set(2, 2, 3)
+        check
+            TridiagonalDecomposition decomposition
+            decomposition:Calculate(matrix)
+            ShowArray("GetDiagonal", decomposition:GetDiagonal())
+            ShowArray("GetSubDiagonal", decomposition:GetSubDiagonal())
+            Show("GetTridiagonalMatrix", decomposition:GetTridiagonalMatrix())
+            Matrix q = decomposition:GetOrthogonalMatrix()
+            Matrix product = q:Multiply(decomposition:GetTridiagonalMatrix())
+            product = product:Multiply(decomposition:GetOrthogonalTransposedMatrix())
+            Show("Q times T times Q transposed", product)
+            Show("Q transposed times Q", decomposition:GetOrthogonalTransposedMatrix():Multiply(q))
+            Show("GetOriginalMatrix", decomposition:GetOriginalMatrix())
+        detect e
+            output "3 by 3 unexpected error: " + e:GetErrorMessage()
+        end
+        Matrix small
+        small:SetSize(2, 2)
+        small:Set(0, 0, 2)
+        small:Set(0, 1, 1)
+        small:Set(1, 0, 1)
+        small:Set(1, 1, 3)
+        check
+            TridiagonalDecomposition decomposition
+            decomposition:Calculate(small)
+            Show("2 by 2 GetTridiagonalMatrix", decomposition:GetTridiagonalMatrix())
+            Matrix q = decomposition:GetOrthogonalMatrix()
+            Matrix product = q:Multiply(decomposition:GetTridiagonalMatrix())
+            product = product:Multiply(decomposition:GetOrthogonalTransposedMatrix())
+            Show("2 by 2 Q times T times Q transposed", product)
+            Show("2 by 2 Q transposed times Q", decomposition:GetOrthogonalTransposedMatrix():Multiply(q))
+        detect e
+            output "2 by 2 unexpected error: " + e:GetErrorMessage()
+        end
+        Matrix lopsided
+        lopsided:SetSize(2, 2)
+        lopsided:Set(0, 0, 1)
+        lopsided:Set(0, 1, 2)
+        lopsided:Set(1, 0, 3)
+        lopsided:Set(1, 1, 4)
+        check
+            TridiagonalDecomposition decomposition
+            decomposition:Calculate(lopsided)
+            output "Calculate of the non-symmetric |1, 2| |3, 4| should fail but did not"
+        detect e
+            output "Calculate of the non-symmetric |1, 2| |3, 4| fails, as it should"
+        end
+    end
+
+    action ShowArray(text label, Array<number> values)
+        text line = label + " ="
+        integer i = 0
+        repeat while i < values:GetSize()
+            line = line + " " + math:Round(values:Get(i), 4)
+            i = i + 1
+        end
+        output line
+    end
+
+    action Show(text label, Matrix result)
+        output label + " gives a " + result:GetRows() + " by " + result:GetColumns() + " matrix:"
+        integer row = 0
+        repeat while row < result:GetRows()
+            text line = "|"
+            integer column = 0
+            repeat while column < result:GetColumns()
+                line = line + math:Round(result:Get(row, column), 4)
+                if column < result:GetColumns() - 1
+                    line = line + ", "
+                end
+                column = column + 1
+            end
+            output line + "|"
+            row = row + 1
+        end
+    end
+end

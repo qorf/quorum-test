@@ -1,0 +1,151 @@
+use Libraries.Containers.HashTable
+use Libraries.Containers.Array
+
+/*
+    HashTable Copy must give an independent table, as Copy does for Array and
+    List: changing a value, removing a key or adding keys (including enough
+    to make the copy grow) in the copy leaves the original alone, and the
+    reverse.
+*/
+class Main
+    action Show(text value) returns text
+        if value = undefined
+            return "undefined"
+        end
+        return "[" + value + "]"
+    end
+
+    action Describe(Array<text> array) returns text
+        text result = "["
+        integer i = 0
+        repeat while i < array:GetSize()
+            if i > 0
+                result = result + ","
+            end
+            text value = array:Get(i)
+            if value = undefined
+                result = result + "undefined"
+            else
+                result = result + value
+            end
+            i = i + 1
+        end
+        return result + "]"
+    end
+
+    // The keys sorted, so the output does not depend on hash order.
+    action SortedKeys(HashTable<text, text> table) returns text
+        Array<text> keys = table:CopyToKeyArray()
+        keys:Sort()
+        return Describe(keys)
+    end
+
+    action Values(HashTable<text, text> table) returns text
+        Array<text> keys = table:CopyToKeyArray()
+        keys:Sort()
+        text result = "{"
+        integer i = 0
+        repeat while i < keys:GetSize()
+            if i > 0
+                result = result + ","
+            end
+            text key = keys:Get(i)
+            result = result + key + ":" + Show(table:GetValue(key))
+            i = i + 1
+        end
+        return result + "}"
+    end
+
+    action Make returns HashTable<text, text>
+        HashTable<text, text> table
+        table:Add("a", "1")
+        table:Add("b", "2")
+        table:Add("c", "3")
+        table:Add("d", "4")
+        table:Add("e", "5")
+        return table
+    end
+
+    // True when value is defined and equals expected (undefined never crashes the count).
+    action Same(text value, text expected) returns boolean
+        if value = undefined
+            return false
+        end
+        return value = expected
+    end
+
+    action Main
+        HashTable<text, text> original = Make()
+        Object copyObject = original:Copy()
+        HashTable<text, text> copy = cast(HashTable<text, text>, copyObject)
+        check
+            output "HashTable{a..e} Copy(): copy size " + copy:GetSize() + ", copy " + Values(copy)
+        detect e
+            output "HashTable{a..e} Copy() unexpected error: " + e:GetErrorMessage()
+        end
+        check
+            copy:Set("a", "changed")
+            output "Copy Set(a, changed): copy GetValue(a) = " + Show(copy:GetValue("a")) + ", original GetValue(a) = " + Show(original:GetValue("a"))
+        detect e
+            output "Copy Set(a, changed) unexpected error: " + e:GetErrorMessage()
+        end
+        check
+            copy:RemoveKey("b")
+            output "Copy RemoveKey(b): copy HasKey(b) = " + copy:HasKey("b") + ", original HasKey(b) = " + original:HasKey("b") + ", original size " + original:GetSize()
+        detect e
+            output "Copy RemoveKey(b) unexpected error: " + e:GetErrorMessage()
+        end
+        check
+            original:Set("c", "again")
+            output "Original Set(c, again): original GetValue(c) = " + Show(original:GetValue("c")) + ", copy GetValue(c) = " + Show(copy:GetValue("c"))
+        detect e
+            output "Original Set(c, again) unexpected error: " + e:GetErrorMessage()
+        end
+
+        HashTable<text, text> second = Make()
+        Object secondObject = second:Copy()
+        HashTable<text, text> secondCopy = cast(HashTable<text, text>, secondObject)
+        check
+            integer i = 0
+            repeat 40 times
+                secondCopy:Add("new" + i, "n" + i)
+                i = i + 1
+            end
+            output "HashTable{a..e} Copy() then 40 Adds to the copy: copy size " + secondCopy:GetSize() + ", original size " + second:GetSize()
+        detect e
+            output "HashTable{a..e} Copy() then 40 Adds to the copy unexpected error: " + e:GetErrorMessage()
+        end
+        check
+            output "Original after the copy grew: " + Values(second) + ", HasKey(new0) = " + second:HasKey("new0")
+        detect e
+            output "Original after the copy grew unexpected error: " + e:GetErrorMessage()
+        end
+        check
+            integer found = 0
+            integer i = 0
+            repeat 40 times
+                if Same(secondCopy:GetValue("new" + i), "n" + i)
+                    found = found + 1
+                end
+                i = i + 1
+            end
+            output "Copy after growing finds " + found + " of 40 new keys, and has a..e: " + secondCopy:HasKey("a") + secondCopy:HasKey("b") + secondCopy:HasKey("c") + secondCopy:HasKey("d") + secondCopy:HasKey("e")
+        detect e
+            output "Copy after growing unexpected error: " + e:GetErrorMessage()
+        end
+
+        HashTable<text, text> third = Make()
+        Object thirdObject = third:Copy()
+        HashTable<text, text> thirdCopy = cast(HashTable<text, text>, thirdObject)
+        check
+            integer i = 0
+            repeat 40 times
+                third:Add("orig" + i, "o" + i)
+                i = i + 1
+            end
+            output "HashTable{a..e} Copy() then 40 Adds to the original: copy " + Values(thirdCopy) + ", copy size " + thirdCopy:GetSize()
+        detect e
+            output "HashTable{a..e} Copy() then 40 Adds to the original unexpected error: " + e:GetErrorMessage()
+        end
+    end
+end

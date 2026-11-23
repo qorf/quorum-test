@@ -1,0 +1,231 @@
+use Libraries.Compute.Math
+use Libraries.Compute.Statistics.WindowingActions.CosineAction
+use Libraries.Compute.Statistics.WindowingActions.LogisticAction
+use Libraries.Compute.Statistics.WindowingActions.NormalDistributionAction
+use Libraries.Compute.Statistics.WindowingActions.ParabolicAction
+use Libraries.Compute.Statistics.WindowingActions.SigmoidAction
+use Libraries.Compute.Statistics.WindowingActions.TriangularAction
+use Libraries.Compute.Statistics.WindowingActions.TricubeAction
+use Libraries.Compute.Statistics.WindowingActions.TriweightAction
+
+/*
+Tests the windowing actions (kernels): each Calculate(x) against the kernel
+its documentation points to (https://en.wikipedia.org/wiki/Kernel_(statistics)),
+rounded to 6 places. The cosine, parabolic (Epanechnikov), triangular,
+tricube and triweight kernels are 0 outside -1 to 1 by that definition,
+so Calculate(1.5) should be 0 for them; logistic, normal and sigmoid have
+no such limit.
+*/
+class Main
+    action Main
+        Math math
+        CosineAction cosineAction
+        check
+            output "CosineAction:Calculate(0) = " + math:Round(cosineAction:Calculate(0), 6)
+        detect e
+            output "CosineAction:Calculate(0) unexpected error: " + e:GetErrorMessage()
+        end
+        check
+            output "CosineAction:Calculate(0.5) = " + math:Round(cosineAction:Calculate(0.5), 6)
+        detect e
+            output "CosineAction:Calculate(0.5) unexpected error: " + e:GetErrorMessage()
+        end
+        check
+            output "CosineAction:Calculate(-0.5) = " + math:Round(cosineAction:Calculate(-0.5), 6)
+        detect e
+            output "CosineAction:Calculate(-0.5) unexpected error: " + e:GetErrorMessage()
+        end
+        check
+            output "CosineAction:Calculate(1) = " + math:Round(cosineAction:Calculate(1), 6)
+        detect e
+            output "CosineAction:Calculate(1) unexpected error: " + e:GetErrorMessage()
+        end
+        check
+            output "CosineAction:Calculate(1.5) = " + math:Round(cosineAction:Calculate(1.5), 6)
+        detect e
+            output "CosineAction:Calculate(1.5) unexpected error: " + e:GetErrorMessage()
+        end
+        LogisticAction logisticAction
+        check
+            output "LogisticAction:Calculate(0) = " + math:Round(logisticAction:Calculate(0), 6)
+        detect e
+            output "LogisticAction:Calculate(0) unexpected error: " + e:GetErrorMessage()
+        end
+        check
+            output "LogisticAction:Calculate(0.5) = " + math:Round(logisticAction:Calculate(0.5), 6)
+        detect e
+            output "LogisticAction:Calculate(0.5) unexpected error: " + e:GetErrorMessage()
+        end
+        check
+            output "LogisticAction:Calculate(-0.5) = " + math:Round(logisticAction:Calculate(-0.5), 6)
+        detect e
+            output "LogisticAction:Calculate(-0.5) unexpected error: " + e:GetErrorMessage()
+        end
+        check
+            output "LogisticAction:Calculate(1) = " + math:Round(logisticAction:Calculate(1), 6)
+        detect e
+            output "LogisticAction:Calculate(1) unexpected error: " + e:GetErrorMessage()
+        end
+        check
+            output "LogisticAction:Calculate(1.5) = " + math:Round(logisticAction:Calculate(1.5), 6)
+        detect e
+            output "LogisticAction:Calculate(1.5) unexpected error: " + e:GetErrorMessage()
+        end
+        NormalDistributionAction normalDistributionAction
+        check
+            output "NormalDistributionAction:Calculate(0) = " + math:Round(normalDistributionAction:Calculate(0), 6)
+        detect e
+            output "NormalDistributionAction:Calculate(0) unexpected error: " + e:GetErrorMessage()
+        end
+        check
+            output "NormalDistributionAction:Calculate(0.5) = " + math:Round(normalDistributionAction:Calculate(0.5), 6)
+        detect e
+            output "NormalDistributionAction:Calculate(0.5) unexpected error: " + e:GetErrorMessage()
+        end
+        check
+            output "NormalDistributionAction:Calculate(-0.5) = " + math:Round(normalDistributionAction:Calculate(-0.5), 6)
+        detect e
+            output "NormalDistributionAction:Calculate(-0.5) unexpected error: " + e:GetErrorMessage()
+        end
+        check
+            output "NormalDistributionAction:Calculate(1) = " + math:Round(normalDistributionAction:Calculate(1), 6)
+        detect e
+            output "NormalDistributionAction:Calculate(1) unexpected error: " + e:GetErrorMessage()
+        end
+        check
+            output "NormalDistributionAction:Calculate(1.5) = " + math:Round(normalDistributionAction:Calculate(1.5), 6)
+        detect e
+            output "NormalDistributionAction:Calculate(1.5) unexpected error: " + e:GetErrorMessage()
+        end
+        ParabolicAction parabolicAction
+        check
+            output "ParabolicAction:Calculate(0) = " + math:Round(parabolicAction:Calculate(0), 6)
+        detect e
+            output "ParabolicAction:Calculate(0) unexpected error: " + e:GetErrorMessage()
+        end
+        check
+            output "ParabolicAction:Calculate(0.5) = " + math:Round(parabolicAction:Calculate(0.5), 6)
+        detect e
+            output "ParabolicAction:Calculate(0.5) unexpected error: " + e:GetErrorMessage()
+        end
+        check
+            output "ParabolicAction:Calculate(-0.5) = " + math:Round(parabolicAction:Calculate(-0.5), 6)
+        detect e
+            output "ParabolicAction:Calculate(-0.5) unexpected error: " + e:GetErrorMessage()
+        end
+        check
+            output "ParabolicAction:Calculate(1) = " + math:Round(parabolicAction:Calculate(1), 6)
+        detect e
+            output "ParabolicAction:Calculate(1) unexpected error: " + e:GetErrorMessage()
+        end
+        check
+            output "ParabolicAction:Calculate(1.5) = " + math:Round(parabolicAction:Calculate(1.5), 6)
+        detect e
+            output "ParabolicAction:Calculate(1.5) unexpected error: " + e:GetErrorMessage()
+        end
+        SigmoidAction sigmoidAction
+        check
+            output "SigmoidAction:Calculate(0) = " + math:Round(sigmoidAction:Calculate(0), 6)
+        detect e
+            output "SigmoidAction:Calculate(0) unexpected error: " + e:GetErrorMessage()
+        end
+        check
+            output "SigmoidAction:Calculate(0.5) = " + math:Round(sigmoidAction:Calculate(0.5), 6)
+        detect e
+            output "SigmoidAction:Calculate(0.5) unexpected error: " + e:GetErrorMessage()
+        end
+        check
+            output "SigmoidAction:Calculate(-0.5) = " + math:Round(sigmoidAction:Calculate(-0.5), 6)
+        detect e
+            output "SigmoidAction:Calculate(-0.5) unexpected error: " + e:GetErrorMessage()
+        end
+        check
+            output "SigmoidAction:Calculate(1) = " + math:Round(sigmoidAction:Calculate(1), 6)
+        detect e
+            output "SigmoidAction:Calculate(1) unexpected error: " + e:GetErrorMessage()
+        end
+        check
+            output "SigmoidAction:Calculate(1.5) = " + math:Round(sigmoidAction:Calculate(1.5), 6)
+        detect e
+            output "SigmoidAction:Calculate(1.5) unexpected error: " + e:GetErrorMessage()
+        end
+        TriangularAction triangularAction
+        check
+            output "TriangularAction:Calculate(0) = " + math:Round(triangularAction:Calculate(0), 6)
+        detect e
+            output "TriangularAction:Calculate(0) unexpected error: " + e:GetErrorMessage()
+        end
+        check
+            output "TriangularAction:Calculate(0.5) = " + math:Round(triangularAction:Calculate(0.5), 6)
+        detect e
+            output "TriangularAction:Calculate(0.5) unexpected error: " + e:GetErrorMessage()
+        end
+        check
+            output "TriangularAction:Calculate(-0.5) = " + math:Round(triangularAction:Calculate(-0.5), 6)
+        detect e
+            output "TriangularAction:Calculate(-0.5) unexpected error: " + e:GetErrorMessage()
+        end
+        check
+            output "TriangularAction:Calculate(1) = " + math:Round(triangularAction:Calculate(1), 6)
+        detect e
+            output "TriangularAction:Calculate(1) unexpected error: " + e:GetErrorMessage()
+        end
+        check
+            output "TriangularAction:Calculate(1.5) = " + math:Round(triangularAction:Calculate(1.5), 6)
+        detect e
+            output "TriangularAction:Calculate(1.5) unexpected error: " + e:GetErrorMessage()
+        end
+        TricubeAction tricubeAction
+        check
+            output "TricubeAction:Calculate(0) = " + math:Round(tricubeAction:Calculate(0), 6)
+        detect e
+            output "TricubeAction:Calculate(0) unexpected error: " + e:GetErrorMessage()
+        end
+        check
+            output "TricubeAction:Calculate(0.5) = " + math:Round(tricubeAction:Calculate(0.5), 6)
+        detect e
+            output "TricubeAction:Calculate(0.5) unexpected error: " + e:GetErrorMessage()
+        end
+        check
+            output "TricubeAction:Calculate(-0.5) = " + math:Round(tricubeAction:Calculate(-0.5), 6)
+        detect e
+            output "TricubeAction:Calculate(-0.5) unexpected error: " + e:GetErrorMessage()
+        end
+        check
+            output "TricubeAction:Calculate(1) = " + math:Round(tricubeAction:Calculate(1), 6)
+        detect e
+            output "TricubeAction:Calculate(1) unexpected error: " + e:GetErrorMessage()
+        end
+        check
+            output "TricubeAction:Calculate(1.5) = " + math:Round(tricubeAction:Calculate(1.5), 6)
+        detect e
+            output "TricubeAction:Calculate(1.5) unexpected error: " + e:GetErrorMessage()
+        end
+        TriweightAction triweightAction
+        check
+            output "TriweightAction:Calculate(0) = " + math:Round(triweightAction:Calculate(0), 6)
+        detect e
+            output "TriweightAction:Calculate(0) unexpected error: " + e:GetErrorMessage()
+        end
+        check
+            output "TriweightAction:Calculate(0.5) = " + math:Round(triweightAction:Calculate(0.5), 6)
+        detect e
+            output "TriweightAction:Calculate(0.5) unexpected error: " + e:GetErrorMessage()
+        end
+        check
+            output "TriweightAction:Calculate(-0.5) = " + math:Round(triweightAction:Calculate(-0.5), 6)
+        detect e
+            output "TriweightAction:Calculate(-0.5) unexpected error: " + e:GetErrorMessage()
+        end
+        check
+            output "TriweightAction:Calculate(1) = " + math:Round(triweightAction:Calculate(1), 6)
+        detect e
+            output "TriweightAction:Calculate(1) unexpected error: " + e:GetErrorMessage()
+        end
+        check
+            output "TriweightAction:Calculate(1.5) = " + math:Round(triweightAction:Calculate(1.5), 6)
+        detect e
+            output "TriweightAction:Calculate(1.5) unexpected error: " + e:GetErrorMessage()
+        end
+    end
+end

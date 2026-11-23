@@ -1,0 +1,7 @@
+Stack[] GetSize() = 0, IsEmpty() = true, Peek() = undefined, Pop() = undefined, Has(a) = false, Remove(a) = false
+Stack[] GetIterator() HasNext() = false
+Stack pushed 1,2,3 Copy(): copy Pop() twice = 32, then copy Push(x); original Peek() = [3], original size 3, copy size 2
+Stack pushed 1,2,3 Pop() three times = 321, then Pop() = undefined, IsEmpty() = true
+Queue[] GetSize() = 0, IsEmpty() = true, GetFromFront() = undefined, RemoveFromFront() = undefined, Has(a) = false, RemoveAll(a) = false
+Queue added 1,2,3 Copy(): copy RemoveFromFront() twice = 12, then copy Add(x); original GetFromFront() = [1], original size 3, copy size 2
+Queue added 1,2,3 RemoveFromFront() three times = 123, then RemoveFromFront() = undefined, IsEmpty() = true

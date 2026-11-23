@@ -1,0 +1,31 @@
+use Libraries.Compute.Math
+
+/*
+Math:RoundToNearestInteger. Its documentation says a midpoint rounds up,
+the same as Round, so 2.5 gives 3 and -2.5 gives -2. (The Java plugin
+rounds midpoints to the even neighbor instead, which disagrees with the
+documentation for 2.5 and -3.5.)
+*/
+class Main
+    Math math
+
+    action Main
+        Show(11.932356)
+        Show(2.4)
+        Show(2.6)
+        Show(2.5)
+        Show(3.5)
+        Show(-2.5)
+        Show(-3.5)
+        Show(-2.6)
+        Show(4.0)
+    end
+
+    action Show(number value)
+        check
+            output "RoundToNearestInteger(" + value + ") = " + math:RoundToNearestInteger(value)
+        detect e
+            output "RoundToNearestInteger(" + value + ") unexpected error: " + e:GetErrorMessage()
+        end
+    end
+end

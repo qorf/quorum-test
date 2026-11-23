@@ -1,0 +1,47 @@
+/*
+How numbers are written when they are output or joined to text. The
+expected text is what the Java back end prints (Java's Double.toString
+rules), which the other back ends should match since the language
+documents no other format.
+*/
+class Main
+    action Main
+        number one = 1.0
+        output "1.0 prints as " + one
+        number sum = 0.1 + 0.2
+        output "0.1 + 0.2 prints as " + sum
+        number third = 1 / 3.0
+        output "1 / 3.0 prints as " + third
+        number huge = 1.0e21
+        output "1.0e21 prints as " + huge
+        number big = 12345678.0
+        output "12345678.0 prints as " + big
+        number tenMillion = 10000000.0
+        output "10000000.0 prints as " + tenMillion
+        number million = 1000000.0
+        output "1000000.0 prints as " + million
+        number small = 0.001
+        output "0.001 prints as " + small
+        number smaller = 0.0001
+        output "0.0001 prints as " + smaller
+        number tiny = 1.0e-10
+        output "1.0e-10 prints as " + tiny
+        number zero = 0.0
+        number negativeZero = -1 * zero
+        output "-1 * 0.0 prints as " + negativeZero
+        number half = -0.5
+        output "-0.5 prints as " + half
+        number infinity = one / zero
+        output "1.0 / 0.0 prints as " + infinity
+        number negativeInfinity = -1.0 / zero
+        output "-1.0 / 0.0 prints as " + negativeInfinity
+        number notANumber = zero / zero
+        output "0.0 / 0.0 prints as " + notANumber
+        output "number 5 joined to text prints as " + 5.0
+        integer whole = 5
+        number converted = whole
+        output "integer 5 stored in a number prints as " + converted
+        output "output of 2.5 on its own line follows"
+        output 2.5
+    end
+end

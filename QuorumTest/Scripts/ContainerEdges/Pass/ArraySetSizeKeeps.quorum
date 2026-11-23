@@ -1,0 +1,90 @@
+use Libraries.Containers.Array
+
+/*
+    SetSize documents: "sets the size of the array and fills it with undefined
+    items. Changing the size of the array means any items already in the array
+    will be copied over." Growing keeps the items and adds undefined ones;
+    shrinking keeps the first items.
+*/
+class Main
+    action Show(text value) returns text
+        if value = undefined
+            return "undefined"
+        end
+        return "[" + value + "]"
+    end
+
+    action Describe(Array<text> array) returns text
+        text result = "["
+        integer i = 0
+        repeat while i < array:GetSize()
+            if i > 0
+                result = result + ","
+            end
+            text value = array:Get(i)
+            if value = undefined
+                result = result + "undefined"
+            else
+                result = result + value
+            end
+            i = i + 1
+        end
+        return result + "]"
+    end
+    action Main
+        Array<text> array
+        array:Add("a")
+        array:Add("b")
+        array:Add("c")
+        check
+            array:SetSize(5)
+            output "Array[a,b,c] SetSize(5) gives " + Describe(array)
+        detect e
+            output "Array[a,b,c] SetSize(5) unexpected error: " + e:GetErrorMessage()
+        end
+        check
+            array:SetSize(2)
+            output "Array[a,b,c,undefined,undefined] SetSize(2) gives " + Describe(array)
+        detect e
+            output "Array SetSize(2) unexpected error: " + e:GetErrorMessage()
+        end
+        check
+            array:SetSize(4)
+            output "Array[a,b] SetSize(4) gives " + Describe(array)
+        detect e
+            output "Array[a,b] SetSize(4) unexpected error: " + e:GetErrorMessage()
+        end
+        check
+            array:SetSize(4)
+            output "Array[a,b,undefined,undefined] SetSize(4) again gives " + Describe(array)
+        detect e
+            output "Array SetSize(4) again unexpected error: " + e:GetErrorMessage()
+        end
+        check
+            array:SetSize(30)
+            output "Array[a,b,undefined,undefined] SetSize(30): size " + array:GetSize() + ", Get(0) = " + Show(array:Get(0)) + ", Get(1) = " + Show(array:Get(1)) + ", Get(29) = " + Show(array:Get(29))
+        detect e
+            output "Array SetSize(30) unexpected error: " + e:GetErrorMessage()
+        end
+        check
+            array:Add("z")
+            output "Array of 30 then Add(z): size " + array:GetSize() + ", Get(30) = " + Show(array:Get(30))
+        detect e
+            output "Array of 30 then Add(z) unexpected error: " + e:GetErrorMessage()
+        end
+
+        Array<text> fresh
+        check
+            fresh:SetSize(3)
+            output "Array[] SetSize(3) gives " + Describe(fresh)
+        detect e
+            output "Array[] SetSize(3) unexpected error: " + e:GetErrorMessage()
+        end
+        check
+            fresh:Add("x")
+            output "Array[undefined,undefined,undefined] Add(x) gives " + Describe(fresh)
+        detect e
+            output "Array SetSize(3) then Add(x) unexpected error: " + e:GetErrorMessage()
+        end
+    end
+end

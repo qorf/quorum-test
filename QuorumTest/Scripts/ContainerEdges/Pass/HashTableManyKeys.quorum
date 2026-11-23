@@ -1,0 +1,179 @@
+use Libraries.Containers.HashTable
+use Libraries.Containers.Array
+
+/*
+    Many keys, so the table resizes several times: 2,000 text keys and 2,000
+    integer keys (negative, zero, large), overwriting keys, removing half,
+    adding them back, and texts with the same hash code ("Aa" and "BB" have
+    the same Java hash code, as do longer combinations of them), which must
+    chain in one bucket and still be found and removed one by one.
+*/
+class Main
+    action Show(text value) returns text
+        if value = undefined
+            return "undefined"
+        end
+        return "[" + value + "]"
+    end
+
+    action Describe(Array<text> array) returns text
+        text result = "["
+        integer i = 0
+        repeat while i < array:GetSize()
+            if i > 0
+                result = result + ","
+            end
+            text value = array:Get(i)
+            if value = undefined
+                result = result + "undefined"
+            else
+                result = result + value
+            end
+            i = i + 1
+        end
+        return result + "]"
+    end
+
+    // The keys sorted, so the output does not depend on hash order.
+    action SortedKeys(HashTable<text, text> table) returns text
+        Array<text> keys = table:CopyToKeyArray()
+        keys:Sort()
+        return Describe(keys)
+    end
+
+    // True when value is defined and equals expected (undefined never crashes the count).
+    action Same(text value, text expected) returns boolean
+        if value = undefined
+            return false
+        end
+        return value = expected
+    end
+
+    action Main
+        HashTable<text, text> texts
+        check
+            integer i = 0
+            repeat 2000 times
+                texts:Add("key" + i, "value" + i)
+                i = i + 1
+            end
+            output "HashTable 2000 x Add(key<i>, value<i>): size " + texts:GetSize()
+        detect e
+            output "HashTable 2000 x Add text keys unexpected error: " + e:GetErrorMessage()
+        end
+        check
+            integer found = 0
+            integer i = 0
+            repeat 2000 times
+                if texts:HasKey("key" + i) and Same(texts:GetValue("key" + i), "value" + i)
+                    found = found + 1
+                end
+                i = i + 1
+            end
+            output "HashTable of 2000 text keys: HasKey and GetValue right for " + found + " of 2000, HasKey(key2000) = " + texts:HasKey("key2000")
+        detect e
+            output "HashTable of 2000 text keys lookups unexpected error: " + e:GetErrorMessage()
+        end
+        check
+            integer i = 0
+            repeat 2000 times
+                texts:Set("key" + i, "new" + i)
+                i = i + 1
+            end
+            output "HashTable of 2000 text keys, Set every key again: size " + texts:GetSize() + ", GetValue(key1999) = " + Show(texts:GetValue("key1999"))
+        detect e
+            output "HashTable Set every key again unexpected error: " + e:GetErrorMessage()
+        end
+        check
+            integer removedRight = 0
+            integer i = 0
+            repeat 1000 times
+                if Same(texts:RemoveKey("key" + (i * 2)), "new" + (i * 2))
+                    removedRight = removedRight + 1
+                end
+                i = i + 1
+            end
+            integer evenLeft = 0
+            integer oddLeft = 0
+            i = 0
+            repeat 2000 times
+                if texts:HasKey("key" + i)
+                    if i mod 2 = 0
+                        evenLeft = evenLeft + 1
+                    else
+                        oddLeft = oddLeft + 1
+                    end
+                end
+                i = i + 1
+            end
+            output "HashTable of 2000 text keys, RemoveKey every even key: " + removedRight + " returned the right value, size " + texts:GetSize() + ", even keys left " + evenLeft + ", odd keys left " + oddLeft
+        detect e
+            output "HashTable RemoveKey every even key unexpected error: " + e:GetErrorMessage()
+        end
+        check
+            integer i = 0
+            repeat 1000 times
+                texts:Add("key" + (i * 2), "back")
+                i = i + 1
+            end
+            output "HashTable re-adding the 1000 even keys: size " + texts:GetSize() + ", GetValue(key0) = " + Show(texts:GetValue("key0")) + ", GetValue(key1) = " + Show(texts:GetValue("key1"))
+        detect e
+            output "HashTable re-adding the even keys unexpected error: " + e:GetErrorMessage()
+        end
+
+        HashTable<integer, text> numbers
+        check
+            integer i = 0
+            repeat 2000 times
+                numbers:Add(i * 7919 - 7000000, "n" + i)
+                i = i + 1
+            end
+            numbers:Add(0, "zero")
+            numbers:Add(2147483647, "max")
+            numbers:Add(-2147483647, "min")
+            output "HashTable 2000 integer keys (i * 7919 - 7000000) plus 0, 2147483647, -2147483647: size " + numbers:GetSize()
+        detect e
+            output "HashTable integer keys unexpected error: " + e:GetErrorMessage()
+        end
+        check
+            integer found = 0
+            integer i = 0
+            repeat 2000 times
+                if Same(numbers:GetValue(i * 7919 - 7000000), "n" + i)
+                    found = found + 1
+                end
+                i = i + 1
+            end
+            output "HashTable of integer keys: GetValue right for " + found + " of 2000, GetValue(0) = " + Show(numbers:GetValue(0)) + ", GetValue(2147483647) = " + Show(numbers:GetValue(2147483647)) + ", GetValue(-2147483647) = " + Show(numbers:GetValue(-2147483647)) + ", HasKey(1) = " + numbers:HasKey(1)
+        detect e
+            output "HashTable integer key lookups unexpected error: " + e:GetErrorMessage()
+        end
+
+        HashTable<text, text> same
+        check
+            same:Add("Aa", "1")
+            same:Add("BB", "2")
+            same:Add("AaAa", "3")
+            same:Add("AaBB", "4")
+            same:Add("BBAa", "5")
+            same:Add("BBBB", "6")
+            output "HashTable keys with equal hash codes Aa, BB, AaAa, AaBB, BBAa, BBBB: size " + same:GetSize() + ", values " + Show(same:GetValue("Aa")) + Show(same:GetValue("BB")) + Show(same:GetValue("AaAa")) + Show(same:GetValue("AaBB")) + Show(same:GetValue("BBAa")) + Show(same:GetValue("BBBB"))
+        detect e
+            output "HashTable keys with equal hash codes unexpected error: " + e:GetErrorMessage()
+        end
+        check
+            text removed = same:RemoveKey("AaBB")
+            output "HashTable equal hash codes RemoveKey(AaBB) = " + Show(removed) + ", keys " + SortedKeys(same) + ", HasKey(BBAa) = " + same:HasKey("BBAa") + ", HasKey(AaAa) = " + same:HasKey("AaAa")
+        detect e
+            output "HashTable equal hash codes RemoveKey(AaBB) unexpected error: " + e:GetErrorMessage()
+        end
+        check
+            same:RemoveKey("Aa")
+            same:RemoveKey("BBBB")
+            same:Set("BB", "changed")
+            output "HashTable equal hash codes RemoveKey(Aa), RemoveKey(BBBB), Set(BB, changed): size " + same:GetSize() + ", keys " + SortedKeys(same) + ", GetValue(BB) = " + Show(same:GetValue("BB"))
+        detect e
+            output "HashTable equal hash codes removals unexpected error: " + e:GetErrorMessage()
+        end
+    end
+end

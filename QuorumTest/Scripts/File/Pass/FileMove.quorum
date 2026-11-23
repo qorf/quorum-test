@@ -1,0 +1,76 @@
+use Libraries.System.File
+
+/*
+Tests Move inside a scratch folder (FileTestsWork/FileMove), deleted at the
+end. The new paths are relative, which the documentation allows; the
+program's working directory is the File's working directory here, so they
+mean the same place either way. Only the return value and what is on disk
+afterward are checked.
+*/
+class Main
+    action Main
+        File work
+        work:SetPath("FileTestsWork/FileMove")
+        work:Delete(true)
+        boolean made = work:CreateDirectories()
+
+        File file
+        file:SetPath("FileTestsWork/FileMove/old.txt")
+        file:Write("moving")
+        check
+            output "Move(old.txt to new.txt) = " + file:Move("FileTestsWork/FileMove/new.txt")
+        detect e
+            output "Move(old.txt to new.txt) unexpected error: " + e:GetErrorMessage()
+        end
+        File old
+        old:SetPath("FileTestsWork/FileMove/old.txt")
+        File moved
+        moved:SetPath("FileTestsWork/FileMove/new.txt")
+        check
+            output "Exists(old.txt) after Move = " + old:Exists()
+        detect e
+            output "Exists(old.txt) unexpected error: " + e:GetErrorMessage()
+        end
+        check
+            output "Read(new.txt) after Move = [" + moved:Read() + "]"
+        detect e
+            output "Read(new.txt) unexpected error: " + e:GetErrorMessage()
+        end
+
+        File folder
+        folder:SetPath("FileTestsWork/FileMove/box")
+        made = folder:CreateDirectory()
+        File inBox
+        inBox:SetPath("FileTestsWork/FileMove/box/item.txt")
+        inBox:Write("item")
+        check
+            output "Move(folder box to crate) = " + folder:Move("FileTestsWork/FileMove/crate")
+        detect e
+            output "Move(folder box to crate) unexpected error: " + e:GetErrorMessage()
+        end
+        File inCrate
+        inCrate:SetPath("FileTestsWork/FileMove/crate/item.txt")
+        check
+            output "Read(crate/item.txt) after moving the folder = [" + inCrate:Read() + "]"
+        detect e
+            output "Read(crate/item.txt) unexpected error: " + e:GetErrorMessage()
+        end
+
+        File missing
+        missing:SetPath("FileTestsWork/FileMove/missing.txt")
+        check
+            output "Move(missing.txt to other.txt) = " + missing:Move("FileTestsWork/FileMove/other.txt")
+        detect e
+            output "Move(missing.txt) unexpected error: " + e:GetErrorMessage()
+        end
+        check
+            output "Move(new.txt into a missing folder) = " + moved:Move("FileTestsWork/FileMove/nowhere/new.txt")
+        detect e
+            output "Move(new.txt into a missing folder) unexpected error: " + e:GetErrorMessage()
+        end
+        work:Delete(true)
+        File top
+        top:SetPath("FileTestsWork")
+        boolean removed = top:Delete()
+    end
+end

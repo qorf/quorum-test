@@ -1,0 +1,124 @@
+use Libraries.Containers.List
+
+/*
+    Locations at and past the edges of a List of three items: the size, one
+    past it and -1. Add and Set accept location = size and append (the List
+    code does so on purpose for Set); every other out-of-range location fails.
+*/
+class Main
+    action Show(text value) returns text
+        if value = undefined
+            return "undefined"
+        end
+        return "[" + value + "]"
+    end
+
+    action Describe(List<text> list) returns text
+        text result = "["
+        integer i = 0
+        repeat while i < list:GetSize()
+            if i > 0
+                result = result + ","
+            end
+            text value = list:Get(i)
+            if value = undefined
+                result = result + "undefined"
+            else
+                result = result + value
+            end
+            i = i + 1
+        end
+        return result + "]"
+    end
+
+    action Main
+        List<text> list
+        list:Add("a")
+        list:Add("b")
+        list:Add("c")
+        check
+            text value = list:Get(3)
+            output "List[a,b,c] Get(3) should fail but returned " + Show(value)
+        detect e
+            output "List[a,b,c] Get(3) fails, as it should"
+        end
+        check
+            text value = list:Get(-1)
+            output "List[a,b,c] Get(-1) should fail but returned " + Show(value)
+        detect e
+            output "List[a,b,c] Get(-1) fails, as it should"
+        end
+        check
+            text value = list:RemoveAt(3)
+            output "List[a,b,c] RemoveAt(3) should fail but returned " + Show(value)
+        detect e
+            output "List[a,b,c] RemoveAt(3) fails, as it should"
+        end
+        check
+            text value = list:RemoveAt(-1)
+            output "List[a,b,c] RemoveAt(-1) should fail but returned " + Show(value)
+        detect e
+            output "List[a,b,c] RemoveAt(-1) fails, as it should"
+        end
+        check
+            list:Set(4, "x")
+            output "List[a,b,c] Set(4, x) should fail but gave " + Describe(list)
+        detect e
+            output "List[a,b,c] Set(4, x) fails, as it should"
+        end
+        check
+            list:Set(-1, "x")
+            output "List[a,b,c] Set(-1, x) should fail but gave " + Describe(list)
+        detect e
+            output "List[a,b,c] Set(-1, x) fails, as it should"
+        end
+        check
+            list:Add(4, "x")
+            output "List[a,b,c] Add(4, x) should fail but gave " + Describe(list)
+        detect e
+            output "List[a,b,c] Add(4, x) fails, as it should"
+        end
+        check
+            list:Add(-1, "x")
+            output "List[a,b,c] Add(-1, x) should fail but gave " + Describe(list)
+        detect e
+            output "List[a,b,c] Add(-1, x) fails, as it should"
+        end
+        check
+            output "List[a,b,c] after the failed calls is " + Describe(list) + ", size " + list:GetSize()
+        detect e
+            output "List[a,b,c] after the failed calls unexpected error: " + e:GetErrorMessage()
+        end
+        check
+            list:Add(3, "d")
+            output "List[a,b,c] Add(3, d) gives " + Describe(list) + ", GetFromEnd() = " + Show(list:GetFromEnd())
+        detect e
+            output "List[a,b,c] Add(3, d) unexpected error: " + e:GetErrorMessage()
+        end
+        check
+            list:Set(4, "e")
+            output "List[a,b,c,d] Set(4, e) gives " + Describe(list)
+        detect e
+            output "List[a,b,c,d] Set(4, e) unexpected error: " + e:GetErrorMessage()
+        end
+        check
+            list:Add(0, "z")
+            list:Add(2, "m")
+            output "List[a,b,c,d,e] Add(0, z), Add(2, m) gives " + Describe(list)
+        detect e
+            output "List Add(0, z), Add(2, m) unexpected error: " + e:GetErrorMessage()
+        end
+        check
+            output "List[z,a,m,b,c,d,e] GetLastLocation(z) = " + list:GetLastLocation("z") + ", GetLastLocation(m) = " + list:GetLastLocation("m") + ", GetLastLocation(e) = " + list:GetLastLocation("e")
+        detect e
+            output "List GetLastLocation unexpected error: " + e:GetErrorMessage()
+        end
+        check
+            list:Set(6, "E")
+            list:Set(0, "Z")
+            output "List[z,a,m,b,c,d,e] Set(6, E), Set(0, Z) gives " + Describe(list) + ", size " + list:GetSize()
+        detect e
+            output "List Set(6, E), Set(0, Z) unexpected error: " + e:GetErrorMessage()
+        end
+    end
+end

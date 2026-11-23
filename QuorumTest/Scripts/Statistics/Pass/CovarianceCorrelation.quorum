@@ -1,0 +1,165 @@
+use Libraries.Compute.Statistics.DataFrame
+use Libraries.Compute.Statistics.DataFrameColumn
+use Libraries.Compute.Statistics.Transforms.CovarianceMatrixTransform
+use Libraries.Compute.Statistics.Transforms.CorrelationMatrixTransform
+use Libraries.Compute.Matrix
+use Libraries.Compute.Math
+
+/*
+Tests CovarianceMatrixTransform and CorrelationMatrixTransform, and
+DataFrame:CovarianceMatrix and CorrelationMatrix. The transform's
+documentation says it gives the sample covariance by default and the
+population covariance with UsePopulation(true). For x = 1.5, 2.5, 3.5, 4.5
+and y = 2, 4.5, 5.5, 8: sample var(x) = 5/3, cov(x, y) = 9.5/3, var(y) =
+18.5/3; population 1.25, 2.375, 4.625; correlation 0.987763. For two rows
+x = 1, 3 and y = 2, 6 the sample covariance is 4. Matrices are printed by
+row, rounded to 6 places.
+*/
+class Main
+    action Main
+        text data = "x,y;1.5,2.0;2.5,4.5;3.5,5.5;4.5,8.0"
+        check
+            DataFrame frame = Frame(data)
+            CovarianceMatrixTransform cov
+            cov:AddColumn(0)
+            cov:AddColumn(1)
+            DataFrame result = frame:Transform(cov)
+            output "CovarianceMatrixTransform(x, y) matrix = " + Rows(cov:GetMatrix())
+        detect e
+            output "CovarianceMatrixTransform unexpected error: " + e:GetErrorMessage()
+        end
+        check
+            DataFrame frame = Frame(data)
+            CovarianceMatrixTransform cov
+            cov:AddColumn(0)
+            cov:AddColumn(1)
+            DataFrame result = frame:Transform(cov)
+            output "CovarianceMatrixTransform(x, y) frame headers and row names = " + result:GetColumn(1):GetHeader() + "," + result:GetColumn(2):GetHeader() + " rows " + result:GetColumn(0):GetAsText(0) + "," + result:GetColumn(0):GetAsText(1)
+        detect e
+            output "CovarianceMatrixTransform frame unexpected error: " + e:GetErrorMessage()
+        end
+        check
+            DataFrame frame = Frame(data)
+            CovarianceMatrixTransform cov
+            cov:AddColumn(0)
+            cov:AddColumn(1)
+            cov:UsePopulation(true)
+            DataFrame result = frame:Transform(cov)
+            output "CovarianceMatrixTransform UsePopulation(true) matrix = " + Rows(cov:GetMatrix()) + " (UsePopulation " + cov:UsePopulation() + ", UseSample " + cov:UseSample() + ")"
+        detect e
+            output "CovarianceMatrixTransform UsePopulation unexpected error: " + e:GetErrorMessage()
+        end
+        check
+            DataFrame frame = Frame("x,y;1,2;3,6")
+            CovarianceMatrixTransform cov
+            cov:AddColumn(0)
+            cov:AddColumn(1)
+            DataFrame result = frame:Transform(cov)
+            output "CovarianceMatrixTransform of two rows matrix = " + Rows(cov:GetMatrix())
+        detect e
+            output "CovarianceMatrixTransform of two rows unexpected error: " + e:GetErrorMessage()
+        end
+        check
+            DataFrame frame = Frame(data)
+            frame:AddSelectedColumn(0)
+            frame:AddSelectedColumn(1)
+            output "DataFrame CovarianceMatrix() = " + Rows(frame:CovarianceMatrix())
+        detect e
+            output "DataFrame CovarianceMatrix() unexpected error: " + e:GetErrorMessage()
+        end
+        check
+            DataFrame frame = Frame(data)
+            CorrelationMatrixTransform cor
+            cor:AddColumn(0)
+            cor:AddColumn(1)
+            DataFrame result = frame:Transform(cor)
+            output "CorrelationMatrixTransform(x, y) matrix = " + Rows(cor:GetMatrix())
+        detect e
+            output "CorrelationMatrixTransform unexpected error: " + e:GetErrorMessage()
+        end
+        check
+            DataFrame frame = Frame(data)
+            frame:AddSelectedColumn(1)
+            frame:AddSelectedColumn(0)
+            output "DataFrame CorrelationMatrix() of y, x = " + Rows(frame:CorrelationMatrix())
+        detect e
+            output "DataFrame CorrelationMatrix() unexpected error: " + e:GetErrorMessage()
+        end
+        check
+            DataFrame frame = Frame("x,w;1.5,hi;2.5,yo")
+            CovarianceMatrixTransform cov
+            cov:AddColumn(0)
+            cov:AddColumn(1)
+            DataFrame result = frame:Transform(cov)
+            output "CovarianceMatrixTransform with a text column should fail but returned " + Show(result)
+        detect e
+            output "CovarianceMatrixTransform with a text column fails, as it should"
+        end
+        check
+            DataFrame frame = Frame(data)
+            CorrelationMatrixTransform cor
+            DataFrame result = frame:Transform(cor)
+            output "CorrelationMatrixTransform with no columns should fail but returned " + Show(result)
+        detect e
+            output "CorrelationMatrixTransform with no columns fails, as it should"
+        end
+    end
+
+    /* A matrix by rows, each value rounded to 6 places: [a, b; c, d]. */
+    action Rows(Matrix matrix) returns text
+        Math math
+        text result = "["
+        integer row = 0
+        repeat while row < matrix:GetRows()
+            if row > 0
+                result = result + "; "
+            end
+            integer column = 0
+            repeat while column < matrix:GetColumns()
+                if column > 0
+                    result = result + ", "
+                end
+                result = result + math:Round(matrix:Get(row, column), 6)
+                column = column + 1
+            end
+            row = row + 1
+        end
+        return result + "]"
+    end
+
+    /* A frame as one line: each column's header, then its values; NA for undefined. */
+    action Show(DataFrame frame) returns text
+        text result = ""
+        integer i = 0
+        repeat while i < frame:GetSize()
+            DataFrameColumn column = frame:GetColumn(i)
+            if i > 0
+                result = result + " | "
+            end
+            result = result + column:GetHeader() + "="
+            integer j = 0
+            repeat while j < column:GetSize()
+                if j > 0
+                    result = result + ","
+                end
+                if column:IsUndefined(j)
+                    result = result + "NA"
+                else
+                    result = result + column:GetAsText(j)
+                end
+                j = j + 1
+            end
+            i = i + 1
+        end
+        return result
+    end
+
+    /* Makes a frame from comma separated text whose rows are separated by ; */
+    action Frame(text rows) returns DataFrame
+        text lf = ""
+        lf = lf:GetLineFeed()
+        DataFrame frame
+        frame:LoadFromCommaSeparatedValue(rows:Replace(";", lf))
+        return frame
+    end
+end

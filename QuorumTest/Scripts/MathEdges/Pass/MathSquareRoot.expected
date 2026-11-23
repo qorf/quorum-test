@@ -1,0 +1,9 @@
+SquareRoot(0.0) = 0.0
+SquareRoot(1.0) = 1.0
+SquareRoot(4.0) = 2.0
+SquareRoot(0.25) = 0.5
+SquareRoot(1000000.0) = 1000.0
+SquareRoot(-1.0) = NaN
+SquareRoot(-4.0) = NaN
+SquareRoot(2) rounded to 10 places = 1.4142135624
+SquareRoot(Infinity) = Infinity

@@ -1,0 +1,143 @@
+use Libraries.Data.Formats.ExtensibleMarkupReader
+use Libraries.Data.Formats.MarkupListener
+use Libraries.Data.Formats.Element
+use Libraries.Data.Formats.DocumentTypeDefinition
+use Libraries.Data.Formats.DocumentTypeDefinitionEntity
+use Libraries.System.File
+
+/*
+The actions that read files: ExtensibleMarkupReader:Read(File) (and a
+missing file, which the documentation says is an error),
+DocumentTypeDefinition:Read(File), SetSourceDirectory with a SYSTEM
+identifier, an internal subset next to an external one, and
+DocumentTypeDefinitionEntity:SetSourceDirectory with a SYSTEM entity, as in
+their documentation examples. A document read from a file resolves a
+relative SYSTEM identifier against the document's own folder (XML 1.0
+section 4.2.2). Files live in a scratch folder, XmlScratch, made in the
+working directory and deleted at the end. Absolute paths are used but never
+printed.
+*/
+class Main is MarkupListener
+    text log = ""
+
+    action Main
+        text dq = ""
+        dq = dq:GetDoubleQuote()
+        File folder
+        folder:SetPath("XmlScratch")
+        check
+            folder:Delete(true)
+        detect cleanup
+        end
+        folder:CreateDirectories()
+        Write("XmlScratch/doc.xml", "<a x='1'>hi<b/></a>")
+        Write("XmlScratch/note.dtd", "<!ENTITY language 'Quorum'>")
+        Write("XmlScratch/withdtd.xml", "<!DOCTYPE note SYSTEM 'note.dtd'><note>&language;</note>")
+        Write("XmlScratch/entity.txt", "external text")
+        text folderPath = folder:GetAbsolutePath()
+
+        check
+            ExtensibleMarkupReader reader
+            reader:SetMarkupListener(me)
+            File file
+            file:SetPath("XmlScratch/doc.xml")
+            log = ""
+            reader:Read(file)
+            output "Read(File doc.xml holding <a x='1'>hi<b/></a>) events:" + log
+        detect e
+            output "Read(File doc.xml) unexpected error: " + e:GetErrorMessage()
+        end
+
+        check
+            ExtensibleMarkupReader reader
+            reader:SetMarkupListener(me)
+            File file
+            file:SetPath("XmlScratch/missing.xml")
+            log = ""
+            reader:Read(file)
+            output "Read(File missing.xml) should fail but returned events:" + log
+        detect e
+            output "Read(File missing.xml) fails, as it should"
+        end
+
+        check
+            ExtensibleMarkupReader reader
+            reader:SetMarkupListener(me)
+            File file
+            file:SetPath("XmlScratch/withdtd.xml")
+            log = ""
+            reader:Read(file)
+            output "Read(File withdtd.xml holding <!DOCTYPE note SYSTEM 'note.dtd'><note>&language;</note>) events:" + log
+        detect e
+            output "Read(File withdtd.xml) unexpected error: " + e:GetErrorMessage()
+        end
+
+        check
+            DocumentTypeDefinition dtd
+            File file
+            file:SetPath("XmlScratch/note.dtd")
+            dtd:Read(file)
+            output "DocumentTypeDefinition Read(File note.dtd): GetEntityValue(language) = [" + dtd:GetEntityValue("language") + "], HasExternalFile() = [" + dtd:HasExternalFile() + "], GetExternalFileName() = [" + dtd:GetExternalFileName() + "]"
+        detect e
+            output "DocumentTypeDefinition Read(File note.dtd) unexpected error: " + e:GetErrorMessage()
+        end
+
+        check
+            DocumentTypeDefinition dtd
+            dtd:SetSourceDirectory(folderPath)
+            dtd:Read("<!DOCTYPE note SYSTEM " + dq + "note.dtd" + dq + ">")
+            output "DocumentTypeDefinition SetSourceDirectory(XmlScratch) Read(<!DOCTYPE note SYSTEM " + dq + "note.dtd" + dq + ">): GetEntityValue(language) = [" + dtd:GetEntityValue("language") + "], GetRootElement() = [" + dtd:GetRootElement() + "], HasExternalFile() = [" + dtd:HasExternalFile() + "], GetExternalFileName() = [" + dtd:GetExternalFileName() + "]"
+        detect e
+            output "DocumentTypeDefinition SetSourceDirectory then Read SYSTEM unexpected error: " + e:GetErrorMessage()
+        end
+
+        check
+            DocumentTypeDefinition dtd
+            dtd:SetSourceDirectory(folderPath)
+            dtd:Read("<!DOCTYPE note SYSTEM 'note.dtd' [<!ENTITY local 'here'>]>")
+            output "DocumentTypeDefinition SetSourceDirectory(XmlScratch) Read(<!DOCTYPE note SYSTEM 'note.dtd' [<!ENTITY local 'here'>]>): GetEntityValue(local) = [" + dtd:GetEntityValue("local") + "], GetEntityValue(language) = [" + dtd:GetEntityValue("language") + "]"
+        detect e
+            output "DocumentTypeDefinition SYSTEM with an internal subset unexpected error: " + e:GetErrorMessage()
+        end
+
+        check
+            DocumentTypeDefinitionEntity entity
+            entity:SetSourceDirectory(folderPath)
+            entity:SetValue("SYSTEM " + dq + "entity.txt" + dq)
+            output "DocumentTypeDefinitionEntity SetSourceDirectory(XmlScratch) SetValue(SYSTEM " + dq + "entity.txt" + dq + ") GetValue() = [" + entity:GetValue() + "]"
+        detect e
+            output "DocumentTypeDefinitionEntity SYSTEM value unexpected error: " + e:GetErrorMessage()
+        end
+
+        check
+            folder:Delete(true)
+            output "scratch folder removed = [" + (not folder:Exists()) + "]"
+        detect e
+            output "removing the scratch folder unexpected error: " + e:GetErrorMessage()
+        end
+    end
+
+    action Write(text path, text contents)
+        File file
+        file:SetPath(path)
+        file:Write(contents)
+    end
+
+    action StartElement(Element element)
+        text result = " Start(" + element:GetName()
+        integer i = 0
+        repeat while i < element:GetAttributes():GetSize()
+            result = result + " " + element:GetAttributes():GetName(i) + "=[" + element:GetAttributes():GetValue(i) + "]"
+            i = i + 1
+        end
+        log = log + result + ")"
+    end
+
+    action Value(text value)
+        log = log + " Value[" + value + "]"
+    end
+
+    action EndElement(Element element)
+        log = log + " End(" + element:GetName() + ")"
+    end
+end

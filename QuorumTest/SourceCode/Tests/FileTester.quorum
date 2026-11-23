@@ -1,0 +1,50 @@
+package Libraries.Language.Compile.Test
+use Libraries.Testing.QuorumTest
+use Libraries.Testing.ScriptCheck
+
+/*
+Tests File, FileReader, FileWriter, FileRandomAccess, BinaryFileReader and
+Path: names, folders, listing, delete, move, copy, locations, reading and
+writing, each script working in its own scratch folder under the current
+directory (FileTestsWork/<ScriptName>) that it deletes at the end.
+Bytecode only: the JavaScript File plugin treats paths as web addresses
+(no local folders, no create, delete, move or listing, and FileRandomAccess
+and Path have no JavaScript plugin), and Python has no File, FileReader,
+FileWriter, FileRandomAccess, BinaryFileReader or Path plugin at all.
+*/
+class FileTester
+    QuorumTest suite = undefined
+    ScriptCheck scripts
+    text path = "Scripts/File/Pass/"
+
+    action Test
+        scripts:SetSuite(suite)
+        scripts:Check(path + "FileNames", false, false)
+        scripts:Check(path + "FileExists", false, false)
+        scripts:Check(path + "FileWriteRead", false, false)
+        scripts:Check(path + "FileDirectories", false, false)
+        scripts:Check(path + "FileListing", false, false)
+        scripts:Check(path + "FileDelete", false, false)
+        scripts:Check(path + "FileMove", false, false)
+        scripts:Check(path + "FileCopy", false, false)
+        scripts:Check(path + "FileLocations", false, false)
+        scripts:Check(path + "FileReaderActions", false, false)
+        scripts:Check(path + "FileWriterActions", false, false)
+        scripts:Check(path + "FileRandomAccessActions", false, false)
+        scripts:Check(path + "BinaryFileReaderActions", false, false)
+        scripts:Check(path + "PathActions", false, false)
+        scripts:Check(path + "FileSystemInfo", false, false)
+    end
+
+    action GetName returns text
+        return "File Tests"
+    end
+
+    action GetCompilerTestSuite returns QuorumTest
+        return suite
+    end
+
+    action SetCompilerTestSuite(QuorumTest suite)
+        me:suite = suite
+    end
+end

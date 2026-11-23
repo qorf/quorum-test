@@ -1,0 +1,16 @@
+MultipleLineText(ab/cde/f) GetText() = [ab/cde/f], GetSize() = 8, GetLineCount() = 3
+MultipleLineText(ab/cde/f) GetLine(0..2) = [ab/][cde/][f]
+MultipleLineText(ab/cde/f) GetLines() has 3: [ab/][cde/][f]
+MultipleLineText(ab/cde/f) LineIndexFromCharacterIndex(0, 2, 3, 6, 7) = 0 0 1 1 2
+MultipleLineText(ab/cde/f) CharacterIndexFromLineIndex(0, 1, 2) = 0 3 7
+MultipleLineText(ab/cde/f) GetCharacter(2) = [/], GetCharacter(3) = [c], GetText(1, 5) = [b/cd]
+MultipleLineText(ab/cde/f) SetLine(1, XY) = [ab/XY/f], lines [ab/][XY/][f], original [ab/cde/f]
+MultipleLineText(ab/cde/f) SetLine(2, Z) = [ab/cde/Z], lines [ab/][cde/][Z]
+MultipleLineText(ab/cde/f) SetLine(0, '') = [/cde/f], GetLineCount() = 3
+MultipleLineText(ab/cde/f) Insert(1, separator) = [a/b/cde/f], GetLineCount() = 4, lines [a/][b/][cde/][f]
+MultipleLineText(ab/cde/f) Delete(2, 3) (a separator) = [abcde/f], GetLineCount() = 2, lines [abcde/][f]
+MultipleLineText(ab/cde/f) Delete(1, 7) = [af], GetLineCount() = 1
+MultipleLineText(ab/cde/f) Concatenate(/g) then Concatenate(h/i) = [ab/cde/f/gh/i], GetLineCount() = 5, lines [ab/][cde/][f/][gh/][i]
+MultipleLineText(ab/cde/f) Balance() = [ab/cde/f], GetLineCount() = 3, NeedsBalancing() = false
+MultipleLineText(ab/) GetLineCount() = 2, GetLine(1) = [], GetSize() = 3
+MultipleLineText(ab/cde/f) SetLineSeparator(|): GetText() = [ab|cde|f], GetLineSeparator() = [|], GetLineCount() = 3

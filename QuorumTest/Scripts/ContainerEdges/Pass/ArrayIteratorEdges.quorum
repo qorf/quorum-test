@@ -1,0 +1,90 @@
+use Libraries.Containers.Array
+use Libraries.Containers.Iterator
+
+/*
+    The Array iterator at its edges. GetCurrent documents "gets the current
+    item in the iteration without continuing the iteration": undefined before
+    the first Next, then the item the last Next returned. Rewind starts over.
+*/
+class Main
+    action Show(text value) returns text
+        if value = undefined
+            return "undefined"
+        end
+        return "[" + value + "]"
+    end
+
+    action Describe(Array<text> array) returns text
+        text result = "["
+        integer i = 0
+        repeat while i < array:GetSize()
+            if i > 0
+                result = result + ","
+            end
+            text value = array:Get(i)
+            if value = undefined
+                result = result + "undefined"
+            else
+                result = result + value
+            end
+            i = i + 1
+        end
+        return result + "]"
+    end
+    action Main
+        Array<text> array
+        array:Add("a")
+        array:Add("b")
+        Iterator<text> it = array:GetIterator()
+        check
+            output "Array[a,b] iterator before Next: HasNext() = " + it:HasNext() + ", GetCurrent() = " + Show(it:GetCurrent())
+        detect e
+            output "Array[a,b] iterator before Next unexpected error: " + e:GetErrorMessage()
+        end
+        check
+            text value = it:Next()
+            output "Array[a,b] iterator Next() = " + Show(value) + ", GetCurrent() = " + Show(it:GetCurrent()) + ", HasNext() = " + it:HasNext()
+        detect e
+            output "Array[a,b] iterator first Next() unexpected error: " + e:GetErrorMessage()
+        end
+        check
+            text value = it:Next()
+            output "Array[a,b] iterator Next() = " + Show(value) + ", GetCurrent() = " + Show(it:GetCurrent()) + ", HasNext() = " + it:HasNext()
+        detect e
+            output "Array[a,b] iterator second Next() unexpected error: " + e:GetErrorMessage()
+        end
+        check
+            output "Array[a,b] iterator at the end GetCurrent() twice = " + Show(it:GetCurrent()) + " " + Show(it:GetCurrent())
+        detect e
+            output "Array[a,b] iterator at the end GetCurrent() unexpected error: " + e:GetErrorMessage()
+        end
+        check
+            text value = it:Next()
+            output "Array[a,b] iterator Next() past the end should fail but returned " + Show(value)
+        detect e
+            output "Array[a,b] iterator Next() past the end fails, as it should"
+        end
+        check
+            it:Rewind()
+            output "Array[a,b] iterator Rewind(): HasNext() = " + it:HasNext() + ", GetCurrent() = " + Show(it:GetCurrent()) + ", Next() = " + Show(it:Next())
+        detect e
+            output "Array[a,b] iterator Rewind() unexpected error: " + e:GetErrorMessage()
+        end
+
+        Array<text> withUndefined
+        withUndefined:SetSize(2)
+        withUndefined:Set(1, "b")
+        check
+            Iterator<text> it2 = withUndefined:GetIterator()
+            text all = ""
+            integer count = 0
+            repeat while it2:HasNext()
+                all = all + Show(it2:Next())
+                count = count + 1
+            end
+            output "Array[undefined,b] iterating: " + count + " items " + all
+        detect e
+            output "Array[undefined,b] iterating unexpected error: " + e:GetErrorMessage()
+        end
+    end
+end

@@ -1,0 +1,77 @@
+use Libraries.Compute.Plane
+use Libraries.Compute.Vector3
+
+/*
+Every action of Plane. A plane is a unit length normal and a distance d,
+and the signed distance of a point p from it is normal . p + d. Set from a
+normal and a distance, or a normal and a point, normalizes the normal; Set
+from three points uses (point1 - point2) x (point2 - point3) as the
+normal. TestPoint gives "Front" on the side the normal points to, "Back"
+on the other side and "OnPlane" on the plane. IsFrontFacing is true when
+the normal points against the viewing direction (or across it).
+*/
+class Main
+    action Main
+        check
+            Plane plane
+            plane:Set(MakeVector(0, 0, 2), 5)
+            output "Set(normal (0, 0, 2), 5): GetNormal = " + Text(plane:GetNormal()) + ", GetDistance = " + plane:GetDistance()
+            output "Distance of (1, 2, 3) = " + plane:Distance(MakeVector(1, 2, 3))
+            output "Distance of (0, 0, -5) = " + plane:Distance(MakeVector(0, 0, -5))
+        detect e
+            output "Set(normal, distance) unexpected error: " + e:GetErrorMessage()
+        end
+        check
+            Plane plane
+            plane:Set(MakeVector(0, 3, 0), MakeVector(1, 2, 3))
+            output "Set(normal (0, 3, 0), point (1, 2, 3)): GetNormal = " + Text(plane:GetNormal()) + ", GetDistance = " + plane:GetDistance()
+            output "Distance of (0, 5, 0) = " + plane:Distance(MakeVector(0, 5, 0))
+            output "TestPoint (7, 2, 9) = " + plane:TestPoint(MakeVector(7, 2, 9))
+            output "TestPoint (0, 5, 0) = " + plane:TestPoint(MakeVector(0, 5, 0))
+            output "TestPoint (0, -1, 0) = " + plane:TestPoint(MakeVector(0, -1, 0))
+            output "TestPoint(3, 2, -4) = " + plane:TestPoint(3, 2, -4)
+            output "TestPoint(3, 2.5, -4) = " + plane:TestPoint(3, 2.5, -4)
+            output "TestPoint(3, 1.5, -4) = " + plane:TestPoint(3, 1.5, -4)
+        detect e
+            output "Set(normal, point) unexpected error: " + e:GetErrorMessage()
+        end
+        check
+            Plane plane
+            plane:Set(MakeVector(0, 0, 2), MakeVector(1, 0, 2), MakeVector(1, 1, 2))
+            output "Set((0, 0, 2), (1, 0, 2), (1, 1, 2)): GetNormal = " + Text(plane:GetNormal()) + ", GetDistance = " + plane:GetDistance()
+            output "TestPoint (5, 5, 2) = " + plane:TestPoint(MakeVector(5, 5, 2))
+            output "TestPoint (0, 0, 3) = " + plane:TestPoint(MakeVector(0, 0, 3))
+            output "TestPoint (0, 0, 0) = " + plane:TestPoint(MakeVector(0, 0, 0))
+            output "IsFrontFacing toward (0, 0, -1) = " + plane:IsFrontFacing(MakeVector(0, 0, -1))
+            output "IsFrontFacing toward (0, 0, 1) = " + plane:IsFrontFacing(MakeVector(0, 0, 1))
+            output "IsFrontFacing toward (1, 0, 0) = " + plane:IsFrontFacing(MakeVector(1, 0, 0))
+        detect e
+            output "Set(three points) unexpected error: " + e:GetErrorMessage()
+        end
+        check
+            Plane plane
+            plane:Set(1, 0, 0, -1)
+            output "Set(1, 0, 0, -1): GetNormal = " + Text(plane:GetNormal()) + ", GetDistance = " + plane:GetDistance()
+            output "Distance of (4, 9, 9) = " + plane:Distance(MakeVector(4, 9, 9))
+            Plane copy
+            copy:Set(plane)
+            output "Set(plane) copy: GetNormal = " + Text(copy:GetNormal()) + ", GetDistance = " + copy:GetDistance()
+            plane:Set(0, 1, 0, 7)
+            output "the copy after changing the original: GetNormal = " + Text(copy:GetNormal()) + ", GetDistance = " + copy:GetDistance()
+        detect e
+            output "Set(numbers) and Set(plane) unexpected error: " + e:GetErrorMessage()
+        end
+        Plane names
+        output "constants: onPlane = " + names:onPlane + ", front = " + names:front + ", back = " + names:back
+    end
+
+    action MakeVector(number x, number y, number z) returns Vector3
+        Vector3 vector
+        vector:Set(x, y, z)
+        return vector
+    end
+
+    action Text(Vector3 vector) returns text
+        return "(" + vector:GetX() + ", " + vector:GetY() + ", " + vector:GetZ() + ")"
+    end
+end

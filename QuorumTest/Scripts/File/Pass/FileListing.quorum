@@ -1,0 +1,68 @@
+use Libraries.System.File
+use Libraries.Containers.Array
+
+/*
+Tests GetDirectoryListing inside a scratch folder (FileTestsWork/FileListing),
+deleted at the end. The order of a listing depends on the system, so the
+names are sorted before they are printed. Each listed File's GetPath is the
+item's name, and its working directory is the listed folder. A file (not a
+folder) has no listing: undefined, as the documentation says. An empty folder
+has an empty listing.
+*/
+class Main
+    action Main
+        File work
+        work:SetPath("FileTestsWork/FileListing")
+        work:Delete(true)
+        boolean made = work:CreateDirectories()
+        File a
+        a:SetPath("FileTestsWork/FileListing/b.txt")
+        a:Write("b")
+        File b
+        b:SetPath("FileTestsWork/FileListing/a.txt")
+        b:Write("a")
+        File sub
+        sub:SetPath("FileTestsWork/FileListing/sub")
+        made = sub:CreateDirectory()
+
+        check
+            Array<File> items = work:GetDirectoryListing()
+            output "GetDirectoryListing(folder with a.txt, b.txt, sub) size = " + items:GetSize()
+            Array<text> names
+            integer i = 0
+            repeat while i < items:GetSize()
+                File item = items:Get(i)
+                text kind = "file"
+                if item:IsDirectory()
+                    kind = "folder"
+                end
+                names:Add(item:GetPath() + " (" + kind + ", contents of " + item:GetParentDirectory():GetFileName() + ")")
+                i = i + 1
+            end
+            names:Sort()
+            i = 0
+            repeat while i < names:GetSize()
+                output "GetDirectoryListing item: " + names:Get(i)
+                i = i + 1
+            end
+        detect e
+            output "GetDirectoryListing(folder) unexpected error: " + e:GetErrorMessage()
+        end
+        check
+            Array<File> empty = sub:GetDirectoryListing()
+            output "GetDirectoryListing(empty sub) size = " + empty:GetSize()
+        detect e
+            output "GetDirectoryListing(empty sub) unexpected error: " + e:GetErrorMessage()
+        end
+        check
+            Array<File> none = a:GetDirectoryListing()
+            output "GetDirectoryListing(b.txt, a file) is undefined = " + (none = undefined)
+        detect e
+            output "GetDirectoryListing(b.txt) unexpected error: " + e:GetErrorMessage()
+        end
+        work:Delete(true)
+        File top
+        top:SetPath("FileTestsWork")
+        boolean removed = top:Delete()
+    end
+end

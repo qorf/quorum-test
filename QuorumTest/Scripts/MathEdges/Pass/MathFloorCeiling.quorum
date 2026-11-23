@@ -1,0 +1,44 @@
+use Libraries.Compute.Math
+
+/*
+Math:Floor rounds toward negative infinity and Math:Ceiling toward positive
+infinity. Both return a number, so the answer prints with a decimal point.
+Cases whose answer would be negative zero are left out. The large cases
+stay under 10 million, where every back end prints numbers the same way
+(Java switches to 1.0E7 notation there).
+*/
+class Main
+    Math math
+
+    action Main
+        ShowFloor(2.7)
+        ShowFloor(2.0)
+        ShowFloor(-2.2)
+        ShowFloor(-2.0)
+        ShowFloor(0.5)
+        ShowFloor(-0.5)
+        ShowFloor(1234567.5)
+        ShowCeiling(2.2)
+        ShowCeiling(2.0)
+        ShowCeiling(-2.7)
+        ShowCeiling(-2.0)
+        ShowCeiling(0.5)
+        ShowCeiling(-1234567.5)
+    end
+
+    action ShowFloor(number value)
+        check
+            output "Floor(" + value + ") = " + math:Floor(value)
+        detect e
+            output "Floor(" + value + ") unexpected error: " + e:GetErrorMessage()
+        end
+    end
+
+    action ShowCeiling(number value)
+        check
+            output "Ceiling(" + value + ") = " + math:Ceiling(value)
+        detect e
+            output "Ceiling(" + value + ") unexpected error: " + e:GetErrorMessage()
+        end
+    end
+end

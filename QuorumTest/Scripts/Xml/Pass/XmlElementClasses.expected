@@ -1,0 +1,12 @@
+new Element: GetName() = [], GetValue() = [], GetAttributes():GetSize() = 0
+ElementImplementation SetName(book) SetValue(Lord of the Flies): GetName() = [book], GetValue() = [Lord of the Flies]
+ElementImplementation SetName twice keeps the last = [second], SetValue() empty = []
+ElementImplementation Add(author) Add(year): size = 2, 0 = [author=William Golding], 1 = [year=1954]
+ElementImplementation used as an Element: GetName() = [cast]
+new Attribute: name = [], value = []
+new AttributesImplementation GetSize() = 0
+AttributesImplementation Add(day=01) Add(month=02): GetSize() = 2, GetName(1) = [month], GetValue(1) = [02], GetName(0) = [day], GetValue(0) = [01]
+AttributesImplementation Empty() after three Adds: GetSize() = 0
+AttributesImplementation GetName(1) with one attribute fails, as it should
+AttributesImplementation GetValue(0) when empty fails, as it should
+AttributesImplementation GetName(-1) fails, as it should

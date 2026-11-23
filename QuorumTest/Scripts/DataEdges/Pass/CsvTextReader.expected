@@ -1,0 +1,14 @@
+SetText(a,b\nc,d) GetText() = [a,b\nc,d], GetCharacterSize() = 7
+SetText(a,b\nc,d) ReadLine() = [a,b], GetCharacterIndex() = 4, IsAtEndOfFile() = false, ReadLine() = [c,d], IsAtEndOfFile() = true
+SetText(a,b\r\nc,d\r\n) ReadLines() = 2 lines [a,b][c,d]
+SetText(a,b\rc,d) ReadLines() = 2 lines [a,b][c,d]
+SetText(a,b\n\nc,d) ReadLines() = 3 lines [a,b][][c,d]
+SetText("a\nb",c\nd) ReadLines() = 2 lines ["a\nb",c][d]
+SetText(one line) ReadLines() = 1 lines [one line]
+SetText(a,b\r) ReadLines() = 1 lines [a,b]
+SetText(x\n) ReadLines() = 1 lines [x]
+SetText() IsAtEndOfFile() = true, GetCharacterSize() = 0
+new reader GetStoreLines() = true, GetCharacterIndex() = 0
+SetStoreLines(false) GetStoreLines() = false
+SetText(1\n2\n3) ReadLine() = [1] then ReadLines() with lines stored = 3 lines [1][2][3]
+SetText(1\n2\n3) SetStoreLines(false) ReadLine() = [1] then ReadLines() = 2 lines [2][3]

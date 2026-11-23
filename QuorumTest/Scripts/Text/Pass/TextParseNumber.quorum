@@ -1,0 +1,67 @@
+/*
+    Text:ParseNumber gives the number in the text, and alerts an error when
+    the text is not a valid number. The whole text must be the number:
+    trailing letters, an underscore, a comma or an empty text fail (Java's
+    parseDouble agrees). Results are compared with number literals rather
+    than printed only, so number-to-text formatting does not decide the
+    test. Java also accepts surrounding spaces, "NaN" and exponents; the
+    documentation is silent on those, so they are not tested.
+    Each case runs on a text primitive and on a Text object.
+*/
+class Main
+    action Main
+        Show("12.5", 12.5)
+        Show("-0.5", -0.5)
+        Show("3", 3.0)
+        Show("0", 0.0)
+        Show("0.0", 0.0)
+        Show(".5", 0.5)
+        Show("-12", -12.0)
+        Show("1000000", 1000000.0)
+        Fail("abc")
+        Fail("12abc")
+        Fail("12.5.3")
+        Fail("")
+        Fail(" ")
+        Fail("1_000")
+        Fail("1,5")
+        Fail("-")
+        Fail(".")
+    end
+
+    action Show(text value, number expected)
+        text call = "ParseNumber([" + value + "])"
+        check
+            number result = value:ParseNumber()
+            output call + " = " + result + ", equals " + expected + " is " + (result = expected)
+        detect e
+            output call + " unexpected error: " + e:GetErrorMessage()
+        end
+        Text object
+        object:SetValue(value)
+        check
+            number result = object:ParseNumber()
+            output "Text " + call + " = " + result + ", equals " + expected + " is " + (result = expected)
+        detect e
+            output "Text " + call + " unexpected error: " + e:GetErrorMessage()
+        end
+    end
+
+    action Fail(text value)
+        text call = "ParseNumber([" + value + "])"
+        check
+            number result = value:ParseNumber()
+            output call + " should fail but returned " + result
+        detect e
+            output call + " fails, as it should"
+        end
+        Text object
+        object:SetValue(value)
+        check
+            number result = object:ParseNumber()
+            output "Text " + call + " should fail but returned " + result
+        detect e
+            output "Text " + call + " fails, as it should"
+        end
+    end
+end

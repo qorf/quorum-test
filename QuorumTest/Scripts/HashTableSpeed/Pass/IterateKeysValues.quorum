@@ -1,0 +1,81 @@
+use Libraries.Containers.HashTable
+use Libraries.Containers.Array
+use Libraries.Containers.Iterator
+use Libraries.System.DateTime
+
+/*
+    Speed of walking a whole HashTable: GetKeyIterator, GetValueIterator,
+    CopyToKeyArray and CopyToValueArray over tables of 100,000 and 400,000
+    integer keys. The sums show every key and value was visited once.
+    Limit: all four walks of the 400,000-key table within 2,000 ms (about
+    30 ms on bytecode). Scaling: 100,000 then 400,000.
+*/
+class Main
+    DateTime clock
+
+    action Now returns number
+        return clock:GetEpochTime()
+    end
+
+    // Prints a fixed line when the time is within the limit, and the
+    // measured time only when it is not.
+    action Limit(text name, number milliseconds, integer limit)
+        if milliseconds <= limit
+            output name + ": within " + limit + " ms"
+        else
+            output name + ": too slow, " + cast(integer, milliseconds) + " ms (limit " + limit + " ms)"
+        end
+    end
+
+    // Four times the work may take at most eight times as long. A smaller
+    // time under 20 ms is too short to measure a ratio reliably (timer
+    // granularity, JIT warm-up), so it counts as linear.
+    action Scaling(text name, text unit, integer smallCount, number smallTime, integer bigCount, number bigTime)
+        if smallTime < 20 or bigTime <= smallTime * 8
+            output name + " scales linearly (4x " + unit + ", at most 8x time)"
+        else
+            number ratio = cast(integer, bigTime / smallTime * 10) / 10.0
+            output name + " grows faster than linear: " + smallCount + " in " + cast(integer, smallTime) + " ms, " + bigCount + " in " + cast(integer, bigTime) + " ms (" + ratio + "x)"
+        end
+    end
+
+    action Fill(integer count) returns HashTable<integer, integer>
+        HashTable<integer, integer> table
+        integer i = 0
+        repeat count times
+            table:Add(i, i * 2)
+            i = i + 1
+        end
+        return table
+    end
+
+    action TimeWalks(HashTable<integer, integer> table) returns number
+        number start = Now()
+        integer keySum = 0
+        integer keyCount = 0
+        Iterator<integer> keys = table:GetKeyIterator()
+        repeat while keys:HasNext()
+            keySum = (keySum + keys:Next()) mod 1000000
+            keyCount = keyCount + 1
+        end
+        integer valueSum = 0
+        Iterator<integer> values = table:GetValueIterator()
+        repeat while values:HasNext()
+            valueSum = (valueSum + values:Next()) mod 1000000
+        end
+        Array<integer> keyArray = table:CopyToKeyArray()
+        Array<integer> valueArray = table:CopyToValueArray()
+        number time = Now() - start
+        output "Walk a table of " + table:GetSize() + " integer keys: key iterator visits " + keyCount + ", key sum mod 1000000 = " + keySum + ", value sum mod 1000000 = " + valueSum + ", CopyToKeyArray() size " + keyArray:GetSize() + ", CopyToValueArray() size " + valueArray:GetSize()
+        return time
+    end
+
+    action Main
+        HashTable<integer, integer> small = Fill(100000)
+        HashTable<integer, integer> big = Fill(400000)
+        number smallTime = TimeWalks(small)
+        number bigTime = TimeWalks(big)
+        Limit("Walk a table of 400000 keys four ways", bigTime, 2000)
+        Scaling("Walking keys and values", "keys", 100000, smallTime, 400000, bigTime)
+    end
+end

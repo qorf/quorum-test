@@ -1,0 +1,7 @@
+SetSize(100, 50) Add(circle) ToText() = [<svg width="100" height="50"\n\txmlns="http://www.w3.org/2000/svg" tabindex="0">\n\n\t<circle cx="12.5" cy="20.5" r="5.5" tabindex="0" />\n\n</svg>\n]
+GetWidth() = [100], GetHeight() = [50], IsTopLevel() = [true]
+Add(circle) then Empty() ToText() = [<svg width="10" height="10"\n\txmlns="http://www.w3.org/2000/svg" tabindex="0">\n\n</svg>\n]
+SetIsTopLevel(false) SetSize(20, 30) SetPosition(5, 6) ToText() = [<svg width="20" height="30" x="5" y="6" tabindex="0">\n\n</svg>\n]
+IsTopLevel() = [false], GetPositionX() = [5], GetPositionY() = [6]
+SetViewBox(0, 0, 10, 20) ToText() contains viewBox="0 0 10 20" = [true]
+SetTitle(Chart) ToText() contains <title>Chart</title> = [true]

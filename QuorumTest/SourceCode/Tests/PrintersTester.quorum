@@ -1,0 +1,62 @@
+package Libraries.Language.Compile.Test
+
+use Libraries.Testing.QuorumTest
+use Libraries.Testing.ScriptCheck
+
+/*
+Tests the printer classes in Libraries.Fabrication.Printers that
+Scripts/Fabrication doesn't: each script makes one printer and prints its
+name, its settings and family, its validation, its start and end G-code
+(line breaks shown as \n), SetBed and a child profile. Bambu printers
+also check SetBambuFiles and that their G-code needs Bambu's files.
+Bytecode and JavaScript: the printers are pure Quorum and read no files,
+but Profile and its schema aren't known to work on Python (the other
+Fabrication tests are bytecode only), so Python is left off.
+*/
+class PrintersTester
+    QuorumTest suite = undefined
+    ScriptCheck scripts
+    text path = "Scripts/Printers/Pass/"
+
+    action Test
+        scripts:SetSuite(suite)
+        scripts:Check(path + "AnycubicChiron", true, false)
+        scripts:Check(path + "AnycubicI3Mega", true, false)
+        scripts:Check(path + "AnycubicKobra", true, false)
+        scripts:Check(path + "AnycubicKobra2", true, false)
+        scripts:Check(path + "AnycubicKobra2Neo", true, false)
+        scripts:Check(path + "BambuA1", true, false)
+        scripts:Check(path + "BambuA1Mini", true, false)
+        scripts:Check(path + "BambuP2S", true, false)
+        scripts:Check(path + "BambuPrinter", true, false)
+        scripts:Check(path + "BowdenPrinter", true, false)
+        scripts:Check(path + "CrealityCR10S", true, false)
+        scripts:Check(path + "CrealityEnder3S1", true, false)
+        scripts:Check(path + "CrealityEnder3V2", true, false)
+        scripts:Check(path + "CrealityEnder3V3SE", true, false)
+        scripts:Check(path + "CrealityEnder5", true, false)
+        scripts:Check(path + "CrealitySermoonD1", true, false)
+        scripts:Check(path + "DirectDrivePrinter", true, false)
+        scripts:Check(path + "ElegooNeptune3Pro", true, false)
+        scripts:Check(path + "ElegooNeptune4Pro", true, false)
+        scripts:Check(path + "Printer", true, false)
+        scripts:Check(path + "PrusaMK2S", true, false)
+        scripts:Check(path + "PrusaMK4", true, false)
+        scripts:Check(path + "PrusaMK4S", true, false)
+        scripts:Check(path + "PrusaMini", true, false)
+        scripts:Check(path + "SovolSV06", true, false)
+        scripts:Check(path + "Ultimaker2", true, false)
+    end
+
+    action GetName returns text
+        return "Printer Tests"
+    end
+
+    action GetCompilerTestSuite returns QuorumTest
+        return suite
+    end
+
+    action SetCompilerTestSuite(QuorumTest suite)
+        me:suite = suite
+    end
+end

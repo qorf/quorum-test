@@ -1,0 +1,88 @@
+use Libraries.Data.Formats.SeparatedValue
+use Libraries.Containers.Array
+
+/*
+Spaces are part of a field (RFC 4180 section 2), at the start and end of
+every field, including the last one.
+
+Each case reads one text with a new SeparatedValue and prints the number of
+rows and every row as [cell][cell], rows separated by " | ". The input and
+cells show line feeds, carriage returns and tabs as \n, \r and \t. In the
+source, ` stands for a double quote, ^ for a line feed, @ for a carriage
+return and ~ for a tab (Quorum text literals have no escapes).
+
+The documentation doesn't describe quoting, so the expectations follow RFC
+4180: fields may be quoted, a quoted field may hold the separator, line
+breaks and doubled quotes ("" for one "), the quotes themselves are not part
+of the value, spaces are part of a field, and a final line break does not
+start another row.
+*/
+class Main
+    action Main
+        Parse("a, b")
+        Parse(" a ,b ")
+        Parse("a,b ")
+        Parse("` a `,b")
+        Parse("a,~b~")
+    end
+
+    action Build(text raw) returns text
+        text dq = ""
+        dq = dq:GetDoubleQuote()
+        text result = raw:Replace("`", dq)
+        result = result:Replace("^", dq:GetLineFeed())
+        result = result:Replace("~", dq:GetTab())
+        result = result:Replace("@", dq:GetCarriageReturn())
+        return result
+    end
+
+    action Show(text value) returns text
+        text result = value:Replace(value:GetCarriageReturn(), "\r")
+        result = result:Replace(value:GetLineFeed(), "\n")
+        result = result:Replace(value:GetTab(), "\t")
+        return result
+    end
+
+    action Rows(SeparatedValue csv) returns text
+        text result = "rows = " + csv:GetNumberOfRows() + ":"
+        integer row = 0
+        repeat while row < csv:GetNumberOfRows()
+            if row > 0
+                result = result + " |"
+            end
+            result = result + " "
+            Array<text> cells = csv:GetRow(row)
+            integer column = 0
+            repeat while column < cells:GetSize()
+                result = result + "[" + Show(cells:Get(column)) + "]"
+                column = column + 1
+            end
+            row = row + 1
+        end
+        return result
+    end
+
+    action Parse(text raw)
+        text value = Build(raw)
+        check
+            SeparatedValue csv
+            csv:Read(value)
+            output "Read(" + Show(value) + ") " + Rows(csv)
+        detect e
+            output "Read(" + Show(value) + ") unexpected error: " + e:GetErrorMessage()
+        end
+    end
+
+    action ParseWith(text separator, text raw)
+        text value = Build(raw)
+        text sep = Build(separator)
+        check
+            SeparatedValue csv
+            csv:SetSeparator(sep)
+            csv:Read(value)
+            output "SetSeparator(" + Show(sep) + ") Read(" + Show(value) + ") " + Rows(csv)
+        detect e
+            output "SetSeparator(" + Show(sep) + ") Read(" + Show(value) + ") unexpected error: " + e:GetErrorMessage()
+        end
+    end
+end

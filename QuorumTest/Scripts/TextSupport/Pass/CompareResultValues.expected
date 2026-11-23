@@ -1,0 +1,9 @@
+LARGER = 1, EQUAL = 0, SMALLER = -1, INVALID = -2, result = -2
+Number 10.3 Compare(9.6) = LARGER is [true]
+Number 9.6 Compare(10.3) = SMALLER is [true]
+Number 10.3 Compare(10.3) = EQUAL is [true]
+Integer 3 Compare(5) = SMALLER is [true]
+Integer 5 Compare(3) = LARGER is [true]
+Text apple Compare(banana) = SMALLER is [true]
+Text banana Compare(apple) = LARGER is [true]
+result set to LARGER = 1, a new CompareResult's result is still -2

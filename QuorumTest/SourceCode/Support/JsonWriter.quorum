@@ -1,6 +1,7 @@
 package Libraries.Testing
 
 use Libraries.System.File
+use Libraries.Language.Support.TextBuilder
 
 /*
     Small helpers for writing JSON as text: quoting a value, and writing a
@@ -16,11 +17,58 @@ class JsonWriter
         text quote = ""
         quote = quote:GetDoubleQuote()
         text result = value:Replace("\", "\\")
-        result = result:Replace(quote, "\" + quote)
+        //the standard library's reader ends a text at any double quote, even
+        //an escaped one, so a quote is written as its Unicode escape
+        result = result:Replace(quote, "\" + "u0022")
         result = result:Replace(quote:GetCarriageReturn(), "\r")
         result = result:Replace(quote:GetLineFeed(), "\n")
         result = result:Replace(quote:GetTab(), "\t")
         return quote + result + quote
+    end
+
+    /*
+        Undoes Quote's escapes in a text read back with the standard
+        library's reader, which keeps escapes as written: \n, \r, \t, \\ and
+        \u0022 become their characters, and anything else stays as it is.
+        One character at a time, so \\n stays a backslash and an n.
+    */
+    action Decode(text value) returns text
+        if value = undefined
+            return undefined
+        end
+        text quote = ""
+        quote = quote:GetDoubleQuote()
+        TextBuilder result
+        integer i = 0
+        repeat while i < value:GetSize()
+            text character = value:GetCharacter(i)
+            if character = "\" and i + 1 < value:GetSize()
+                text next = value:GetCharacter(i + 1)
+                if next = "n"
+                    result:Append(quote:GetLineFeed())
+                    i = i + 2
+                elseif next = "r"
+                    result:Append(quote:GetCarriageReturn())
+                    i = i + 2
+                elseif next = "t"
+                    result:Append(quote:GetTab())
+                    i = i + 2
+                elseif next = "\"
+                    result:Append("\")
+                    i = i + 2
+                elseif i + 6 <= value:GetSize() and value:GetSubtext(i, i + 6) = "\" + "u0022"
+                    result:Append(quote)
+                    i = i + 6
+                else
+                    result:Append(character)
+                    i = i + 1
+                end
+            else
+                result:Append(character)
+                i = i + 1
+            end
+        end
+        return result:ToText()
     end
 
     /* Returns "key": value, with the key quoted and the value as given. */

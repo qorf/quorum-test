@@ -1,0 +1,23 @@
+ParseTimestamp(2024-03-15T13:45:30): GetYear() = 2024
+ParseTimestamp(2024-03-15T13:45:30): GetMonth() = 3
+ParseTimestamp(2024-03-15T13:45:30): GetDayOfMonth() = 15
+ParseTimestamp(2024-03-15T13:45:30): GetDayOfWeek() = 5
+ParseTimestamp(2024-03-15T13:45:30): GetHour() = 13
+ParseTimestamp(2024-03-15T13:45:30): GetMinute() = 45
+ParseTimestamp(2024-03-15T13:45:30): GetSecond() = 30
+ParseTimestamp(1999-12-31 23:59:59): GetYear() = 1999
+ParseTimestamp(1999-12-31 23:59:59): GetMonth() = 12
+ParseTimestamp(1999-12-31 23:59:59): GetDayOfMonth() = 31
+ParseTimestamp(1999-12-31 23:59:59): GetDayOfWeek() = 5
+ParseTimestamp(1999-12-31 23:59:59): GetHour() = 23
+ParseTimestamp(1999-12-31 23:59:59): GetMinute() = 59
+ParseTimestamp(1999-12-31 23:59:59): GetSecond() = 59
+ParseTimestamp(2000-02-29T00:00:00): GetYear() = 2000
+ParseTimestamp(2000-02-29T00:00:00): GetMonth() = 2
+ParseTimestamp(2000-02-29T00:00:00): GetDayOfMonth() = 29
+ParseTimestamp(2000-02-29T00:00:00): GetDayOfWeek() = 2
+ParseTimestamp(2000-02-29T00:00:00): GetHour() = 0
+ParseTimestamp(2000-02-29T00:00:00): GetMinute() = 0
+ParseTimestamp(2000-02-29T00:00:00): GetSecond() = 0
+ParseTimestamp(not a timestamp) fails, as it should
+ParseTimestamp(2024-13-01T10:00:00) fails, as it should

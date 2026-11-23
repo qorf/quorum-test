@@ -1,0 +1,7 @@
+Array[3,9,1,9,-4,0,7] Sort(Descending) gives [9,9,7,3,1,0,-4]
+Array[ccc,a,bb,x,dd,e] Sort(ByLength) gives [a,x,e,bb,dd,ccc]
+Array[] Sort(ByLength) gives []
+Array[only] Sort(ByLength) gives [only]
+Array[1,2] Sort(Descending) gives [2,1]
+Array of 0..99 shuffled Sort(Descending, temp of 100): size 100, first 99, last 0, in order = true
+Array[1,5,3] auto-resize off Sort(Descending) gives [5,3,1]

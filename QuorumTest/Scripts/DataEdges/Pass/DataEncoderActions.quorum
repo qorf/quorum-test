@@ -1,0 +1,71 @@
+use Libraries.Data.Formats.DataEncoder
+use Libraries.System.File
+
+/*
+DataEncoder:EncodeImageAsDataURI(text) and EncodeImageAsDataURI(File). The
+"images" are small text files written to a scratch folder, DataEncoderScratch,
+in the working directory, so the base 64 is known: "abc" is YWJj, "hello" is
+aGVsbG8= (RFC 4648). The media type in a data URI (RFC 2397) should be the
+registered image type for the extension: image/png, image/gif, image/jpeg
+for .jpg, image/svg+xml for .svg. A missing file can't be encoded and should
+fail. Only the bytecode back end reads files (the JavaScript version is
+documented to return the path instead).
+*/
+class Main
+    action Main
+        File folder
+        folder:SetPath("DataEncoderScratch")
+        check
+            folder:Delete(true)
+        detect cleanup
+        end
+        folder:CreateDirectories()
+        Write("DataEncoderScratch/a.png", "abc")
+        Write("DataEncoderScratch/b.gif", "hello")
+        Write("DataEncoderScratch/c.jpg", "abc")
+        Write("DataEncoderScratch/d.svg", "abc")
+
+        DataEncoder encoder
+        check
+            output "EncodeImageAsDataURI(text a.png holding abc) = [" + encoder:EncodeImageAsDataURI("DataEncoderScratch/a.png") + "]"
+        detect e
+            output "EncodeImageAsDataURI(text a.png) unexpected error: " + e:GetErrorMessage()
+        end
+        check
+            File file
+            file:SetPath("DataEncoderScratch/b.gif")
+            output "EncodeImageAsDataURI(File b.gif holding hello) = [" + encoder:EncodeImageAsDataURI(file) + "]"
+        detect e
+            output "EncodeImageAsDataURI(File b.gif) unexpected error: " + e:GetErrorMessage()
+        end
+        check
+            output "EncodeImageAsDataURI(text c.jpg holding abc) = [" + encoder:EncodeImageAsDataURI("DataEncoderScratch/c.jpg") + "]"
+        detect e
+            output "EncodeImageAsDataURI(text c.jpg) unexpected error: " + e:GetErrorMessage()
+        end
+        check
+            output "EncodeImageAsDataURI(text d.svg holding abc) = [" + encoder:EncodeImageAsDataURI("DataEncoderScratch/d.svg") + "]"
+        detect e
+            output "EncodeImageAsDataURI(text d.svg) unexpected error: " + e:GetErrorMessage()
+        end
+        check
+            text result = encoder:EncodeImageAsDataURI("DataEncoderScratch/missing.png")
+            output "EncodeImageAsDataURI(text missing.png) should fail but returned [" + result + "]"
+        detect e
+            output "EncodeImageAsDataURI(text missing.png) fails, as it should"
+        end
+
+        check
+            folder:Delete(true)
+            output "scratch folder removed = [" + (not folder:Exists()) + "]"
+        detect e
+            output "removing the scratch folder unexpected error: " + e:GetErrorMessage()
+        end
+    end
+
+    action Write(text path, text contents)
+        File file
+        file:SetPath(path)
+        file:Write(contents)
+    end
+end

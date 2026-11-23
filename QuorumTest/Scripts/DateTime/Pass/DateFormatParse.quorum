@@ -1,0 +1,63 @@
+use Libraries.System.CalendarDate
+use Libraries.System.DateFormat
+
+/*
+Tests DateFormat's Parse. As the documentation says, it returns undefined
+for text that is not a date in the format (or a date that does not exist);
+names are read in any case, in full or short; numbers with or without zeros
+in front; a space in the pattern matches any number of spaces; space around
+the date is ignored; a missing year is 1970, a missing month January and a
+missing day the first. A weekday is read but the date comes from the rest.
+A two digit year with yy is in the 2000s.
+*/
+class Main
+    action Main
+        Read("MMMM d, yyyy", "November 3, 2026")
+        Read("MMMM d, yyyy", "nov 3, 2026")
+        Read("MMMM d, yyyy", "NOVEMBER 03, 2026")
+        Read("MMMM d, yyyy", "  November 3,   2026  ")
+        Read("MMMM d, yyyy", "November 3,2026")
+        Read("MMMM d, yyyy", "November 31, 2026")
+        Read("MMMM d, yyyy", "tomorrow")
+        Read("MMMM d, yyyy", "November 3, 2026 extra")
+        Read("MMMM d, yyyy", "")
+        Read("MM/dd/yyyy", "11/03/2026")
+        Read("MM/dd/yyyy", "1/2/2026")
+        Read("MM/dd/yyyy", "13/01/2026")
+        Read("MM/dd/yyyy", "02/29/2023")
+        Read("MM/dd/yyyy", "02/29/2024")
+        Read("yyyyMMdd", "20261103")
+        Read("yyyy-MM-dd", "2026-11-03")
+        Read("yyyy-MM-dd", "2026/11/03")
+        Read("yy-M-d", "26-11-3")
+        Read("yy-M-d", "1999-1-1")
+        Read("EEEE, MMMM d, yyyy", "Wednesday, November 3, 2026")
+        Read("EEEE, MMMM d, yyyy", "Funday, November 3, 2026")
+        Read("MMMM yyyy", "March 2024")
+        Read("d MMMM", "15 June")
+        Read("'Day' d 'of' MMMM", "day 4 OF july")
+        DateFormat format
+        check
+            text nothing = undefined
+            CalendarDate none = format:Parse(nothing)
+            output "Parse(undefined) is undefined = " + (none = undefined)
+        detect e
+            output "Parse(undefined) unexpected error: " + e:GetErrorMessage()
+        end
+    end
+
+    action Read(text pattern, text value)
+        DateFormat format
+        check
+            format:SetPattern(pattern)
+            CalendarDate date = format:Parse(value)
+            if date = undefined
+                output "Parse(" + value + ") with " + pattern + " = undefined"
+            else
+                output "Parse(" + value + ") with " + pattern + " = [" + date:ToText() + "]"
+            end
+        detect e
+            output "Parse(" + value + ") with " + pattern + " unexpected error: " + e:GetErrorMessage()
+        end
+    end
+end

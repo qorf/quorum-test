@@ -56,6 +56,20 @@ class Shard
         return "Output/Process" + shardNumber
     end
 
+    /* The tester running now, by key, or "" between testers and once done. */
+    action GetCurrent returns text
+        return current
+    end
+
+    /* Tests passed and run so far in the current tester, not yet in GetPassed and GetTotal. */
+    action GetCurrentPassed returns integer
+        return currentPassed
+    end
+
+    action GetCurrentTotal returns integer
+        return currentTotal
+    end
+
     action GetStatus returns text
         return status
     end
@@ -199,14 +213,5 @@ class Shard
         if process:IsAlive()
             process:Cancel()
         end
-    end
-
-    /* One line for the window's list of processes. */
-    action GetLine returns text
-        text line = "Process " + shardNumber + ": " + testers:GetSize() + " testers. " + passed + " of " + total + " passed. " + status
-        if status = "Running" and current not= ""
-            line = line + ": " + current + ", " + currentPassed + " of " + currentTotal + " passed so far"
-        end
-        return line
     end
 end

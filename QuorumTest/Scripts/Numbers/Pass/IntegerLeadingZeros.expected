@@ -1,0 +1,16 @@
+LeadingZeros(0) = 32
+Integer LeadingZeros(0) = 32
+LeadingZeros(1) = 31
+Integer LeadingZeros(1) = 31
+LeadingZeros(2) = 30
+Integer LeadingZeros(2) = 30
+LeadingZeros(255) = 24
+Integer LeadingZeros(255) = 24
+LeadingZeros(65536) = 15
+Integer LeadingZeros(65536) = 15
+LeadingZeros(2147483647) = 1
+Integer LeadingZeros(2147483647) = 1
+LeadingZeros(-1) = 0
+Integer LeadingZeros(-1) = 0
+LeadingZeros(-2147483648) = 0
+Integer LeadingZeros(-2147483648) = 0

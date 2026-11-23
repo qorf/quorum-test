@@ -1,0 +1,41 @@
+use Libraries.System.CalendarDate
+
+/*
+Tests a new CalendarDate (January 1, 1970), SetDate, GetYear, GetMonth and
+GetDay. SetDate returns false and leaves the date as it was when there is no
+such date: month 0 or 13, day 0, February 30, or February 29 in a year that
+is not a leap year (1900 and 2023 are not; 2000 and 2024 are).
+*/
+class Main
+    action Main
+        CalendarDate fresh
+        check
+            output "New CalendarDate: GetYear() = " + fresh:GetYear() + ", GetMonth() = " + fresh:GetMonth() + ", GetDay() = " + fresh:GetDay() + ", ToText() = [" + fresh:ToText() + "]"
+        detect e
+            output "New CalendarDate unexpected error: " + e:GetErrorMessage()
+        end
+        CalendarDate date
+        Try(date, 2026, 11, 12)
+        Try(date, 2024, 2, 29)
+        Try(date, 2023, 2, 29)
+        Try(date, 2000, 2, 29)
+        Try(date, 1900, 2, 29)
+        Try(date, 2026, 2, 30)
+        Try(date, 2026, 4, 31)
+        Try(date, 2026, 13, 1)
+        Try(date, 2026, 0, 10)
+        Try(date, 2026, 5, 0)
+        Try(date, 2026, 12, 31)
+        Try(date, 1, 1, 1)
+        Try(date, -44, 3, 15)
+    end
+
+    action Try(CalendarDate date, integer year, integer month, integer day)
+        check
+            boolean result = date:SetDate(year, month, day)
+            output "SetDate(" + year + ", " + month + ", " + day + ") = " + result + ", date is now " + date:GetYear() + "/" + date:GetMonth() + "/" + date:GetDay()
+        detect e
+            output "SetDate(" + year + ", " + month + ", " + day + ") unexpected error: " + e:GetErrorMessage()
+        end
+    end
+end

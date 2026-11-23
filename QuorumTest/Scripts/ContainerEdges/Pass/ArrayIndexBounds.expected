@@ -1,0 +1,15 @@
+Array[a,b,c] Get(3) fails, as it should
+Array[a,b,c] Get(-1) fails, as it should
+Array[a,b,c] Set(3, x) fails, as it should
+Array[a,b,c] Set(-1, x) fails, as it should
+Array[a,b,c] RemoveAt(3) fails, as it should
+Array[a,b,c] RemoveAt(-1) fails, as it should
+Array[a,b,c] Add(4, x) fails, as it should
+Array[a,b,c] Add(-1, x) fails, as it should
+Array[a,b,c] after the failed calls is [a,b,c]
+Array[a,b,c] Add(3, d) gives [a,b,c,d]
+Array[a,b,c,d] Add(0, z) gives [z,a,b,c,d]
+Array[z,a,b,c,d] Add(2, m) gives [z,a,m,b,c,d]
+Array[z,a,m,b,c,d] RemoveAt(5) = [d], leaving [z,a,m,b,c]
+Array[z,a,m,b,c] RemoveAt(0) = [z], leaving [a,m,b,c]
+Array[a,m,b,c] Get(3) = [c]

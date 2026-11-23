@@ -1,0 +1,11 @@
+OpenForWrite, Write(one), Write( two), Close: Read() = [one two]
+WriteLine(first), WriteLine(second): Read() ends each line = true
+OpenForWrite again replaces the contents: Read() = [fresh]
+OpenForWriteAppend, Write( and more): Read() = [fresh and more]
+OpenForWriteAppend on a missing file makes it: Read() = [made]
+PushToDisk() before Close: Read() = [buffered]
+File:OpenForWrite, Write, File:Close: Read() = [through File]
+File:OpenForWriteAppend, Write, File:Close: Read() = [through File appended]
+File:OpenForWrite on a folder is undefined = true
+File:OpenForWriteAppend on a folder is undefined = true
+OpenForWrite(a file in a missing folder) fails, as it should

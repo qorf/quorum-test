@@ -1,0 +1,69 @@
+use Libraries.System.Logging.ConsoleLogger
+use Libraries.System.Logging.SharedLogger
+use Libraries.System.Logging.Logger
+
+/*
+Tests ConsoleLogger (Log, Close, IsLoggingTime, SetLoggingTime) and
+SharedLogger (Log, Close, GetLogger, SetLogger, IsLoggingTime,
+SetLoggingTime). A ConsoleLogger writes each value as an output line. With
+logging time on, it also writes the current time, which changes, so Log is
+only called with it off. SharedLogger writes nothing until a logger is set,
+passes values and the time setting to that logger, and refuses itself as its
+own logger.
+*/
+class Main
+    action Main
+        ConsoleLogger console
+        check
+            output "ConsoleLogger: IsLoggingTime() at first = " + console:IsLoggingTime()
+            console:Log("ConsoleLogger:Log(this line) wrote this line")
+            console:SetLoggingTime(true)
+            output "ConsoleLogger: SetLoggingTime(true), IsLoggingTime() = " + console:IsLoggingTime()
+            console:SetLoggingTime(false)
+            output "ConsoleLogger: SetLoggingTime(false), IsLoggingTime() = " + console:IsLoggingTime()
+            console:Close()
+            output "ConsoleLogger: Close() = done"
+        detect e
+            output "ConsoleLogger unexpected error: " + e:GetErrorMessage()
+        end
+
+        SharedLogger sharedLogger
+        check
+            Logger none = sharedLogger:GetLogger()
+            output "SharedLogger: GetLogger() at first is undefined = " + (none = undefined)
+            sharedLogger:Log("SharedLogger:Log with no logger set must not write this line")
+            output "SharedLogger: Log(...) with no logger set wrote nothing"
+            sharedLogger:Close()
+            output "SharedLogger: Close() with no logger set = done"
+        detect e
+            output "SharedLogger with no logger unexpected error: " + e:GetErrorMessage()
+        end
+        ConsoleLogger target
+        check
+            sharedLogger:SetLogger(target)
+            Logger current = sharedLogger:GetLogger()
+            output "SharedLogger: SetLogger(a ConsoleLogger), GetLogger() is that logger = " + current:Equals(target)
+            sharedLogger:Log("SharedLogger:Log(this line) wrote this line through the ConsoleLogger")
+            sharedLogger:SetLoggingTime(true)
+            output "SharedLogger: SetLoggingTime(true), IsLoggingTime() = " + sharedLogger:IsLoggingTime() + ", the ConsoleLogger's IsLoggingTime() = " + target:IsLoggingTime()
+            sharedLogger:SetLoggingTime(false)
+            output "SharedLogger: SetLoggingTime(false), IsLoggingTime() = " + sharedLogger:IsLoggingTime() + ", the ConsoleLogger's IsLoggingTime() = " + target:IsLoggingTime()
+            sharedLogger:Close()
+            output "SharedLogger: Close() with a logger set = done"
+        detect e
+            output "SharedLogger with a logger unexpected error: " + e:GetErrorMessage()
+        end
+        check
+            sharedLogger:SetLogger(sharedLogger)
+            output "SharedLogger: SetLogger(itself) should fail but returned normally"
+        detect e
+            output "SharedLogger: SetLogger(itself) fails, as it should"
+        end
+        check
+            Logger kept = sharedLogger:GetLogger()
+            output "SharedLogger: after the refused SetLogger, GetLogger() is still the ConsoleLogger = " + kept:Equals(target)
+        detect e
+            output "SharedLogger: GetLogger() after refusal unexpected error: " + e:GetErrorMessage()
+        end
+    end
+end

@@ -1,0 +1,47 @@
+/*
+    Text:Equals(Object) compares exactly; Text:EqualsIgnoringCase(Object)
+    ignores the case of letters. Each case runs on a text primitive and on
+    a Text object; the other value is always a Text object.
+*/
+class Main
+    action Main
+        Show("a", "a")
+        Show("a", "A")
+        Show("Hello", "hELLO")
+        Show("abc", "abd")
+        Show("abc", "ab")
+        Show("", "")
+        Show("", " ")
+        Show(" a", "a")
+        Show("A1!", "a1!")
+    end
+
+    action Show(text value, text other)
+        Text otherObject
+        otherObject:SetValue(other)
+        text equals = "Equals(" + value + ", " + other + ")"
+        text ignoring = "EqualsIgnoringCase(" + value + ", " + other + ")"
+        check
+            output equals + " = " + value:Equals(otherObject)
+        detect e
+            output equals + " unexpected error: " + e:GetErrorMessage()
+        end
+        check
+            output ignoring + " = " + value:EqualsIgnoringCase(otherObject)
+        detect e
+            output ignoring + " unexpected error: " + e:GetErrorMessage()
+        end
+        Text object
+        object:SetValue(value)
+        check
+            output "Text " + equals + " = " + object:Equals(otherObject)
+        detect e
+            output "Text " + equals + " unexpected error: " + e:GetErrorMessage()
+        end
+        check
+            output "Text " + ignoring + " = " + object:EqualsIgnoringCase(otherObject)
+        detect e
+            output "Text " + ignoring + " unexpected error: " + e:GetErrorMessage()
+        end
+    end
+end

@@ -1,0 +1,83 @@
+use Libraries.Compute.Ray
+use Libraries.Compute.Vector3
+use Libraries.Compute.Matrix4
+
+/*
+Every action of Ray. The end point at a distance is origin + distance *
+direction. Multiply moves the ray into another coordinate system: the
+origin is transformed as a point and the direction as the difference of
+two transformed points, so a translation moves the origin and leaves the
+direction alone, and scaling by 2 doubles both. Set copies the vectors it
+is given, so a copy doesn't change when the original does.
+*/
+class Main
+    action Main
+        check
+            Ray ray
+            Ray returned = ray:Set(MakeVector(1, 2, 3), MakeVector(0, 0, 1))
+            output "Set(origin (1, 2, 3), direction (0, 0, 1)): GetOrigin = " + Text(ray:GetOrigin()) + ", GetDirection = " + Text(ray:GetDirection())
+            output "Set returns the same ray = " + (returned = ray)
+            output "GetEndPoint(5) = " + Text(ray:GetEndPoint(5))
+            output "GetEndPoint(-2.5) = " + Text(ray:GetEndPoint(-2.5))
+            output "GetEndPoint(0) = " + Text(ray:GetEndPoint(0))
+            output "the ray after GetEndPoint: GetOrigin = " + Text(ray:GetOrigin()) + ", GetDirection = " + Text(ray:GetDirection())
+        detect e
+            output "Set(vectors) unexpected error: " + e:GetErrorMessage()
+        end
+        check
+            Ray ray
+            ray:Set(1, 1, 1, 0.6, 0.8, 0)
+            output "Set(1, 1, 1, 0.6, 0.8, 0): GetOrigin = " + Text(ray:GetOrigin()) + ", GetDirection = " + Text(ray:GetDirection())
+            output "GetEndPoint(10) = " + Text(ray:GetEndPoint(10))
+            ray:SetOrigin(MakeVector(-1, 0, 4))
+            ray:SetDirection(MakeVector(0, -1, 0))
+            output "after SetOrigin (-1, 0, 4) and SetDirection (0, -1, 0): GetOrigin = " + Text(ray:GetOrigin()) + ", GetDirection = " + Text(ray:GetDirection())
+        detect e
+            output "Set(numbers) unexpected error: " + e:GetErrorMessage()
+        end
+        check
+            Ray ray
+            ray:Set(1, 2, 3, 0, 0, 1)
+            Ray copy = ray:Copy()
+            Ray other
+            other:Set(ray)
+            output "Copy Equals original = " + copy:Equals(ray) + ", Set(ray) Equals original = " + other:Equals(ray)
+            output "Copy is a different object = " + not (copy = ray)
+            output "original Equals itself = " + ray:Equals(ray)
+            ray:SetOrigin(MakeVector(9, 9, 9))
+            output "after changing the original: Copy = " + Text(copy:GetOrigin()) + ", Set(ray) = " + Text(other:GetOrigin())
+            output "Copy Equals the changed original = " + copy:Equals(ray)
+            Ray turned
+            turned:Set(1, 2, 3, 1, 0, 0)
+            output "rays with different directions Equal = " + copy:Equals(turned)
+        detect e
+            output "Copy and Equals unexpected error: " + e:GetErrorMessage()
+        end
+        check
+            Ray ray
+            ray:Set(1, 2, 3, 0, 0, 1)
+            Matrix4 move
+            move:SetToTranslation(10, 0, -1)
+            Ray result = ray:Multiply(move)
+            output "Multiply by a translation of (10, 0, -1): GetOrigin = " + Text(ray:GetOrigin()) + ", GetDirection = " + Text(ray:GetDirection())
+            output "Multiply returns the same ray = " + (result = ray)
+            Matrix4 grow
+            grow:Set(2, 0, 0, 0, 0, 2, 0, 0, 0, 0, 2, 0, 0, 0, 0, 1)
+            ray:Set(1, 2, 3, 0, 0, 1)
+            ray:Multiply(grow)
+            output "Multiply by a scaling of 2: GetOrigin = " + Text(ray:GetOrigin()) + ", GetDirection = " + Text(ray:GetDirection())
+        detect e
+            output "Multiply unexpected error: " + e:GetErrorMessage()
+        end
+    end
+
+    action MakeVector(number x, number y, number z) returns Vector3
+        Vector3 vector
+        vector:Set(x, y, z)
+        return vector
+    end
+
+    action Text(Vector3 vector) returns text
+        return "(" + vector:GetX() + ", " + vector:GetY() + ", " + vector:GetZ() + ")"
+    end
+end

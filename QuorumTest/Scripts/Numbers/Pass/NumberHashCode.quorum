@@ -1,0 +1,43 @@
+/*
+    Number:GetHashCode matches the hash code of the equivalent Java double
+    (the documentation says so): the 64 bits of the value with the high
+    half XORed into the low half. Equal values give equal hash codes. Each
+    case runs on a number primitive and on a Number object. The labels are
+    written as text, not printed from the values, because back ends print
+    some numbers differently (JavaScript prints -0.0 as 0.0).
+*/
+class Main
+    action Main
+        Show("0.0", 0.0)
+        Show("1.0", 1.0)
+        Show("-1.0", -1.0)
+        Show("2.5", 2.5)
+        Show("0.5", 0.5)
+        Show("100.0", 100.0)
+        Show("-0.0", -0.0)
+        Number a
+        a:SetValue(3.75)
+        Number b
+        b:SetValue(3.75)
+        check
+            output "GetHashCode(3.75) of two Number objects equal is " + (a:GetHashCode() = b:GetHashCode())
+        detect e
+            output "GetHashCode(3.75) of two Number objects unexpected error: " + e:GetErrorMessage()
+        end
+    end
+
+    action Show(text label, number value)
+        check
+            output "GetHashCode(" + label + ") = " + value:GetHashCode()
+        detect e
+            output "GetHashCode(" + label + ") unexpected error: " + e:GetErrorMessage()
+        end
+        Number object
+        object:SetValue(value)
+        check
+            output "Number GetHashCode(" + label + ") = " + object:GetHashCode()
+        detect e
+            output "Number GetHashCode(" + label + ") unexpected error: " + e:GetErrorMessage()
+        end
+    end
+end

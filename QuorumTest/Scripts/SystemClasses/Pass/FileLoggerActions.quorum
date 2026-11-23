@@ -1,0 +1,67 @@
+use Libraries.System.Logging.FileLogger
+use Libraries.System.File
+use Libraries.Containers.Array
+
+/*
+Tests FileLogger (Log, Close, GetFile, SetFile, IsLoggingTime,
+SetLoggingTime) inside a scratch folder (FileTestsWork/FileLoggerActions),
+deleted at the end. Without a file, Log writes the value as an output line.
+With a file, each value is a line in the file, added after what the file
+already holds. With logging time on, a line starting "Time: " comes before
+each value; the time itself changes, so only that start is checked.
+*/
+class Main
+    action Main
+        File work
+        work:SetPath("FileTestsWork/FileLoggerActions")
+        work:Delete(true)
+        boolean made = work:CreateDirectories()
+        File file
+        file:SetPath("FileTestsWork/FileLoggerActions/log.txt")
+
+        FileLogger logger
+        check
+            File none = logger:GetFile()
+            output "FileLogger: GetFile() at first is undefined = " + (none = undefined)
+            logger:Log("FileLogger:Log(this line) with no file wrote this line")
+        detect e
+            output "FileLogger with no file unexpected error: " + e:GetErrorMessage()
+        end
+        check
+            logger:SetFile(file)
+            output "FileLogger: SetFile(log.txt), GetFile():GetFileName() = [" + logger:GetFile():GetFileName() + "]"
+            logger:Log("first")
+            logger:Log("second")
+            logger:Close()
+            Array<text> lines = file:Read():SplitIntoLines()
+            output "FileLogger: Log(first), Log(second), Close(): the file has " + lines:GetSize() + " lines"
+            integer i = 0
+            repeat while i < lines:GetSize()
+                output "FileLogger: line " + i + " = [" + lines:Get(i) + "]"
+                i = i + 1
+            end
+        detect e
+            output "FileLogger with a file unexpected error: " + e:GetErrorMessage()
+        end
+        FileLogger timed
+        check
+            output "FileLogger: IsLoggingTime() at first = " + timed:IsLoggingTime()
+            timed:SetLoggingTime(true)
+            output "FileLogger: SetLoggingTime(true), IsLoggingTime() = " + timed:IsLoggingTime()
+            timed:SetFile(file)
+            timed:Log("third")
+            timed:Close()
+            Array<text> lines = file:Read():SplitIntoLines()
+            output "FileLogger: a second logger with time on, Log(third): the file has " + lines:GetSize() + " lines"
+            text stamp = lines:Get(2)
+            output "FileLogger: line 2 starts with Time: = " + stamp:StartsWith("Time: ")
+            output "FileLogger: line 3 = [" + lines:Get(3) + "]"
+        detect e
+            output "FileLogger with time unexpected error: " + e:GetErrorMessage()
+        end
+        work:Delete(true)
+        File top
+        top:SetPath("FileTestsWork")
+        boolean removed = top:Delete()
+    end
+end

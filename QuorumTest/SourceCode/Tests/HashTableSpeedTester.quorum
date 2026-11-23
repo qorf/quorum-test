@@ -1,0 +1,47 @@
+package Libraries.Language.Compile.Test
+
+use Libraries.Testing.QuorumTest
+use Libraries.Testing.ScriptCheck
+
+/*
+    Speed of HashTable for common operations: Add with short text, long text
+    and integer keys, GetValue and HasKey, RemoveKey, add/remove churn,
+    walking keys and values, Copy, and a comparison with Array and List
+    doing similar work. Each operation prints a correctness line, an
+    absolute verdict (a generous limit for a decent hash table) and a
+    scaling verdict (4x the work in at most 8x the time); times appear in
+    the output only when a verdict fails. Runs on bytecode and JavaScript.
+    Not on Python: the Python back end is far slower for loops of hundreds
+    of thousands of steps, so these limits would measure the interpreter,
+    not the hash table.
+*/
+class HashTableSpeedTester
+    QuorumTest suite = undefined
+    ScriptCheck scripts
+    text path = "Scripts/HashTableSpeed/Pass/"
+
+    action Test
+        scripts:SetSuite(suite)
+        scripts:Check(path + "AddIntegerKeys", true, false)
+        scripts:Check(path + "AddLongTextKeys", true, false)
+        scripts:Check(path + "AddRemoveChurn", true, false)
+        scripts:Check(path + "AddTextKeys", true, false)
+        scripts:Check(path + "CompareWithArrayAndList", true, false)
+        scripts:Check(path + "CopyBigTable", true, false)
+        scripts:Check(path + "IterateKeysValues", true, false)
+        scripts:Check(path + "LookupKeys", true, false)
+        scripts:Check(path + "RemoveKeys", true, false)
+    end
+
+    action GetName returns text
+        return "HashTable Speed Tests"
+    end
+
+    action GetCompilerTestSuite returns QuorumTest
+        return suite
+    end
+
+    action SetCompilerTestSuite(QuorumTest suite)
+        me:suite = suite
+    end
+end

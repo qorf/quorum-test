@@ -1,0 +1,71 @@
+use Libraries.System.File
+use Libraries.System.BinaryFileReader
+use Libraries.Containers.ByteArray
+use Libraries.Interface.Events.FileLoadListener
+
+/*
+Tests BinaryFileReader's OpenForRead(File), OpenForRead(File,
+FileLoadListener) and ReadBytes, inside a scratch folder
+(FileTestsWork/BinaryFileReaderActions), deleted at the end. The file holds
+the text "Quorum", so its bytes are the letters' character codes. The
+listener is a plain FileLoadListener, which does nothing when the file
+loads; the reader is then read the same way. An empty file has no bytes.
+*/
+class Main
+    action Main
+        File work
+        work:SetPath("FileTestsWork/BinaryFileReaderActions")
+        work:Delete(true)
+        boolean made = work:CreateDirectories()
+        File file
+        file:SetPath("FileTestsWork/BinaryFileReaderActions/word.txt")
+        file:Write("Quorum")
+
+        BinaryFileReader reader
+        check
+            reader:OpenForRead(file)
+            ByteArray bytes = reader:ReadBytes()
+            output "OpenForRead(word.txt with Quorum), ReadBytes() size = " + bytes:GetSize()
+            text values = ""
+            integer i = 0
+            repeat while i < bytes:GetSize()
+                values = values + bytes:Get(i)
+                if i < bytes:GetSize() - 1
+                    values = values + " "
+                end
+                i = i + 1
+            end
+            output "ReadBytes() values = [" + values + "]"
+        detect e
+            output "OpenForRead and ReadBytes unexpected error: " + e:GetErrorMessage()
+        end
+
+        BinaryFileReader listened
+        FileLoadListener listener
+        check
+            listened:OpenForRead(file, listener)
+            ByteArray bytes = listened:ReadBytes()
+            output "OpenForRead(word.txt, listener), ReadBytes() size = " + bytes:GetSize()
+            output "OpenForRead(word.txt, listener), ReadBytes() first byte = " + bytes:Get(0)
+        detect e
+            output "OpenForRead with a listener unexpected error: " + e:GetErrorMessage()
+        end
+
+        File empty
+        empty:SetPath("FileTestsWork/BinaryFileReaderActions/empty.txt")
+        empty:Write("")
+        BinaryFileReader emptyReader
+        check
+            emptyReader:OpenForRead(empty)
+            ByteArray bytes = emptyReader:ReadBytes()
+            output "OpenForRead(empty.txt), ReadBytes() size = " + bytes:GetSize()
+        detect e
+            output "ReadBytes() of an empty file unexpected error: " + e:GetErrorMessage()
+        end
+
+        work:Delete(true)
+        File top
+        top:SetPath("FileTestsWork")
+        boolean removed = top:Delete()
+    end
+end

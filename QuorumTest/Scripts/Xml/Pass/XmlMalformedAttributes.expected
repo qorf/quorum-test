@@ -1,0 +1,8 @@
+Read(<a x=1/>) fails, as it should
+Read(<a x='1/>) fails, as it should
+Read(<a x="1'/>) fails, as it should
+Read(<a x='1' x='2'/>) fails, as it should
+Read(<a x/>) fails, as it should
+Read(<a x='1'y='2'/>) fails, as it should
+Read(<a x='a<b'/>) fails, as it should
+Read(<a ='1'/>) fails, as it should

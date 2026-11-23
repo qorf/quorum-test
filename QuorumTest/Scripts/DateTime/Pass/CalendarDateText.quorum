@@ -1,0 +1,74 @@
+use Libraries.System.CalendarDate
+use Libraries.System.DateFormat
+
+/*
+Tests GetMonthName, GetDayName, ToText, ToText(DateFormat) and
+ToSpokenText. ToText is ISO 8601 with the year padded to four digits (and a
+minus sign in front for years before year 0). ToText with an undefined
+format is the same as ToText(). SetToToday reads the clock, so only that it
+gives a real date in 2025 or later is printed.
+*/
+class Main
+    action Main
+        integer month = 1
+        repeat while month <= 12
+            CalendarDate date
+            check
+                boolean valid = date:SetDate(2023, month, 1)
+                output "SetDate(2023, " + month + ", 1): GetMonthName() = [" + date:GetMonthName() + "]"
+            detect e
+                output "GetMonthName() for month " + month + " unexpected error: " + e:GetErrorMessage()
+            end
+            month = month + 1
+        end
+        integer day = 1
+        repeat while day <= 7
+            CalendarDate date
+            check
+                boolean valid = date:SetDate(2024, 1, day)
+                output "SetDate(2024, 1, " + day + "): GetDayName() = [" + date:GetDayName() + "]"
+            detect e
+                output "GetDayName() for day " + day + " unexpected error: " + e:GetErrorMessage()
+            end
+            day = day + 1
+        end
+        CalendarDate november
+        boolean valid = november:SetDate(2026, 11, 12)
+        check
+            output "2026-11-12: ToText() = [" + november:ToText() + "]"
+            output "2026-11-12: ToSpokenText() = [" + november:ToSpokenText() + "]"
+            DateFormat format
+            output "2026-11-12: ToText(new DateFormat) = [" + november:ToText(format) + "]"
+            format:SetPattern("MM/dd/yyyy")
+            output "2026-11-12: ToText(DateFormat MM/dd/yyyy) = [" + november:ToText(format) + "]"
+            DateFormat none = undefined
+            output "2026-11-12: ToText(undefined format) = [" + november:ToText(none) + "]"
+        detect e
+            output "2026-11-12 text unexpected error: " + e:GetErrorMessage()
+        end
+        CalendarDate early
+        valid = early:SetDate(987, 6, 5)
+        check
+            output "987-06-05: ToText() = [" + early:ToText() + "]"
+            output "987-06-05: ToSpokenText() = [" + early:ToSpokenText() + "]"
+        detect e
+            output "987-06-05 text unexpected error: " + e:GetErrorMessage()
+        end
+        CalendarDate bc
+        valid = bc:SetDate(-44, 3, 15)
+        check
+            output "-44-03-15: ToText() = [" + bc:ToText() + "]"
+        detect e
+            output "-44-03-15 text unexpected error: " + e:GetErrorMessage()
+        end
+        CalendarDate today
+        check
+            today:SetToToday()
+            CalendarDate check2
+            boolean real = check2:SetDate(today:GetYear(), today:GetMonth(), today:GetDay())
+            output "SetToToday() gives a real date in 2025 or later = " + (real and today:GetYear() >= 2025)
+        detect e
+            output "SetToToday() unexpected error: " + e:GetErrorMessage()
+        end
+    end
+end

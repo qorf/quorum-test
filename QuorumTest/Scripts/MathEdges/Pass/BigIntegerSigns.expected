@@ -1,0 +1,15 @@
+Mod(-7, 3) = 2
+Mod(7, 3) = 1
+Mod(-6, 3) = 0
+Mod(-100000000000000000001, 7) = 4
+Remainder(-7, 3) = -1
+Remainder(7, -3) = 1
+Remainder(-7, -3) = -1
+Divide(-7, 2) = -3
+Divide(7, -2) = -3
+Divide(-7, -2) = 3
+Divide(-100000000000000000000, 3) = -33333333333333333333
+Divide(5, 0) fails, as it should
+Mod(5, 0) fails, as it should
+Remainder(5, 0) fails, as it should
+GetSignValue(-12) = -1, Negate(-12) = 12

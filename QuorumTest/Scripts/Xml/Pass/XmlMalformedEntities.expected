@@ -1,0 +1,8 @@
+Read(<a>&foo;</a>) fails, as it should
+Read(<a>a & b</a>) fails, as it should
+Read(<a>&amp</a>) fails, as it should
+Read(<a>&#xZZ;</a>) fails, as it should
+Read(<a>&#abc;</a>) fails, as it should
+Read(<a>x < y</a>) fails, as it should
+Read(<a x='&foo;'/>) fails, as it should
+Read(<a>]]></a>) fails, as it should

@@ -1,0 +1,130 @@
+use Libraries.Data.Formats.ScalableVectorGraphics.Circle
+use Libraries.Data.Formats.ScalableVectorGraphics.Rectangle
+use Libraries.Data.Formats.ScalableVectorGraphics.Line
+use Libraries.Data.Formats.ScalableVectorGraphics.Ellipse
+use Libraries.Data.Formats.ScalableVectorGraphics.Label
+use Libraries.Data.Formats.ScalableVectorGraphics.Group
+
+/*
+Small SVG shapes written with ToText, compared as text: Circle, Rectangle,
+Line, Ellipse, Label and a Group holding a circle, their getters, units, and a title and description
+on a shape. Line feeds and tabs in ToText are shown as \n and \t. Numbers use
+fractions such as 12.5 so the text is the same on every back end. Every case
+sets the tab index to 0 (the documented default) so the output doesn't
+depend on the default. Expected markup keeps the library's own layout; it
+must be well-formed XML (a shape opened with > must be closed with its end
+tag), and text content must escape < and & (SVG is XML).
+*/
+class Main
+    action Main
+        check
+            Circle circle
+            circle:SetPosition(12.5, 20.5)
+            circle:SetRadius(5.5)
+            circle:SetTabIndex(0)
+            output "Circle SetPosition(12.5, 20.5) SetRadius(5.5) ToText() = [" + Show(circle:ToText()) + "]"
+            output "Circle GetPositionX() = [" + circle:GetPositionX() + "], GetPositionY() = [" + circle:GetPositionY() + "], GetRadius() = [" + circle:GetRadius() + "]"
+        detect e
+            output "Circle unexpected error: " + e:GetErrorMessage()
+        end
+
+        check
+            Circle circle
+            circle:SetPosition(10.5, 20.5, "%")
+            circle:SetRadius(5.5, "px")
+            output "Circle SetPosition(10.5, 20.5, %) SetRadius(5.5, px): GetPositionX() = [" + circle:GetPositionX() + "], GetPositionY() = [" + circle:GetPositionY() + "], GetRadius() = [" + circle:GetRadius() + "]"
+        detect e
+            output "Circle with units unexpected error: " + e:GetErrorMessage()
+        end
+
+        check
+            Circle circle
+            output "new Circle GetTabIndex() = [" + circle:GetTabIndex() + "]"
+        detect e
+            output "new Circle GetTabIndex unexpected error: " + e:GetErrorMessage()
+        end
+
+        check
+            Rectangle rectangle
+            rectangle:SetSize(10.5, 20.5)
+            rectangle:SetPosition(1.5, 2.5)
+            rectangle:SetHorizontalCornerRadius(3.5)
+            rectangle:SetVerticalCornerRadius(4.5)
+            rectangle:SetTabIndex(0)
+            output "Rectangle SetSize(10.5, 20.5) SetPosition(1.5, 2.5) corner radii 3.5 and 4.5 ToText() = [" + Show(rectangle:ToText()) + "]"
+            output "Rectangle GetWidth() = [" + rectangle:GetWidth() + "], GetHeight() = [" + rectangle:GetHeight() + "], GetPositionX() = [" + rectangle:GetPositionX() + "], GetPositionY() = [" + rectangle:GetPositionY() + "]"
+        detect e
+            output "Rectangle unexpected error: " + e:GetErrorMessage()
+        end
+
+        check
+            Line line
+            line:SetPoints(0.5, 1.5, 2.5, 3.5)
+            line:SetStroke("black")
+            line:SetTabIndex(0)
+            output "Line SetPoints(0.5, 1.5, 2.5, 3.5) SetStroke(black) ToText() = [" + Show(line:ToText()) + "]"
+            output "Line GetX1() = [" + line:GetX1() + "], GetY1() = [" + line:GetY1() + "], GetX2() = [" + line:GetX2() + "], GetY2() = [" + line:GetY2() + "]"
+        detect e
+            output "Line unexpected error: " + e:GetErrorMessage()
+        end
+
+        check
+            Ellipse ellipse
+            ellipse:SetPosition(5, 6)
+            ellipse:SetRadii(7, 8)
+            ellipse:SetTabIndex(0)
+            output "Ellipse SetPosition(5, 6) SetRadii(7, 8) ToText() = [" + Show(ellipse:ToText()) + "]"
+            output "Ellipse GetPositionX() = [" + ellipse:GetPositionX() + "], GetXRadius() = [" + ellipse:GetXRadius() + "], GetYRadius() = [" + ellipse:GetYRadius() + "]"
+        detect e
+            output "Ellipse unexpected error: " + e:GetErrorMessage()
+        end
+
+        check
+            Label label
+            label:SetText("A < B & C")
+            label:SetPosition(1.5, 2.5)
+            label:SetTabIndex(0)
+            output "Label SetText(A < B & C) SetPosition(1.5, 2.5) ToText() = [" + Show(label:ToText()) + "]"
+            output "Label GetText() = [" + label:GetText() + "]"
+        detect e
+            output "Label unexpected error: " + e:GetErrorMessage()
+        end
+
+        check
+            Circle circle
+            circle:SetPosition(12.5, 20.5)
+            circle:SetRadius(5.5)
+            circle:SetTabIndex(0)
+            circle:SetTitle("A & B")
+            circle:SetDescription("x < y")
+            output "Circle SetTitle(A & B) SetDescription(x < y) ToText() = [" + Show(circle:ToText()) + "]"
+            output "Circle GetTitle() = [" + circle:GetTitle() + "], GetDescription() = [" + circle:GetDescription() + "]"
+        detect e
+            output "Circle with a title unexpected error: " + e:GetErrorMessage()
+        end
+        GroupCase()
+    end
+
+    action GroupCase
+        check
+            Group group
+            group:SetTabIndex(0)
+            Circle circle
+            circle:SetPosition(1.5, 2.5)
+            circle:SetRadius(3.5)
+            circle:SetTabIndex(0)
+            group:Add(circle)
+            output "Group Add(circle) ToText() = [" + Show(group:ToText()) + "]"
+            group:Empty()
+            output "Group Empty() ToText() = [" + Show(group:ToText()) + "]"
+        detect e
+            output "Group unexpected error: " + e:GetErrorMessage()
+        end
+    end
+
+    action Show(text value) returns text
+        text result = value:Replace(value:GetLineFeed(), "\n")
+        result = result:Replace(value:GetTab(), "\t")
+        return result
+    end
+end

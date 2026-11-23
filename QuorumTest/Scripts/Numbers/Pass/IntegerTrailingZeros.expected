@@ -1,0 +1,16 @@
+TrailingZeros(0) = 32, called again = 32, value after = 0
+Integer TrailingZeros(0) = 32, called again = 32
+TrailingZeros(1) = 0, called again = 0, value after = 1
+Integer TrailingZeros(1) = 0, called again = 0
+TrailingZeros(8) = 3, called again = 3, value after = 8
+Integer TrailingZeros(8) = 3, called again = 3
+TrailingZeros(12) = 2, called again = 2, value after = 12
+Integer TrailingZeros(12) = 2, called again = 2
+TrailingZeros(-1) = 0, called again = 0, value after = -1
+Integer TrailingZeros(-1) = 0, called again = 0
+TrailingZeros(-8) = 3, called again = 3, value after = -8
+Integer TrailingZeros(-8) = 3, called again = 3
+TrailingZeros(1073741824) = 30, called again = 30, value after = 1073741824
+Integer TrailingZeros(1073741824) = 30, called again = 30
+TrailingZeros(-2147483648) = 31, called again = 31, value after = -2147483648
+Integer TrailingZeros(-2147483648) = 31, called again = 31

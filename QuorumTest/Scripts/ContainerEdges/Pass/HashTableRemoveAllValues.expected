@@ -1,0 +1,2 @@
+HashTable{a:same,b:other,c:same,d:same} RemoveAllValues(same) = true, size 1, keys [b], HasValue(same) = false
+HashTable{b:other} RemoveAllValues(same) again = false, size 1

@@ -1,0 +1,4 @@
+Copy a table of 100000 integer keys: copy size 100000, copy has 100000 of the keys
+Copy a table of 400000 integer keys: copy size 400000, copy has 400000 of the keys
+Copy a table of 400000 keys: within 1000 ms
+Copy scales linearly (4x keys, at most 8x time)

@@ -1,0 +1,10 @@
+CreateDirectory(single) = true
+IsDirectory(single) after CreateDirectory = true
+CreateDirectory(single) again, when it exists = false
+CreateDirectory(a/b/c) with a and b missing = false
+Exists(a/b/c) after the failed CreateDirectory = false
+CreateDirectories(a/b/c) = true
+IsDirectory(a/b/c) after CreateDirectories = true
+IsDirectory(a/b) after CreateDirectories(a/b/c) = true
+CreateDirectories(a/b/c) again, when it exists = false
+Exists(FileTestsWork/FileDirectories) after Delete(true) = false

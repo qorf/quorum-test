@@ -1,0 +1,5 @@
+Read(File data.csv holding name,note\r\nAnn,"a, b\nc"\r\nBob,ok\r\n) GetNumberOfRows() = 3, GetNumberOfColumns() = 2, Get(1, 1) = [a, b\nc], Get(2, 1) = [ok]
+Read(File data.csv) twice GetNumberOfRows() = 3
+Read(File missing.csv) fails, as it should
+SeparatedValueFileReader OpenForRead(data.csv) ReadLines() = 3 lines [name,note][Ann,"a, b\nc"][Bob,ok]
+scratch folder removed = [true]

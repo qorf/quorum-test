@@ -1,0 +1,103 @@
+use Libraries.Containers.HashTable
+use Libraries.Containers.Array
+
+/*
+    The value-side actions (GetKey, HasValue, RemoveValue), Add over an
+    existing key, Set, and CopyToKeyArray / CopyToValueArray: their contents,
+    that they follow removals, and that changing the returned Array does not
+    change the table.
+*/
+class Main
+    action Show(text value) returns text
+        if value = undefined
+            return "undefined"
+        end
+        return "[" + value + "]"
+    end
+
+    action Describe(Array<text> array) returns text
+        text result = "["
+        integer i = 0
+        repeat while i < array:GetSize()
+            if i > 0
+                result = result + ","
+            end
+            text value = array:Get(i)
+            if value = undefined
+                result = result + "undefined"
+            else
+                result = result + value
+            end
+            i = i + 1
+        end
+        return result + "]"
+    end
+
+    // The keys sorted, so the output does not depend on hash order.
+    action SortedKeys(HashTable<text, text> table) returns text
+        Array<text> keys = table:CopyToKeyArray()
+        keys:Sort()
+        return Describe(keys)
+    end
+
+    action SortedValues(HashTable<text, text> table) returns text
+        Array<text> values = table:CopyToValueArray()
+        values:Sort()
+        return Describe(values)
+    end
+
+    action Main
+        HashTable<text, text> table
+        table:Add("a", "1")
+        table:Add("b", "2")
+        table:Add("c", "3")
+        check
+            output "HashTable{a:1,b:2,c:3} CopyToKeyArray() sorted " + SortedKeys(table) + ", CopyToValueArray() sorted " + SortedValues(table)
+        detect e
+            output "HashTable{a:1,b:2,c:3} CopyToKeyArray/CopyToValueArray unexpected error: " + e:GetErrorMessage()
+        end
+        check
+            table:Add("b", "20")
+            output "HashTable{a:1,b:2,c:3} Add(b, 20): size " + table:GetSize() + ", GetValue(b) = " + Show(table:GetValue("b")) + ", HasValue(2) = " + table:HasValue("2")
+        detect e
+            output "HashTable Add(b, 20) unexpected error: " + e:GetErrorMessage()
+        end
+        check
+            table:Set("d", "4")
+            output "HashTable Set(d, 4): size " + table:GetSize() + ", GetValue(d) = " + Show(table:GetValue("d"))
+        detect e
+            output "HashTable Set(d, 4) unexpected error: " + e:GetErrorMessage()
+        end
+        check
+            output "HashTable{a:1,b:20,c:3,d:4} GetKey(3) = " + Show(table:GetKey("3")) + ", GetKey(9) = " + Show(table:GetKey("9")) + ", HasValue(4) = " + table:HasValue("4") + ", HasValue(9) = " + table:HasValue("9")
+        detect e
+            output "HashTable GetKey/HasValue unexpected error: " + e:GetErrorMessage()
+        end
+        check
+            text key = table:RemoveValue("20")
+            output "HashTable RemoveValue(20) = " + Show(key) + ", size " + table:GetSize() + ", keys " + SortedKeys(table) + ", values " + SortedValues(table)
+        detect e
+            output "HashTable RemoveValue(20) unexpected error: " + e:GetErrorMessage()
+        end
+        check
+            text key = table:RemoveValue("20")
+            output "HashTable RemoveValue(20) again = " + Show(key) + ", size " + table:GetSize()
+        detect e
+            output "HashTable RemoveValue(20) again unexpected error: " + e:GetErrorMessage()
+        end
+        check
+            output "HashTable RemoveAllKeys(a) = " + table:RemoveAllKeys("a") + ", RemoveAllKeys(a) again = " + table:RemoveAllKeys("a") + ", keys " + SortedKeys(table)
+        detect e
+            output "HashTable RemoveAllKeys(a) unexpected error: " + e:GetErrorMessage()
+        end
+        check
+            Array<text> keys = table:CopyToKeyArray()
+            keys:Empty()
+            Array<text> values = table:CopyToValueArray()
+            values:Add("extra")
+            output "HashTable{c:3,d:4} emptying CopyToKeyArray() and adding to CopyToValueArray(): table size " + table:GetSize() + ", keys " + SortedKeys(table) + ", values " + SortedValues(table)
+        detect e
+            output "HashTable copied arrays independence unexpected error: " + e:GetErrorMessage()
+        end
+    end
+end

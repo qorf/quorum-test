@@ -1,0 +1,10 @@
+AbsoluteValue(integer -5) = 5
+AbsoluteValue(integer 0) = 0
+AbsoluteValue(integer 2147483647) = 2147483647
+AbsoluteValue(integer -2147483647) = 2147483647
+AbsoluteValue(integer -2147483648) = -2147483648
+AbsoluteValue(-2.5) = 2.5
+AbsoluteValue(-0.0) = 0.0
+AbsoluteValue(-Infinity) = Infinity
+AbsoluteValue(NaN) = NaN
+AbsoluteValue(-1.0E-300) = 1.0E-300

@@ -1,0 +1,20 @@
+OpenForRead(lines.txt): IsAtEndOfFile() = false
+ReadLine() first = [alpha]
+Read(3) after the first line = [bet]
+ReadLine() rest of the second line = [a]
+Read() rest of the file = [gamma]
+IsAtEndOfFile() after Read() = true
+Read() at the end of the file fails, as it should
+Read(2) at the end of the file fails, as it should
+Close() after reading = done
+Read() of the whole file equals what was written = true
+Read(100) when 5 characters are left = [gamma], size 5
+ReadLines() size = 3
+ReadLines() line 0 = [alpha]
+ReadLines() line 1 = [beta]
+ReadLines() line 2 = [gamma]
+Read(0) fails, as it should
+FileReader:OpenForRead(missing.txt) fails, as it should
+File:OpenForRead(missing.txt) is undefined = true
+File:OpenForRead(lines.txt) then ReadLine() = [alpha]
+File:Close() after File:OpenForRead = done

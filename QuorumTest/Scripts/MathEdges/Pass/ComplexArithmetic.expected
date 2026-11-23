@@ -1,0 +1,19 @@
+first is 3.0 + 4.0i and second is 1.0 + -2.0i
+first GetReal = 3.0, GetImaginary = 4.0
+first Add second = 4.0 + 2.0i
+first Add 2 = 5.0 + 4.0i
+first Subtract second = 2.0 + 6.0i
+first Subtract 1 = 2.0 + 4.0i
+first Multiply second = 11.0 + -2.0i
+first Multiply 2 = 6.0 + 8.0i
+first Divide second = -1.0 + 2.0i
+first Divide 2 = 1.5 + 2.0i
+first Conjugate = 3.0 + -4.0i
+first Negate = -3.0 + -4.0i
+first AbsoluteValue = 5.0
+first Reciprocal = 0.12 + -0.16i
+first Equals 3 + 4i = true
+first Equals second = false
+SetValue(7) gives 7.0 + 0.0i
+first Multiply its Reciprocal Equals one = true
+first is still 3.0 + 4.0i and second is still 1.0 + -2.0i

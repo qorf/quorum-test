@@ -1,0 +1,4 @@
+Churn of 100000 keys through a table of 1000: size 1000, HasKey(newest) = true, HasKey(the one 1000 back) = false
+Churn of 400000 keys through a table of 1000: size 1000, HasKey(newest) = true, HasKey(the one 1000 back) = false
+Churn of 400000 keys: within 2000 ms
+Churn scales linearly (4x steps, at most 8x time)

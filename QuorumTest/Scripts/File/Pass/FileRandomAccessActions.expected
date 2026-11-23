@@ -1,0 +1,26 @@
+OpenForRandomAccess(digits.txt): GetPosition() = 0
+OpenForRandomAccess(digits.txt): IsAtEndOfFile() = false
+Read(4) = [0123]
+GetPosition() after Read(4) = 4
+SetPosition(7), GetPosition() = 7
+Read() from 7 = [789]
+IsAtEndOfFile() after Read() = true
+GetPosition() after Read() = 10
+Read() at the end of the file fails, as it should
+GoToBeginning(), GetPosition() = 0
+Read(3) after GoToBeginning() = [012]
+SetPosition(2), Write(ab), GetPosition() = 4
+GoToBeginning(), Read() after Write(ab) at 2 = [01ab456789]
+SetPosition(5), Read(20) with 5 bytes left = [56789], size 5
+SetPosition(-1) fails, as it should
+SetPosition(10), WriteLine(end), Close(): the file is 01ab456789end and a line feed = true
+ReadLine() first = [red]
+ReadLine() second = [green]
+GoToBeginning(), ReadLines() size = 3
+ReadLines() line 0 = [red]
+ReadLines() line 1 = [green]
+ReadLines() line 2 = [blue]
+File:OpenForRandomAccess(colors.txt) then Read(3) = [red]
+File:OpenForRandomAccess(missing.txt) is undefined = true
+OpenForRandomAccess(a folder) fails, as it should
+OpenForRandomAccess(missing.txt) fails, as it should

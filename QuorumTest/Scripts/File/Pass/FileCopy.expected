@@ -1,0 +1,13 @@
+Copy(source.txt to copy.txt) = true
+Read(copy.txt) = [original]
+Read(source.txt) after Copy = [original]
+Copy(source.txt over an existing copy.txt) = true
+Read(copy.txt) after copying over it = [changed]
+Copy(source.txt to second.txt, false) = true
+Read(second.txt) = [changed]
+Copy(missing.txt to target.txt) = false
+Copy(missing.txt to target.txt, true) = false
+Copy(folder tree to treeCopy, true) = true
+Read(treeCopy/leaf.txt) = [leaf]
+Read(treeCopy/branch/twig.txt) = [twig]
+Copy(folder tree into the file blocker.txt, true) = false

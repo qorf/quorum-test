@@ -1,0 +1,5 @@
+Read(<x:a xmlns:x='urn:x'/>) events: Start(x:a xmlns:x=[urn:x]) End(x:a)
+Read(<a xmlns='urn:d'>t</a>) events: Start(a xmlns=[urn:d]) Value[t] End(a)
+Read(<x:a xmlns:x='urn:x'><x:b x:c='1'>t</x:b></x:a>) events: Start(x:a xmlns:x=[urn:x]) Start(x:b x:c=[1]) Value[t] End(x:b) End(x:a)
+Read(<a xmlns:p='http://example.com/p'><p:b/></a>) events: Start(a xmlns:p=[http://example.com/p]) Start(p:b) End(p:b) End(a)
+Read(<a xml:lang='en'/>) events: Start(a xml:lang=[en]) End(a)

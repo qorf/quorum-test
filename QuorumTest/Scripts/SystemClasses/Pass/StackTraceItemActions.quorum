@@ -1,0 +1,50 @@
+use Libraries.System.StackTraceItem
+
+/*
+Tests StackTraceItem: the values of a new item, Init, GetClassName,
+GetMethodName, GetFileName, GetLineNumber and Equals. Equals is true only for
+another StackTraceItem with the same class, method, file and line.
+*/
+class Main
+    action Main
+        StackTraceItem fresh
+        check
+            output "New item: GetClassName() = [" + fresh:GetClassName() + "], GetMethodName() = [" + fresh:GetMethodName() + "], GetFileName() = [" + fresh:GetFileName() + "], GetLineNumber() = " + fresh:GetLineNumber()
+        detect e
+            output "New item unexpected error: " + e:GetErrorMessage()
+        end
+        StackTraceItem item
+        check
+            item:Init("Main", "Run", "Main.quorum", 42)
+            output "Init(Main, Run, Main.quorum, 42): GetClassName() = [" + item:GetClassName() + "]"
+            output "Init(Main, Run, Main.quorum, 42): GetMethodName() = [" + item:GetMethodName() + "]"
+            output "Init(Main, Run, Main.quorum, 42): GetFileName() = [" + item:GetFileName() + "]"
+            output "Init(Main, Run, Main.quorum, 42): GetLineNumber() = " + item:GetLineNumber()
+        detect e
+            output "Init unexpected error: " + e:GetErrorMessage()
+        end
+        Compare(item, "Main", "Run", "Main.quorum", 42)
+        Compare(item, "Other", "Run", "Main.quorum", 42)
+        Compare(item, "Main", "Walk", "Main.quorum", 42)
+        Compare(item, "Main", "Run", "Other.quorum", 42)
+        Compare(item, "Main", "Run", "Main.quorum", 43)
+        check
+            output "Equals(the same item) = " + item:Equals(item)
+            Text word
+            word:SetValue("Main")
+            output "Equals(a Text, not a StackTraceItem) = " + item:Equals(word)
+        detect e
+            output "Equals with other objects unexpected error: " + e:GetErrorMessage()
+        end
+    end
+
+    action Compare(StackTraceItem item, text clazz, text method, text file, integer line)
+        StackTraceItem other
+        check
+            other:Init(clazz, method, file, line)
+            output "Equals(" + clazz + ", " + method + ", " + file + ", " + line + ") = " + item:Equals(other)
+        detect e
+            output "Equals(" + clazz + ", " + method + ", " + file + ", " + line + ") unexpected error: " + e:GetErrorMessage()
+        end
+    end
+end

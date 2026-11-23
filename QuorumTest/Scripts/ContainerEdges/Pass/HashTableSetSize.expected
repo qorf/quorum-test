@@ -1,0 +1,7 @@
+HashTable{} SetSize(64): GetSize() = 0, IsEmpty() = true
+HashTable SetSize(64) then 100 Adds: size 100, found 100 of 100
+HashTable of 10 SetSize(3): size 10, found 10 of 10
+HashTable SetSize(3) then 10 more Adds: size 20, found 20 of 20
+HashTable of 20 SetSize(1): size 20, found 20 of 20
+HashTable of 20 SetSize(100), RemoveKey(k5): size 19, found 19 of 20, CopyToKeyArray() size 19
+HashTable Empty(), SetSize(16), Add(x, y): size 1, keys [x]

@@ -1,0 +1,17 @@
+GetYear() is 2025 or later = true
+GetMonth() is from 1 to 12 = true
+GetDayOfMonth() is from 1 to 31 = true
+GetDayOfWeek() is from 1 to 7 = true
+GetHour() is from 0 to 23 = true
+GetMinute() is from 0 to 59 = true
+GetSecond() is from 0 to 59 = true
+GetTimeZone() is from -12 to 14 = true
+IsDaylightSavings() returns a boolean = true
+Now() is after January 1, 2025 in milliseconds = true
+GetEpochTime() of a clock DateTime is after January 1, 2025 in milliseconds = true
+clock:IsAfter(2000-01-01) = true
+2000-01-01:IsBefore(clock) = true
+clock:Compare(2000-01-01) = 1
+After 800 ms, a time set 300 ms after the clock DateTime: soon:IsBefore(clock) = true
+After 800 ms: soon:IsAfter(clock) = false
+After 800 ms: clock:IsAfter(soon) = true

@@ -1,0 +1,134 @@
+use Libraries.System.File
+use Libraries.System.FileWriter
+use Libraries.System.Blueprints.FileWriterBlueprint
+
+/*
+Tests FileWriter (OpenForWrite, OpenForWriteAppend, Write, WriteLine,
+PushToDisk, Close) and File's OpenForWrite, OpenForWriteAppend and Close,
+inside a scratch folder (FileTestsWork/FileWriterActions), deleted at the
+end. WriteLine ends a line with the system's line separator; the check
+compares it with a line feed, the separator on Mac and Linux. OpenForWrite replaces what
+the file held; OpenForWriteAppend keeps it and writes after it (and makes the
+file when it is missing). PushToDisk writes what is buffered, so the file has
+it before Close. File's OpenForWrite on a folder returns undefined.
+*/
+class Main
+    action Main
+        File work
+        work:SetPath("FileTestsWork/FileWriterActions")
+        work:Delete(true)
+        boolean made = work:CreateDirectories()
+        text lf = ""
+        lf = lf:GetLineFeed()
+        File file
+        file:SetPath("FileTestsWork/FileWriterActions/out.txt")
+
+        FileWriter writer
+        check
+            writer:OpenForWrite(file)
+            writer:Write("one")
+            writer:Write(" two")
+            writer:Close()
+            output "OpenForWrite, Write(one), Write( two), Close: Read() = [" + file:Read() + "]"
+        detect e
+            output "OpenForWrite and Write unexpected error: " + e:GetErrorMessage()
+        end
+        FileWriter lines
+        check
+            lines:OpenForWrite(file)
+            lines:WriteLine("first")
+            lines:WriteLine("second")
+            lines:Close()
+            text content = file:Read()
+            output "WriteLine(first), WriteLine(second): Read() ends each line = " + (content = "first" + lf + "second" + lf)
+        detect e
+            output "WriteLine unexpected error: " + e:GetErrorMessage()
+        end
+        FileWriter replace
+        check
+            replace:OpenForWrite(file)
+            replace:Write("fresh")
+            replace:Close()
+            output "OpenForWrite again replaces the contents: Read() = [" + file:Read() + "]"
+        detect e
+            output "OpenForWrite again unexpected error: " + e:GetErrorMessage()
+        end
+        FileWriter append
+        check
+            append:OpenForWriteAppend(file)
+            append:Write(" and more")
+            append:Close()
+            output "OpenForWriteAppend, Write( and more): Read() = [" + file:Read() + "]"
+        detect e
+            output "OpenForWriteAppend unexpected error: " + e:GetErrorMessage()
+        end
+        File newFile
+        newFile:SetPath("FileTestsWork/FileWriterActions/new.txt")
+        FileWriter maker
+        check
+            maker:OpenForWriteAppend(newFile)
+            maker:Write("made")
+            maker:Close()
+            output "OpenForWriteAppend on a missing file makes it: Read() = [" + newFile:Read() + "]"
+        detect e
+            output "OpenForWriteAppend on a missing file unexpected error: " + e:GetErrorMessage()
+        end
+        File pushed
+        pushed:SetPath("FileTestsWork/FileWriterActions/pushed.txt")
+        FileWriter push
+        check
+            push:OpenForWrite(pushed)
+            push:Write("buffered")
+            push:PushToDisk()
+            output "PushToDisk() before Close: Read() = [" + pushed:Read() + "]"
+            push:Close()
+        detect e
+            output "PushToDisk() unexpected error: " + e:GetErrorMessage()
+        end
+
+        File viaFile
+        viaFile:SetPath("FileTestsWork/FileWriterActions/via.txt")
+        check
+            FileWriterBlueprint w = viaFile:OpenForWrite()
+            w:Write("through File")
+            viaFile:Close()
+            output "File:OpenForWrite, Write, File:Close: Read() = [" + viaFile:Read() + "]"
+        detect e
+            output "File:OpenForWrite unexpected error: " + e:GetErrorMessage()
+        end
+        check
+            FileWriterBlueprint w = viaFile:OpenForWriteAppend()
+            w:Write(" appended")
+            viaFile:Close()
+            output "File:OpenForWriteAppend, Write, File:Close: Read() = [" + viaFile:Read() + "]"
+        detect e
+            output "File:OpenForWriteAppend unexpected error: " + e:GetErrorMessage()
+        end
+        check
+            FileWriterBlueprint none = work:OpenForWrite()
+            output "File:OpenForWrite on a folder is undefined = " + (none = undefined)
+        detect e
+            output "File:OpenForWrite on a folder unexpected error: " + e:GetErrorMessage()
+        end
+        check
+            FileWriterBlueprint none = work:OpenForWriteAppend()
+            output "File:OpenForWriteAppend on a folder is undefined = " + (none = undefined)
+        detect e
+            output "File:OpenForWriteAppend on a folder unexpected error: " + e:GetErrorMessage()
+        end
+        File badPlace
+        badPlace:SetPath("FileTestsWork/FileWriterActions/nowhere/out.txt")
+        FileWriter bad
+        check
+            bad:OpenForWrite(badPlace)
+            output "OpenForWrite(a file in a missing folder) should fail but returned normally"
+        detect e
+            output "OpenForWrite(a file in a missing folder) fails, as it should"
+        end
+
+        work:Delete(true)
+        File top
+        top:SetPath("FileTestsWork")
+        boolean removed = top:Delete()
+    end
+end

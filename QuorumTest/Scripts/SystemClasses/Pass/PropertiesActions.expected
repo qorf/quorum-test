@@ -1,0 +1,24 @@
+Constants: operatingSystem = [os.name], architecture = [os.arch], version = [os.version]
+Constants: javaRuntimeName = [java.runtime.name], requestedWebPage = [quorum.url], iosSimulator = [IOS-Simulator]
+GetProperty(quorum.test.missing.property) = []
+SetProperty(quorum.test.property, a value), GetProperty(quorum.test.property) = [a value]
+SetProperty(quorum.test.property, another), GetProperty(quorum.test.property) = [another]
+GetOperatingSystemName() is not empty = true
+GetOperatingSystemName() is the os.name property = true
+GetArchitecture() is not empty = true
+GetOperatingSystemVersion() is not empty = true
+IsWindows() or IsMac() or Linux = true
+IsWindows() and IsMac() are not both true = true
+IsAndroid() = false
+IsIos() = false
+IsIosSimulator() = false
+IsWebBrowser() = false
+GetEnvironmentVariable(QUORUM_TEST_MISSING_VARIABLE) = []
+GetEnvironmentVariable(PATH) is not empty = true
+GetRequestedWebPage() = []
+GetProperties() has os.name = true
+GetProperties() has quorum.test.property = [another]
+GetEnvironmentVariables() is not empty = true
+GetEnvironmentVariables() has QUORUM_TEST_MISSING_VARIABLE = false
+GetRunLocation() is defined = true
+GetRunLocation() is a .jar file = true

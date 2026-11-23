@@ -1,0 +1,29 @@
+GetDiagonalMatrix of |3, 0| |4, 5| gives a 2 by 2 matrix:
+|6.7082, 0.0|
+|0.0, 2.2361|
+GetRank of |3, 0| |4, 5| = 2
+U times D times V transposed for |3, 0| |4, 5| gives a 2 by 2 matrix:
+|3.0, 0.0|
+|4.0, 5.0|
+U transposed times U for |3, 0| |4, 5| gives a 2 by 2 matrix:
+|1.0, 0.0|
+|0.0, 1.0|
+V transposed times V for |3, 0| |4, 5| gives a 2 by 2 matrix:
+|1.0, 0.0|
+|0.0, 1.0|
+GetOriginalMatrix of |3, 0| |4, 5| gives a 2 by 2 matrix:
+|3.0, 0.0|
+|4.0, 5.0|
+GetInverse of |3, 0| |4, 5| gives a 2 by 2 matrix:
+|0.3333, 0.0|
+|-0.2667, 0.2|
+GetDiagonalMatrix of |3, 0| |4, 5| after GetInverse gives a 2 by 2 matrix:
+|6.7082, 0.0|
+|0.0, 2.2361|
+Solve |3, 0| |4, 5| for the column 3, 9 gives a 2 by 1 matrix:
+|1.0|
+|1.0|
+GetDiagonalMatrix of |1, 2| |2, 4| gives a 2 by 2 matrix:
+|5.0, 0.0|
+|0.0, 0.0|
+GetRank of |1, 2| |2, 4| = 1

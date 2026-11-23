@@ -1,0 +1,84 @@
+use Libraries.Compute.Noise.PerlinNoise
+use Libraries.Compute.Math
+
+/*
+The settings of PerlinNoise (from NoiseGenerator): their documented
+defaults, that each setter is read back by its getter, that SetOctaves
+keeps at least one octave as documented, ToUnitRange (which maps -1..1 to
+0..1 and clamps values outside), and WeightBySlope, which multiplies the
+height by e^(-alpha * slope): a flat slope leaves the height alone, and a
+slope of length 5 with the default alpha 0.15 multiplies it by e^(-0.75),
+about 0.4724.
+*/
+class Main
+    Math math
+
+    action Main
+        PerlinNoise noise
+        output "default GetSeed = " + noise:GetSeed()
+        output "default GetFrequency = " + noise:GetFrequency()
+        output "default GetOctaves = " + noise:GetOctaves()
+        output "default GetLacunarity = " + noise:GetLacunarity()
+        output "default GetPersistence = " + noise:GetPersistence()
+        output "default GetRidgeGain = " + noise:GetRidgeGain()
+        output "default GetSlopeAlpha = " + noise:GetSlopeAlpha()
+        output "default GetSlopeSpacing = " + noise:GetSlopeSpacing()
+        output "default GetWarpFrequency = " + noise:GetWarpFrequency()
+        output "default GetWarpStrength = " + noise:GetWarpStrength()
+        check
+            noise:SetSeed(77)
+            noise:SetFrequency(0.5)
+            noise:SetOctaves(6)
+            noise:SetLacunarity(3)
+            noise:SetPersistence(0.25)
+            noise:SetRidgeGain(1.5)
+            noise:SetSlopeAlpha(0.3)
+            noise:SetSlopeSpacing(2)
+            noise:SetWarpFrequency(0.01)
+            noise:SetWarpStrength(10)
+            output "after setting: seed " + noise:GetSeed() + ", frequency " + noise:GetFrequency() + ", octaves " + noise:GetOctaves() + ", lacunarity " + noise:GetLacunarity() + ", persistence " + noise:GetPersistence()
+            output "after setting: ridge gain " + noise:GetRidgeGain() + ", slope alpha " + noise:GetSlopeAlpha() + ", slope spacing " + noise:GetSlopeSpacing() + ", warp frequency " + noise:GetWarpFrequency() + ", warp strength " + noise:GetWarpStrength()
+        detect e
+            output "setters unexpected error: " + e:GetErrorMessage()
+        end
+        check
+            noise:SetOctaves(0)
+            output "SetOctaves(0) then GetOctaves = " + noise:GetOctaves()
+            noise:SetOctaves(-5)
+            output "SetOctaves(-5) then GetOctaves = " + noise:GetOctaves()
+        detect e
+            output "SetOctaves unexpected error: " + e:GetErrorMessage()
+        end
+        ShowUnit(-1)
+        ShowUnit(0)
+        ShowUnit(1)
+        ShowUnit(0.5)
+        ShowUnit(2)
+        ShowUnit(-3)
+        PerlinNoise fresh
+        check
+            output "WeightBySlope(0.5, 0, 0) = " + fresh:WeightBySlope(0.5, 0, 0)
+        detect e
+            output "WeightBySlope(0.5, 0, 0) unexpected error: " + e:GetErrorMessage()
+        end
+        check
+            output "WeightBySlope(1, 3, 4) rounded to 4 places = " + math:Round(fresh:WeightBySlope(1, 3, 4), 4)
+        detect e
+            output "WeightBySlope(1, 3, 4) unexpected error: " + e:GetErrorMessage()
+        end
+        check
+            output "WeightBySlope(-0.8, -3, 4) rounded to 4 places = " + math:Round(fresh:WeightBySlope(-0.8, -3, 4), 4)
+        detect e
+            output "WeightBySlope(-0.8, -3, 4) unexpected error: " + e:GetErrorMessage()
+        end
+    end
+
+    action ShowUnit(number value)
+        PerlinNoise noise
+        check
+            output "ToUnitRange(" + value + ") = " + noise:ToUnitRange(value)
+        detect e
+            output "ToUnitRange(" + value + ") unexpected error: " + e:GetErrorMessage()
+        end
+    end
+end

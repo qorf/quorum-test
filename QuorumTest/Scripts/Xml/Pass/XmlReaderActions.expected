@@ -1,0 +1,7 @@
+SetMarkupListener(me) then GetMarkupListener() returns the same listener = [true]
+GetMarkupListener() on a new reader is defined = [true]
+Read(<a x='1'>hi<b/></a>) with the default listener completes
+Read(<a>x</a>) then Read(<b>y</b>) on one reader: first events: Start(a) Value[x] End(a), second events: Start(b) Value[y] End(b)
+Read(<b>y</b>) after an unfinished document on one reader events: Start(b) Value[y] End(b)
+a second reader does not share the first reader's entities: Read(<a>&lt;</a>) events: Start(a) Value[<] End(a)
+MarkupListener StartElement, Value and EndElement do nothing by default

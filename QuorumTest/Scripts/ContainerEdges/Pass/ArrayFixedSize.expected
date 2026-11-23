@@ -1,0 +1,26 @@
+Array auto-resize off, max 10, 10 x Add(value): accepted all 10 items, size 10
+Array full (auto-resize off) Add(extra) fails, as it should
+Array full (auto-resize off) Add(0, extra) fails, as it should
+Array full (auto-resize off) GetMaxSize() = 10
+Array auto-resize off, max 10, 10 x Add(GetSize(), value): accepted all 10 items, size 10
+Array full (auto-resize off) Add(extra) fails, as it should
+Array full (auto-resize off) Add(0, extra) fails, as it should
+Array full (auto-resize off) GetMaxSize() = 10
+Array auto-resize off, max 10, 10 x Add(0, value): accepted all 10 items, size 10
+Array full (auto-resize off) Add(extra) fails, as it should
+Array full (auto-resize off) Add(0, extra) fails, as it should
+Array full (auto-resize off) GetMaxSize() = 10
+Array auto-resize off, max 10, 10 x AddToFront(value): accepted all 10 items, size 10
+Array full (auto-resize off) Add(extra) fails, as it should
+Array full (auto-resize off) Add(0, extra) fails, as it should
+Array full (auto-resize off) GetMaxSize() = 10
+Array auto-resize off, max 10, 10 x AddToEnd(value): accepted all 10 items, size 10
+Array full (auto-resize off) Add(extra) fails, as it should
+Array full (auto-resize off) Add(0, extra) fails, as it should
+Array full (auto-resize off) GetMaxSize() = 10
+Array auto-resize off, max 10, 10 x Add(1, value): accepted all 10 items, size 10
+Array full (auto-resize off) Add(extra) fails, as it should
+Array full (auto-resize off) Add(0, extra) fails, as it should
+Array full (auto-resize off) GetMaxSize() = 10
+Array auto-resize off SetSize(3), Set(2, c) gives [undefined,undefined,c]
+Array auto-resize off then RemoveAt(0), Add(d) gives [undefined,c,d]

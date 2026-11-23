@@ -1,0 +1,4 @@
+RemoveKey every key of a table of 100000: 100000 returned the right value, size afterward 0, IsEmpty() = true
+RemoveKey every key of a table of 400000: 400000 returned the right value, size afterward 0, IsEmpty() = true
+RemoveKey 400000 text keys: within 2000 ms
+RemoveKey scales linearly (4x keys, at most 8x time)

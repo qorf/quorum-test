@@ -1,0 +1,70 @@
+package Libraries.Language.Compile.Test
+
+use Libraries.Testing.QuorumTest
+use Libraries.Testing.ScriptCheck
+
+/*
+Edge cases of Math (every rounding form, Floor, Ceiling, Factorial, angle
+conversion, logarithms, square roots of negatives, powers, special angles,
+InverseTangent2, AbsoluteValue), 32 bit integer overflow, integer divide and
+mod by zero, number output formatting, BigInteger signs and ToInteger
+wrapping, BitwiseOperations at the 32 bit edges, the MatrixTransform classes
+that had no tests (scalar transforms, Flip, Rotation, LowerUpper,
+SingularValue and Tridiagonal decompositions), ComplexNumber and
+PerlinNoise. Everything runs on all three back ends except the BigInteger
+scripts, which skip Python: BigInteger is a system class and there is no
+Python plugin for it (Plugins/python/Libraries/Compute has only Math and
+BitwiseOperations).
+*/
+class MathEdgesTester
+    QuorumTest suite = undefined
+    ScriptCheck scripts
+    text path = "Scripts/MathEdges/Pass/"
+
+    action Test
+        scripts:SetSuite(suite)
+        scripts:CheckEverywhere(path + "MathRound")
+        scripts:CheckEverywhere(path + "MathRoundMidpoint")
+        scripts:CheckEverywhere(path + "MathRoundPlaces")
+        scripts:CheckEverywhere(path + "MathRoundToNearestInteger")
+        scripts:CheckEverywhere(path + "MathFloorCeiling")
+        scripts:CheckEverywhere(path + "MathFactorial")
+        scripts:CheckEverywhere(path + "MathAngles")
+        scripts:CheckEverywhere(path + "MathLogarithms")
+        scripts:CheckEverywhere(path + "MathSquareRoot")
+        scripts:CheckEverywhere(path + "MathPowers")
+        scripts:CheckEverywhere(path + "MathTrigSpecialAngles")
+        scripts:CheckEverywhere(path + "MathInverseTangentPoint")
+        scripts:CheckEverywhere(path + "MathAbsoluteValueEdges")
+        scripts:CheckEverywhere(path + "MathHelpers")
+        scripts:CheckEverywhere(path + "IntegerOverflow")
+        scripts:CheckEverywhere(path + "IntegerDivideByZero")
+        scripts:CheckEverywhere(path + "NumberOutput")
+        scripts:Check(path + "BigIntegerSigns", true, false)
+        scripts:Check(path + "BigIntegerToInteger", true, false)
+        scripts:CheckEverywhere(path + "BitwiseEdges")
+        scripts:CheckEverywhere(path + "MatrixScalarTransforms")
+        scripts:CheckEverywhere(path + "MatrixFlipRotation")
+        scripts:CheckEverywhere(path + "MatrixLowerUpper")
+        scripts:CheckEverywhere(path + "MatrixSingularValue")
+        scripts:CheckEverywhere(path + "MatrixTridiagonal")
+        scripts:CheckEverywhere(path + "ComplexArithmetic")
+        scripts:CheckEverywhere(path + "ComplexFunctions")
+        scripts:CheckEverywhere(path + "ComplexSpecialValues")
+        scripts:CheckEverywhere(path + "PerlinNoiseProperties")
+        scripts:CheckEverywhere(path + "PerlinNoiseSettings")
+        scripts:CheckEverywhere(path + "PerlinNoiseValues")
+    end
+
+    action GetName returns text
+        return "Math Edge Tests"
+    end
+
+    action GetCompilerTestSuite returns QuorumTest
+        return suite
+    end
+
+    action SetCompilerTestSuite(QuorumTest suite)
+        me:suite = suite
+    end
+end

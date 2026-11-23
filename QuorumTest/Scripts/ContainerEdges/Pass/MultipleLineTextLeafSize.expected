@@ -1,0 +1,5 @@
+MultipleLineText Initialize(Hello world! What a lovely day!, 10): GetText() = [Hello world! What a lovely day!], GetSize() = 31, GetLeafSize() as an integer = 10
+MultipleLineText SetLeafSize(10) then Initialize(Hello world! What a lovely day!): GetText() = [Hello world! What a lovely day!], GetLeafSize() as an integer = 10
+MultipleLineText Initialize(short, 10) then Concatenate( and now much longer than ten): GetText() = [short and now much longer than ten], GetSize() = 34
+MultipleLineText Initialize(0123456789, 10) then Insert(5, abcdef): GetText() = [01234abcdef56789]
+MultipleLineText(Hello) DisableTextWrapping(): GetText() = [Hello], GetLineCount() = 1

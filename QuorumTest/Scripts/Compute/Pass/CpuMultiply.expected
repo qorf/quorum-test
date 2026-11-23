@@ -1,0 +1,13 @@
+Transform of |1, 2| |3, 4| by |5, 6| |7, 8| has 2 rows and 2 columns
+Transform of |1, 2| |3, 4| by |5, 6| |7, 8| (0, 0) = 19.0, hand-worked 19
+Transform of |1, 2| |3, 4| by |5, 6| |7, 8| (0, 1) = 22.0, hand-worked 22
+Transform of |1, 2| |3, 4| by |5, 6| |7, 8| (1, 0) = 43.0, hand-worked 43
+Transform of |1, 2| |3, 4| by |5, 6| |7, 8| (1, 1) = 50.0, hand-worked 50
+TransformInSoftware of |1, 0, 2| |-1, 3, 1| by the column |3| |2| |1| has 2 rows and 1 columns
+TransformInSoftware of |1, 0, 2| |-1, 3, 1| by the column |3| |2| |1| (0, 0) = 5.0, hand-worked 5
+TransformInSoftware of |1, 0, 2| |-1, 3, 1| by the column |3| |2| |1| (1, 0) = 4.0, hand-worked 4
+Transform of |1 + e, 2| |3, 1 + f + g| by |1 - e, 5| |6, 7|, e = 2^-20, f = 2^-25, g = 2^-40: (0, 0) equals 13 - g exactly: true
+Transform of |1 + e, 2| |3, 1 + f + g| by |1 - e, 5| |6, 7|, e = 2^-20, f = 2^-25, g = 2^-40: (0, 1) equals 19 + 5e exactly: true
+Transform of |1 + e, 2| |3, 1 + f + g| by |1 - e, 5| |6, 7|, e = 2^-20, f = 2^-25, g = 2^-40: (1, 0) equals 9 - 3e + 6f + 6g exactly: true
+Transform of |1 + e, 2| |3, 1 + f + g| by |1 - e, 5| |6, 7|, e = 2^-20, f = 2^-25, g = 2^-40: (1, 1) equals 22 + 7f + 7g exactly: true
+Transform of |1 + e, 2| |3, 1 + f + g| by |1 - e, 5| |6, 7|, e = 2^-20, f = 2^-25, g = 2^-40: (0, 0) is below 13: true

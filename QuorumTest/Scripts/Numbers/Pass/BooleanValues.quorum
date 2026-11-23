@@ -1,0 +1,86 @@
+/*
+    Boolean:SetValue, GetValue, GetText, Compare(Object) (false is smaller
+    than true), Equals(Object) and GetHashCode (1231 for true and 1237 for
+    false, as the documentation says). The other value is a Boolean object.
+    Each case runs on a boolean primitive and on a Boolean object.
+*/
+class Main
+    action Main
+        Show(true)
+        Show(false)
+        ShowPair(false, true)
+        ShowPair(true, false)
+        ShowPair(true, true)
+        ShowPair(false, false)
+        Boolean object
+        check
+            output "new Boolean GetValue() = " + object:GetValue()
+            object:SetValue(true)
+            object:SetValue(false)
+            output "SetValue(true) then SetValue(false): GetValue() = " + object:GetValue() + ", GetHashCode() = " + object:GetHashCode()
+            object:SetValue(true)
+            output "SetValue(true) again: GetValue() = " + object:GetValue() + ", GetHashCode() = " + object:GetHashCode()
+        detect e
+            output "SetValue several times unexpected error: " + e:GetErrorMessage()
+        end
+    end
+
+    action Show(boolean value)
+        check
+            output "GetText(" + value + ") = [" + value:GetText() + "]"
+        detect e
+            output "GetText(" + value + ") unexpected error: " + e:GetErrorMessage()
+        end
+        check
+            output "GetHashCode(" + value + ") = " + value:GetHashCode()
+        detect e
+            output "GetHashCode(" + value + ") unexpected error: " + e:GetErrorMessage()
+        end
+        Boolean object
+        object:SetValue(value)
+        check
+            output "Boolean GetValue(" + value + ") = " + object:GetValue()
+        detect e
+            output "Boolean GetValue(" + value + ") unexpected error: " + e:GetErrorMessage()
+        end
+        check
+            output "Boolean GetText(" + value + ") = [" + object:GetText() + "]"
+        detect e
+            output "Boolean GetText(" + value + ") unexpected error: " + e:GetErrorMessage()
+        end
+        check
+            output "Boolean GetHashCode(" + value + ") = " + object:GetHashCode()
+        detect e
+            output "Boolean GetHashCode(" + value + ") unexpected error: " + e:GetErrorMessage()
+        end
+    end
+
+    action ShowPair(boolean value, boolean other)
+        Boolean otherObject
+        otherObject:SetValue(other)
+        text compare = "Compare(" + value + ", " + other + ")"
+        text equals = "Equals(" + value + ", " + other + ")"
+        check
+            output compare + " = " + value:Compare(otherObject)
+        detect e
+            output compare + " unexpected error: " + e:GetErrorMessage()
+        end
+        check
+            output equals + " = " + value:Equals(otherObject)
+        detect e
+            output equals + " unexpected error: " + e:GetErrorMessage()
+        end
+        Boolean object
+        object:SetValue(value)
+        check
+            output "Boolean " + compare + " = " + object:Compare(otherObject)
+        detect e
+            output "Boolean " + compare + " unexpected error: " + e:GetErrorMessage()
+        end
+        check
+            output "Boolean " + equals + " = " + object:Equals(otherObject)
+        detect e
+            output "Boolean " + equals + " unexpected error: " + e:GetErrorMessage()
+        end
+    end
+end

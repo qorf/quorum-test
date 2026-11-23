@@ -1,0 +1,23 @@
+Set(normal (0, 0, 2), 5): GetNormal = (0.0, 0.0, 1.0), GetDistance = 5.0
+Distance of (1, 2, 3) = 8.0
+Distance of (0, 0, -5) = 0.0
+Set(normal (0, 3, 0), point (1, 2, 3)): GetNormal = (0.0, 1.0, 0.0), GetDistance = -2.0
+Distance of (0, 5, 0) = 3.0
+TestPoint (7, 2, 9) = OnPlane
+TestPoint (0, 5, 0) = Front
+TestPoint (0, -1, 0) = Back
+TestPoint(3, 2, -4) = OnPlane
+TestPoint(3, 2.5, -4) = Front
+TestPoint(3, 1.5, -4) = Back
+Set((0, 0, 2), (1, 0, 2), (1, 1, 2)): GetNormal = (0.0, 0.0, 1.0), GetDistance = -2.0
+TestPoint (5, 5, 2) = OnPlane
+TestPoint (0, 0, 3) = Front
+TestPoint (0, 0, 0) = Back
+IsFrontFacing toward (0, 0, -1) = true
+IsFrontFacing toward (0, 0, 1) = false
+IsFrontFacing toward (1, 0, 0) = true
+Set(1, 0, 0, -1): GetNormal = (1.0, 0.0, 0.0), GetDistance = -1.0
+Distance of (4, 9, 9) = 3.0
+Set(plane) copy: GetNormal = (1.0, 0.0, 0.0), GetDistance = -1.0
+the copy after changing the original: GetNormal = (1.0, 0.0, 0.0), GetDistance = -1.0
+constants: onPlane = OnPlane, front = Front, back = Back

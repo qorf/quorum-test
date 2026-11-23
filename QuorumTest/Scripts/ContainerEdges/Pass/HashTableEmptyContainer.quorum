@@ -1,0 +1,125 @@
+use Libraries.Containers.HashTable
+use Libraries.Containers.Array
+use Libraries.Containers.Iterator
+
+/*
+    Every read and remove action on an empty HashTable: lookups return
+    undefined or false, removals report nothing removed, iterators have no
+    next item and the copies are empty.
+*/
+class Main
+    action Show(text value) returns text
+        if value = undefined
+            return "undefined"
+        end
+        return "[" + value + "]"
+    end
+
+    action Describe(Array<text> array) returns text
+        text result = "["
+        integer i = 0
+        repeat while i < array:GetSize()
+            if i > 0
+                result = result + ","
+            end
+            text value = array:Get(i)
+            if value = undefined
+                result = result + "undefined"
+            else
+                result = result + value
+            end
+            i = i + 1
+        end
+        return result + "]"
+    end
+
+    // The keys sorted, so the output does not depend on hash order.
+    action SortedKeys(HashTable<text, text> table) returns text
+        Array<text> keys = table:CopyToKeyArray()
+        keys:Sort()
+        return Describe(keys)
+    end
+
+    action Main
+        HashTable<text, text> table
+        check
+            output "HashTable{} GetSize() = " + table:GetSize() + ", IsEmpty() = " + table:IsEmpty()
+        detect e
+            output "HashTable{} GetSize() unexpected error: " + e:GetErrorMessage()
+        end
+        check
+            output "HashTable{} GetValue(a) = " + Show(table:GetValue("a"))
+        detect e
+            output "HashTable{} GetValue(a) unexpected error: " + e:GetErrorMessage()
+        end
+        check
+            output "HashTable{} HasKey(a) = " + table:HasKey("a")
+        detect e
+            output "HashTable{} HasKey(a) unexpected error: " + e:GetErrorMessage()
+        end
+        check
+            output "HashTable{} HasValue(v) = " + table:HasValue("v")
+        detect e
+            output "HashTable{} HasValue(v) unexpected error: " + e:GetErrorMessage()
+        end
+        check
+            output "HashTable{} GetKey(v) = " + Show(table:GetKey("v"))
+        detect e
+            output "HashTable{} GetKey(v) unexpected error: " + e:GetErrorMessage()
+        end
+        check
+            output "HashTable{} RemoveKey(a) = " + Show(table:RemoveKey("a"))
+        detect e
+            output "HashTable{} RemoveKey(a) unexpected error: " + e:GetErrorMessage()
+        end
+        check
+            output "HashTable{} RemoveValue(v) = " + Show(table:RemoveValue("v"))
+        detect e
+            output "HashTable{} RemoveValue(v) unexpected error: " + e:GetErrorMessage()
+        end
+        check
+            output "HashTable{} RemoveAllKeys(a) = " + table:RemoveAllKeys("a") + ", RemoveAllValues(v) = " + table:RemoveAllValues("v")
+        detect e
+            output "HashTable{} RemoveAllKeys/RemoveAllValues unexpected error: " + e:GetErrorMessage()
+        end
+        check
+            Iterator<text> keys = table:GetKeyIterator()
+            Iterator<text> values = table:GetValueIterator()
+            output "HashTable{} GetKeyIterator() HasNext() = " + keys:HasNext() + ", GetValueIterator() HasNext() = " + values:HasNext()
+        detect e
+            output "HashTable{} iterators unexpected error: " + e:GetErrorMessage()
+        end
+        check
+            Array<text> keys = table:CopyToKeyArray()
+            Array<text> values = table:CopyToValueArray()
+            output "HashTable{} CopyToKeyArray() size " + keys:GetSize() + ", CopyToValueArray() size " + values:GetSize()
+        detect e
+            output "HashTable{} CopyToKeyArray/CopyToValueArray unexpected error: " + e:GetErrorMessage()
+        end
+        check
+            Object copyObject = table:Copy()
+            HashTable<text, text> copy = cast(HashTable<text, text>, copyObject)
+            output "HashTable{} Copy() size " + copy:GetSize() + ", IsEmpty() = " + copy:IsEmpty()
+        detect e
+            output "HashTable{} Copy() unexpected error: " + e:GetErrorMessage()
+        end
+        check
+            table:Empty()
+            output "HashTable{} Empty() leaves size " + table:GetSize()
+        detect e
+            output "HashTable{} Empty() unexpected error: " + e:GetErrorMessage()
+        end
+        check
+            table:Add("a", "1")
+            output "HashTable{} then Add(a, 1): size " + table:GetSize() + ", GetValue(a) = " + Show(table:GetValue("a"))
+        detect e
+            output "HashTable{} then Add(a, 1) unexpected error: " + e:GetErrorMessage()
+        end
+        check
+            table:Empty()
+            output "HashTable{a:1} Empty(): size " + table:GetSize() + ", IsEmpty() = " + table:IsEmpty() + ", HasKey(a) = " + table:HasKey("a") + ", keys " + SortedKeys(table)
+        detect e
+            output "HashTable{a:1} Empty() unexpected error: " + e:GetErrorMessage()
+        end
+    end
+end

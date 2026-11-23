@@ -1,0 +1,17 @@
+SetTimeZone(0), SetEpochTime(1700000000000): GetTimeZone() = 0
+SetTimeZone(0), SetEpochTime(1700000000000): GetTimestamp() = [2023-11-14T22:13:20]
+SetTimeZone(0), SetEpochTime(1700000000000): GetYear() = 2023, GetMonth() = 11, GetDayOfMonth() = 14
+SetTimeZone(0), SetEpochTime(1700000000000): GetHour() = 22, GetMinute() = 13, GetSecond() = 20
+SetTimeZone(0), SetEpochTime(1700000000000): GetDayOfWeek() = 2
+SetTimeZone(0), SetEpochTime(1700000000000): IsDaylightSavings() = false
+SetTimeZone(5), SetEpochTime(1700000000000): GetTimeZone() = 5
+SetTimeZone(5), SetEpochTime(1700000000000): GetTimestamp() = [2023-11-15T03:13:20]
+SetTimeZone(5), SetEpochTime(1700000000000): GetDayOfWeek() = 3
+SetTimeZone(-6), SetEpochTime(0): GetTimeZone() = -6
+SetTimeZone(-6), SetEpochTime(0): GetTimestamp() = [1969-12-31T18:00:00]
+SetTimeZone(-6), SetEpochTime(0): GetYear() = 1969, GetDayOfWeek() = 3
+SetEpochTime(0), then SetTimeZone(9): GetTimestamp() = [1970-01-01T09:00:00]
+SetEpochTime(0), then SetTimeZone(9): GetEpochTime() = 0
+SetTimeZone(0), SetEpochTime(1704024000000): GetMonthName() = [December], GetShortMonthName() = [Dec]
+SetTimeZone(0), SetEpochTime(1704024000000): GetDayOfWeek() = 7, GetDayOfWeekName() = [Sunday]
+SetTimeZone(0), SetEpochTime(1704024000000): DateToText() = [2023-12-31], TimeToText() = [12:00:00]

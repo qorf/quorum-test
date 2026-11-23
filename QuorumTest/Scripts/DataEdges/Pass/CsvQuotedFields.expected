@@ -1,0 +1,6 @@
+Read("a,b",c) rows = 1: [a,b][c]
+Read(x,"a,b") rows = 1: [x][a,b]
+Read("a","b") rows = 1: [a][b]
+Read("",x) rows = 1: [][x]
+Read("a,b,c") rows = 1: [a,b,c]
+Read("1,000","2,000"\n3,4) rows = 2: [1,000][2,000] | [3][4]

@@ -1,0 +1,35 @@
+/*
+    Integer:BitCount counts the one bits in the 32-bit two's complement form,
+    so -1 has 32 and the minimum integer has 1.
+    Each case runs on an integer primitive and on an Integer object.
+*/
+class Main
+    action Main
+        ShowBitCount(0)
+        ShowBitCount(1)
+        ShowBitCount(3)
+        ShowBitCount(255)
+        ShowBitCount(-1)
+        ShowBitCount(-20)
+        ShowBitCount(2147483647)
+        ShowBitCount(-2147483647 - 1)
+    end
+
+    action ShowBitCount(integer value)
+        text call = "BitCount(" + value + ")"
+        check
+            integer result = value:BitCount()
+            output call + " = " + result
+        detect e
+            output call + " unexpected error: " + e:GetErrorMessage()
+        end
+        Integer object
+        object:SetValue(value)
+        check
+            integer result = object:BitCount()
+            output "Integer " + call + " = " + result
+        detect e
+            output "Integer " + call + " unexpected error: " + e:GetErrorMessage()
+        end
+    end
+end

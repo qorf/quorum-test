@@ -1,0 +1,103 @@
+use Libraries.Containers.Array
+
+/*
+    SetSize(0) and SetSize with a negative size. After SetSize(0) the Array is
+    empty and must still grow when items are added (a backing store of length
+    0 cannot grow by doubling).
+*/
+class Main
+    action Show(text value) returns text
+        if value = undefined
+            return "undefined"
+        end
+        return "[" + value + "]"
+    end
+
+    action Describe(Array<text> array) returns text
+        text result = "["
+        integer i = 0
+        repeat while i < array:GetSize()
+            if i > 0
+                result = result + ","
+            end
+            text value = array:Get(i)
+            if value = undefined
+                result = result + "undefined"
+            else
+                result = result + value
+            end
+            i = i + 1
+        end
+        return result + "]"
+    end
+
+    action Main
+        Array<text> a
+        check
+            a:SetSize(0)
+            output "Array[] SetSize(0): size " + a:GetSize() + ", IsEmpty() = " + a:IsEmpty()
+        detect e
+            output "Array[] SetSize(0) unexpected error: " + e:GetErrorMessage()
+        end
+        check
+            a:Add("x")
+            output "Array SetSize(0) then Add(x) gives " + Describe(a)
+        detect e
+            output "Array SetSize(0) then Add(x) unexpected error: " + e:GetErrorMessage()
+        end
+
+        Array<text> b
+        check
+            b:SetSize(0)
+            b:Add(0, "x")
+            output "Array SetSize(0) then Add(0, x) gives " + Describe(b)
+        detect e
+            output "Array SetSize(0) then Add(0, x) unexpected error: " + e:GetErrorMessage()
+        end
+
+        Array<text> c
+        check
+            c:SetSize(0)
+            c:AddToFront("x")
+            c:AddToFront("w")
+            c:AddToEnd("y")
+            output "Array SetSize(0) then AddToFront(x), AddToFront(w), AddToEnd(y) gives " + Describe(c)
+        detect e
+            output "Array SetSize(0) then AddToFront/AddToEnd unexpected error: " + e:GetErrorMessage()
+        end
+
+        Array<text> d
+        d:Add("a")
+        d:Add("b")
+        check
+            d:SetSize(0)
+            output "Array[a,b] SetSize(0): size " + d:GetSize() + ", IsEmpty() = " + d:IsEmpty()
+        detect e
+            output "Array[a,b] SetSize(0) unexpected error: " + e:GetErrorMessage()
+        end
+        check
+            integer i = 0
+            repeat 25 times
+                d:Add("n" + i)
+                i = i + 1
+            end
+            output "Array[a,b] SetSize(0) then 25 Adds: size " + d:GetSize() + ", Get(0) = " + Show(d:Get(0)) + ", Get(24) = " + Show(d:Get(24))
+        detect e
+            output "Array[a,b] SetSize(0) then 25 Adds unexpected error: " + e:GetErrorMessage()
+        end
+
+        Array<text> f
+        f:Add("a")
+        check
+            f:SetSize(-1)
+            output "Array[a] SetSize(-1) should fail but gave size " + f:GetSize()
+        detect e
+            output "Array[a] SetSize(-1) fails, as it should"
+        end
+        check
+            output "Array[a] after SetSize(-1) is " + Describe(f)
+        detect e
+            output "Array[a] after SetSize(-1) unexpected error: " + e:GetErrorMessage()
+        end
+    end
+end

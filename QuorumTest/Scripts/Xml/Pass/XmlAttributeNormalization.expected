@@ -1,0 +1,6 @@
+Read(<a x='1\n2'/>) events: Start(a x=[1 2]) End(a)
+Read(<a x='1\t2'/>) events: Start(a x=[1 2]) End(a)
+Read(<a x='1\r\n2'/>) events: Start(a x=[1 2]) End(a)
+Read(<a x='1&#10;2'/>) events: Start(a x=[1\n2]) End(a)
+Read(<a x='1&#9;2'/>) events: Start(a x=[1\t2]) End(a)
+Read(<a x='  spaced  '/>) events: Start(a x=[  spaced  ]) End(a)

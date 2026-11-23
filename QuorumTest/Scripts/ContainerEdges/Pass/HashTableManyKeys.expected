@@ -1,0 +1,10 @@
+HashTable 2000 x Add(key<i>, value<i>): size 2000
+HashTable of 2000 text keys: HasKey and GetValue right for 2000 of 2000, HasKey(key2000) = false
+HashTable of 2000 text keys, Set every key again: size 2000, GetValue(key1999) = [new1999]
+HashTable of 2000 text keys, RemoveKey every even key: 1000 returned the right value, size 1000, even keys left 0, odd keys left 1000
+HashTable re-adding the 1000 even keys: size 2000, GetValue(key0) = [back], GetValue(key1) = [new1]
+HashTable 2000 integer keys (i * 7919 - 7000000) plus 0, 2147483647, -2147483647: size 2003
+HashTable of integer keys: GetValue right for 2000 of 2000, GetValue(0) = [zero], GetValue(2147483647) = [max], GetValue(-2147483647) = [min], HasKey(1) = false
+HashTable keys with equal hash codes Aa, BB, AaAa, AaBB, BBAa, BBBB: size 6, values [1][2][3][4][5][6]
+HashTable equal hash codes RemoveKey(AaBB) = [4], keys [Aa,AaAa,BB,BBAa,BBBB], HasKey(BBAa) = true, HasKey(AaAa) = true
+HashTable equal hash codes RemoveKey(Aa), RemoveKey(BBBB), Set(BB, changed): size 3, keys [AaAa,BB,BBAa], GetValue(BB) = [changed]

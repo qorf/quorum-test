@@ -1,0 +1,8 @@
+Read(File doc.xml holding <a x='1'>hi<b/></a>) events: Start(a x=[1]) Value[hi] Start(b) End(b) End(a)
+Read(File missing.xml) fails, as it should
+Read(File withdtd.xml holding <!DOCTYPE note SYSTEM 'note.dtd'><note>&language;</note>) events: Start(note) Value[Quorum] End(note)
+DocumentTypeDefinition Read(File note.dtd): GetEntityValue(language) = [Quorum], HasExternalFile() = [true], GetExternalFileName() = [note.dtd]
+DocumentTypeDefinition SetSourceDirectory(XmlScratch) Read(<!DOCTYPE note SYSTEM "note.dtd">): GetEntityValue(language) = [Quorum], GetRootElement() = [note], HasExternalFile() = [true], GetExternalFileName() = [note.dtd]
+DocumentTypeDefinition SetSourceDirectory(XmlScratch) Read(<!DOCTYPE note SYSTEM 'note.dtd' [<!ENTITY local 'here'>]>): GetEntityValue(local) = [here], GetEntityValue(language) = [Quorum]
+DocumentTypeDefinitionEntity SetSourceDirectory(XmlScratch) SetValue(SYSTEM "entity.txt") GetValue() = [external text]
+scratch folder removed = [true]

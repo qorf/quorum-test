@@ -1,0 +1,8 @@
+HashTable{a..e} Copy(): copy size 5, copy {a:[1],b:[2],c:[3],d:[4],e:[5]}
+Copy Set(a, changed): copy GetValue(a) = [changed], original GetValue(a) = [1]
+Copy RemoveKey(b): copy HasKey(b) = false, original HasKey(b) = true, original size 5
+Original Set(c, again): original GetValue(c) = [again], copy GetValue(c) = [3]
+HashTable{a..e} Copy() then 40 Adds to the copy: copy size 45, original size 5
+Original after the copy grew: {a:[1],b:[2],c:[3],d:[4],e:[5]}, HasKey(new0) = false
+Copy after growing finds 40 of 40 new keys, and has a..e: truetruetruetruetrue
+HashTable{a..e} Copy() then 40 Adds to the original: copy {a:[1],b:[2],c:[3],d:[4],e:[5]}, copy size 5

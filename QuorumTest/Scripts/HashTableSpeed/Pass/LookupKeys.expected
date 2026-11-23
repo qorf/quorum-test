@@ -1,0 +1,4 @@
+Look up in a table of 100000 text keys: 200000 right answers for present keys, 200000 for absent keys
+Look up in a table of 400000 text keys: 800000 right answers for present keys, 800000 for absent keys
+1600000 lookups in a table of 400000 text keys: within 3000 ms
+Lookup scales linearly (4x keys and lookups, at most 8x time)

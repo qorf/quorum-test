@@ -1,0 +1,104 @@
+use Libraries.Compute.Matrix
+use Libraries.Compute.MatrixTransform.Multiply
+
+/*
+Multiply:Transform and Multiply:TransformInSoftware, the CPU's matrix
+multiply, on small matrices whose answers are worked out by hand. Neither
+uses a graphics card.
+
+The whole-number case multiplies |1, 2| |3, 4| by |5, 6| |7, 8|, giving
+|19, 22| |43, 50|.
+
+The exact case comes from the compute shader project's MatrixTestValues.
+With e = 2^-20, f = 2^-25 and g = 2^-40, all exact as numbers:
+
+    |1 + e, 2| |3, 1 + f + g|  times  |1 - e, 5| |6, 7|  gives
+    |13 - g, 19 + 5e| |9 - 3e + 6f + 6g, 22 + 7f + 7g|
+
+Each answer is exact in 64-bit numbers, so the CPU's answer must equal the
+hand-worked one exactly. The -g in 13 - g is only there if each product
+keeps its rounding error, so (0, 0) is below 13.
+*/
+class Main
+    action Main
+        check
+            Matrix left
+            left:SetSize(2, 2)
+            left:Set(0, 0, 1)
+            left:Set(0, 1, 2)
+            left:Set(1, 0, 3)
+            left:Set(1, 1, 4)
+            Matrix right
+            right:SetSize(2, 2)
+            right:Set(0, 0, 5)
+            right:Set(0, 1, 6)
+            right:Set(1, 0, 7)
+            right:Set(1, 1, 8)
+            Multiply multiply
+            multiply:SetValue(right)
+            Matrix result = multiply:Transform(left)
+            text call = "Transform of |1, 2| |3, 4| by |5, 6| |7, 8|"
+            output call + " has " + result:GetRows() + " rows and " + result:GetColumns() + " columns"
+            output call + " (0, 0) = " + result:Get(0, 0) + ", hand-worked 19"
+            output call + " (0, 1) = " + result:Get(0, 1) + ", hand-worked 22"
+            output call + " (1, 0) = " + result:Get(1, 0) + ", hand-worked 43"
+            output call + " (1, 1) = " + result:Get(1, 1) + ", hand-worked 50"
+        detect problem
+            output "Whole numbers unexpected error: " + problem:GetErrorMessage()
+        end
+
+        check
+            Matrix left
+            left:SetSize(2, 3)
+            left:Set(0, 0, 1)
+            left:Set(0, 1, 0)
+            left:Set(0, 2, 2)
+            left:Set(1, 0, -1)
+            left:Set(1, 1, 3)
+            left:Set(1, 2, 1)
+            Matrix right
+            right:SetSize(3, 1)
+            right:Set(0, 0, 3)
+            right:Set(1, 0, 2)
+            right:Set(2, 0, 1)
+            Multiply multiply
+            multiply:SetValue(right)
+            Matrix result = multiply:TransformInSoftware(left)
+            text call = "TransformInSoftware of |1, 0, 2| |-1, 3, 1| by the column |3| |2| |1|"
+            output call + " has " + result:GetRows() + " rows and " + result:GetColumns() + " columns"
+            output call + " (0, 0) = " + result:Get(0, 0) + ", hand-worked 5"
+            output call + " (1, 0) = " + result:Get(1, 0) + ", hand-worked 4"
+        detect problem
+            output "Different sizes unexpected error: " + problem:GetErrorMessage()
+        end
+
+        check
+            number e = 1.0 / 1048576.0
+            number f = 1.0 / 33554432.0
+            number g = 1.0 / 1099511627776.0
+            Matrix left
+            left:SetSize(2, 2)
+            left:Set(0, 0, 1 + e)
+            left:Set(0, 1, 2)
+            left:Set(1, 0, 3)
+            left:Set(1, 1, 1 + f + g)
+            Matrix right
+            right:SetSize(2, 2)
+            right:Set(0, 0, 1 - e)
+            right:Set(0, 1, 5)
+            right:Set(1, 0, 6)
+            right:Set(1, 1, 7)
+            Multiply multiply
+            multiply:SetValue(right)
+            Matrix result = multiply:Transform(left)
+            text call = "Transform of |1 + e, 2| |3, 1 + f + g| by |1 - e, 5| |6, 7|, e = 2^-20, f = 2^-25, g = 2^-40:"
+            output call + " (0, 0) equals 13 - g exactly: " + (result:Get(0, 0) = 13 - g)
+            output call + " (0, 1) equals 19 + 5e exactly: " + (result:Get(0, 1) = 19 + 5 * e)
+            output call + " (1, 0) equals 9 - 3e + 6f + 6g exactly: " + (result:Get(1, 0) = 9 - 3 * e + 6 * f + 6 * g)
+            output call + " (1, 1) equals 22 + 7f + 7g exactly: " + (result:Get(1, 1) = 22 + 7 * f + 7 * g)
+            output call + " (0, 0) is below 13: " + (result:Get(0, 0) < 13)
+        detect problem
+            output "Exact case unexpected error: " + problem:GetErrorMessage()
+        end
+    end
+end

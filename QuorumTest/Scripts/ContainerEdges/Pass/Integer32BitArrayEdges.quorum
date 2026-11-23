@@ -1,0 +1,110 @@
+use Libraries.Containers.Integer32BitArray
+use Libraries.Language.Errors.InvalidLocationError
+
+/*
+    Integer32BitArray, the fixed-size array the graphics engine uses. Its documentation
+    is copied from Array: Get and Set take a location, SetSize "sets the size
+    of the array" and "any items already in the array will be copied over".
+    Where it is silent this test assumes what the plugins and Array agree on:
+    a new array has size 0 (GetSize before SetSize), a fresh slot holds 0
+    (the type cannot hold undefined), and an invalid location fails with an
+    InvalidLocationError, as the Java plugin raises for Get. Location = size
+    is invalid for Set as well as Get.
+*/
+class Main
+    action Main
+        Integer32BitArray array
+        check
+            output "Integer32BitArray new GetSize() = " + array:GetSize()
+        detect e
+            output "Integer32BitArray new GetSize() unexpected error: " + e:GetErrorMessage()
+        end
+        check
+            array:Set(0, 7)
+            output "Integer32BitArray new Set(0, 7) should fail but succeeded"
+        detect e is InvalidLocationError
+            output "Integer32BitArray new Set(0, 7) fails, as it should"
+        detect other
+            output "Integer32BitArray new Set(0, 7) fails with the wrong error: " + other:GetErrorMessage()
+        end
+        check
+            integer value = array:Get(0)
+            output "Integer32BitArray new Get(0) should fail but returned " + value
+        detect e is InvalidLocationError
+            output "Integer32BitArray new Get(0) fails, as it should"
+        detect other
+            output "Integer32BitArray new Get(0) fails with the wrong error: " + other:GetErrorMessage()
+        end
+        check
+            array:SetSize(3)
+            output "Integer32BitArray SetSize(3): GetSize() = " + array:GetSize() + ", fill values " + array:Get(0) + " " + array:Get(1) + " " + array:Get(2)
+        detect e
+            output "Integer32BitArray SetSize(3) unexpected error: " + e:GetErrorMessage()
+        end
+        check
+            array:Set(0, 7)
+            array:Set(2, -9)
+            output "Integer32BitArray of 3 Set(0, 7), Set(2, -9): Get(0) = " + array:Get(0) + ", Get(1) = " + array:Get(1) + ", Get(2) = " + array:Get(2)
+        detect e
+            output "Integer32BitArray of 3 Set unexpected error: " + e:GetErrorMessage()
+        end
+        check
+            array:Set(3, 7)
+            output "Integer32BitArray of 3 Set(3, 7) should fail but succeeded, GetSize() = " + array:GetSize()
+        detect e is InvalidLocationError
+            output "Integer32BitArray of 3 Set(3, 7) fails, as it should"
+        detect other
+            output "Integer32BitArray of 3 Set(3, 7) fails with the wrong error: " + other:GetErrorMessage()
+        end
+        check
+            array:Set(-1, 7)
+            output "Integer32BitArray of 3 Set(-1, 7) should fail but succeeded"
+        detect e is InvalidLocationError
+            output "Integer32BitArray of 3 Set(-1, 7) fails, as it should"
+        detect other
+            output "Integer32BitArray of 3 Set(-1, 7) fails with the wrong error: " + other:GetErrorMessage()
+        end
+        check
+            integer value = array:Get(3)
+            output "Integer32BitArray of 3 Get(3) should fail but returned " + value
+        detect e is InvalidLocationError
+            output "Integer32BitArray of 3 Get(3) fails, as it should"
+        detect other
+            output "Integer32BitArray of 3 Get(3) fails with the wrong error: " + other:GetErrorMessage()
+        end
+        check
+            integer value = array:Get(-1)
+            output "Integer32BitArray of 3 Get(-1) should fail but returned " + value
+        detect e is InvalidLocationError
+            output "Integer32BitArray of 3 Get(-1) fails, as it should"
+        detect other
+            output "Integer32BitArray of 3 Get(-1) fails with the wrong error: " + other:GetErrorMessage()
+        end
+        check
+            array:SetSize(5)
+            output "Integer32BitArray [7,0,-9] SetSize(5): GetSize() = " + array:GetSize() + ", items " + array:Get(0) + " " + array:Get(1) + " " + array:Get(2) + " " + array:Get(3) + " " + array:Get(4)
+        detect e
+            output "Integer32BitArray SetSize(5) unexpected error: " + e:GetErrorMessage()
+        end
+        check
+            array:SetSize(2)
+            output "Integer32BitArray of 5 SetSize(2): GetSize() = " + array:GetSize() + ", items " + array:Get(0) + " " + array:Get(1)
+        detect e
+            output "Integer32BitArray SetSize(2) unexpected error: " + e:GetErrorMessage()
+        end
+        check
+            array:SetSize(0)
+            output "Integer32BitArray SetSize(0): GetSize() = " + array:GetSize()
+        detect e
+            output "Integer32BitArray SetSize(0) unexpected error: " + e:GetErrorMessage()
+        end
+        check
+            integer value = array:Get(0)
+            output "Integer32BitArray of 0 Get(0) should fail but returned " + value
+        detect e is InvalidLocationError
+            output "Integer32BitArray of 0 Get(0) fails, as it should"
+        detect other
+            output "Integer32BitArray of 0 Get(0) fails with the wrong error: " + other:GetErrorMessage()
+        end
+    end
+end

@@ -1,0 +1,218 @@
+use Libraries.Compute.Statistics.DataFrame
+use Libraries.Compute.Statistics.DataFrameColumn
+use Libraries.Compute.Statistics.Transforms.TransformWider
+use Libraries.Compute.Statistics.Transforms.TransformLonger
+
+/*
+Tests TransformWider (pivot wider: one factor's values become columns) with
+its conflict resolutions, and TransformLonger (pivot longer: the selected
+columns become a names column and a values column, other columns
+stretched to match). Frames are shown one per line: header=values,
+columns separated by |. TransformLonger lists the first selected column's
+values, then the next's (the documentation doesn't fix the order; the
+unselected columns are stretched the same way, so rows still match).
+*/
+class Main
+    action Main
+        text tall = "id,key,value;a,x,1.5;a,y,2.5;b,x,3.5;b,y,4.5"
+        check
+            DataFrame frame = Frame(tall)
+            frame:AddSelectedFactor(1)
+            frame:AddSelectedColumn(2)
+            TransformWider wider
+            output "TransformWider(factor key, column value) = " + Show(frame:Transform(wider))
+        detect e
+            output "TransformWider unexpected error: " + e:GetErrorMessage()
+        end
+        check
+            DataFrame frame = Frame("key,value;x,1.5;y,2.5;x,3.5")
+            frame:AddSelectedFactor(0)
+            frame:AddSelectedColumn(1)
+            TransformWider wider
+            output "TransformWider with no other columns = " + Show(frame:Transform(wider))
+        detect e
+            output "TransformWider with no other columns unexpected error: " + e:GetErrorMessage()
+        end
+        text clash = "id,key,value;a,x,1.5;a,x,2.5;a,y,4.0"
+        check
+            DataFrame frame = Frame(clash)
+            frame:AddSelectedFactor(1)
+            frame:AddSelectedColumn(2)
+            TransformWider wider
+            output "TransformWider with two (a, x) rows and no resolution should fail but returned " + Show(frame:Transform(wider))
+        detect e
+            output "TransformWider with two (a, x) rows and no resolution fails, as it should"
+        end
+        check
+            DataFrame frame = Frame(clash)
+            frame:AddSelectedFactor(1)
+            frame:AddSelectedColumn(2)
+            TransformWider wider
+            wider:ResolveConflictsWithSum()
+            output "TransformWider ResolveConflictsWithSum() = " + Show(frame:Transform(wider))
+        detect e
+            output "TransformWider ResolveConflictsWithSum() unexpected error: " + e:GetErrorMessage()
+        end
+        check
+            DataFrame frame = Frame(clash)
+            frame:AddSelectedFactor(1)
+            frame:AddSelectedColumn(2)
+            TransformWider wider
+            wider:ResolveConflictsWithMean()
+            output "TransformWider ResolveConflictsWithMean() = " + Show(frame:Transform(wider))
+        detect e
+            output "TransformWider ResolveConflictsWithMean() unexpected error: " + e:GetErrorMessage()
+        end
+        check
+            DataFrame frame = Frame("id,key,value;a,x,1;a,x,3;a,y,4;a,x,5")
+            frame:AddSelectedFactor(1)
+            frame:AddSelectedColumn(2)
+            TransformWider wider
+            wider:ResolveConflictsWithMean()
+            output "TransformWider ResolveConflictsWithMean() with an x row after the y row = " + Show(frame:Transform(wider))
+        detect e
+            output "TransformWider ResolveConflictsWithMean() interleaved unexpected error: " + e:GetErrorMessage()
+        end
+        check
+            DataFrame frame = Frame(clash)
+            frame:AddSelectedFactor(1)
+            frame:AddSelectedColumn(2)
+            TransformWider wider
+            wider:ResolveConflictsWithMinimum()
+            output "TransformWider ResolveConflictsWithMinimum() = " + Show(frame:Transform(wider))
+        detect e
+            output "TransformWider ResolveConflictsWithMinimum() unexpected error: " + e:GetErrorMessage()
+        end
+        check
+            DataFrame frame = Frame(clash)
+            frame:AddSelectedFactor(1)
+            frame:AddSelectedColumn(2)
+            TransformWider wider
+            wider:ResolveConflictsWithMaximum()
+            output "TransformWider ResolveConflictsWithMaximum() = " + Show(frame:Transform(wider))
+        detect e
+            output "TransformWider ResolveConflictsWithMaximum() unexpected error: " + e:GetErrorMessage()
+        end
+        check
+            DataFrame frame = Frame(clash)
+            frame:AddSelectedFactor(1)
+            frame:AddSelectedColumn(2)
+            TransformWider wider
+            wider:ResolveConflictsWithCount()
+            output "TransformWider ResolveConflictsWithCount() = " + Show(frame:Transform(wider))
+        detect e
+            output "TransformWider ResolveConflictsWithCount() unexpected error: " + e:GetErrorMessage()
+        end
+        check
+            DataFrame frame = Frame("id,key,word;a,x,hi;a,x,yo;a,y,ok")
+            frame:AddSelectedFactor(1)
+            frame:AddSelectedColumn(2)
+            TransformWider wider
+            wider:ResolveConflictsWithAppend()
+            output "TransformWider ResolveConflictsWithAppend() on text = " + Show(frame:Transform(wider))
+        detect e
+            output "TransformWider ResolveConflictsWithAppend() unexpected error: " + e:GetErrorMessage()
+        end
+        check
+            DataFrame frame = Frame(tall)
+            frame:AddSelectedColumn(2)
+            TransformWider wider
+            output "TransformWider with no factor should fail but returned " + Show(frame:Transform(wider))
+        detect e
+            output "TransformWider with no factor fails, as it should"
+        end
+
+        text wide = "id,x,y;a,1.5,2.5;b,3.5,4.5"
+        check
+            DataFrame frame = Frame(wide)
+            frame:AddSelectedColumn(1)
+            frame:AddSelectedColumn(2)
+            TransformLonger longer
+            output "TransformLonger(columns x, y) = " + Show(frame:Transform(longer))
+        detect e
+            output "TransformLonger unexpected error: " + e:GetErrorMessage()
+        end
+        check
+            DataFrame frame = Frame(wide)
+            frame:AddSelectedColumn(1)
+            frame:AddSelectedColumn(2)
+            TransformLonger longer
+            longer:SetNamesHeader("key")
+            longer:SetValuesHeader("value")
+            output "TransformLonger SetNamesHeader(key) SetValuesHeader(value) = " + Show(frame:Transform(longer)) + " (headers read back: " + longer:GetNamesHeader() + ", " + longer:GetValuesHeader() + ")"
+        detect e
+            output "TransformLonger with headers unexpected error: " + e:GetErrorMessage()
+        end
+        check
+            DataFrame frame = Frame(wide)
+            frame:AddSelectedColumn(1)
+            frame:AddSelectedColumn(2)
+            TransformLonger longer
+            DataFrame long = frame:Transform(longer)
+            output "TransformLonger leaves the original frame unchanged = " + Show(frame)
+        detect e
+            output "TransformLonger original frame unexpected error: " + e:GetErrorMessage()
+        end
+        check
+            DataFrame frame = Frame(wide)
+            frame:AddSelectedFactor(1)
+            frame:AddSelectedColumn(2)
+            TransformWider wider
+            DataFrame back = Frame(tall)
+            back:AddSelectedFactor(1)
+            back:AddSelectedColumn(2)
+            DataFrame widened = back:Transform(wider)
+            widened:AddSelectedColumn(1)
+            widened:AddSelectedColumn(2)
+            TransformLonger longer
+            longer:SetNamesHeader("key")
+            longer:SetValuesHeader("value")
+            output "TransformWider then TransformLonger = " + Show(widened:Transform(longer))
+        detect e
+            output "TransformWider then TransformLonger unexpected error: " + e:GetErrorMessage()
+        end
+        check
+            DataFrame frame = Frame(wide)
+            TransformLonger longer
+            output "TransformLonger with no selected columns should fail but returned " + Show(frame:Transform(longer))
+        detect e
+            output "TransformLonger with no selected columns fails, as it should"
+        end
+    end
+
+    /* A frame as one line: each column's header, then its values; NA for undefined. */
+    action Show(DataFrame frame) returns text
+        text result = ""
+        integer i = 0
+        repeat while i < frame:GetSize()
+            DataFrameColumn column = frame:GetColumn(i)
+            if i > 0
+                result = result + " | "
+            end
+            result = result + column:GetHeader() + "="
+            integer j = 0
+            repeat while j < column:GetSize()
+                if j > 0
+                    result = result + ","
+                end
+                if column:IsUndefined(j)
+                    result = result + "NA"
+                else
+                    result = result + column:GetAsText(j)
+                end
+                j = j + 1
+            end
+            i = i + 1
+        end
+        return result
+    end
+
+    /* Makes a frame from comma separated text whose rows are separated by ; */
+    action Frame(text rows) returns DataFrame
+        text lf = ""
+        lf = lf:GetLineFeed()
+        DataFrame frame
+        frame:LoadFromCommaSeparatedValue(rows:Replace(";", lf))
+        return frame
+    end
+end

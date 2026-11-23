@@ -1,0 +1,113 @@
+use Libraries.Data.Formats.SeparatedValueTextReader
+use Libraries.Containers.Array
+
+/*
+Every action of SeparatedValueTextReader and the SeparatedValueFileReader
+actions it inherits, on text instead of a file: SetText, GetText, ReadLine,
+ReadLines, IsAtEndOfFile, GetCharacterSize, GetCharacterIndex,
+GetStoreLines, SetStoreLines. A line never includes its line ending (line
+feed, carriage return and line feed, or a lone carriage return); line breaks
+inside double quotes don't end a line. Lines show line feeds and carriage
+returns as \n and \r; ` in the source stands for a double quote.
+*/
+class Main
+    action Main
+        text lf = ""
+        lf = lf:GetLineFeed()
+        text cr = lf:GetCarriageReturn()
+        text dq = lf:GetDoubleQuote()
+
+        check
+            SeparatedValueTextReader reader
+            reader:SetText("a,b" + lf + "c,d")
+            output "SetText(a,b\nc,d) GetText() = [" + Show(reader:GetText()) + "], GetCharacterSize() = " + reader:GetCharacterSize()
+        detect e
+            output "SetText/GetText unexpected error: " + e:GetErrorMessage()
+        end
+
+        check
+            SeparatedValueTextReader reader
+            reader:SetText("a,b" + lf + "c,d")
+            text first = reader:ReadLine()
+            integer index = reader:GetCharacterIndex()
+            boolean endAfterFirst = reader:IsAtEndOfFile()
+            text second = reader:ReadLine()
+            output "SetText(a,b\nc,d) ReadLine() = [" + Show(first) + "], GetCharacterIndex() = " + index + ", IsAtEndOfFile() = " + endAfterFirst + ", ReadLine() = [" + Show(second) + "], IsAtEndOfFile() = " + reader:IsAtEndOfFile()
+        detect e
+            output "SetText(a,b\nc,d) ReadLine unexpected error: " + e:GetErrorMessage()
+        end
+
+        Lines("a,b" + cr + lf + "c,d" + cr + lf)
+        Lines("a,b" + cr + "c,d")
+        Lines("a,b" + lf + lf + "c,d")
+        Lines(dq + "a" + lf + "b" + dq + ",c" + lf + "d")
+        Lines("one line")
+        Lines("a,b" + cr)
+        Lines("x" + lf)
+
+        check
+            SeparatedValueTextReader reader
+            reader:SetText("")
+            output "SetText() IsAtEndOfFile() = " + reader:IsAtEndOfFile() + ", GetCharacterSize() = " + reader:GetCharacterSize()
+        detect e
+            output "SetText() unexpected error: " + e:GetErrorMessage()
+        end
+
+        check
+            SeparatedValueTextReader reader
+            output "new reader GetStoreLines() = " + reader:GetStoreLines() + ", GetCharacterIndex() = " + reader:GetCharacterIndex()
+            reader:SetStoreLines(false)
+            output "SetStoreLines(false) GetStoreLines() = " + reader:GetStoreLines()
+        detect e
+            output "GetStoreLines/SetStoreLines unexpected error: " + e:GetErrorMessage()
+        end
+
+        check
+            SeparatedValueTextReader reader
+            reader:SetText("1" + lf + "2" + lf + "3")
+            text first = reader:ReadLine()
+            Array<text> lines = reader:ReadLines()
+            output "SetText(1\n2\n3) ReadLine() = [" + first + "] then ReadLines() with lines stored = " + Join(lines)
+        detect e
+            output "ReadLine then ReadLines (stored) unexpected error: " + e:GetErrorMessage()
+        end
+
+        check
+            SeparatedValueTextReader reader
+            reader:SetText("1" + lf + "2" + lf + "3")
+            reader:SetStoreLines(false)
+            text first = reader:ReadLine()
+            Array<text> lines = reader:ReadLines()
+            output "SetText(1\n2\n3) SetStoreLines(false) ReadLine() = [" + first + "] then ReadLines() = " + Join(lines)
+        detect e
+            output "ReadLine then ReadLines (not stored) unexpected error: " + e:GetErrorMessage()
+        end
+    end
+
+    action Show(text value) returns text
+        text result = value:Replace(value:GetCarriageReturn(), "\r")
+        result = result:Replace(value:GetLineFeed(), "\n")
+        return result
+    end
+
+    action Join(Array<text> lines) returns text
+        text result = "" + lines:GetSize() + " lines "
+        integer i = 0
+        repeat while i < lines:GetSize()
+            result = result + "[" + Show(lines:Get(i)) + "]"
+            i = i + 1
+        end
+        return result
+    end
+
+    action Lines(text value)
+        check
+            SeparatedValueTextReader reader
+            reader:SetText(value)
+            Array<text> lines = reader:ReadLines()
+            output "SetText(" + Show(value) + ") ReadLines() = " + Join(lines)
+        detect e
+            output "SetText(" + Show(value) + ") ReadLines() unexpected error: " + e:GetErrorMessage()
+        end
+    end
+end

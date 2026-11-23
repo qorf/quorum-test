@@ -1,0 +1,17 @@
+1970-01-01: GetDayOfWeek() = 4, GetDayOfYear() = 1, IsLeapYear() = false, GetDaysInMonth() = 31, GetDayNumber() = 0
+1969-12-31: GetDayOfWeek() = 3, GetDayOfYear() = 365, IsLeapYear() = false, GetDaysInMonth() = 31, GetDayNumber() = -1
+2000-01-01: GetDayOfWeek() = 6, GetDayOfYear() = 1, IsLeapYear() = true, GetDaysInMonth() = 31, GetDayNumber() = 10957
+2024-02-29: GetDayOfWeek() = 4, GetDayOfYear() = 60, IsLeapYear() = true, GetDaysInMonth() = 29, GetDayNumber() = 19782
+2023-12-31: GetDayOfWeek() = 7, GetDayOfYear() = 365, IsLeapYear() = false, GetDaysInMonth() = 31, GetDayNumber() = 19722
+2024-12-31: GetDayOfWeek() = 2, GetDayOfYear() = 366, IsLeapYear() = true, GetDaysInMonth() = 31, GetDayNumber() = 20088
+1900-03-01: GetDayOfWeek() = 4, GetDayOfYear() = 60, IsLeapYear() = false, GetDaysInMonth() = 31, GetDayNumber() = -25508
+0001-01-01: GetDayOfWeek() = 1, GetDayOfYear() = 1, IsLeapYear() = false, GetDaysInMonth() = 31, GetDayNumber() = -719162
+2026-11-12: GetDayOfWeek() = 4, GetDayOfYear() = 316, IsLeapYear() = false, GetDaysInMonth() = 30, GetDayNumber() = 20769
+GetDaysInMonth() for each month of 2023 = [31 28 31 30 31 30 31 31 30 31 30 31]
+GetDaysInMonth() for each month of 2024 = [31 29 31 30 31 30 31 31 30 31 30 31]
+SetDayNumber(0): ToText() = [1970-01-01], GetDayNumber() = 0, GetDayOfWeek() = 4
+SetDayNumber(-1): ToText() = [1969-12-31], GetDayNumber() = -1, GetDayOfWeek() = 3
+SetDayNumber(19675): ToText() = [2023-11-14], GetDayNumber() = 19675, GetDayOfWeek() = 2
+SetDayNumber(10957): ToText() = [2000-01-01], GetDayNumber() = 10957, GetDayOfWeek() = 6
+SetDayNumber(-719162): ToText() = [0001-01-01], GetDayNumber() = -719162, GetDayOfWeek() = 1
+SetDayNumber(20088): ToText() = [2024-12-31], GetDayNumber() = 20088, GetDayOfWeek() = 2

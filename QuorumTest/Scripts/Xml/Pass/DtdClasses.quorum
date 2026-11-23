@@ -1,0 +1,155 @@
+use Libraries.Data.Formats.DocumentTypeDefinitionElement
+use Libraries.Data.Formats.DocumentTypeDefinitionAttribute
+use Libraries.Data.Formats.DocumentTypeDefinitionEntity
+use Libraries.Containers.Array
+
+/*
+Every public action of DocumentTypeDefinitionElement,
+DocumentTypeDefinitionAttribute and DocumentTypeDefinitionEntity, used
+directly, following the examples in their documentation (for instance
+SetValue("#FIXED " + quote + "cash" + quote) makes GetValue() "cash"). An
+enumerated type may have spaces around its | separators (XML 1.0 production
+[59] Enumeration allows S?), which are not part of the values.
+*/
+class Main
+    action Main
+        text dq = ""
+        dq = dq:GetDoubleQuote()
+
+        check
+            DocumentTypeDefinitionElement element
+            output "new DocumentTypeDefinitionElement: " + Describe(element)
+        detect e
+            output "new DocumentTypeDefinitionElement unexpected error: " + e:GetErrorMessage()
+        end
+        ElementCase("(to,from,heading,body)")
+        ElementCase("EMPTY")
+        ElementCase("ANY")
+        ElementCase("(#PCDATA)")
+        check
+            DocumentTypeDefinitionElement element
+            element:SetElementName("note")
+            output "DocumentTypeDefinitionElement SetElementName(note) GetElementName() = [" + element:GetElementName() + "]"
+        detect e
+            output "DocumentTypeDefinitionElement SetElementName unexpected error: " + e:GetErrorMessage()
+        end
+
+        check
+            DocumentTypeDefinitionAttribute attribute
+            output "new DocumentTypeDefinitionAttribute: " + DescribeAttribute(attribute)
+        detect e
+            output "new DocumentTypeDefinitionAttribute unexpected error: " + e:GetErrorMessage()
+        end
+        check
+            DocumentTypeDefinitionAttribute attribute
+            attribute:SetElementName("person")
+            attribute:SetAttributeName("name")
+            output "DocumentTypeDefinitionAttribute SetElementName(person) SetAttributeName(name): GetElementName() = [" + attribute:GetElementName() + "], GetAttributeName() = [" + attribute:GetAttributeName() + "]"
+        detect e
+            output "DocumentTypeDefinitionAttribute names unexpected error: " + e:GetErrorMessage()
+        end
+        ValueCase("#REQUIRED")
+        ValueCase("#IMPLIED")
+        ValueCase("#FIXED " + dq + "cash" + dq)
+        ValueCase(dq + "default" + dq)
+        TypeCase("CDATA")
+        TypeCase("ID")
+        TypeCase("IDREF")
+        TypeCase("IDREFS")
+        TypeCase("NMTOKEN")
+        TypeCase("NMTOKENS")
+        TypeCase("ENTITY")
+        TypeCase("ENTITIES")
+        TypeCase("NOTATION")
+        TypeCase("BOGUS")
+        TypeCase("cdata")
+        check
+            DocumentTypeDefinitionAttribute attribute
+            boolean first = attribute:SetType("ID")
+            boolean second = attribute:SetType("BOGUS")
+            output "DocumentTypeDefinitionAttribute SetType(ID) = [" + first + "] then SetType(BOGUS) = [" + second + "]: GetType() keeps [" + attribute:GetType() + "]"
+        detect e
+            output "DocumentTypeDefinitionAttribute SetType(ID) then SetType(BOGUS) unexpected error: " + e:GetErrorMessage()
+        end
+        EnumerationCase("(cash|check)")
+        EnumerationCase("(red|green|blue)")
+        EnumerationCase("( yes | no )")
+
+        check
+            DocumentTypeDefinitionEntity entity
+            output "new DocumentTypeDefinitionEntity: GetName() = [" + entity:GetName() + "], GetValue() = [" + entity:GetValue() + "]"
+        detect e
+            output "new DocumentTypeDefinitionEntity unexpected error: " + e:GetErrorMessage()
+        end
+        check
+            DocumentTypeDefinitionEntity entity
+            entity:SetName("language")
+            entity:SetValue("Quorum")
+            output "DocumentTypeDefinitionEntity SetName(language) SetValue(Quorum): GetName() = [" + entity:GetName() + "], GetValue() = [" + entity:GetValue() + "]"
+        detect e
+            output "DocumentTypeDefinitionEntity SetName/SetValue unexpected error: " + e:GetErrorMessage()
+        end
+        check
+            DocumentTypeDefinitionEntity entity
+            entity:SetValue("two words")
+            output "DocumentTypeDefinitionEntity SetValue(two words) GetValue() = [" + entity:GetValue() + "]"
+        detect e
+            output "DocumentTypeDefinitionEntity SetValue(two words) unexpected error: " + e:GetErrorMessage()
+        end
+    end
+
+    action Describe(DocumentTypeDefinitionElement element) returns text
+        return "GetElementName() = [" + element:GetElementName() + "], IsEmptyElement() = [" + element:IsEmptyElement() + "], IsAnyContentElement() = [" + element:IsAnyContentElement() + "], IsParsedCharacterData() = [" + element:IsParsedCharacterData() + "], HasChildren() = [" + element:HasChildren() + "], GetChildren() = [" + element:GetChildren() + "]"
+    end
+
+    action ElementCase(text category)
+        check
+            DocumentTypeDefinitionElement element
+            element:SetCategory(category)
+            output "DocumentTypeDefinitionElement SetCategory(" + category + "): " + Describe(element)
+        detect e
+            output "DocumentTypeDefinitionElement SetCategory(" + category + ") unexpected error: " + e:GetErrorMessage()
+        end
+    end
+
+    action DescribeAttribute(DocumentTypeDefinitionAttribute attribute) returns text
+        return "GetElementName() = [" + attribute:GetElementName() + "], GetAttributeName() = [" + attribute:GetAttributeName() + "], GetType() = [" + attribute:GetType() + "], GetValue() = [" + attribute:GetValue() + "], IsRequiredValue() = [" + attribute:IsRequiredValue() + "], IsImpliedValue() = [" + attribute:IsImpliedValue() + "], IsFixedValue() = [" + attribute:IsFixedValue() + "], HasEnumeratedValues() = [" + attribute:HasEnumeratedValues() + "]"
+    end
+
+    action ValueCase(text value)
+        check
+            DocumentTypeDefinitionAttribute attribute
+            attribute:SetValue(value)
+            output "DocumentTypeDefinitionAttribute SetValue(" + value + "): GetValue() = [" + attribute:GetValue() + "], IsRequiredValue() = [" + attribute:IsRequiredValue() + "], IsImpliedValue() = [" + attribute:IsImpliedValue() + "], IsFixedValue() = [" + attribute:IsFixedValue() + "]"
+        detect e
+            output "DocumentTypeDefinitionAttribute SetValue(" + value + ") unexpected error: " + e:GetErrorMessage()
+        end
+    end
+
+    action TypeCase(text type)
+        check
+            DocumentTypeDefinitionAttribute attribute
+            boolean accepted = attribute:SetType(type)
+            output "DocumentTypeDefinitionAttribute SetType(" + type + ") = [" + accepted + "], GetType() = [" + attribute:GetType() + "]"
+        detect e
+            output "DocumentTypeDefinitionAttribute SetType(" + type + ") unexpected error: " + e:GetErrorMessage()
+        end
+    end
+
+    action EnumerationCase(text type)
+        check
+            DocumentTypeDefinitionAttribute attribute
+            boolean accepted = attribute:SetType(type)
+            Array<text> values = attribute:GetEnumeratedValues()
+            text list = ""
+            integer i = 0
+            repeat while i < values:GetSize()
+                list = list + "[" + values:Get(i) + "]"
+                i = i + 1
+            end
+            output "DocumentTypeDefinitionAttribute SetType(" + type + ") = [" + accepted + "], HasEnumeratedValues() = [" + attribute:HasEnumeratedValues() + "], GetEnumeratedValues() = " + list
+        detect e
+            output "DocumentTypeDefinitionAttribute SetType(" + type + ") unexpected error: " + e:GetErrorMessage()
+        end
+    end
+end

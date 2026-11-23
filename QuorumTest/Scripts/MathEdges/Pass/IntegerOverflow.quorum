@@ -1,0 +1,70 @@
+/*
+Integers are 32 bit and wrap around on overflow, the same as a Java int. The
+language documents integers as 32 bit values, so going past the largest or
+smallest value wraps to the other end rather than growing or failing.
+*/
+class Main
+    action Main
+        integer maximum = 2147483647
+        integer minimum = -2147483647 - 1
+        check
+            integer result = maximum + 1
+            output "2147483647 + 1 = " + result
+        detect e
+            output "2147483647 + 1 unexpected error: " + e:GetErrorMessage()
+        end
+        check
+            integer result = minimum - 1
+            output "-2147483648 - 1 = " + result
+        detect e
+            output "-2147483648 - 1 unexpected error: " + e:GetErrorMessage()
+        end
+        check
+            integer result = maximum * 2
+            output "2147483647 * 2 = " + result
+        detect e
+            output "2147483647 * 2 unexpected error: " + e:GetErrorMessage()
+        end
+        check
+            integer result = minimum * -1
+            output "-2147483648 * -1 = " + result
+        detect e
+            output "-2147483648 * -1 unexpected error: " + e:GetErrorMessage()
+        end
+        check
+            integer result = 65536 * 65536
+            output "65536 * 65536 = " + result
+        detect e
+            output "65536 * 65536 unexpected error: " + e:GetErrorMessage()
+        end
+        check
+            integer result = 100000 * 100000
+            output "100000 * 100000 = " + result
+        detect e
+            output "100000 * 100000 unexpected error: " + e:GetErrorMessage()
+        end
+        check
+            integer result = minimum / -1
+            output "-2147483648 / -1 = " + result
+        detect e
+            output "-2147483648 / -1 unexpected error: " + e:GetErrorMessage()
+        end
+        check
+            integer result = -minimum
+            output "-(-2147483648) = " + result
+        detect e
+            output "-(-2147483648) unexpected error: " + e:GetErrorMessage()
+        end
+        check
+            integer total = 0
+            integer i = 0
+            repeat 3 times
+                total = total + 1000000000
+                i = i + 1
+            end
+            output "adding 1000000000 three times = " + total
+        detect e
+            output "adding 1000000000 three times unexpected error: " + e:GetErrorMessage()
+        end
+    end
+end

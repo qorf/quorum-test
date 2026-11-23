@@ -1,0 +1,37 @@
+use Libraries.System.DateTime
+
+/*
+Tests the actions that write a DateTime as text: GetTimestamp, DateToText,
+TimeToText and ToText. The documentation does not give their formats, so
+these are the Java plugin's: GetTimestamp is the ISO 8601 date and time
+(2024-03-15T13:45:30), DateToText the ISO date, TimeToText the ISO time,
+and ToText the RFC 1123 form ("Fri, 15 Mar 2024 13:45:30" followed by the
+time zone offset). The times are parsed, so they are the same in every time
+zone; ToText's offset depends on the machine's time zone, so only the part
+before it is checked.
+*/
+class Main
+    action Main
+        Show("2024-03-15T13:45:30")
+        Show("2023-12-25T00:00:00")
+        Show("1969-07-20T20:17:40")
+    end
+
+    action Show(text value)
+        DateTime time
+        check
+            time:ParseTimestamp(value)
+            output "ParseTimestamp(" + value + "): GetTimestamp() = [" + time:GetTimestamp() + "]"
+            output "ParseTimestamp(" + value + "): DateToText() = [" + time:DateToText() + "]"
+            output "ParseTimestamp(" + value + "): TimeToText() = [" + time:TimeToText() + "]"
+            text full = time:ToText()
+            integer cut = full:GetSize()
+            if cut > 25
+                cut = 25
+            end
+            output "ParseTimestamp(" + value + "): ToText() before the time zone = [" + full:GetSubtext(0, cut) + "]"
+        detect e
+            output "ParseTimestamp(" + value + ") text unexpected error: " + e:GetErrorMessage()
+        end
+    end
+end

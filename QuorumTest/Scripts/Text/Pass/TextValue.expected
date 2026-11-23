@@ -1,0 +1,6 @@
+new Text GetValue = [] size 0
+SetValue([hello]) then GetValue = [hello], GetSize = 5
+SetValue([]) then GetValue = [], GetSize = 0
+SetValue([  ]) then GetValue = [  ], GetSize = 2
+SetValue([a]) then GetValue = [a], GetSize = 1
+SetValue(first) then SetValue(second): GetValue = [second], GetSize = 6, Contains(first) = false, ToUpperCase = [SECOND]

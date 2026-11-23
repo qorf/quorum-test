@@ -1,0 +1,5 @@
+Read(<!DOCTYPE a [<!ATTLIST a x CDATA 'd'>]><a/>) events: Start(a x=[d]) End(a)
+Read(<!DOCTYPE a [<!ATTLIST a x CDATA 'd'>]><a x='w'/>) events: Start(a x=[w]) End(a)
+Read(<!DOCTYPE a [<!ATTLIST a x CDATA #FIXED 'f'>]><a/>) events: Start(a x=[f]) End(a)
+Read(<!DOCTYPE a [<!ATTLIST a x CDATA #IMPLIED>]><a/>) events: Start(a) End(a)
+Read(<!DOCTYPE a [<!ATTLIST a x (p|q) 'q'>]><a/>) events: Start(a x=[q]) End(a)

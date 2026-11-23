@@ -1,0 +1,59 @@
+use Libraries.Compute.Math
+
+/*
+Trigonometry at special angles. Values that are exact in floating point
+(sine of 0, cosine of 0, cosine of pi) print raw; values that land a last
+binary digit away from a neat answer are rounded to 10 places. Inverse sine
+and inverse cosine outside -1 to 1 have no real answer and give NaN, as
+Java's Math.asin and Math.acos do; that is not an error.
+*/
+class Main
+    Math math
+
+    action Main
+        ShowRaw("Sine(0)", math:Sine(0))
+        ShowRaw("Cosine(0)", math:Cosine(0))
+        ShowRaw("Tangent(0)", math:Tangent(0))
+        ShowRaw("Sine(pi / 2)", math:Sine(math:piOver2))
+        ShowRaw("Cosine(pi)", math:Cosine(math:pi))
+        Show("Sine(pi)", math:Sine(math:pi))
+        Show("Cosine(pi / 2)", math:Cosine(math:piOver2))
+        Show("Sine(pi / 6)", math:Sine(math:pi / 6))
+        Show("Cosine(pi / 3)", math:Cosine(math:pi / 3))
+        Show("Tangent(pi / 4)", math:Tangent(math:piOver4))
+        Show("Tangent(-pi / 4)", math:Tangent(-math:piOver4))
+        Show("Sine(-pi / 2)", math:Sine(-math:piOver2))
+        Show("Sine(2 pi)", math:Sine(2 * math:pi))
+        Show("Cosine(2 pi)", math:Cosine(2 * math:pi))
+        Show("InverseSine(1)", math:InverseSine(1))
+        Show("InverseSine(-1)", math:InverseSine(-1))
+        Show("InverseSine(0.5)", math:InverseSine(0.5))
+        Show("InverseCosine(-1)", math:InverseCosine(-1))
+        Show("InverseCosine(0)", math:InverseCosine(0))
+        ShowRaw("InverseCosine(1)", math:InverseCosine(1))
+        Show("InverseTangent(1)", math:InverseTangent(1))
+        ShowRaw("InverseTangent(0)", math:InverseTangent(0))
+        check
+            output "InverseSine(2) = " + math:InverseSine(2)
+        detect e
+            output "InverseSine(2) unexpected error: " + e:GetErrorMessage()
+        end
+        check
+            output "InverseCosine(-1.5) = " + math:InverseCosine(-1.5)
+        detect e
+            output "InverseCosine(-1.5) unexpected error: " + e:GetErrorMessage()
+        end
+    end
+
+    action ShowRaw(text call, number value)
+        output call + " = " + value
+    end
+
+    action Show(text call, number value)
+        check
+            output call + " rounded to 10 places = " + math:Round(value, 10)
+        detect e
+            output call + " unexpected error: " + e:GetErrorMessage()
+        end
+    end
+end

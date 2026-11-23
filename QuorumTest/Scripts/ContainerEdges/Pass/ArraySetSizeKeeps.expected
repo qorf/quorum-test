@@ -1,0 +1,8 @@
+Array[a,b,c] SetSize(5) gives [a,b,c,undefined,undefined]
+Array[a,b,c,undefined,undefined] SetSize(2) gives [a,b]
+Array[a,b] SetSize(4) gives [a,b,undefined,undefined]
+Array[a,b,undefined,undefined] SetSize(4) again gives [a,b,undefined,undefined]
+Array[a,b,undefined,undefined] SetSize(30): size 30, Get(0) = [a], Get(1) = [b], Get(29) = undefined
+Array of 30 then Add(z): size 31, Get(30) = [z]
+Array[] SetSize(3) gives [undefined,undefined,undefined]
+Array[undefined,undefined,undefined] Add(x) gives [undefined,undefined,undefined,x]

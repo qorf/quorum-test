@@ -1,0 +1,5 @@
+Read(<a></a>) events: Start(a) End(a)
+Read(<a><b></b></a>) events: Start(a) Start(b) End(b) End(a)
+Read(<a><b></b><b/></a>) events: Start(a) Start(b) End(b) Start(b) End(b) End(a)
+Read(<a x='1'></a>) events: Start(a x=[1]) End(a)
+Read(<a>t</a><!---->) events: Start(a) Value[t] End(a)

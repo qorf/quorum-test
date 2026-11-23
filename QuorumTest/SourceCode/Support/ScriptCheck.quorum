@@ -1,0 +1,93 @@
+package Libraries.Testing
+
+use Libraries.Containers.Array
+use Libraries.System.File
+
+/*
+    ScriptCheck runs one test program with its expected output kept in a
+    file beside it, for the testers added in NewTests.md. A test is two
+    files:
+
+        Scripts/<Area>/Pass/<Name>.quorum     the program
+        Scripts/<Area>/Pass/<Name>.expected   what it should print, one line
+                                              per output line
+
+    Check runs the program on the chosen back ends through QuorumTest, which
+    compares the output line by line and records, for each line that
+    differs, "Line N: got '...', expected '...'" in Fail.txt. The programs
+    print one self-describing line per case (the action, its input and its
+    result), so a failure says what went wrong.
+
+    A missing .expected file is a failure too: the test runs, and its reason
+    says the file is missing.
+*/
+class ScriptCheck
+    QuorumTest suite = undefined
+
+    action SetSuite(QuorumTest suite)
+        me:suite = suite
+    end
+
+    /*
+        Runs Scripts/.../<name>.quorum on bytecode, and on JavaScript and
+        Python when asked. script is the path without its extension.
+    */
+    action Check(text script, boolean onJavaScript, boolean onPython)
+        Array<File> files
+        File main
+        main:SetPath(script + ".quorum")
+        files:Add(main)
+        Array<text> expected = ReadExpected(script + ".expected")
+        suite:Test(files, expected)
+        if onJavaScript
+            suite:TestJavaScript(files, expected)
+        end
+        if onPython
+            suite:TestPython(files, expected)
+        end
+    end
+
+    /* Runs a program on all three back ends. */
+    action CheckEverywhere(text script)
+        Check(script, true, true)
+    end
+
+    /*
+        The lines of an expected-output file. Carriage returns are ignored, so
+        the file can have Windows or Unix line endings, and a final line
+        ending doesn't add an empty line. Lines in the middle may be empty.
+        A missing file gives one line saying so, which can't match.
+    */
+    action ReadExpected(text path) returns Array<text>
+        Array<text> lines
+        File file
+        file:SetPath(path)
+        if not file:Exists()
+            lines:Add("(missing expected-output file " + path + ")")
+            return lines
+        end
+
+        text contents = file:Read()
+        text lineFeed = ""
+        lineFeed = lineFeed:GetLineFeed()
+        text carriageReturn = ""
+        carriageReturn = carriageReturn:GetCarriageReturn()
+
+        text current = ""
+        integer i = 0
+        repeat while i < contents:GetSize()
+            text character = contents:GetCharacter(i)
+            if character = lineFeed
+                lines:Add(current)
+                current = ""
+            elseif character not= carriageReturn
+                current = current + character
+            end
+            i = i + 1
+        end
+        if current not= ""
+            lines:Add(current)
+        end
+        return lines
+    end
+end

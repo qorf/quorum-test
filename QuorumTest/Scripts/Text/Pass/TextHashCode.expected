@@ -1,0 +1,17 @@
+GetHashCode() = 0
+Text GetHashCode() = 0
+GetHashCode(a) = 97
+Text GetHashCode(a) = 97
+GetHashCode(A) = 65
+Text GetHashCode(A) = 65
+GetHashCode( ) = 32
+Text GetHashCode( ) = 32
+GetHashCode(abc) = 96354
+Text GetHashCode(abc) = 96354
+GetHashCode(hello) = 99162322
+Text GetHashCode(hello) = 99162322
+GetHashCode(hello world) = 1794106052
+Text GetHashCode(hello world) = 1794106052
+GetHashCode(The quick brown fox jumps over the lazy dog) = -609428141
+Text GetHashCode(The quick brown fox jumps over the lazy dog) = -609428141
+GetHashCode(same) = GetHashCode(sa + me) is true

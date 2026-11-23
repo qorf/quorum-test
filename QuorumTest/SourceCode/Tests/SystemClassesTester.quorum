@@ -1,0 +1,41 @@
+package Libraries.Language.Compile.Test
+use Libraries.Testing.QuorumTest
+use Libraries.Testing.ScriptCheck
+
+/*
+Tests the small system classes: Properties, StackTraceItem, SystemHelper
+(only its safe actions, never Exit or OpenInDefaultTextEditor) and the
+Logging classes (ConsoleLogger, SharedLogger, FileLogger).
+Back ends: StackTraceItem, ConsoleLogger and SharedLogger are written in
+Quorum, so they run everywhere. Properties is bytecode only (the expected
+values are a desktop computer's; JavaScript reports a web browser and has no
+environment variable support, and Python has no plugin). SystemHelper runs
+on bytecode and JavaScript (Python has no plugin). FileLogger writes a file,
+so it is bytecode only, like the File tests.
+*/
+class SystemClassesTester
+    QuorumTest suite = undefined
+    ScriptCheck scripts
+    text path = "Scripts/SystemClasses/Pass/"
+
+    action Test
+        scripts:SetSuite(suite)
+        scripts:Check(path + "PropertiesActions", false, false)
+        scripts:CheckEverywhere(path + "StackTraceItemActions")
+        scripts:Check(path + "SystemHelperActions", true, false)
+        scripts:CheckEverywhere(path + "ConsoleLoggerActions")
+        scripts:Check(path + "FileLoggerActions", false, false)
+    end
+
+    action GetName returns text
+        return "System Classes Tests"
+    end
+
+    action GetCompilerTestSuite returns QuorumTest
+        return suite
+    end
+
+    action SetCompilerTestSuite(QuorumTest suite)
+        me:suite = suite
+    end
+end

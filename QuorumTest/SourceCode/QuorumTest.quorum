@@ -144,6 +144,26 @@ class QuorumTest is ProcessListener
     DataFormatsTester dataFormatsChecks
     FabricationTester fabricationChecks
     ScienceTester scienceChecks
+    // Added with NewTests.md.
+    TextTester textChecks
+    NumbersTester numbersChecks
+    ContainerEdgesTester containerEdgesChecks
+    MathEdgesTester mathEdgesChecks
+    GeometryTester geometryChecks
+    TextSupportTester textSupportChecks
+    FileTester fileChecks
+    DateTimeTester dateTimeChecks
+    SystemClassesTester systemClassesChecks
+    XmlTester xmlChecks
+    DataEdgesTester dataEdgesChecks
+    WebTester webChecks
+    PrintersTester printersChecks
+    HashTableSpeedTester hashTableSpeedChecks
+    ComputeTester computeChecks
+    StatisticsTester statisticsChecks
+    PhysicsTester physicsChecks
+    RenderTreeTester renderTreeChecks
+    WorldsTester worldsChecks
 
 
     on create
@@ -179,6 +199,25 @@ class QuorumTest is ProcessListener
         dataFormatsChecks:SetCompilerTestSuite(me)
         fabricationChecks:SetCompilerTestSuite(me)
         scienceChecks:SetTester(tester)
+        textChecks:SetCompilerTestSuite(me)
+        numbersChecks:SetCompilerTestSuite(me)
+        containerEdgesChecks:SetCompilerTestSuite(me)
+        mathEdgesChecks:SetCompilerTestSuite(me)
+        geometryChecks:SetCompilerTestSuite(me)
+        textSupportChecks:SetCompilerTestSuite(me)
+        fileChecks:SetCompilerTestSuite(me)
+        dateTimeChecks:SetCompilerTestSuite(me)
+        systemClassesChecks:SetCompilerTestSuite(me)
+        xmlChecks:SetCompilerTestSuite(me)
+        dataEdgesChecks:SetCompilerTestSuite(me)
+        webChecks:SetCompilerTestSuite(me)
+        printersChecks:SetCompilerTestSuite(me)
+        hashTableSpeedChecks:SetCompilerTestSuite(me)
+        computeChecks:SetCompilerTestSuite(me)
+        statisticsChecks:SetCompilerTestSuite(me)
+        physicsChecks:SetTester(tester)
+        renderTreeChecks:SetTester(tester)
+        worldsChecks:SetTester(tester)
     end
 
     /*
@@ -513,6 +552,83 @@ class QuorumTest is ProcessListener
         if StartTester("Science")
             scienceChecks:Test()
             FinishTester(scienceChecks:GetName())
+        end
+        // Added with NewTests.md, in TesterCatalog's order.
+        if StartTester("Text")
+            textChecks:Test()
+            FinishTester(textChecks:GetName())
+        end
+        if StartTester("Numbers")
+            numbersChecks:Test()
+            FinishTester(numbersChecks:GetName())
+        end
+        if StartTester("ContainerEdges")
+            containerEdgesChecks:Test()
+            FinishTester(containerEdgesChecks:GetName())
+        end
+        if StartTester("MathEdges")
+            mathEdgesChecks:Test()
+            FinishTester(mathEdgesChecks:GetName())
+        end
+        if StartTester("Geometry")
+            geometryChecks:Test()
+            FinishTester(geometryChecks:GetName())
+        end
+        if StartTester("TextSupport")
+            textSupportChecks:Test()
+            FinishTester(textSupportChecks:GetName())
+        end
+        if StartTester("File")
+            fileChecks:Test()
+            FinishTester(fileChecks:GetName())
+        end
+        if StartTester("DateTime")
+            dateTimeChecks:Test()
+            FinishTester(dateTimeChecks:GetName())
+        end
+        if StartTester("SystemClasses")
+            systemClassesChecks:Test()
+            FinishTester(systemClassesChecks:GetName())
+        end
+        if StartTester("Xml")
+            xmlChecks:Test()
+            FinishTester(xmlChecks:GetName())
+        end
+        if StartTester("DataEdges")
+            dataEdgesChecks:Test()
+            FinishTester(dataEdgesChecks:GetName())
+        end
+        if StartTester("Web")
+            webChecks:Test()
+            FinishTester(webChecks:GetName())
+        end
+        if StartTester("Printers")
+            printersChecks:Test()
+            FinishTester(printersChecks:GetName())
+        end
+        if StartTester("HashTableSpeed")
+            hashTableSpeedChecks:Test()
+            FinishTester(hashTableSpeedChecks:GetName())
+        end
+        if StartTester("Physics")
+            physicsChecks:Test()
+            FinishTester(physicsChecks:GetName())
+        end
+        if StartTester("RenderTrees")
+            renderTreeChecks:Test()
+            FinishTester(renderTreeChecks:GetName())
+        end
+        if StartTester("Worlds")
+            worldsChecks:Test()
+            FinishTester(worldsChecks:GetName())
+        end
+        if StartTester("Compute")
+            computeChecks:Test()
+            FinishTester(computeChecks:GetName())
+        end
+        if StartTester("Statistics")
+            statisticsChecks:Test()
+            FinishTester(statisticsChecks:GetName())
         end
 
         text EOL = ""

@@ -1,0 +1,43 @@
+use Libraries.Data.Formats.JavaScriptObjectNotation
+
+/*
+JavaScriptObjectNotation:ToText must write valid JSON, so a text value or
+key holding a double quote, backslash, line feed, carriage return or tab
+must be escaped as RFC 8259 section 7 requires (\", \\, \n, \r, \t). Each
+case adds one key and text value to a new object and prints ToText. Real
+control characters left in the output are shown as <LF>, <CR> and <TAB> so
+they can't be confused with an escape. (Suspected: ToText doesn't escape.)
+*/
+class Main
+    action Main
+        text dq = ""
+        dq = dq:GetDoubleQuote()
+        text lf = dq:GetLineFeed()
+        Write("k", "plain", "plain value")
+        Write("k", "a" + dq + "b", "value with a double quote")
+        Write("k", "a\b", "value with a backslash")
+        Write("k", "a" + lf + "b", "value with a line feed")
+        Write("k", "a" + dq:GetTab() + "b", "value with a tab")
+        Write("k", "a" + dq:GetCarriageReturn() + "b", "value with a carriage return")
+        Write("k" + dq + "ey", "v", "key with a double quote")
+        Write("k\ey", "v", "key with a backslash")
+        Write("k" + lf + "ey", "v", "key with a line feed")
+    end
+
+    action Show(text value) returns text
+        text result = value:Replace(value:GetCarriageReturn(), "<CR>")
+        result = result:Replace(value:GetLineFeed(), "<LF>")
+        result = result:Replace(value:GetTab(), "<TAB>")
+        return result
+    end
+
+    action Write(text key, text value, text description)
+        check
+            JavaScriptObjectNotation json
+            json:Add(key, value)
+            output "Add(" + description + ") ToText() = " + Show(json:ToText())
+        detect e
+            output "Add(" + description + ") unexpected error: " + e:GetErrorMessage()
+        end
+    end
+end

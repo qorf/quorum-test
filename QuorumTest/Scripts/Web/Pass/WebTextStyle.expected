@@ -1,0 +1,17 @@
+new WebTextStyle Generate() = []
+SetFontSize(24) Generate() = [font-size:1.5rem;]
+SetFontSize(24) GetFontSize() = 24.0
+SetLineHeight(40) Generate() = [line-height:2.5rem;]
+SetBold(true) Generate() and IsBold() = [font-weight:700; true]
+SetBold(false) Generate() = [font-weight:400;]
+SetSemibold(true) Generate() = [font-weight:600;]
+SetItalic(true) Generate() and IsItalic() = [font-style:italic; true]
+UseSurroundingFont() Generate() and UsesSurroundingFont() = [font-family:inherit; true]
+SetColor(255,0,0) Generate() = [color:rgb(255,0,0);]
+SetColor then GetColor():GetRed() = 255
+SetUnderline(false) Generate() = [text-decoration-line:none;]
+SetUppercase(true) Generate() = [text-transform:uppercase;]
+AlignCenter() Generate() = [text-align:center;]
+AlignLeft() then AlignRight() Generate() = [text-align:right;]
+SetFontSize(24) SetBold(true) AlignLeft() Generate() order = [font-size:1.5rem;font-weight:700;text-align:left;]
+SetColor(undefined) Generate() = []

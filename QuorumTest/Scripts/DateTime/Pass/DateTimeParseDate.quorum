@@ -1,0 +1,81 @@
+use Libraries.System.DateTime
+
+/*
+Tests ParseDate (ISO 8601, year-month-day) and ParseAmericanDate
+(month/day/year, with a four or two digit year; a two digit year is in the
+2000s, as the Java plugin reads it). A parsed date is the start of that day,
+hour 0, with no time zone, so the values are the same in every time zone.
+GetDayOfWeek counts 1 for Monday to 7 for Sunday. Text that is not such a
+date, or a date that does not exist, raises an error.
+*/
+class Main
+    action Main
+        DateTime christmas
+        check
+            christmas:ParseDate("2023-12-25")
+            output "ParseDate(2023-12-25): GetYear() = " + christmas:GetYear()
+            output "ParseDate(2023-12-25): GetMonth() = " + christmas:GetMonth()
+            output "ParseDate(2023-12-25): GetDayOfMonth() = " + christmas:GetDayOfMonth()
+            output "ParseDate(2023-12-25): GetDayOfWeek() = " + christmas:GetDayOfWeek()
+            output "ParseDate(2023-12-25): GetHour() = " + christmas:GetHour()
+            output "ParseDate(2023-12-25): GetMinute() = " + christmas:GetMinute()
+            output "ParseDate(2023-12-25): GetSecond() = " + christmas:GetSecond()
+        detect e
+            output "ParseDate(2023-12-25) unexpected error: " + e:GetErrorMessage()
+        end
+        DateTime leap
+        check
+            leap:ParseDate("2024-02-29")
+            output "ParseDate(2024-02-29): GetMonth() = " + leap:GetMonth() + ", GetDayOfMonth() = " + leap:GetDayOfMonth() + ", GetDayOfWeek() = " + leap:GetDayOfWeek()
+        detect e
+            output "ParseDate(2024-02-29) unexpected error: " + e:GetErrorMessage()
+        end
+        DateTime notLeap
+        check
+            notLeap:ParseDate("2023-02-29")
+            output "ParseDate(2023-02-29) should fail but returned normally"
+        detect e
+            output "ParseDate(2023-02-29) fails, as it should"
+        end
+        DateTime words
+        check
+            words:ParseDate("December 25, 2023")
+            output "ParseDate(December 25, 2023) should fail but returned normally"
+        detect e
+            output "ParseDate(December 25, 2023) fails, as it should"
+        end
+
+        DateTime july
+        check
+            july:ParseAmericanDate("7/4/2021")
+            output "ParseAmericanDate(7/4/2021): GetYear() = " + july:GetYear()
+            output "ParseAmericanDate(7/4/2021): GetMonth() = " + july:GetMonth()
+            output "ParseAmericanDate(7/4/2021): GetDayOfMonth() = " + july:GetDayOfMonth()
+            output "ParseAmericanDate(7/4/2021): GetDayOfWeek() = " + july:GetDayOfWeek()
+            output "ParseAmericanDate(7/4/2021): GetHour() = " + july:GetHour()
+        detect e
+            output "ParseAmericanDate(7/4/2021) unexpected error: " + e:GetErrorMessage()
+        end
+        DateTime padded
+        check
+            padded:ParseAmericanDate("11/09/1989")
+            output "ParseAmericanDate(11/09/1989): GetYear() = " + padded:GetYear() + ", GetMonth() = " + padded:GetMonth() + ", GetDayOfMonth() = " + padded:GetDayOfMonth()
+        detect e
+            output "ParseAmericanDate(11/09/1989) unexpected error: " + e:GetErrorMessage()
+        end
+        DateTime short
+        check
+            short:ParseAmericanDate("1/2/21")
+            output "ParseAmericanDate(1/2/21): GetYear() = " + short:GetYear() + ", GetMonth() = " + short:GetMonth() + ", GetDayOfMonth() = " + short:GetDayOfMonth()
+        detect e
+            output "ParseAmericanDate(1/2/21) unexpected error: " + e:GetErrorMessage()
+        end
+        DateTime badAmerican
+        check
+            badAmerican:ParseAmericanDate("13/40/2021")
+            output "ParseAmericanDate(13/40/2021) should fail but returned normally"
+        detect e
+            output "ParseAmericanDate(13/40/2021) fails, as it should"
+        end
+    end
+end

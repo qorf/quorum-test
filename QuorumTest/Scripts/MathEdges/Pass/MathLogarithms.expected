@@ -1,0 +1,13 @@
+Logarithm(1.0) = 0.0
+Logarithm(10.0) = 1.0
+Logarithm(100.0) = 2.0
+Logarithm(1000.0) = 3.0
+Logarithm(1000000.0) = 6.0
+Logarithm(0.001) = -3.0
+Logarithm(0.0) = -Infinity
+Logarithm(-1.0) = NaN
+NaturalLogarithm(1.0) = 0.0
+NaturalLogarithm(2.718281828459045) = 1.0
+NaturalLogarithm(0.0) = -Infinity
+NaturalLogarithm(-1.0) = NaN
+NaturalLogarithm(e^3) rounded to 10 places = 3.0

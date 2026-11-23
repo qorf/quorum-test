@@ -1,0 +1,17 @@
+MultipleLineText(Hello world!) GetText() = [Hello world!], GetSize() = 12, GetLineCount() = 1, GetWidth() as an integer = 12
+MultipleLineText(Hello world!) GetCharacter(0..11) = [Hello world!]
+MultipleLineText(Hello world!) GetCharacter(12) fails, as it should
+MultipleLineText(Hello world!) GetText(1, 10) = [ello worl], GetText(0, 12) = [Hello world!], GetText(4, 4) = [], GetText(11, 12) = [!]
+MultipleLineText(Hello world!) GetText(-1, 3) fails, as it should
+MultipleLineText(Hello world!) GetText(0, 13) fails, as it should
+MultipleLineText(Hello world!) Insert(11, ' of tomorrow') = [Hello world of tomorrow!], Insert(0, '>> ') = [>> Hello world!], Insert(12, ' <<') = [Hello world! <<], original [Hello world!]
+MultipleLineText(Hello world!) Insert(-1, x) fails, as it should
+MultipleLineText(Hello world!) Insert(13, x) fails, as it should
+MultipleLineText(Hello world!) Delete(5, 11) = [Hello!], Delete(0, 12) = [] length 0, Delete(3, 3) = [Hello world!], original [Hello world!]
+MultipleLineText(Hello world!) Delete(-1, 2) fails, as it should
+MultipleLineText(Hello world!) Delete(2, 13) fails, as it should
+MultipleLineText(Hello world!) Concatenate(' Bye.') then Concatenate(MultipleLineText( Again!)) = [Hello world! Bye. Again!] length 24, original [Hello world!], other [ Again!]
+MultipleLineText(Hello world!) Balance(): [Hello world!], NeedsBalancing() = false
+MultipleLineText() GetText() = [], GetSize() = 0
+MultipleLineText() Insert(0, abc) = [abc], Concatenate(xyz) = [xyz]
+MultipleLineText new GetLineSeparator() equals GetDefaultLineSeparator(): true

@@ -1,0 +1,162 @@
+use Libraries.System.DateTime
+
+/*
+Tests the Add and Subtract actions (years, months, weeks, days, hours,
+minutes, seconds), each on a new DateTime parsed from a fixed timestamp,
+printing GetTimestamp afterward. Parsed times have no time zone, and the
+dates are far from any daylight saving change, so the results are the same
+in every time zone. The documentation does not say what adding a month to
+January 31 gives; like CalendarDate's AddMonths and the Java plugin, it is
+the last day of the shorter month.
+*/
+class Main
+    action Main
+        text base = "2024-01-31T10:00:00"
+        DateTime a
+        check
+            a:ParseTimestamp(base)
+            a:AddYears(1)
+            output "AddYears(1) to " + base + " = [" + a:GetTimestamp() + "]"
+        detect e
+            output "AddYears(1) unexpected error: " + e:GetErrorMessage()
+        end
+        DateTime b
+        check
+            b:ParseTimestamp(base)
+            b:AddMonths(1)
+            output "AddMonths(1) to " + base + " = [" + b:GetTimestamp() + "]"
+        detect e
+            output "AddMonths(1) unexpected error: " + e:GetErrorMessage()
+        end
+        DateTime c
+        check
+            c:ParseTimestamp(base)
+            c:AddWeeks(2)
+            output "AddWeeks(2) to " + base + " = [" + c:GetTimestamp() + "]"
+        detect e
+            output "AddWeeks(2) unexpected error: " + e:GetErrorMessage()
+        end
+        DateTime d
+        check
+            d:ParseTimestamp(base)
+            d:AddDays(1)
+            output "AddDays(1) to " + base + " = [" + d:GetTimestamp() + "]"
+        detect e
+            output "AddDays(1) unexpected error: " + e:GetErrorMessage()
+        end
+        DateTime d2
+        check
+            d2:ParseTimestamp(base)
+            d2:AddDays(366)
+            output "AddDays(366) to " + base + " = [" + d2:GetTimestamp() + "]"
+        detect e
+            output "AddDays(366) unexpected error: " + e:GetErrorMessage()
+        end
+        DateTime f
+        check
+            f:ParseTimestamp(base)
+            f:AddHours(15)
+            output "AddHours(15) to " + base + " = [" + f:GetTimestamp() + "]"
+        detect e
+            output "AddHours(15) unexpected error: " + e:GetErrorMessage()
+        end
+        DateTime g
+        check
+            g:ParseTimestamp(base)
+            g:AddMinutes(75)
+            output "AddMinutes(75) to " + base + " = [" + g:GetTimestamp() + "]"
+        detect e
+            output "AddMinutes(75) unexpected error: " + e:GetErrorMessage()
+        end
+        DateTime h
+        check
+            h:ParseTimestamp(base)
+            h:AddSeconds(3661)
+            output "AddSeconds(3661) to " + base + " = [" + h:GetTimestamp() + "]"
+        detect e
+            output "AddSeconds(3661) unexpected error: " + e:GetErrorMessage()
+        end
+        DateTime i
+        check
+            i:ParseTimestamp(base)
+            i:SubtractYears(4)
+            output "SubtractYears(4) from " + base + " = [" + i:GetTimestamp() + "]"
+        detect e
+            output "SubtractYears(4) unexpected error: " + e:GetErrorMessage()
+        end
+        DateTime j
+        check
+            j:ParseTimestamp(base)
+            j:SubtractMonths(3)
+            output "SubtractMonths(3) from " + base + " = [" + j:GetTimestamp() + "]"
+        detect e
+            output "SubtractMonths(3) unexpected error: " + e:GetErrorMessage()
+        end
+        DateTime k
+        check
+            k:ParseTimestamp(base)
+            k:SubtractWeeks(5)
+            output "SubtractWeeks(5) from " + base + " = [" + k:GetTimestamp() + "]"
+        detect e
+            output "SubtractWeeks(5) unexpected error: " + e:GetErrorMessage()
+        end
+        DateTime l
+        check
+            l:ParseTimestamp(base)
+            l:SubtractDays(31)
+            output "SubtractDays(31) from " + base + " = [" + l:GetTimestamp() + "]"
+        detect e
+            output "SubtractDays(31) unexpected error: " + e:GetErrorMessage()
+        end
+        DateTime m
+        check
+            m:ParseTimestamp(base)
+            m:SubtractHours(11)
+            output "SubtractHours(11) from " + base + " = [" + m:GetTimestamp() + "]"
+        detect e
+            output "SubtractHours(11) unexpected error: " + e:GetErrorMessage()
+        end
+        DateTime n
+        check
+            n:ParseTimestamp(base)
+            n:SubtractMinutes(601)
+            output "SubtractMinutes(601) from " + base + " = [" + n:GetTimestamp() + "]"
+        detect e
+            output "SubtractMinutes(601) unexpected error: " + e:GetErrorMessage()
+        end
+        DateTime o
+        check
+            o:ParseTimestamp(base)
+            o:SubtractSeconds(1)
+            output "SubtractSeconds(1) from " + base + " = [" + o:GetTimestamp() + "]"
+        detect e
+            output "SubtractSeconds(1) unexpected error: " + e:GetErrorMessage()
+        end
+        text leap = "2024-02-29T12:30:00"
+        DateTime p
+        check
+            p:ParseTimestamp(leap)
+            p:SubtractYears(1)
+            output "SubtractYears(1) from " + leap + " = [" + p:GetTimestamp() + "]"
+        detect e
+            output "SubtractYears(1) from a leap day unexpected error: " + e:GetErrorMessage()
+        end
+        DateTime q
+        check
+            q:ParseTimestamp(leap)
+            q:AddYears(4)
+            output "AddYears(4) to " + leap + " = [" + q:GetTimestamp() + "]"
+        detect e
+            output "AddYears(4) to a leap day unexpected error: " + e:GetErrorMessage()
+        end
+        DateTime r
+        check
+            r:ParseTimestamp(base)
+            r:AddDays(10)
+            r:SubtractDays(10)
+            output "AddDays(10) then SubtractDays(10) on " + base + " = [" + r:GetTimestamp() + "]"
+        detect e
+            output "AddDays then SubtractDays unexpected error: " + e:GetErrorMessage()
+        end
+    end
+end

@@ -1,0 +1,80 @@
+package Libraries.Language.Compile.Test
+
+use Libraries.Testing.QuorumTest
+use Libraries.Testing.ScriptCheck
+
+/*
+    Edge cases of the containers in Libraries.Containers that the older
+    Array, List, HashTable, Table, Stack and Queue tests do not reach: empty
+    containers, locations at and past the edges, full arrays with
+    auto-resize off, SetSize(0), undefined items and keys, copies being
+    independent, iterators (GetCurrent, Rewind, the end), Sort with a custom
+    Comparison, HashTable resizing, collisions and object keys, the
+    fixed-size number arrays, MultipleLineText and TextTree (which had no
+    tests). Every script runs on all three back ends: the Array plugin and
+    the fixed-size arrays are written separately for Java, JavaScript and
+    Python, and their differences are what these cases check. The expected
+    output is the documented behavior, so a script fails where the library
+    is wrong. Python has no Integer32BitArray or Number32BitArray plugin, so
+    those two scripts cannot pass there until one is written.
+*/
+class ContainerEdgesTester
+    QuorumTest suite = undefined
+    ScriptCheck scripts
+    text path = "Scripts/ContainerEdges/Pass/"
+
+    action Test
+        scripts:SetSuite(suite)
+        scripts:CheckEverywhere(path + "ArrayCopyIndependent")
+        scripts:CheckEverywhere(path + "ArrayEmptyContainer")
+        scripts:CheckEverywhere(path + "ArrayEmptyFalse")
+        scripts:CheckEverywhere(path + "ArrayFixedSize")
+        scripts:CheckEverywhere(path + "ArrayIndexBounds")
+        scripts:CheckEverywhere(path + "ArrayIteratorEdges")
+        scripts:CheckEverywhere(path + "ArrayMaxSize")
+        scripts:CheckEverywhere(path + "ArraySetSizeKeeps")
+        scripts:CheckEverywhere(path + "ArraySizeZero")
+        scripts:CheckEverywhere(path + "ArraySortCompareDifference")
+        scripts:CheckEverywhere(path + "ArraySortComparison")
+        scripts:CheckEverywhere(path + "ArrayUndefinedItems")
+        scripts:CheckEverywhere(path + "HashTableCopyIndependent")
+        scripts:CheckEverywhere(path + "HashTableEmptyContainer")
+        scripts:CheckEverywhere(path + "HashTableIteratorEdges")
+        scripts:CheckEverywhere(path + "HashTableManyKeys")
+        scripts:CheckEverywhere(path + "HashTableObjectKeys")
+        scripts:CheckEverywhere(path + "HashTableRemoveAllValues")
+        scripts:CheckEverywhere(path + "HashTableSetSize")
+        scripts:CheckEverywhere(path + "HashTableUndefinedKeys")
+        scripts:CheckEverywhere(path + "HashTableValueActions")
+        scripts:CheckEverywhere(path + "Integer32BitArrayEdges")
+        scripts:CheckEverywhere(path + "ListCopyIndependent")
+        scripts:CheckEverywhere(path + "ListEmptyContainer")
+        scripts:CheckEverywhere(path + "ListIndexBounds")
+        scripts:CheckEverywhere(path + "ListIteratorEdges")
+        scripts:CheckEverywhere(path + "ListRemoveNodes")
+        scripts:CheckEverywhere(path + "ListUndefinedItems")
+        scripts:CheckEverywhere(path + "MultipleLineTextBasics")
+        scripts:CheckEverywhere(path + "MultipleLineTextLeafSize")
+        scripts:CheckEverywhere(path + "MultipleLineTextLines")
+        scripts:CheckEverywhere(path + "MultipleLineTextManyEdits")
+        scripts:CheckEverywhere(path + "Number32BitArrayEdges")
+        scripts:CheckEverywhere(path + "Number64BitArrayEdges")
+        scripts:CheckEverywhere(path + "StackQueueEdges")
+        scripts:CheckEverywhere(path + "TableEdges")
+        scripts:CheckEverywhere(path + "TableRemoveAll")
+        scripts:CheckEverywhere(path + "TextTreeBasics")
+        scripts:CheckEverywhere(path + "TextTreeManyEdits")
+    end
+
+    action GetName returns text
+        return "Container Edge Tests"
+    end
+
+    action GetCompilerTestSuite returns QuorumTest
+        return suite
+    end
+
+    action SetCompilerTestSuite(QuorumTest suite)
+        me:suite = suite
+    end
+end

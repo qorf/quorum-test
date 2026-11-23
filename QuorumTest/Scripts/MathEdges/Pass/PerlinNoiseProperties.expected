@@ -1,0 +1,16 @@
+GetNoise(0, 0) is zero = true
+GetNoise(3, 7) is zero = true
+GetNoise(-2, 5) is zero = true
+GetNoise(300, -41) is zero = true
+GetNoise stays between -1 and 1 over 400 positions = true
+GetNoise is not zero everywhere off the lattice = true
+GetNoise(12.3, 45.6) is the same after asking about another position = true
+a second PerlinNoise with seed 1979 gives the same GetNoise(12.3, 45.6) = true
+seed 42 gives different noise from seed 1979 = true
+GetAdditiveNoise matches (n1 + 0.5 n2) / 1.5 = true
+GetMultiplicativeNoise matches its formula = true
+GetRidgedNoise with one octave matches (1 - |n|)^2 * 2 - 1 = true
+GetRidgedMultifractalNoise with one octave matches (1 - (1 - |n|)^2) * 2 - 1 = true
+GetWarpedX(5.5, 6.5) with warp strength 0 = 5.5
+GetWarpedY(5.5, 6.5) with warp strength 0 = 6.5
+every combined noise stays between -1 and 1 over 100 positions = true

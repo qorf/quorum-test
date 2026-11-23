@@ -1,0 +1,252 @@
+use Libraries.Web.Page.Area
+use Libraries.Web.Page.Audio
+use Libraries.Web.Page.Canvas
+use Libraries.Web.Page.Image
+use Libraries.Web.Page.ImageMap
+use Libraries.Web.Page.InlineFrame
+use Libraries.Web.Page.Source
+use Libraries.Web.Page.Track
+use Libraries.Web.Page.Video
+
+/*
+Tests the attribute setters and getters of the media and picture elements
+(Image, Audio, Video, Source, Track, Area, ImageMap, Canvas, InlineFrame):
+each writes the HTML attribute's own name, boolean attributes read back
+what was set, and sources and tracks nest inside a video.
+*/
+class Main
+    action Main
+        check
+            Image i
+            i:SetAddress("cat.png")
+            output "Image SetAddress(cat.png) GetAddress():Generate() = [" + Flat(i:GetAddress():Generate()) + "]"
+        detect e
+            output "Image SetAddress(cat.png) GetAddress():Generate() unexpected error: " + e:GetErrorMessage()
+        end
+        check
+            Image i
+            i:SetAlternate("A cat")
+            output "Image SetAlternate(A cat) Generate() = [" + Flat(i:Generate()) + "]"
+        detect e
+            output "Image SetAlternate(A cat) Generate() unexpected error: " + e:GetErrorMessage()
+        end
+        check
+            Image i
+            i:SetWidth("20")
+            output "Image SetWidth(20) GetWidth():Generate() = [" + Flat(i:GetWidth():Generate()) + "]"
+        detect e
+            output "Image SetWidth(20) GetWidth():Generate() unexpected error: " + e:GetErrorMessage()
+        end
+        check
+            Image i
+            i:SetHeight("10")
+            output "Image SetHeight(10) GetHeight():Generate() = [" + Flat(i:GetHeight():Generate()) + "]"
+        detect e
+            output "Image SetHeight(10) GetHeight():Generate() unexpected error: " + e:GetErrorMessage()
+        end
+        check
+            Image i
+            i:SetUseMap("#m")
+            output "Image SetUseMap(#m) GetUseMap():Generate() = [" + Flat(i:GetUseMap():Generate()) + "]"
+        detect e
+            output "Image SetUseMap(#m) GetUseMap():Generate() unexpected error: " + e:GetErrorMessage()
+        end
+        check
+            Image i
+            i:SetIsMap(true)
+            output "Image SetIsMap(true) GetIsMap() = " + i:GetIsMap()
+        detect e
+            output "Image SetIsMap(true) GetIsMap() unexpected error: " + e:GetErrorMessage()
+        end
+        check
+            Image i
+            i:SetIsMap(true)
+            i:SetIsMap(false)
+            output "Image SetIsMap(true) then SetIsMap(false) GetIsMap() = " + i:GetIsMap()
+        detect e
+            output "Image SetIsMap(true) then SetIsMap(false) GetIsMap() unexpected error: " + e:GetErrorMessage()
+        end
+        check
+            Audio a
+            a:SetAutoPlay(true)
+            output "Audio SetAutoPlay(true) GetAutoPlay() and Generate() = [" + Flat(a:GetAutoPlay() + " " + a:Generate()) + "]"
+        detect e
+            output "Audio SetAutoPlay(true) GetAutoPlay() and Generate() unexpected error: " + e:GetErrorMessage()
+        end
+        check
+            Audio a
+            a:SetControls(true)
+            output "Audio SetControls(true) GetControls() = " + a:GetControls()
+        detect e
+            output "Audio SetControls(true) GetControls() unexpected error: " + e:GetErrorMessage()
+        end
+        check
+            Audio a
+            a:SetLoop(true)
+            a:SetLoop(false)
+            output "Audio SetLoop(true) then SetLoop(false) GetLoop() = " + a:GetLoop()
+        detect e
+            output "Audio SetLoop(true) then SetLoop(false) GetLoop() unexpected error: " + e:GetErrorMessage()
+        end
+        check
+            Audio a
+            a:SetPreload("none")
+            output "Audio SetPreload(none) GetPreload():Generate() = [" + Flat(a:GetPreload():Generate()) + "]"
+        detect e
+            output "Audio SetPreload(none) GetPreload():Generate() unexpected error: " + e:GetErrorMessage()
+        end
+        check
+            Audio a
+            a:SetAddress("a.mp3")
+            output "Audio SetAddress(a.mp3) GetAddress():Generate() = [" + Flat(a:GetAddress():Generate()) + "]"
+        detect e
+            output "Audio SetAddress(a.mp3) GetAddress():Generate() unexpected error: " + e:GetErrorMessage()
+        end
+        check
+            Video v
+            v:SetControlsVisible(true)
+            output "Video SetControlsVisible(true) Generate() = [" + Flat(v:Generate()) + "]"
+        detect e
+            output "Video SetControlsVisible(true) Generate() unexpected error: " + e:GetErrorMessage()
+        end
+        check
+            Video v
+            v:SetMuted(true)
+            output "Video SetMuted(true) GetMuted() = " + v:GetMuted()
+        detect e
+            output "Video SetMuted(true) GetMuted() unexpected error: " + e:GetErrorMessage()
+        end
+        check
+            Video v
+            v:SetPoster("p.png")
+            output "Video SetPoster(p.png) GetPoster():Generate() = [" + Flat(v:GetPoster():Generate()) + "]"
+        detect e
+            output "Video SetPoster(p.png) GetPoster():Generate() unexpected error: " + e:GetErrorMessage()
+        end
+        check
+            Video v
+            v:SetAddress("v.mp4")
+            output "Video SetAddress(v.mp4) GetAddress():Generate() = [" + Flat(v:GetAddress():Generate()) + "]"
+        detect e
+            output "Video SetAddress(v.mp4) GetAddress():Generate() unexpected error: " + e:GetErrorMessage()
+        end
+        check
+            Video v
+            Source s
+            s:SetAddress("v.webm")
+            Track t
+            t:SetKind("captions")
+            v:AddNestedTag(s)
+            v:AddNestedTag(t)
+            output "Video with Source(v.webm) and Track(captions) Generate() = [" + Flat(v:Generate()) + "]"
+        detect e
+            output "Video with Source(v.webm) and Track(captions) Generate() unexpected error: " + e:GetErrorMessage()
+        end
+        check
+            Source s
+            s:SetType("video/webm")
+            output "Source SetType(video/webm) GetType():Generate() = [" + Flat(s:GetType():Generate()) + "]"
+        detect e
+            output "Source SetType(video/webm) GetType():Generate() unexpected error: " + e:GetErrorMessage()
+        end
+        check
+            Source s
+            s:SetMedia("print")
+            output "Source SetMedia(print) GetMedia():Generate() = [" + Flat(s:GetMedia():Generate()) + "]"
+        detect e
+            output "Source SetMedia(print) GetMedia():Generate() unexpected error: " + e:GetErrorMessage()
+        end
+        check
+            Track t
+            t:SetDefault(true)
+            output "Track SetDefault(true) GetDefault() = " + t:GetDefault()
+        detect e
+            output "Track SetDefault(true) GetDefault() unexpected error: " + e:GetErrorMessage()
+        end
+        check
+            Track t
+            t:SetLabel("English")
+            output "Track SetLabel(English) GetLabel():Generate() = [" + Flat(t:GetLabel():Generate()) + "]"
+        detect e
+            output "Track SetLabel(English) GetLabel():Generate() unexpected error: " + e:GetErrorMessage()
+        end
+        check
+            Track t
+            t:SetSourceLanguageCode("en")
+            output "Track SetSourceLanguageCode(en) GetSourceLanguageCode():Generate() = [" + Flat(t:GetSourceLanguageCode():Generate()) + "]"
+        detect e
+            output "Track SetSourceLanguageCode(en) GetSourceLanguageCode():Generate() unexpected error: " + e:GetErrorMessage()
+        end
+        check
+            Area a
+            a:SetShape("rect")
+            output "Area SetShape(rect) GetShape():Generate() = [" + Flat(a:GetShape():Generate()) + "]"
+        detect e
+            output "Area SetShape(rect) GetShape():Generate() unexpected error: " + e:GetErrorMessage()
+        end
+        check
+            Area a
+            a:SetCoordinates("0,0,10,10")
+            output "Area SetCoordinates(0,0,10,10) GetCoordinates():Generate() = [" + Flat(a:GetCoordinates():Generate()) + "]"
+        detect e
+            output "Area SetCoordinates(0,0,10,10) GetCoordinates():Generate() unexpected error: " + e:GetErrorMessage()
+        end
+        check
+            Area a
+            a:SetAddress("a.html")
+            output "Area SetAddress(a.html) GetAddress():Generate() = [" + Flat(a:GetAddress():Generate()) + "]"
+        detect e
+            output "Area SetAddress(a.html) GetAddress():Generate() unexpected error: " + e:GetErrorMessage()
+        end
+        check
+            Area a
+            a:SetAlternativeText("Door")
+            output "Area SetAlternativeText(Door) GetAlternativeText():Generate() = [" + Flat(a:GetAlternativeText():Generate()) + "]"
+        detect e
+            output "Area SetAlternativeText(Door) GetAlternativeText():Generate() unexpected error: " + e:GetErrorMessage()
+        end
+        check
+            ImageMap m
+            Area a
+            a:SetShape("rect")
+            m:AddNestedTag(a)
+            output "ImageMap with an Area Generate() = [" + Flat(m:Generate()) + "]"
+        detect e
+            output "ImageMap with an Area Generate() unexpected error: " + e:GetErrorMessage()
+        end
+        check
+            Canvas c
+            c:SetWidth("300")
+            output "Canvas SetWidth(300) GetWidth():Generate() = [" + Flat(c:GetWidth():Generate()) + "]"
+        detect e
+            output "Canvas SetWidth(300) GetWidth():Generate() unexpected error: " + e:GetErrorMessage()
+        end
+        check
+            InlineFrame f
+            f:SetAddress("f.html")
+            output "InlineFrame SetAddress(f.html) GetAddress():Generate() = [" + Flat(f:GetAddress():Generate()) + "]"
+        detect e
+            output "InlineFrame SetAddress(f.html) GetAddress():Generate() unexpected error: " + e:GetErrorMessage()
+        end
+        check
+            InlineFrame f
+            f:SetSandbox("allow-scripts")
+            output "InlineFrame SetSandbox(allow-scripts) GetSandbox():Generate() = [" + Flat(f:GetSandbox():Generate()) + "]"
+        detect e
+            output "InlineFrame SetSandbox(allow-scripts) GetSandbox():Generate() unexpected error: " + e:GetErrorMessage()
+        end
+    end
+
+    /* Shows line breaks as the two characters \n and double quotes as ', so each case is one line. */
+    action Flat(text value) returns text
+        text lf = ""
+        lf = lf:GetLineFeed()
+        text cr = ""
+        cr = cr:GetCarriageReturn()
+        text quote = ""
+        quote = quote:GetDoubleQuote()
+        text result = value:Replace(cr, "")
+        result = result:Replace(lf, "\n")
+        return result:Replace(quote, "'")
+    end
+end

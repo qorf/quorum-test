@@ -1,0 +1,140 @@
+use Libraries.Containers.TextTree
+
+/*
+    Every public TextTree action on short texts, using the default leaf size
+    (5) so most texts span several leaves. Insert, Delete and Concatenate
+    return a new tree and leave the original unchanged. The index ranges
+    follow the documentation: start inclusive, end exclusive, and Insert
+    accepts 0 through GetLength().
+*/
+class Main
+    action Main
+        TextTree tree
+        tree:Initialize("Hello world!")
+        check
+            output "TextTree(Hello world!) GetText() = [" + tree:GetText() + "], GetLength() = " + tree:GetLength() + ", GetLeafSize() = " + tree:GetLeafSize()
+        detect e
+            output "TextTree(Hello world!) GetText() unexpected error: " + e:GetErrorMessage()
+        end
+        check
+            text all = ""
+            integer i = 0
+            repeat tree:GetLength() times
+                all = all + tree:GetCharacter(i)
+                i = i + 1
+            end
+            output "TextTree(Hello world!) GetCharacter(0..11) = [" + all + "]"
+        detect e
+            output "TextTree(Hello world!) GetCharacter unexpected error: " + e:GetErrorMessage()
+        end
+        check
+            text value = tree:GetCharacter(12)
+            output "TextTree(Hello world!) GetCharacter(12) should fail but returned [" + value + "]"
+        detect e
+            output "TextTree(Hello world!) GetCharacter(12) fails, as it should"
+        end
+        check
+            output "TextTree(Hello world!) GetText(1, 10) = [" + tree:GetText(1, 10) + "], GetText(0, 12) = [" + tree:GetText(0, 12) + "], GetText(4, 4) = [" + tree:GetText(4, 4) + "], GetText(11, 12) = [" + tree:GetText(11, 12) + "]"
+        detect e
+            output "TextTree(Hello world!) GetText ranges unexpected error: " + e:GetErrorMessage()
+        end
+        check
+            text value = tree:GetText(-1, 3)
+            output "TextTree(Hello world!) GetText(-1, 3) should fail but returned [" + value + "]"
+        detect e
+            output "TextTree(Hello world!) GetText(-1, 3) fails, as it should"
+        end
+        check
+            text value = tree:GetText(0, 13)
+            output "TextTree(Hello world!) GetText(0, 13) should fail but returned [" + value + "]"
+        detect e
+            output "TextTree(Hello world!) GetText(0, 13) fails, as it should"
+        end
+        check
+            TextTree inserted = tree:Insert(11, " of tomorrow")
+            TextTree front = tree:Insert(0, ">> ")
+            TextTree back = tree:Insert(12, " <<")
+            output "TextTree(Hello world!) Insert(11, ' of tomorrow') = [" + inserted:GetText() + "], Insert(0, '>> ') = [" + front:GetText() + "], Insert(12, ' <<') = [" + back:GetText() + "], original [" + tree:GetText() + "]"
+        detect e
+            output "TextTree(Hello world!) Insert unexpected error: " + e:GetErrorMessage()
+        end
+        check
+            TextTree bad = tree:Insert(-1, "x")
+            output "TextTree(Hello world!) Insert(-1, x) should fail but gave [" + bad:GetText() + "]"
+        detect e
+            output "TextTree(Hello world!) Insert(-1, x) fails, as it should"
+        end
+        check
+            TextTree bad = tree:Insert(13, "x")
+            output "TextTree(Hello world!) Insert(13, x) should fail but gave [" + bad:GetText() + "]"
+        detect e
+            output "TextTree(Hello world!) Insert(13, x) fails, as it should"
+        end
+        check
+            TextTree deleted = tree:Delete(5, 11)
+            TextTree all = tree:Delete(0, 12)
+            TextTree none = tree:Delete(3, 3)
+            output "TextTree(Hello world!) Delete(5, 11) = [" + deleted:GetText() + "], Delete(0, 12) = [" + all:GetText() + "] length " + all:GetLength() + ", Delete(3, 3) = [" + none:GetText() + "], original [" + tree:GetText() + "]"
+        detect e
+            output "TextTree(Hello world!) Delete unexpected error: " + e:GetErrorMessage()
+        end
+        check
+            TextTree bad = tree:Delete(-1, 2)
+            output "TextTree(Hello world!) Delete(-1, 2) should fail but gave [" + bad:GetText() + "]"
+        detect e
+            output "TextTree(Hello world!) Delete(-1, 2) fails, as it should"
+        end
+        check
+            TextTree bad = tree:Delete(2, 13)
+            output "TextTree(Hello world!) Delete(2, 13) should fail but gave [" + bad:GetText() + "]"
+        detect e
+            output "TextTree(Hello world!) Delete(2, 13) fails, as it should"
+        end
+        check
+            TextTree joined = tree:Concatenate(" Bye.")
+            TextTree other
+            other:Initialize(" Again!")
+            TextTree both = joined:Concatenate(other)
+            output "TextTree(Hello world!) Concatenate(' Bye.') then Concatenate(TextTree( Again!)) = [" + both:GetText() + "] length " + both:GetLength() + ", original [" + tree:GetText() + "], other [" + other:GetText() + "]"
+        detect e
+            output "TextTree Concatenate unexpected error: " + e:GetErrorMessage()
+        end
+        check
+            TextTree balanced = tree:Balance()
+            output "TextTree(Hello world!) Balance(): [" + balanced:GetText() + "], NeedsBalancing() = " + balanced:NeedsBalancing()
+        detect e
+            output "TextTree Balance unexpected error: " + e:GetErrorMessage()
+        end
+
+        TextTree empty
+        check
+            empty:Initialize("")
+            output "TextTree() GetText() = [" + empty:GetText() + "], GetLength() = " + empty:GetLength()
+        detect e
+            output "TextTree() unexpected error: " + e:GetErrorMessage()
+        end
+        check
+            TextTree filled = empty:Insert(0, "abc")
+            TextTree joined = empty:Concatenate("xyz")
+            output "TextTree() Insert(0, abc) = [" + filled:GetText() + "], Concatenate(xyz) = [" + joined:GetText() + "]"
+        detect e
+            output "TextTree() Insert/Concatenate unexpected error: " + e:GetErrorMessage()
+        end
+
+        TextTree small
+        check
+            small:Initialize("abcdefghij", 2)
+            output "TextTree(abcdefghij, leaf size 2): GetLeafSize() = " + small:GetLeafSize() + ", GetText(3, 7) = [" + small:GetText(3, 7) + "]"
+        detect e
+            output "TextTree leaf size 2 unexpected error: " + e:GetErrorMessage()
+        end
+        TextTree sized
+        check
+            sized:SetLeafSize(3)
+            sized:Initialize("abcdefgh")
+            output "TextTree SetLeafSize(3) then Initialize(abcdefgh): GetLeafSize() = " + sized:GetLeafSize() + ", GetText() = [" + sized:GetText() + "], GetCharacter(7) = [" + sized:GetCharacter(7) + "]"
+        detect e
+            output "TextTree SetLeafSize(3) unexpected error: " + e:GetErrorMessage()
+        end
+    end
+end

@@ -1,0 +1,8 @@
+Add 100000 consecutive integer keys: size 100000, GetValue(99999) = 99999
+Add 400000 consecutive integer keys: size 400000, GetValue(399999) = 399999
+Add 400000 consecutive integer keys: within 2000 ms
+Add consecutive integer keys scales linearly (4x keys, at most 8x time)
+Add 100000 integer keys i * 1024: size 100000, GetValue(1024 * 99999) = 99999
+Add 400000 integer keys i * 1024: size 400000, GetValue(1024 * 399999) = 399999
+Add 400000 integer keys i * 1024: within 2000 ms
+Add integer keys i * 1024 scales linearly (4x keys, at most 8x time)

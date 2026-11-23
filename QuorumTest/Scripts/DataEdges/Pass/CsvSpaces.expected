@@ -1,0 +1,5 @@
+Read(a, b) rows = 1: [a][ b]
+Read( a ,b ) rows = 1: [ a ][b ]
+Read(a,b ) rows = 1: [a][b ]
+Read(" a ",b) rows = 1: [ a ][b]
+Read(a,\tb\t) rows = 1: [a][\tb\t]

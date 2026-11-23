@@ -1,0 +1,28 @@
+use Libraries.Compute.Math
+
+/*
+Math:Factorial. 12! is the largest factorial that fits in a 32 bit integer.
+13! (6227020800) does not fit, and integers wrap like a Java int, so it
+comes back as 6227020800 minus 2^32, which is 1932053504.
+*/
+class Main
+    Math math
+
+    action Main
+        Show(0)
+        Show(1)
+        Show(2)
+        Show(5)
+        Show(10)
+        Show(12)
+        Show(13)
+    end
+
+    action Show(integer n)
+        check
+            output "Factorial(" + n + ") = " + math:Factorial(n)
+        detect e
+            output "Factorial(" + n + ") unexpected error: " + e:GetErrorMessage()
+        end
+    end
+end

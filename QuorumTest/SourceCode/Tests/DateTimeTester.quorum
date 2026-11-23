@@ -1,0 +1,52 @@
+package Libraries.Language.Compile.Test
+use Libraries.Testing.QuorumTest
+use Libraries.Testing.ScriptCheck
+
+/*
+Tests DateTime (parsing, text, names, epoch times, time zones, arithmetic,
+comparison, the clock), CalendarDate and DateFormat, with fixed dates and
+epoch times; nothing printed depends on the current time or the machine's
+time zone. All three back ends: DateTime has a plugin on bytecode,
+JavaScript and Python, and CalendarDate and DateFormat are written in Quorum.
+Many DateTime scripts are expected to fail on JavaScript and Python, whose
+plugins are incomplete; the .expected files hold the documented behavior.
+*/
+class DateTimeTester
+    QuorumTest suite = undefined
+    ScriptCheck scripts
+    text path = "Scripts/DateTime/Pass/"
+
+    action Test
+        scripts:SetSuite(suite)
+        scripts:CheckEverywhere(path + "DateTimeParseTimestamp")
+        scripts:CheckEverywhere(path + "DateTimeParseDate")
+        scripts:CheckEverywhere(path + "DateTimeParseTime")
+        scripts:CheckEverywhere(path + "DateTimeText")
+        scripts:CheckEverywhere(path + "DateTimeNames")
+        scripts:CheckEverywhere(path + "DateTimeShortDayName")
+        scripts:CheckEverywhere(path + "DateTimeEpoch")
+        scripts:CheckEverywhere(path + "DateTimeTimeZone")
+        scripts:CheckEverywhere(path + "DateTimeArithmetic")
+        scripts:CheckEverywhere(path + "DateTimeCompare")
+        scripts:CheckEverywhere(path + "DateTimeCurrent")
+        scripts:CheckEverywhere(path + "CalendarDateSetDate")
+        scripts:CheckEverywhere(path + "CalendarDateDays")
+        scripts:CheckEverywhere(path + "CalendarDateArithmetic")
+        scripts:CheckEverywhere(path + "CalendarDateText")
+        scripts:CheckEverywhere(path + "DateFormatWrite")
+        scripts:CheckEverywhere(path + "DateFormatParse")
+        scripts:CheckEverywhere(path + "DateFormatNames")
+    end
+
+    action GetName returns text
+        return "Date and Time Tests"
+    end
+
+    action GetCompilerTestSuite returns QuorumTest
+        return suite
+    end
+
+    action SetCompilerTestSuite(QuorumTest suite)
+        me:suite = suite
+    end
+end

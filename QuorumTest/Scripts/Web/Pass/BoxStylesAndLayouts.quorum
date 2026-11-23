@@ -1,0 +1,265 @@
+use Libraries.Web.Layouts.WebGridLayout
+use Libraries.Web.Layouts.WebRowLayout
+use Libraries.Web.Layouts.WebStackLayout
+use Libraries.Web.Styles.WebBoxStyle
+use Libraries.Web.Styles.WebColor
+use Libraries.Web.Styles.WebListStyle
+use Libraries.Web.Styles.WebTableStyle
+use Libraries.Web.Styles.WebTextStyle
+
+/*
+Tests WebBoxStyle, WebListStyle, WebTableStyle and the layouts
+(WebRowLayout, WebStackLayout, WebGridLayout): each setter's CSS and the
+getters. Sizes are in rem, 16 pixels each; the values are chosen so no
+whole number of rem is printed.
+*/
+class Main
+    action Main
+        check
+            WebBoxStyle b
+            output "new WebBoxStyle Generate() = [" + Flat(b:Generate()) + "]"
+        detect e
+            output "new WebBoxStyle Generate() unexpected error: " + e:GetErrorMessage()
+        end
+        check
+            WebBoxStyle b
+            WebColor white
+            white:SetColor(255, 255, 255)
+            b:SetBackground(white)
+            output "SetBackground(white) Generate() = [" + Flat(b:Generate()) + "]"
+        detect e
+            output "SetBackground(white) Generate() unexpected error: " + e:GetErrorMessage()
+        end
+        check
+            WebBoxStyle b
+            b:SetPadding(8, 24)
+            output "SetPadding(8, 24) Generate() = [" + Flat(b:Generate()) + "]"
+        detect e
+            output "SetPadding(8, 24) Generate() unexpected error: " + e:GetErrorMessage()
+        end
+        check
+            WebBoxStyle b
+            b:SetRoundedTop(8)
+            output "SetRoundedTop(8) Generate() = [" + Flat(b:Generate()) + "]"
+        detect e
+            output "SetRoundedTop(8) Generate() unexpected error: " + e:GetErrorMessage()
+        end
+        check
+            WebBoxStyle b
+            WebColor black
+            b:SetBorder(8, black)
+            output "SetBorder(8, black) Generate() = [" + Flat(b:Generate()) + "]"
+        detect e
+            output "SetBorder(8, black) Generate() unexpected error: " + e:GetErrorMessage()
+        end
+        check
+            WebBoxStyle b
+            WebColor black
+            b:SetLeftBorder(8, black)
+            output "SetLeftBorder(8, black) Generate() = [" + Flat(b:Generate()) + "]"
+        detect e
+            output "SetLeftBorder(8, black) Generate() unexpected error: " + e:GetErrorMessage()
+        end
+        check
+            WebBoxStyle b
+            b:SetClipContent(true)
+            output "SetClipContent(true) Generate() = [" + Flat(b:Generate()) + "]"
+        detect e
+            output "SetClipContent(true) Generate() unexpected error: " + e:GetErrorMessage()
+        end
+        check
+            WebBoxStyle b
+            b:SetDisplayed(false)
+            output "SetDisplayed(false) Generate() = [" + Flat(b:Generate()) + "]"
+        detect e
+            output "SetDisplayed(false) Generate() unexpected error: " + e:GetErrorMessage()
+        end
+        check
+            WebBoxStyle b
+            b:SetShadow(false)
+            output "SetShadow(false) Generate() = [" + Flat(b:Generate()) + "]"
+        detect e
+            output "SetShadow(false) Generate() unexpected error: " + e:GetErrorMessage()
+        end
+        check
+            WebBoxStyle b
+            WebTextStyle t
+            t:SetBold(true)
+            b:SetTextStyle(t)
+            output "SetTextStyle then GetTextStyle():IsBold() = " + b:GetTextStyle():IsBold()
+        detect e
+            output "SetTextStyle then GetTextStyle():IsBold() unexpected error: " + e:GetErrorMessage()
+        end
+        check
+            WebBoxStyle b
+            b:SetPadding(8, 24)
+            b:SetClipContent(true)
+            WebBoxStyle copy = b:Copy()
+            output "Copy() Generate() equals the original = " + (copy:Generate() = b:Generate())
+        detect e
+            output "Copy() Generate() equals the original unexpected error: " + e:GetErrorMessage()
+        end
+        check
+            WebListStyle s
+            output "WebListStyle new Generate() = [" + Flat(s:Generate()) + "]"
+        detect e
+            output "WebListStyle new Generate() unexpected error: " + e:GetErrorMessage()
+        end
+        check
+            WebListStyle s
+            s:UseDiscs()
+            s:MarkersInside()
+            s:SetLeftPadding(24)
+            output "WebListStyle UseDiscs() MarkersInside() SetLeftPadding(24) Generate() = [" + Flat(s:Generate()) + "]"
+        detect e
+            output "WebListStyle UseDiscs() MarkersInside() SetLeftPadding(24) Generate() unexpected error: " + e:GetErrorMessage()
+        end
+        check
+            WebListStyle s
+            s:UseNumbers()
+            output "WebListStyle UseNumbers() UsesNumbers() UsesDiscs() = [" + Flat(s:UsesNumbers() + " " + s:UsesDiscs()) + "]"
+        detect e
+            output "WebListStyle UseNumbers() UsesNumbers() UsesDiscs() unexpected error: " + e:GetErrorMessage()
+        end
+        check
+            WebListStyle s
+            s:UseNoMarker()
+            s:MarkersOutside()
+            output "WebListStyle UseNoMarker() MarkersOutside() Generate() = [" + Flat(s:Generate()) + "]"
+        detect e
+            output "WebListStyle UseNoMarker() MarkersOutside() Generate() unexpected error: " + e:GetErrorMessage()
+        end
+        check
+            WebListStyle s
+            s:SetLeftPadding(24)
+            output "WebListStyle SetLeftPadding(24) GetLeftPadding() = " + s:GetLeftPadding()
+        detect e
+            output "WebListStyle SetLeftPadding(24) GetLeftPadding() unexpected error: " + e:GetErrorMessage()
+        end
+        check
+            WebTableStyle s
+            s:SetFullWidth(true)
+            s:SetEvenColumns(true)
+            s:SetSharedBorders(true)
+            s:RemoveCellSpacing()
+            output "WebTableStyle SetFullWidth(true) SetEvenColumns(true) SetSharedBorders(true) RemoveCellSpacing() Generate() = [" + Flat(s:Generate()) + "]"
+        detect e
+            output "WebTableStyle SetFullWidth(true) SetEvenColumns(true) SetSharedBorders(true) RemoveCellSpacing() Generate() unexpected error: " + e:GetErrorMessage()
+        end
+        check
+            WebTableStyle s
+            s:SetFullWidth(false)
+            output "WebTableStyle SetFullWidth(false) IsFullWidth() Generate() = [" + Flat(s:IsFullWidth() + " " + s:Generate()) + "]"
+        detect e
+            output "WebTableStyle SetFullWidth(false) IsFullWidth() Generate() unexpected error: " + e:GetErrorMessage()
+        end
+        check
+            WebTableStyle s
+            WebBoxStyle b
+            b:SetPadding(8, 24)
+            s:SetBox(b)
+            output "WebTableStyle SetBox(padding 8, 24) Generate() = [" + Flat(s:Generate()) + "]"
+        detect e
+            output "WebTableStyle SetBox(padding 8, 24) Generate() unexpected error: " + e:GetErrorMessage()
+        end
+        check
+            WebRowLayout r
+            output "WebRowLayout new Generate() = [" + Flat(r:Generate()) + "]"
+        detect e
+            output "WebRowLayout new Generate() unexpected error: " + e:GetErrorMessage()
+        end
+        check
+            WebRowLayout r
+            r:SetGap(24)
+            r:SetWrap(true)
+            output "WebRowLayout SetGap(24) SetWrap(true) Generate() = [" + Flat(r:Generate()) + "]"
+        detect e
+            output "WebRowLayout SetGap(24) SetWrap(true) Generate() unexpected error: " + e:GetErrorMessage()
+        end
+        check
+            WebRowLayout r
+            r:SetReversed(true)
+            r:SetSpreadOut(true)
+            r:SetCenteredVertically(true)
+            output "WebRowLayout SetReversed(true) SetSpreadOut(true) SetCenteredVertically(true) Generate() = [" + Flat(r:Generate()) + "]"
+        detect e
+            output "WebRowLayout SetReversed(true) SetSpreadOut(true) SetCenteredVertically(true) Generate() unexpected error: " + e:GetErrorMessage()
+        end
+        check
+            WebRowLayout r
+            r:SetAtEnd(true)
+            r:SetAlignedTop(true)
+            output "WebRowLayout SetAtEnd(true) SetAlignedTop(true) Generate() = [" + Flat(r:Generate()) + "]"
+        detect e
+            output "WebRowLayout SetAtEnd(true) SetAlignedTop(true) Generate() unexpected error: " + e:GetErrorMessage()
+        end
+        check
+            WebRowLayout r
+            r:SetGap(24)
+            output "WebRowLayout SetGap(24) GetGap() = " + r:GetGap()
+        detect e
+            output "WebRowLayout SetGap(24) GetGap() unexpected error: " + e:GetErrorMessage()
+        end
+        check
+            WebStackLayout s
+            s:SetGap(8)
+            s:AlignCenter()
+            s:SetCenteredVertically(true)
+            output "WebStackLayout SetGap(8) AlignCenter() SetCenteredVertically(true) Generate() = [" + Flat(s:Generate()) + "]"
+        detect e
+            output "WebStackLayout SetGap(8) AlignCenter() SetCenteredVertically(true) Generate() unexpected error: " + e:GetErrorMessage()
+        end
+        check
+            WebStackLayout s
+            s:AlignRight()
+            s:Stretch()
+            output "WebStackLayout AlignRight() then Stretch() Generate() and IsStretched() = [" + Flat(s:Generate() + " " + s:IsStretched()) + "]"
+        detect e
+            output "WebStackLayout AlignRight() then Stretch() Generate() and IsStretched() unexpected error: " + e:GetErrorMessage()
+        end
+        check
+            WebStackLayout s
+            s:AlignLeft()
+            output "WebStackLayout AlignLeft() IsAlignedLeft() IsAlignedRight() = [" + Flat(s:IsAlignedLeft() + " " + s:IsAlignedRight()) + "]"
+        detect e
+            output "WebStackLayout AlignLeft() IsAlignedLeft() IsAlignedRight() unexpected error: " + e:GetErrorMessage()
+        end
+        check
+            WebGridLayout g
+            g:SetColumns(3)
+            g:SetGap(24)
+            output "WebGridLayout SetColumns(3) SetGap(24) Generate() = [" + Flat(g:Generate()) + "]"
+        detect e
+            output "WebGridLayout SetColumns(3) SetGap(24) Generate() unexpected error: " + e:GetErrorMessage()
+        end
+        check
+            WebGridLayout g
+            g:SetSmallestColumnWidth(200)
+            output "WebGridLayout SetSmallestColumnWidth(200) Generate() = [" + Flat(g:Generate()) + "]"
+        detect e
+            output "WebGridLayout SetSmallestColumnWidth(200) Generate() unexpected error: " + e:GetErrorMessage()
+        end
+        check
+            WebGridLayout g
+            g:UseFittedFirstColumn()
+            g:SetGap(24)
+            g:SetColumnGap(8)
+            output "WebGridLayout UseFittedFirstColumn() SetGap(24) SetColumnGap(8) Generate() = [" + Flat(g:Generate()) + "]"
+        detect e
+            output "WebGridLayout UseFittedFirstColumn() SetGap(24) SetColumnGap(8) Generate() unexpected error: " + e:GetErrorMessage()
+        end
+    end
+
+    /* Shows line breaks as the two characters \n and double quotes as ', so each case is one line. */
+    action Flat(text value) returns text
+        text lf = ""
+        lf = lf:GetLineFeed()
+        text cr = ""
+        cr = cr:GetCarriageReturn()
+        text quote = ""
+        quote = quote:GetDoubleQuote()
+        text result = value:Replace(cr, "")
+        result = result:Replace(lf, "\n")
+        return result:Replace(quote, "'")
+    end
+end
