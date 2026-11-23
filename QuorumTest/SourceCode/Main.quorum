@@ -140,6 +140,16 @@ class Main is Form
         failButton = actions:AddButton("Open Fail.txt")
         failButton:SetBehavior(behavior)
 
+        //the run's status right under the buttons that control it; the
+        //progress bar before the labels, so it isn't paired with one
+        Grouping status = page:AddGrouping("Status")
+        status:SetTitle("Status")
+        progress = status:AddProgressBar("Testers finished", 0, catalog:GetSize())
+        SetBarHeight(progress, RUN_BAR_HEIGHT)
+        SetBarColor(progress, false)
+        statusLabel = status:AddLabel("Not run yet.")
+        countsLabel = status:AddLabel("No tests run.")
+
         //a titled grouping is a card; an untitled grouping inside it is one
         //row, whose checkboxes share the row evenly from the left, so rows
         //of three line up as columns
@@ -186,15 +196,6 @@ class Main is Form
         processSlider:SetValue(defaultProcesses)
         processLabel = page:AddLabel("Processes")
         UpdateProcessLabel()
-
-        //the progress bar before the labels, so it isn't paired with one
-        Grouping status = page:AddGrouping("Status")
-        status:SetTitle("Status")
-        progress = status:AddProgressBar("Testers finished", 0, catalog:GetSize())
-        SetBarHeight(progress, RUN_BAR_HEIGHT)
-        SetBarColor(progress, false)
-        statusLabel = status:AddLabel("Not run yet.")
-        countsLabel = status:AddLabel("No tests run.")
 
         //one label per card, a line per process or failure: a label splits
         //its text at line feeds

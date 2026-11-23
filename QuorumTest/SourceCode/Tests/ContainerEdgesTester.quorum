@@ -37,6 +37,8 @@ class ContainerEdgesTester
         scripts:CheckEverywhere(path + "ArraySortCompareSign")
         scripts:CheckEverywhere(path + "ArraySortComparison")
         scripts:CheckEverywhere(path + "ArrayUndefinedItems")
+        // ByteArray has no Python plugin, so this runs on bytecode and JavaScript.
+        scripts:Check(path + "ByteArraySubArray", true, false)
         scripts:CheckEverywhere(path + "HashTableCopyIndependent")
         scripts:CheckEverywhere(path + "HashTableEmptyContainer")
         scripts:CheckEverywhere(path + "HashTableIteratorEdges")

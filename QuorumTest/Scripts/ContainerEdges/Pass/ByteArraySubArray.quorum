@@ -1,0 +1,66 @@
+use Libraries.Containers.ByteArray
+use Libraries.Containers.Support.ByteReader
+
+/*
+ByteArray:GetSubArray(begin, finish) gives the bytes from begin up to, but
+not including, finish (finish - begin bytes, as GetSubtext does for text and
+as ByteReader:NextSubArray relies on). So a finish equal to the size takes
+the end of the array. Each case uses the bytes 65, 66, 67, 68 and prints the
+size and the bytes. ByteReader:NextSubArray reads the array in two pieces,
+the second one ending at the end. (Suspected: a finish equal to the size
+gives an empty array.)
+*/
+class Main
+    action Main
+        Show(0, 2)
+        Show(1, 3)
+        Show(2, 4)
+        Show(3, 4)
+        Show(0, 4)
+        Show(4, 4)
+        Show(1, 1)
+
+        check
+            ByteReader reader
+            reader:SetByteArray(Bytes())
+            ByteArray first = reader:NextSubArray(2)
+            ByteArray second = reader:NextSubArray(2)
+            output "ByteReader NextSubArray(2) twice = " + Describe(first) + " then " + Describe(second)
+        detect e
+            output "ByteReader NextSubArray(2) twice unexpected error: " + e:GetErrorMessage()
+        end
+    end
+
+    action Bytes returns ByteArray
+        ByteArray value
+        value:SetSize(4)
+        value:Set(0, 65)
+        value:Set(1, 66)
+        value:Set(2, 67)
+        value:Set(3, 68)
+        return value
+    end
+
+    action Describe(ByteArray value) returns text
+        text result = "size " + value:GetSize() + " ["
+        integer i = 0
+        repeat while i < value:GetSize()
+            if i > 0
+                result = result + " "
+            end
+            result = result + value:Get(i)
+            i = i + 1
+        end
+        return result + "]"
+    end
+
+    action Show(integer begin, integer finish)
+        text call = "GetSubArray(" + begin + ", " + finish + ")"
+        check
+            ByteArray value = Bytes()
+            output call + " = " + Describe(value:GetSubArray(begin, finish))
+        detect e
+            output call + " unexpected error: " + e:GetErrorMessage()
+        end
+    end
+end

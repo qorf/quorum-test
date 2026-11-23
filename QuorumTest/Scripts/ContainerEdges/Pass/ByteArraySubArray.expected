@@ -1,0 +1,8 @@
+GetSubArray(0, 2) = size 2 [65 66]
+GetSubArray(1, 3) = size 2 [66 67]
+GetSubArray(2, 4) = size 2 [67 68]
+GetSubArray(3, 4) = size 1 [68]
+GetSubArray(0, 4) = size 4 [65 66 67 68]
+GetSubArray(4, 4) = size 0 []
+GetSubArray(1, 1) = size 0 []
+ByteReader NextSubArray(2) twice = size 2 [65 66] then size 2 [67 68]
