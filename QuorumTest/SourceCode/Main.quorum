@@ -26,6 +26,8 @@ use Libraries.Testing.ToolSetup
 use Libraries.Testing.TesterCatalog
 use Libraries.Testing.JsonWriter
 use Libraries.Data.Formats.JavaScriptObjectNotation
+// TEMPORARY wheel timing.
+use Libraries.System.DateTime
 
 /*
     The Quorum tests. Started with no flags (from Quorum Studio, run.sh or
@@ -276,6 +278,22 @@ class Main is Form
         InputTable table = GetDefaultInputTable()
         table:Add(bigger, zoomIn)
         table:Add(smaller, zoomOut)
+
+        // TEMPORARY wheel timing: the page's and the failure list's wheel
+        // input print when they arrive (WheelTimingBehavior), then scroll.
+        InputSet wheel
+        wheel:SetInputType(wheel:MOUSE_WHEEL_INPUT)
+        Page timedPage = GetMainPage()
+        InputTable pageTable = timedPage:CopyAndActivateInputTable("TimedPage")
+        WheelTimingBehavior pageWheel
+        pageWheel:SetPlace("page")
+        pageTable:Add(wheel, pageWheel)
+        if failureList not= undefined
+            InputTable listTable = failureList:CopyAndActivateInputTable("TimedList")
+            WheelTimingBehavior listWheel
+            listWheel:SetPlace("failure list")
+            listTable:Add(wheel, listWheel)
+        end
     end
 
     /* Changes the interface scale by the amount, within limits. Called by ZoomBehavior. */
@@ -297,6 +315,11 @@ class Main is Form
 
     /* Keeps the processes label in step with the slider, and checks on a run every two seconds. */
     action Update(number time)
+        // TEMPORARY wheel timing: frames slower than 30 ms.
+        if time > 0.03
+            DateTime frameClock
+            output "slow frame at " + frameClock:GetEpochTime() + " ms, took " + cast(integer, time * 1000) + " ms"
+        end
         if processSlider = undefined
             return now
         end
@@ -310,12 +333,16 @@ class Main is Form
         sincePoll = sincePoll + time
         if sincePoll >= POLL_SECONDS
             sincePoll = 0
+            // TEMPORARY wheel timing: how long checking on the run takes.
+            DateTime pollClock
+            number pollStart = pollClock:GetEpochTime()
             run:Poll()
             if run:IsDone()
                 running = false
                 UpdateProcessLabel()
             end
             ShowRun()
+            output "run check at " + pollStart + " ms took " + (pollClock:GetEpochTime() - pollStart) + " ms"
         end
     end
 

@@ -1,12 +1,13 @@
 use Libraries.Containers.Array
 
 /*
-    Text:SplitIntoLines splits on line feeds. It is written in Quorum as
-    Split(line feed), so it follows the same rules as TextSplit: empty
-    lines are kept, one empty piece after a final line feed is not added,
-    and an empty text gives one empty line. Carriage returns are not
-    tested, because the documentation does not say whether CR LF ends a
-    line. Labels write a line feed as /n. Each case runs on a text
+    Text:SplitIntoLines splits into lines. A line ends at a line feed or at
+    a carriage return and line feed (the carriage return is not part of
+    the line), so a file gives the same lines whichever machine saved it.
+    Empty lines are kept, a final line ending doesn't start an empty line,
+    and an empty text gives one empty line. A lone carriage return is not
+    a line ending and stays in the line. Labels and results write a line
+    feed as /n and a carriage return as /r. Each case runs on a text
     primitive and on a Text object.
 */
 class Main
@@ -22,6 +23,15 @@ class Main
         Show("abc", "abc")
         Show("", "")
         Show("one line" + lf + "two words" + lf + "  three  ", "one line/ntwo words/n  three  ")
+        text cr = lf:GetCarriageReturn()
+        Show("a" + cr + lf + "b", "a/r/nb")
+        Show("a" + cr + lf + "b" + cr + lf, "a/r/nb/r/n")
+        Show("a" + cr + lf + cr + lf + "b", "a/r/n/r/nb")
+        Show("a" + cr + lf + "b" + lf + "c", "a/r/nb/nc")
+        Show(cr + lf, "/r/n")
+        Show("a" + cr + "b", "a/rb")
+        Show("a" + cr, "a/r")
+        Show("a" + cr + cr + lf + "b", "a/r/r/nb")
     end
 
     action Show(text value, text label)
@@ -46,7 +56,8 @@ class Main
         text result = "" + pieces:GetSize() + " lines "
         integer i = 0
         repeat while i < pieces:GetSize()
-            result = result + "[" + pieces:Get(i) + "]"
+            text piece = pieces:Get(i)
+            result = result + "[" + piece:Replace(piece:GetCarriageReturn(), "/r") + "]"
             i = i + 1
         end
         return result

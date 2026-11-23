@@ -3,10 +3,10 @@ use Libraries.Containers.Array
 /*
     Text:Split(delimiter) splits on every occurrence of the delimiter,
     which is plain text, not a pattern: "." and "+" and "|" split only on
-    themselves. Following the library's own comments: empty pieces between
-    delimiters are kept, ONE empty piece after a final delimiter is not
-    added (so "a,b,,," gives a, b, "", ""), an empty text gives one empty
-    piece, and an empty delimiter gives the whole text. Each case runs on a
+    themselves. As documented, Split(delimiter) is Split(delimiter, false):
+    empty pieces between delimiters are kept, empty pieces at the end are
+    left out (so "a,b,,," gives a, b, and "," gives no pieces), an empty text
+    gives one empty piece, and an empty delimiter gives the whole text. Each case runs on a
     text primitive and on a Text object; pieces are shown in brackets.
 */
 class Main

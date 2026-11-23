@@ -3,14 +3,11 @@ use Libraries.Containers.Array
 /*
     Text:Split(delimiter, include). The delimiter is plain text, not a
     pattern. With include = true every trailing piece is kept, including
-    empty ones ("a,b,,," gives five pieces). The documentation does not say
-    exactly what include = false drops; the expectation follows the Java
-    plugin, which drops ALL trailing empty pieces ("a,b,,," gives a, b).
-
-    Note: this differs from Split(delimiter) with one parameter, which drops
-    only one trailing empty piece (see TextSplit). The last lines print both
-    for "a,b,,," side by side so the difference is easy to notice; whether
-    the two forms should agree is a question for the library's author.
+    empty ones ("a,b,,," gives five pieces). With include = false all the
+    empty pieces at the end are left out ("a,b,,," gives a, b). An empty
+    delimiter gives the whole text either way. Split(delimiter) with one
+    parameter is documented as Split(delimiter, false); the last line
+    prints both for "a,b,,," side by side.
     Each case runs on a text primitive and on a Text object.
 */
 class Main
@@ -34,6 +31,8 @@ class Main
         Show("a.b.", ".", false)
         Show("a--b--", "--", true)
         Show("a--b--", "--", false)
+        Show("abc", "", true)
+        Show("abc", "", false)
         text value = "a,b,,,"
         check
             Array<text> one = value:Split(",")
