@@ -1,0 +1,27 @@
+/*
+Expected output:
+check
+always
+returned 5
+
+The check block returns a value from the action. The always block has no
+detect block beside it, and it must still run before the action hands the
+value back to its caller.
+*/
+
+class Main
+    action Main
+        integer result = GetValue()
+        output "returned " + result
+    end
+
+    action GetValue returns integer
+        check
+            output "check"
+            return 5
+        always
+            output "always"
+        end
+        return 0
+    end
+end

@@ -1,0 +1,25 @@
+/*
+Expected output:
+check
+detect boom
+after 1
+
+A check block with a detect block and no always block. The check block raises
+an error, the detect block catches it, and the program carries on after the
+check block. This is the form the compiler has always handled; it is here to
+compare with the always-only form.
+*/
+
+class Main
+    action Main
+        integer count = 0
+        check
+            output "check"
+            alert("boom")
+        detect e
+            count = count + 1
+            output "detect " + e:GetErrorMessage()
+        end
+        output "after " + count
+    end
+end

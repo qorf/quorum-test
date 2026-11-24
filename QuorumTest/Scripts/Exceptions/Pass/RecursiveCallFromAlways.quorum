@@ -1,23 +1,33 @@
 /**
 Expected output:
-detect hit
- */
+always 2
+always 1
+detect bottom
+always 0
+
+Each call's always block calls the action again with a smaller depth, until
+depth 0. At depth 0 the check block raises an error; the detect block
+returns, and the always block still runs, but has nothing left to call.
+*/
 
 class Main
     action Main
-        ARecursiveMethod(100)
+        Count(2)
     end
 
-    action ARecursiveMethod(integer depth)
+    action Count(integer depth)
         check
-            if depth <= 90
-                alert("leave the method")
+            if depth = 0
+                alert("bottom")
             end
         detect e
-            output "detect hit"
+            output "detect " + e:GetErrorMessage()
             return now
         always
-            ARecursiveMethod(depth - 1)
+            output "always " + depth
+            if depth > 0
+                Count(depth - 1)
+            end
         end
     end
 end

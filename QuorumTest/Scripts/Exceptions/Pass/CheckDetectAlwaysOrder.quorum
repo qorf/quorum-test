@@ -1,0 +1,39 @@
+/*
+Expected output:
+check
+always 1
+check
+detect boom
+always 2
+after 2
+
+A check block with both a detect block and an always block, run twice. The
+first time nothing goes wrong: the check block runs, the detect block is
+skipped and the always block runs. The second time the check block raises an
+error: the detect block runs first, then the always block, then the program
+carries on after the check block.
+*/
+
+class Main
+    integer count = 0
+
+    action Main
+        Run(false)
+        Run(true)
+        output "after " + count
+    end
+
+    action Run(boolean fail)
+        check
+            output "check"
+            if fail
+                alert("boom")
+            end
+        detect e
+            output "detect " + e:GetErrorMessage()
+        always
+            count = count + 1
+            output "always " + count
+        end
+    end
+end

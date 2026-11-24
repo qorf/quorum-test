@@ -1,0 +1,35 @@
+/*
+Expected output:
+check 1
+check 2
+always
+after
+
+An action that gives back no value leaves with "return now" from inside a
+loop inside a check block. The always block must run once before the caller
+carries on. The detect block is never reached.
+*/
+
+class Main
+    action Main
+        Work()
+        output "after"
+    end
+
+    action Work
+        check
+            integer i = 1
+            repeat 3 times
+                output "check " + i
+                if i = 2
+                    return now
+                end
+                i = i + 1
+            end
+        detect e
+            output "detect"
+        always
+            output "always"
+        end
+    end
+end

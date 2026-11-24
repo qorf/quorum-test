@@ -1,0 +1,30 @@
+/*
+Expected output:
+check
+detect boom
+always
+returned 2
+
+The check block raises an error and the detect block returns a value. The
+always block must still run, after the detect block and before the value
+reaches the caller.
+*/
+
+class Main
+    action Main
+        output "returned " + GetValue()
+    end
+
+    action GetValue returns integer
+        check
+            output "check"
+            alert("boom")
+        detect e
+            output "detect " + e:GetErrorMessage()
+            return 2
+        always
+            output "always"
+        end
+        return 0
+    end
+end

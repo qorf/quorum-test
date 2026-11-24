@@ -1,0 +1,35 @@
+/*
+Expected output:
+check 7
+always 7
+caught boom
+
+The inner check block has an always block and no detect block, and it raises
+an error. The always block must run first, and then the same error must be
+passed on to the caller, where the outer detect block catches it. Nothing
+after the inner check block may run.
+
+The action has a parameter that the always block reads, so the parameter's
+value must not be overwritten while the error is held during the always
+block.
+*/
+
+class Main
+    action Main
+        check
+            Work(7)
+        detect e
+            output "caught " + e:GetErrorMessage()
+        end
+    end
+
+    action Work(integer value)
+        check
+            output "check " + value
+            alert("boom")
+        always
+            output "always " + value
+        end
+        output "should not get here"
+    end
+end

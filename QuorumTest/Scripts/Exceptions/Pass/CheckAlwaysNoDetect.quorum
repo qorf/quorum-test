@@ -1,0 +1,35 @@
+/*
+Expected output:
+check
+always 1
+always 2
+after 2
+
+A check block with an always block and no detect block. Nothing goes wrong
+in the check block, so the always block runs once, then the program carries
+on. The second check block is empty, which the compiler handles on its own
+path, and its always block must still run.
+
+The variable count is declared before the check, so it shares the action's
+local variable slots with anything the compiler stores while running the
+always block. Its value must come through unchanged.
+*/
+
+class Main
+    action Main
+        integer count = 0
+        check
+            output "check"
+        always
+            count = count + 1
+            output "always " + count
+        end
+
+        check
+        always
+            count = count + 1
+            output "always " + count
+        end
+        output "after " + count
+    end
+end

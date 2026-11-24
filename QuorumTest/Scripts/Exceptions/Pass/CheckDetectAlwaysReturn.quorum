@@ -1,0 +1,28 @@
+/*
+Expected output:
+check
+always
+returned 5
+
+The check block returns a value. There is a detect block and an always
+block. Nothing goes wrong, so the detect block is skipped, and the always
+block must run before the value reaches the caller.
+*/
+
+class Main
+    action Main
+        output "returned " + GetValue()
+    end
+
+    action GetValue returns integer
+        check
+            output "check"
+            return 5
+        detect e
+            output "detect"
+        always
+            output "always"
+        end
+        return 0
+    end
+end

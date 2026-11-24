@@ -1,0 +1,39 @@
+/*
+Expected output:
+inner check
+inner always
+outer always
+returned 3
+
+A return inside a check block that is itself inside another check block.
+Both have always blocks. The inner always block runs first, then the outer
+one, each exactly once, and then the value reaches the caller.
+
+Each check block has a detect block that is never reached, so this tests
+the return, not the separate problem with an always block that has no
+detect block.
+*/
+
+class Main
+    action Main
+        output "returned " + GetValue()
+    end
+
+    action GetValue returns integer
+        check
+            check
+                output "inner check"
+                return 3
+            detect e
+                output "inner detect"
+            always
+                output "inner always"
+            end
+        detect e
+            output "outer detect"
+        always
+            output "outer always"
+        end
+        return 0
+    end
+end

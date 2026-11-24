@@ -106,6 +106,23 @@ class ExceptionTester
         DetectAllReorder()
         DetectAllReorder2()
 
+        //An always block with no detect block beside it, compared with the
+        //forms that have a detect block.
+        CheckAlwaysNoDetect()
+        CheckAlwaysNoDetectWithError()
+        CheckAlwaysNoDetectReturn()
+        CheckDetectAlwaysOrder()
+        CheckDetectNoAlways()
+
+        //A return inside a check, detect or always block: the always blocks
+        //around it must run before the action gives back control.
+        CheckDetectAlwaysReturn()
+        CheckDetectAlwaysReturnFromDetect()
+        CheckDetectAlwaysReturnNow()
+        CheckDetectAlwaysReturnValue()
+        NestedCheckAlwaysReturn()
+        ReturnInAlwaysInsideCheck()
+
 ////FAIL TESTS
         path = failPath
 
@@ -423,6 +440,195 @@ class ExceptionTester
         files:Add(main)
         results:Add(0, "detect")
         results:Add(1, "always")
+        suite:Test(files, results)
+        suite:TestJavaScript(files, results)
+        suite:TestPython(files, results)
+    end
+
+    /*
+        A check block with an always block and no detect block. The always block
+        runs once after the check block, and also after an empty check block.
+        A local variable declared before the check keeps its value.
+    */
+    action CheckAlwaysNoDetect
+        Array<File> files
+        Array<text> results
+        File main
+        main:SetPath(path + "CheckAlwaysNoDetect.quorum")
+        files:Add(main)
+        results:Add(0, "check")
+        results:Add(1, "always 1")
+        results:Add(2, "always 2")
+        results:Add(3, "after 2")
+        suite:Test(files, results)
+        suite:TestJavaScript(files, results)
+        suite:TestPython(files, results)
+    end
+
+    /*
+        An error in a check block that has an always block and no detect block.
+        The always block runs, then the same error reaches the caller's detect
+        block. The action's parameter keeps its value in the always block.
+    */
+    action CheckAlwaysNoDetectWithError
+        Array<File> files
+        Array<text> results
+        File main
+        main:SetPath(path + "CheckAlwaysNoDetectWithError.quorum")
+        files:Add(main)
+        results:Add(0, "check 7")
+        results:Add(1, "always 7")
+        results:Add(2, "caught boom")
+        suite:Test(files, results)
+        suite:TestJavaScript(files, results)
+        suite:TestPython(files, results)
+    end
+
+    /*
+        A return inside a check block that has an always block and no detect
+        block. The always block runs before the value reaches the caller.
+    */
+    action CheckAlwaysNoDetectReturn
+        Array<File> files
+        Array<text> results
+        File main
+        main:SetPath(path + "CheckAlwaysNoDetectReturn.quorum")
+        files:Add(main)
+        results:Add(0, "check")
+        results:Add(1, "always")
+        results:Add(2, "returned 5")
+        suite:Test(files, results)
+        suite:TestJavaScript(files, results)
+        suite:TestPython(files, results)
+    end
+
+    /*
+        A check block with a detect block and an always block. With no error the
+        always block runs after the check block; with an error the detect block
+        runs first and the always block after it.
+    */
+    action CheckDetectAlwaysOrder
+        Array<File> files
+        Array<text> results
+        File main
+        main:SetPath(path + "CheckDetectAlwaysOrder.quorum")
+        files:Add(main)
+        results:Add(0, "check")
+        results:Add(1, "always 1")
+        results:Add(2, "check")
+        results:Add(3, "detect boom")
+        results:Add(4, "always 2")
+        results:Add(5, "after 2")
+        suite:Test(files, results)
+        suite:TestJavaScript(files, results)
+        suite:TestPython(files, results)
+    end
+
+    /*
+        A check block with a detect block and no always block, for comparison.
+    */
+    action CheckDetectNoAlways
+        Array<File> files
+        Array<text> results
+        File main
+        main:SetPath(path + "CheckDetectNoAlways.quorum")
+        files:Add(main)
+        results:Add(0, "check")
+        results:Add(1, "detect boom")
+        results:Add(2, "after 1")
+        suite:Test(files, results)
+        suite:TestJavaScript(files, results)
+        suite:TestPython(files, results)
+    end
+
+    /*
+        A return inside a check block with detect and always blocks. The always
+        block runs before the value reaches the caller.
+    */
+    action CheckDetectAlwaysReturn
+        Array<File> files
+        Array<text> results
+        File main
+        main:SetPath(path + "CheckDetectAlwaysReturn.quorum")
+        files:Add(main)
+        results:Add(0, "check")
+        results:Add(1, "always")
+        results:Add(2, "returned 5")
+        suite:Test(files, results)
+        suite:TestJavaScript(files, results)
+        suite:TestPython(files, results)
+    end
+
+    /*
+        A return inside a detect block. The always block still runs, after the
+        detect block and before the value reaches the caller.
+    */
+    action CheckDetectAlwaysReturnFromDetect
+        Array<File> files
+        Array<text> results
+        File main
+        main:SetPath(path + "CheckDetectAlwaysReturnFromDetect.quorum")
+        files:Add(main)
+        results:Add(0, "check")
+        results:Add(1, "detect boom")
+        results:Add(2, "always")
+        results:Add(3, "returned 2")
+        suite:Test(files, results)
+        suite:TestJavaScript(files, results)
+        suite:TestPython(files, results)
+    end
+
+    /*
+        "return now" from inside a loop inside a check block. The always block
+        runs once before the caller carries on.
+    */
+    action CheckDetectAlwaysReturnNow
+        Array<File> files
+        Array<text> results
+        File main
+        main:SetPath(path + "CheckDetectAlwaysReturnNow.quorum")
+        files:Add(main)
+        results:Add(0, "check 1")
+        results:Add(1, "check 2")
+        results:Add(2, "always")
+        results:Add(3, "after")
+        suite:Test(files, results)
+        suite:TestJavaScript(files, results)
+        suite:TestPython(files, results)
+    end
+
+    /*
+        The value given back is the one it had when the return ran, even though
+        the always block changes it afterward.
+    */
+    action CheckDetectAlwaysReturnValue
+        Array<File> files
+        Array<text> results
+        File main
+        main:SetPath(path + "CheckDetectAlwaysReturnValue.quorum")
+        files:Add(main)
+        results:Add(0, "always 2")
+        results:Add(1, "returned 1")
+        results:Add(2, "count 2")
+        suite:Test(files, results)
+        suite:TestJavaScript(files, results)
+        suite:TestPython(files, results)
+    end
+
+    /*
+        A return inside a check inside another check. The inner always block
+        runs, then the outer one, each once.
+    */
+    action NestedCheckAlwaysReturn
+        Array<File> files
+        Array<text> results
+        File main
+        main:SetPath(path + "NestedCheckAlwaysReturn.quorum")
+        files:Add(main)
+        results:Add(0, "inner check")
+        results:Add(1, "inner always")
+        results:Add(2, "outer always")
+        results:Add(3, "returned 3")
         suite:Test(files, results)
         suite:TestJavaScript(files, results)
         suite:TestPython(files, results)
@@ -914,15 +1120,37 @@ class ExceptionTester
         suite:TestPython(files, results)
     end
 
+    /*
+        A return inside an always block, inside another check. The inner always
+        block is not run again; the outer always block runs once.
+    */
+    action ReturnInAlwaysInsideCheck
+        Array<File> files
+        Array<text> results
+        File main
+        main:SetPath(path + "ReturnInAlwaysInsideCheck.quorum")
+        files:Add(main)
+        results:Add(0, "inner check")
+        results:Add(1, "inner always")
+        results:Add(2, "outer always")
+        results:Add(3, "returned 3")
+        suite:Test(files, results)
+        suite:TestJavaScript(files, results)
+        suite:TestPython(files, results)
+    end
+
     action RecursiveCallFromAlways 
         Array<File> files
         Array<text> results
         File main
         main:SetPath(path + "RecursiveCallFromAlways.quorum")
         files:Add(main)
-        results:Add(0, "detect hit")
+        results:Add(0, "always 2")
+        results:Add(1, "always 1")
+        results:Add(2, "detect bottom")
+        results:Add(3, "always 0")
         suite:Test(files, results)
-        //suite:TestJavaScript(files, results)
+        suite:TestJavaScript(files, results)
         suite:TestPython(files, results)
     end
 

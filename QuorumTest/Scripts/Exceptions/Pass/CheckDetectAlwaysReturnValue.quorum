@@ -1,0 +1,31 @@
+/*
+Expected output:
+always 2
+returned 1
+count 2
+
+The check block returns the field count, and the always block then changes
+count. The value handed back is the one count had when the return ran,
+before the always block changed it. The detect block is never reached.
+*/
+
+class Main
+    integer count = 1
+
+    action Main
+        output "returned " + GetValue()
+        output "count " + count
+    end
+
+    action GetValue returns integer
+        check
+            return count
+        detect e
+            output "detect"
+        always
+            count = 2
+            output "always " + count
+        end
+        return 0
+    end
+end
