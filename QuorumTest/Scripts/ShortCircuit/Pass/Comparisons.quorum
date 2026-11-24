@@ -1,0 +1,419 @@
+/*
+Every grouping of three and/or operators where each part is a comparison of
+an integer (a = 1, b not= 0, c > 0, d >= 1, in turn), as a value and as an
+if condition, for all 16 combinations of 0 and 1 (a first; 1 is shown as
+T). Comparisons are worked out before and and or, so they need no
+parentheses, and they compile to their own jumps, which must fit with the
+and/or jumps around them. Expected output worked out separately.
+*/
+class Main
+    action Main
+        Show("a = 1 and (b not= 0 and (c > 0 and d >= 1))", 0)
+        Show("a not= 0 or (b > 0 and (c >= 1 and d = 1))", 1)
+        Show("a > 0 and (b >= 1 or (c = 1 and d not= 0))", 2)
+        Show("a >= 1 or (b = 1 or (c not= 0 and d > 0))", 3)
+        Show("a = 1 and (b not= 0 and (c > 0 or d >= 1))", 4)
+        Show("a not= 0 or (b > 0 and (c >= 1 or d = 1))", 5)
+        Show("a > 0 and (b >= 1 or (c = 1 or d not= 0))", 6)
+        Show("a >= 1 or (b = 1 or (c not= 0 or d > 0))", 7)
+        Show("a = 1 and ((b not= 0 and c > 0) and d >= 1)", 8)
+        Show("a not= 0 or ((b > 0 and c >= 1) and d = 1)", 9)
+        Show("a > 0 and ((b >= 1 and c = 1) or d not= 0)", 10)
+        Show("a >= 1 or ((b = 1 and c not= 0) or d > 0)", 11)
+        Show("a = 1 and ((b not= 0 or c > 0) and d >= 1)", 12)
+        Show("a not= 0 or ((b > 0 or c >= 1) and d = 1)", 13)
+        Show("a > 0 and ((b >= 1 or c = 1) or d not= 0)", 14)
+        Show("a >= 1 or ((b = 1 or c not= 0) or d > 0)", 15)
+        Show("(a = 1 and b not= 0) and (c > 0 and d >= 1)", 16)
+        Show("(a not= 0 and b > 0) or (c >= 1 and d = 1)", 17)
+        Show("(a > 0 and b >= 1) and (c = 1 or d not= 0)", 18)
+        Show("(a >= 1 and b = 1) or (c not= 0 or d > 0)", 19)
+        Show("(a = 1 or b not= 0) and (c > 0 and d >= 1)", 20)
+        Show("(a not= 0 or b > 0) or (c >= 1 and d = 1)", 21)
+        Show("(a > 0 or b >= 1) and (c = 1 or d not= 0)", 22)
+        Show("(a >= 1 or b = 1) or (c not= 0 or d > 0)", 23)
+        Show("(a = 1 and (b not= 0 and c > 0)) and d >= 1", 24)
+        Show("(a not= 0 and (b > 0 and c >= 1)) or d = 1", 25)
+        Show("(a > 0 or (b >= 1 and c = 1)) and d not= 0", 26)
+        Show("(a >= 1 or (b = 1 and c not= 0)) or d > 0", 27)
+        Show("(a = 1 and (b not= 0 or c > 0)) and d >= 1", 28)
+        Show("(a not= 0 and (b > 0 or c >= 1)) or d = 1", 29)
+        Show("(a > 0 or (b >= 1 or c = 1)) and d not= 0", 30)
+        Show("(a >= 1 or (b = 1 or c not= 0)) or d > 0", 31)
+        Show("((a = 1 and b not= 0) and c > 0) and d >= 1", 32)
+        Show("((a not= 0 and b > 0) and c >= 1) or d = 1", 33)
+        Show("((a > 0 and b >= 1) or c = 1) and d not= 0", 34)
+        Show("((a >= 1 and b = 1) or c not= 0) or d > 0", 35)
+        Show("((a = 1 or b not= 0) and c > 0) and d >= 1", 36)
+        Show("((a not= 0 or b > 0) and c >= 1) or d = 1", 37)
+        Show("((a > 0 or b >= 1) or c = 1) and d not= 0", 38)
+        Show("((a >= 1 or b = 1) or c not= 0) or d > 0", 39)
+    end
+
+    action Show(text expression, integer which)
+        text values = ""
+        text choices = ""
+        integer i = 0
+        repeat while i < 16
+            values = values + Letter(Value(which, Number(i, 0), Number(i, 1), Number(i, 2), Number(i, 3)))
+            choices = choices + Letter(Choice(which, Number(i, 0), Number(i, 1), Number(i, 2), Number(i, 3)))
+            i = i + 1
+        end
+        output expression + ": value " + values + ", if " + choices
+    end
+
+    action Number(integer combination, integer place) returns integer
+        if Bit(combination, place)
+            return 1
+        end
+        return 0
+    end
+
+    action Value(integer which, integer a, integer b, integer c, integer d) returns boolean
+        if which = 0
+            boolean result = a = 1 and (b not= 0 and (c > 0 and d >= 1))
+            return result
+        elseif which = 1
+            boolean result = a not= 0 or (b > 0 and (c >= 1 and d = 1))
+            return result
+        elseif which = 2
+            boolean result = a > 0 and (b >= 1 or (c = 1 and d not= 0))
+            return result
+        elseif which = 3
+            boolean result = a >= 1 or (b = 1 or (c not= 0 and d > 0))
+            return result
+        elseif which = 4
+            boolean result = a = 1 and (b not= 0 and (c > 0 or d >= 1))
+            return result
+        elseif which = 5
+            boolean result = a not= 0 or (b > 0 and (c >= 1 or d = 1))
+            return result
+        elseif which = 6
+            boolean result = a > 0 and (b >= 1 or (c = 1 or d not= 0))
+            return result
+        elseif which = 7
+            boolean result = a >= 1 or (b = 1 or (c not= 0 or d > 0))
+            return result
+        elseif which = 8
+            boolean result = a = 1 and ((b not= 0 and c > 0) and d >= 1)
+            return result
+        elseif which = 9
+            boolean result = a not= 0 or ((b > 0 and c >= 1) and d = 1)
+            return result
+        elseif which = 10
+            boolean result = a > 0 and ((b >= 1 and c = 1) or d not= 0)
+            return result
+        elseif which = 11
+            boolean result = a >= 1 or ((b = 1 and c not= 0) or d > 0)
+            return result
+        elseif which = 12
+            boolean result = a = 1 and ((b not= 0 or c > 0) and d >= 1)
+            return result
+        elseif which = 13
+            boolean result = a not= 0 or ((b > 0 or c >= 1) and d = 1)
+            return result
+        elseif which = 14
+            boolean result = a > 0 and ((b >= 1 or c = 1) or d not= 0)
+            return result
+        elseif which = 15
+            boolean result = a >= 1 or ((b = 1 or c not= 0) or d > 0)
+            return result
+        elseif which = 16
+            boolean result = (a = 1 and b not= 0) and (c > 0 and d >= 1)
+            return result
+        elseif which = 17
+            boolean result = (a not= 0 and b > 0) or (c >= 1 and d = 1)
+            return result
+        elseif which = 18
+            boolean result = (a > 0 and b >= 1) and (c = 1 or d not= 0)
+            return result
+        elseif which = 19
+            boolean result = (a >= 1 and b = 1) or (c not= 0 or d > 0)
+            return result
+        elseif which = 20
+            boolean result = (a = 1 or b not= 0) and (c > 0 and d >= 1)
+            return result
+        elseif which = 21
+            boolean result = (a not= 0 or b > 0) or (c >= 1 and d = 1)
+            return result
+        elseif which = 22
+            boolean result = (a > 0 or b >= 1) and (c = 1 or d not= 0)
+            return result
+        elseif which = 23
+            boolean result = (a >= 1 or b = 1) or (c not= 0 or d > 0)
+            return result
+        elseif which = 24
+            boolean result = (a = 1 and (b not= 0 and c > 0)) and d >= 1
+            return result
+        elseif which = 25
+            boolean result = (a not= 0 and (b > 0 and c >= 1)) or d = 1
+            return result
+        elseif which = 26
+            boolean result = (a > 0 or (b >= 1 and c = 1)) and d not= 0
+            return result
+        elseif which = 27
+            boolean result = (a >= 1 or (b = 1 and c not= 0)) or d > 0
+            return result
+        elseif which = 28
+            boolean result = (a = 1 and (b not= 0 or c > 0)) and d >= 1
+            return result
+        elseif which = 29
+            boolean result = (a not= 0 and (b > 0 or c >= 1)) or d = 1
+            return result
+        elseif which = 30
+            boolean result = (a > 0 or (b >= 1 or c = 1)) and d not= 0
+            return result
+        elseif which = 31
+            boolean result = (a >= 1 or (b = 1 or c not= 0)) or d > 0
+            return result
+        elseif which = 32
+            boolean result = ((a = 1 and b not= 0) and c > 0) and d >= 1
+            return result
+        elseif which = 33
+            boolean result = ((a not= 0 and b > 0) and c >= 1) or d = 1
+            return result
+        elseif which = 34
+            boolean result = ((a > 0 and b >= 1) or c = 1) and d not= 0
+            return result
+        elseif which = 35
+            boolean result = ((a >= 1 and b = 1) or c not= 0) or d > 0
+            return result
+        elseif which = 36
+            boolean result = ((a = 1 or b not= 0) and c > 0) and d >= 1
+            return result
+        elseif which = 37
+            boolean result = ((a not= 0 or b > 0) and c >= 1) or d = 1
+            return result
+        elseif which = 38
+            boolean result = ((a > 0 or b >= 1) or c = 1) and d not= 0
+            return result
+        elseif which = 39
+            boolean result = ((a >= 1 or b = 1) or c not= 0) or d > 0
+            return result
+        end
+        return false
+    end
+
+    action Choice(integer which, integer a, integer b, integer c, integer d) returns boolean
+        if which = 0
+            if a = 1 and (b not= 0 and (c > 0 and d >= 1))
+                return true
+            end
+            return false
+        elseif which = 1
+            if a not= 0 or (b > 0 and (c >= 1 and d = 1))
+                return true
+            end
+            return false
+        elseif which = 2
+            if a > 0 and (b >= 1 or (c = 1 and d not= 0))
+                return true
+            end
+            return false
+        elseif which = 3
+            if a >= 1 or (b = 1 or (c not= 0 and d > 0))
+                return true
+            end
+            return false
+        elseif which = 4
+            if a = 1 and (b not= 0 and (c > 0 or d >= 1))
+                return true
+            end
+            return false
+        elseif which = 5
+            if a not= 0 or (b > 0 and (c >= 1 or d = 1))
+                return true
+            end
+            return false
+        elseif which = 6
+            if a > 0 and (b >= 1 or (c = 1 or d not= 0))
+                return true
+            end
+            return false
+        elseif which = 7
+            if a >= 1 or (b = 1 or (c not= 0 or d > 0))
+                return true
+            end
+            return false
+        elseif which = 8
+            if a = 1 and ((b not= 0 and c > 0) and d >= 1)
+                return true
+            end
+            return false
+        elseif which = 9
+            if a not= 0 or ((b > 0 and c >= 1) and d = 1)
+                return true
+            end
+            return false
+        elseif which = 10
+            if a > 0 and ((b >= 1 and c = 1) or d not= 0)
+                return true
+            end
+            return false
+        elseif which = 11
+            if a >= 1 or ((b = 1 and c not= 0) or d > 0)
+                return true
+            end
+            return false
+        elseif which = 12
+            if a = 1 and ((b not= 0 or c > 0) and d >= 1)
+                return true
+            end
+            return false
+        elseif which = 13
+            if a not= 0 or ((b > 0 or c >= 1) and d = 1)
+                return true
+            end
+            return false
+        elseif which = 14
+            if a > 0 and ((b >= 1 or c = 1) or d not= 0)
+                return true
+            end
+            return false
+        elseif which = 15
+            if a >= 1 or ((b = 1 or c not= 0) or d > 0)
+                return true
+            end
+            return false
+        elseif which = 16
+            if (a = 1 and b not= 0) and (c > 0 and d >= 1)
+                return true
+            end
+            return false
+        elseif which = 17
+            if (a not= 0 and b > 0) or (c >= 1 and d = 1)
+                return true
+            end
+            return false
+        elseif which = 18
+            if (a > 0 and b >= 1) and (c = 1 or d not= 0)
+                return true
+            end
+            return false
+        elseif which = 19
+            if (a >= 1 and b = 1) or (c not= 0 or d > 0)
+                return true
+            end
+            return false
+        elseif which = 20
+            if (a = 1 or b not= 0) and (c > 0 and d >= 1)
+                return true
+            end
+            return false
+        elseif which = 21
+            if (a not= 0 or b > 0) or (c >= 1 and d = 1)
+                return true
+            end
+            return false
+        elseif which = 22
+            if (a > 0 or b >= 1) and (c = 1 or d not= 0)
+                return true
+            end
+            return false
+        elseif which = 23
+            if (a >= 1 or b = 1) or (c not= 0 or d > 0)
+                return true
+            end
+            return false
+        elseif which = 24
+            if (a = 1 and (b not= 0 and c > 0)) and d >= 1
+                return true
+            end
+            return false
+        elseif which = 25
+            if (a not= 0 and (b > 0 and c >= 1)) or d = 1
+                return true
+            end
+            return false
+        elseif which = 26
+            if (a > 0 or (b >= 1 and c = 1)) and d not= 0
+                return true
+            end
+            return false
+        elseif which = 27
+            if (a >= 1 or (b = 1 and c not= 0)) or d > 0
+                return true
+            end
+            return false
+        elseif which = 28
+            if (a = 1 and (b not= 0 or c > 0)) and d >= 1
+                return true
+            end
+            return false
+        elseif which = 29
+            if (a not= 0 and (b > 0 or c >= 1)) or d = 1
+                return true
+            end
+            return false
+        elseif which = 30
+            if (a > 0 or (b >= 1 or c = 1)) and d not= 0
+                return true
+            end
+            return false
+        elseif which = 31
+            if (a >= 1 or (b = 1 or c not= 0)) or d > 0
+                return true
+            end
+            return false
+        elseif which = 32
+            if ((a = 1 and b not= 0) and c > 0) and d >= 1
+                return true
+            end
+            return false
+        elseif which = 33
+            if ((a not= 0 and b > 0) and c >= 1) or d = 1
+                return true
+            end
+            return false
+        elseif which = 34
+            if ((a > 0 and b >= 1) or c = 1) and d not= 0
+                return true
+            end
+            return false
+        elseif which = 35
+            if ((a >= 1 and b = 1) or c not= 0) or d > 0
+                return true
+            end
+            return false
+        elseif which = 36
+            if ((a = 1 or b not= 0) and c > 0) and d >= 1
+                return true
+            end
+            return false
+        elseif which = 37
+            if ((a not= 0 or b > 0) and c >= 1) or d = 1
+                return true
+            end
+            return false
+        elseif which = 38
+            if ((a > 0 or b >= 1) or c = 1) and d not= 0
+                return true
+            end
+            return false
+        elseif which = 39
+            if ((a >= 1 or b = 1) or c not= 0) or d > 0
+                return true
+            end
+            return false
+        end
+        return false
+    end
+
+
+    /* Whether bit place of the combination is set: place 0 is the first variable, the highest bit. */
+    action Bit(integer combination, integer place) returns boolean
+        integer shift = 3 - place
+        integer value = combination
+        repeat shift times
+            value = value / 2
+        end
+        return value mod 2 = 1
+    end
+
+    action Letter(boolean value) returns text
+        if value
+            return "T"
+        end
+        return "F"
+    end
+end

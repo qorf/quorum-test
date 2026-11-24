@@ -1,0 +1,458 @@
+/*
+Every expression of three and/or operators on four boolean variables, every
+way of grouping them (fully in parentheses), each as a value and as an if
+condition, for all 16 combinations of true and false (a, b, c, d: FFFF, FFFT, ...,
+TTTT). Each line shows the 16 values and the 16 choices the if made, as T or F.
+The variables keep the compiler from working the answer out in advance, as
+it can with the literal true and false of Expressions/BoolParens.
+
+This size is the smallest that reaches the bug found on 2026-11-23: on
+bytecode, (a or (b and c)) and d is true when a and b are false and d is
+true (BinaryAndOrOpcode's CalculateJumpPoint jumps to d when b is false).
+*/
+class Main
+    action Main
+        Show("a and (b and (c and d))", 0)
+        Show("a or (b and (c and d))", 1)
+        Show("a and (b or (c and d))", 2)
+        Show("a or (b or (c and d))", 3)
+        Show("a and (b and (c or d))", 4)
+        Show("a or (b and (c or d))", 5)
+        Show("a and (b or (c or d))", 6)
+        Show("a or (b or (c or d))", 7)
+        Show("a and ((b and c) and d)", 8)
+        Show("a or ((b and c) and d)", 9)
+        Show("a and ((b and c) or d)", 10)
+        Show("a or ((b and c) or d)", 11)
+        Show("a and ((b or c) and d)", 12)
+        Show("a or ((b or c) and d)", 13)
+        Show("a and ((b or c) or d)", 14)
+        Show("a or ((b or c) or d)", 15)
+        Show("(a and b) and (c and d)", 16)
+        Show("(a and b) or (c and d)", 17)
+        Show("(a and b) and (c or d)", 18)
+        Show("(a and b) or (c or d)", 19)
+        Show("(a or b) and (c and d)", 20)
+        Show("(a or b) or (c and d)", 21)
+        Show("(a or b) and (c or d)", 22)
+        Show("(a or b) or (c or d)", 23)
+        Show("(a and (b and c)) and d", 24)
+        Show("(a and (b and c)) or d", 25)
+        Show("(a or (b and c)) and d", 26)
+        Show("(a or (b and c)) or d", 27)
+        Show("(a and (b or c)) and d", 28)
+        Show("(a and (b or c)) or d", 29)
+        Show("(a or (b or c)) and d", 30)
+        Show("(a or (b or c)) or d", 31)
+        Show("((a and b) and c) and d", 32)
+        Show("((a and b) and c) or d", 33)
+        Show("((a and b) or c) and d", 34)
+        Show("((a and b) or c) or d", 35)
+        Show("((a or b) and c) and d", 36)
+        Show("((a or b) and c) or d", 37)
+        Show("((a or b) or c) and d", 38)
+        Show("((a or b) or c) or d", 39)
+    end
+
+    /* One line: the expression, then its value and the if's choice for each combination, a, b, c, d first. */
+    action Show(text expression, integer which)
+        text values = ""
+        text choices = ""
+        integer i = 0
+        repeat while i < 16
+            values = values + Letter(Value(which, Bit(i, 0), Bit(i, 1), Bit(i, 2), Bit(i, 3)))
+            choices = choices + Letter(Choice(which, Bit(i, 0), Bit(i, 1), Bit(i, 2), Bit(i, 3)))
+            i = i + 1
+        end
+        output expression + ": value " + values + ", if " + choices
+    end
+
+    action Value(integer which, boolean a, boolean b, boolean c, boolean d) returns boolean
+        if which = 0
+            boolean result = a and (b and (c and d))
+            return result
+        elseif which = 1
+            boolean result = a or (b and (c and d))
+            return result
+        elseif which = 2
+            boolean result = a and (b or (c and d))
+            return result
+        elseif which = 3
+            boolean result = a or (b or (c and d))
+            return result
+        elseif which = 4
+            boolean result = a and (b and (c or d))
+            return result
+        elseif which = 5
+            boolean result = a or (b and (c or d))
+            return result
+        elseif which = 6
+            boolean result = a and (b or (c or d))
+            return result
+        elseif which = 7
+            boolean result = a or (b or (c or d))
+            return result
+        elseif which = 8
+            boolean result = a and ((b and c) and d)
+            return result
+        elseif which = 9
+            boolean result = a or ((b and c) and d)
+            return result
+        elseif which = 10
+            boolean result = a and ((b and c) or d)
+            return result
+        elseif which = 11
+            boolean result = a or ((b and c) or d)
+            return result
+        elseif which = 12
+            boolean result = a and ((b or c) and d)
+            return result
+        elseif which = 13
+            boolean result = a or ((b or c) and d)
+            return result
+        elseif which = 14
+            boolean result = a and ((b or c) or d)
+            return result
+        elseif which = 15
+            boolean result = a or ((b or c) or d)
+            return result
+        elseif which = 16
+            boolean result = (a and b) and (c and d)
+            return result
+        elseif which = 17
+            boolean result = (a and b) or (c and d)
+            return result
+        elseif which = 18
+            boolean result = (a and b) and (c or d)
+            return result
+        elseif which = 19
+            boolean result = (a and b) or (c or d)
+            return result
+        elseif which = 20
+            boolean result = (a or b) and (c and d)
+            return result
+        elseif which = 21
+            boolean result = (a or b) or (c and d)
+            return result
+        elseif which = 22
+            boolean result = (a or b) and (c or d)
+            return result
+        elseif which = 23
+            boolean result = (a or b) or (c or d)
+            return result
+        elseif which = 24
+            boolean result = (a and (b and c)) and d
+            return result
+        elseif which = 25
+            boolean result = (a and (b and c)) or d
+            return result
+        elseif which = 26
+            boolean result = (a or (b and c)) and d
+            return result
+        elseif which = 27
+            boolean result = (a or (b and c)) or d
+            return result
+        elseif which = 28
+            boolean result = (a and (b or c)) and d
+            return result
+        elseif which = 29
+            boolean result = (a and (b or c)) or d
+            return result
+        elseif which = 30
+            boolean result = (a or (b or c)) and d
+            return result
+        elseif which = 31
+            boolean result = (a or (b or c)) or d
+            return result
+        elseif which = 32
+            boolean result = ((a and b) and c) and d
+            return result
+        elseif which = 33
+            boolean result = ((a and b) and c) or d
+            return result
+        elseif which = 34
+            boolean result = ((a and b) or c) and d
+            return result
+        elseif which = 35
+            boolean result = ((a and b) or c) or d
+            return result
+        elseif which = 36
+            boolean result = ((a or b) and c) and d
+            return result
+        elseif which = 37
+            boolean result = ((a or b) and c) or d
+            return result
+        elseif which = 38
+            boolean result = ((a or b) or c) and d
+            return result
+        elseif which = 39
+            boolean result = ((a or b) or c) or d
+            return result
+        end
+        return false
+    end
+
+    action Choice(integer which, boolean a, boolean b, boolean c, boolean d) returns boolean
+        if which = 0
+            if a and (b and (c and d))
+                return true
+            else
+                return false
+            end
+        elseif which = 1
+            if a or (b and (c and d))
+                return true
+            else
+                return false
+            end
+        elseif which = 2
+            if a and (b or (c and d))
+                return true
+            else
+                return false
+            end
+        elseif which = 3
+            if a or (b or (c and d))
+                return true
+            else
+                return false
+            end
+        elseif which = 4
+            if a and (b and (c or d))
+                return true
+            else
+                return false
+            end
+        elseif which = 5
+            if a or (b and (c or d))
+                return true
+            else
+                return false
+            end
+        elseif which = 6
+            if a and (b or (c or d))
+                return true
+            else
+                return false
+            end
+        elseif which = 7
+            if a or (b or (c or d))
+                return true
+            else
+                return false
+            end
+        elseif which = 8
+            if a and ((b and c) and d)
+                return true
+            else
+                return false
+            end
+        elseif which = 9
+            if a or ((b and c) and d)
+                return true
+            else
+                return false
+            end
+        elseif which = 10
+            if a and ((b and c) or d)
+                return true
+            else
+                return false
+            end
+        elseif which = 11
+            if a or ((b and c) or d)
+                return true
+            else
+                return false
+            end
+        elseif which = 12
+            if a and ((b or c) and d)
+                return true
+            else
+                return false
+            end
+        elseif which = 13
+            if a or ((b or c) and d)
+                return true
+            else
+                return false
+            end
+        elseif which = 14
+            if a and ((b or c) or d)
+                return true
+            else
+                return false
+            end
+        elseif which = 15
+            if a or ((b or c) or d)
+                return true
+            else
+                return false
+            end
+        elseif which = 16
+            if (a and b) and (c and d)
+                return true
+            else
+                return false
+            end
+        elseif which = 17
+            if (a and b) or (c and d)
+                return true
+            else
+                return false
+            end
+        elseif which = 18
+            if (a and b) and (c or d)
+                return true
+            else
+                return false
+            end
+        elseif which = 19
+            if (a and b) or (c or d)
+                return true
+            else
+                return false
+            end
+        elseif which = 20
+            if (a or b) and (c and d)
+                return true
+            else
+                return false
+            end
+        elseif which = 21
+            if (a or b) or (c and d)
+                return true
+            else
+                return false
+            end
+        elseif which = 22
+            if (a or b) and (c or d)
+                return true
+            else
+                return false
+            end
+        elseif which = 23
+            if (a or b) or (c or d)
+                return true
+            else
+                return false
+            end
+        elseif which = 24
+            if (a and (b and c)) and d
+                return true
+            else
+                return false
+            end
+        elseif which = 25
+            if (a and (b and c)) or d
+                return true
+            else
+                return false
+            end
+        elseif which = 26
+            if (a or (b and c)) and d
+                return true
+            else
+                return false
+            end
+        elseif which = 27
+            if (a or (b and c)) or d
+                return true
+            else
+                return false
+            end
+        elseif which = 28
+            if (a and (b or c)) and d
+                return true
+            else
+                return false
+            end
+        elseif which = 29
+            if (a and (b or c)) or d
+                return true
+            else
+                return false
+            end
+        elseif which = 30
+            if (a or (b or c)) and d
+                return true
+            else
+                return false
+            end
+        elseif which = 31
+            if (a or (b or c)) or d
+                return true
+            else
+                return false
+            end
+        elseif which = 32
+            if ((a and b) and c) and d
+                return true
+            else
+                return false
+            end
+        elseif which = 33
+            if ((a and b) and c) or d
+                return true
+            else
+                return false
+            end
+        elseif which = 34
+            if ((a and b) or c) and d
+                return true
+            else
+                return false
+            end
+        elseif which = 35
+            if ((a and b) or c) or d
+                return true
+            else
+                return false
+            end
+        elseif which = 36
+            if ((a or b) and c) and d
+                return true
+            else
+                return false
+            end
+        elseif which = 37
+            if ((a or b) and c) or d
+                return true
+            else
+                return false
+            end
+        elseif which = 38
+            if ((a or b) or c) and d
+                return true
+            else
+                return false
+            end
+        elseif which = 39
+            if ((a or b) or c) or d
+                return true
+            else
+                return false
+            end
+        end
+        return false
+    end
+
+    /* Combination i's value for one variable: the first variable is the highest bit. */
+    action Bit(integer i, integer place) returns boolean
+        integer shift = 3 - place
+        integer step = 1
+        integer k = 0
+        repeat while k < shift
+            step = step * 2
+            k = k + 1
+        end
+        return i mod (step * 2) >= step
+    end
+
+    action Letter(boolean value) returns text
+        if value
+            return "T"
+        end
+        return "F"
+    end
+end

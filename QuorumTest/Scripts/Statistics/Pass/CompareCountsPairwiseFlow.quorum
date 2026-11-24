@@ -1,0 +1,96 @@
+use Libraries.Compute.Statistics.DataFrame
+use Libraries.Compute.Statistics.Tests.CompareCounts
+use Libraries.Compute.Statistics.Reporting.CompareCountsResult
+use Libraries.Containers.Array
+use Libraries.Compute.Math
+
+/*
+CompareCounts with more than two groups runs pairwise comparisons when the
+overall test is significant (p at or below the significance level, 0.05),
+or when TestPairwise() asks for them, and never after TestPairwise(false).
+Until the compiler's and/or fix of 2026-11-23, the bytecode back end got
+that condition wrong: a significant result skipped the pairwise
+comparisons unless TestPairwise() was set (CompareCounts lines 237 and
+323). Made-up data with statistics worked out by hand (Python, from the
+textbook formulas):
+
+Independent groups (Pearson chi-squared, rows 30 per group, yes/no):
+- significant: yes/no 20/10, 15/15, 10/20; X2 = 100/15 = 6.666667, df 2,
+  p = exp(-X2/2) = 0.035674. Pairwise (2x2, no continuity correction,
+  Bonferroni times 3): 1.714286 (p 0.571291), 6.666667 (p 0.02947),
+  1.714286 (p 0.571291).
+- not significant: 16/14, 15/15, 14/16; X2 0.266667, p 0.875173.
+- two groups, significant: 20/10 and 10/20; no pairwise (only two).
+Repeated measures (Cochran's Q, 20 subjects, three measurements):
+- significant: yes-yes-yes 4, yes-yes-no 4, yes-no-no 4, no-no-no 8; Q = 12,
+  df 2, p = exp(-6) = 0.002479. Pairwise (McNemar, Bonferroni times 3):
+  4 (p 0.136501), 8 (p 0.014033), 4 (p 0.136501).
+- not significant: yes-no-yes 3, no-yes-yes 3, yes-yes-no 3, no-no-no 11;
+  Q = 0, p = 1.
+Numbers are rounded to 6 decimal places.
+*/
+class Main
+    action Main
+        text significant = "g1,g2,g3;yes,yes,yes;yes,yes,yes;yes,yes,yes;yes,yes,yes;yes,yes,yes;yes,yes,yes;yes,yes,yes;yes,yes,yes;yes,yes,yes;yes,yes,yes;yes,yes,no;yes,yes,no;yes,yes,no;yes,yes,no;yes,yes,no;yes,no,no;yes,no,no;yes,no,no;yes,no,no;yes,no,no;no,no,no;no,no,no;no,no,no;no,no,no;no,no,no;no,no,no;no,no,no;no,no,no;no,no,no;no,no,no"
+        text notSignificant = "g1,g2,g3;yes,yes,yes;yes,yes,yes;yes,yes,yes;yes,yes,yes;yes,yes,yes;yes,yes,yes;yes,yes,yes;yes,yes,yes;yes,yes,yes;yes,yes,yes;yes,yes,yes;yes,yes,yes;yes,yes,yes;yes,yes,yes;yes,yes,no;yes,no,no;no,no,no;no,no,no;no,no,no;no,no,no;no,no,no;no,no,no;no,no,no;no,no,no;no,no,no;no,no,no;no,no,no;no,no,no;no,no,no;no,no,no"
+        text twoGroups = "g1,g2;yes,yes;yes,yes;yes,yes;yes,yes;yes,yes;yes,yes;yes,yes;yes,yes;yes,yes;yes,yes;yes,no;yes,no;yes,no;yes,no;yes,no;yes,no;yes,no;yes,no;yes,no;yes,no;no,no;no,no;no,no;no,no;no,no;no,no;no,no;no,no;no,no;no,no"
+        text relatedSignificant = "t1,t2,t3;yes,yes,yes;yes,yes,yes;yes,yes,yes;yes,yes,yes;yes,yes,no;yes,yes,no;yes,yes,no;yes,yes,no;yes,no,no;yes,no,no;yes,no,no;yes,no,no;no,no,no;no,no,no;no,no,no;no,no,no;no,no,no;no,no,no;no,no,no;no,no,no"
+        text relatedNotSignificant = "t1,t2,t3;yes,no,yes;yes,no,yes;yes,no,yes;no,yes,yes;no,yes,yes;no,yes,yes;yes,yes,no;yes,yes,no;yes,yes,no;no,no,no;no,no,no;no,no,no;no,no,no;no,no,no;no,no,no;no,no,no;no,no,no;no,no,no;no,no,no;no,no,no"
+
+        Run("independent, significant, default", significant, 3, false, 0)
+        Run("independent, not significant, default", notSignificant, 3, false, 0)
+        Run("independent, not significant, TestPairwise()", notSignificant, 3, false, 1)
+        Run("independent, significant, TestPairwise(false)", significant, 3, false, 2)
+        Run("independent, two groups, significant", twoGroups, 2, false, 0)
+        Run("repeated, significant, default", relatedSignificant, 3, true, 0)
+        Run("repeated, not significant, default", relatedNotSignificant, 3, true, 0)
+        Run("repeated, not significant, TestPairwise()", relatedNotSignificant, 3, true, 1)
+        Run("repeated, significant, TestPairwise(false)", relatedSignificant, 3, true, 2)
+    end
+
+    /* pairwise: 0 leaves the default, 1 calls TestPairwise(), 2 TestPairwise(false). */
+    action Run(text name, text data, integer groups, boolean repeated, integer pairwise)
+        check
+            DataFrame frame
+            // rows are written on one line with ; between them
+            text lf = ""
+            lf = lf:GetLineFeed()
+            frame:LoadFromCommaSeparatedValue(data:Replace(";", lf))
+            // the test uses the frame's selected columns: the header row, g1,g2,g3 and so on
+            frame:AddSelectedColumns(data:GetSubtext(0, data:IndexOf(";")))
+            CompareCounts compare
+            if repeated
+                compare:RepeatedMeasures(true)
+            end
+            if pairwise = 1
+                compare:TestPairwise()
+            elseif pairwise = 2
+                compare:TestPairwise(false)
+            end
+            frame:Calculate(compare)
+            CompareCountsResult result = compare:GetResult()
+            output name + ": statistic " + Round(result:GetTestStatistic()) + ", df " + result:GetDegreesOfFreedom() + ", p " + Round(result:GetProbabilityValue())
+            Array<CompareCountsResult> pairs = compare:GetPairwiseResults()
+            // none: CompareCounts gives an empty list when it ran no pairwise comparisons
+            if pairs = undefined or pairs:IsEmpty()
+                output name + ": pairwise none"
+            else
+                text line = name + ": pairwise " + pairs:GetSize()
+                integer j = 0
+                repeat while j < pairs:GetSize()
+                    CompareCountsResult pair = pairs:Get(j)
+                    line = line + ", " + Round(pair:GetTestStatistic()) + " (p " + Round(pair:GetProbabilityValue()) + ")"
+                    j = j + 1
+                end
+                output line
+            end
+        detect e
+            output name + " unexpected error: " + e:GetErrorMessage()
+        end
+    end
+
+    action Round(number value) returns number
+        Math math
+        return math:Round(value, 6)
+    end
+end

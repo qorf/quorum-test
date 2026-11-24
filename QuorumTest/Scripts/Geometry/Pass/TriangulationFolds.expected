@@ -1,0 +1,9 @@
+square: 2 triangles [2-3-0 0-1-2], twice the area 32
+L shape: 4 triangles [4-5-0 0-1-2 3-4-0 0-2-3], twice the area 40
+square with a notch to the middle: 5 triangles [5-6-0 1-2-3 4-5-0 1-3-4 4-0-1], twice the area 32
+two squares touching at a corner: 4 triangles [7-0-1 3-4-5 2-3-5 6-7-1], twice the area 16
+folded six-point shape: 3 triangles [1-3-4 1-4-5 3-1-2], twice the area 4
+folded six-point shape 2: 3 triangles [2-4-5 0-1-2 4-2-3], twice the area 15
+folded six-point shape 3: 3 triangles [5-1-0 1-5-4 3-2-1], twice the area 11
+folded eight-point shape: 3 triangles [6-7-2 7-0-1 1-2-7], twice the area 18
+folded nine-point shape: 4 triangles [7-8-0 7-0-1 5-6-1 1-6-7], twice the area 15

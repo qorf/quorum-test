@@ -1,0 +1,69 @@
+use Libraries.Game.Graphics.Triangulation.Triangulation
+use Libraries.Containers.Number32BitArray
+use Libraries.Containers.Array
+
+/*
+Triangulation:Triangulate turns a polygon's outline into triangles. It is a
+port of earcut4j (https://github.com/earcut4j/earcut4j), and its last
+resort for an outline that folds back on itself, SplitEarcut, depends on
+IsValidDiagonal. Until the compiler's and/or fix of 2026-11-23, the
+bytecode back end rejected valid diagonals there (Triangulation.quorum line
+226), so a folded outline lost some or all of its triangles: the shape
+drew partly or not at all. The expected triangles are earcut4j's: worked
+out with a Python copy of this class's code and earcut4j's IsValidDiagonal
+condition. Each line shows the number of triangles, their corner indices
+and twice the area they cover (whole numbers for these whole-number
+points). The first four shapes never reach SplitEarcut and are a check
+that the copy matches; the folded ones do: with the old condition they
+gave 0, 0, 0, 0 and 2 triangles.
+*/
+class Main
+    action Main
+        Show("square", "0, 0, 4, 0, 4, 4, 0, 4")
+        Show("L shape", "0, 0, 6, 0, 6, 2, 2, 2, 2, 6, 0, 6")
+        Show("square with a notch to the middle", "0, 0, 4, 0, 4, 4, 2, 4, 2, 2, 2, 4, 0, 4")
+        Show("two squares touching at a corner", "0, 0, 2, 0, 2, 2, 4, 2, 4, 4, 2, 4, 2, 2, 0, 2")
+        Show("folded six-point shape", "2, 4, 2, 1, 1, 0, 3, 0, 2, 2, 1, 0")
+        Show("folded six-point shape 2", "0, 1, 3, 3, 0, 4, 0, 1, 1, 3, 4, 3")
+        Show("folded six-point shape 3", "2, 0, 0, 3, 3, 1, 2, 0, 4, 1, 2, 1")
+        Show("folded eight-point shape", "4, 0, 4, 4, 0, 4, 3, 1, 1, 1, 0, 2, 0, 2, 1, 3")
+        Show("folded nine-point shape", "1, 2, 2, 0, 4, 1, 3, 3, 4, 3, 4, 1, 3, 2, 3, 4, 1, 4")
+    end
+
+    action Show(text name, text coordinates)
+        check
+            Array<text> parts = coordinates:Split(", ")
+            Number32BitArray data
+            data:SetSize(parts:GetSize())
+            integer i = 0
+            repeat while i < parts:GetSize()
+                text part = parts:Get(i)
+                data:Set(i, part:ParseNumber())
+                i = i + 1
+            end
+            Triangulation triangulation
+            Array<integer> triangles = triangulation:Triangulate(data)
+            text indices = ""
+            number twiceArea = 0
+            i = 0
+            repeat while i + 2 < triangles:GetSize()
+                integer a = triangles:Get(i)
+                integer b = triangles:Get(i + 1)
+                integer c = triangles:Get(i + 2)
+                if i > 0
+                    indices = indices + " "
+                end
+                indices = indices + a + "-" + b + "-" + c
+                number cross = (data:Get(b * 2) - data:Get(a * 2)) * (data:Get(c * 2 + 1) - data:Get(a * 2 + 1)) - (data:Get(c * 2) - data:Get(a * 2)) * (data:Get(b * 2 + 1) - data:Get(a * 2 + 1))
+                if cross < 0
+                    cross = -cross
+                end
+                twiceArea = twiceArea + cross
+                i = i + 3
+            end
+            output name + ": " + (triangles:GetSize() / 3) + " triangles [" + indices + "], twice the area " + cast(integer, twiceArea)
+        detect e
+            output name + " unexpected error: " + e:GetErrorMessage()
+        end
+    end
+end

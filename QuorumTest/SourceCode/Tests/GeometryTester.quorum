@@ -18,6 +18,7 @@ class GeometryTester
         scripts:CheckEverywhere(path + "Plane")
         scripts:CheckEverywhere(path + "Ray")
         scripts:CheckEverywhere(path + "Frustum")
+        scripts:CheckEverywhere(path + "TriangulationFolds")
     end
 
     action GetName returns text

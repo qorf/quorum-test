@@ -1,0 +1,27 @@
+if (no or (no and no)) and yes: elseif
+if (no or (no and yes)) and yes: else
+not ((no or (no and no)) and yes): true
+repeat while (no or (no and yes)) and count < 3: ran 0 times
+repeat until ((no or (no and yes)) and yes) or count = 4: ran 4 times
+(x = 2 or (y = 2 and z = 3)) and w > 0 = false
+fields (no or (no and yes)) and yes = false
+parameter (no or (no and yes)) and yes = false
+returned (no or (no and yes)) and yes = false
+in text: false
+(A(no) or (B(no) and C(yes))) and D(yes) = false, called AB
+(A(no) or (B(yes) and C(yes))) and D(yes) = true, called ABCD
+(A(yes) or (B(no) and C(yes))) and D(no) = false, called AD
+(A(no) or (B(no) and C(yes))) or D(no) = false, called ABD
+if (A(no) or (B(no) and C(yes))) and D(yes): else, called AB
+(A(yes) and (B(no) or C(no))) or D(no) = false, called ABCD
+(A(yes) and (B(yes) or C(no))) or D(no) = true, called AB
+if (yes and (no or no)) or no: else
+((no or (no and no)) and yes) or no = false
+yes and ((no or (no and no)) and yes) = false
+((no or (no and no)) and yes) and yes = false
+(no or (no or (no and no))) and yes = false
+(no or ((no and no) and no)) and yes = false
+(no or (no and (no or no))) and yes = false
+((no and no) or (no and no)) and yes = false
+(yes and (no or (yes and no))) or no = false
+(no or (no and yes)) and (yes or no) = false

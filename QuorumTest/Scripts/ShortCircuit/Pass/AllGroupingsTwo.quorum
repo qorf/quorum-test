@@ -1,0 +1,134 @@
+/*
+Every expression of two and/or operators on three boolean variables, every
+way of grouping them (fully in parentheses), each as a value and as an if
+condition, for all 8 combinations of true and false (a, b, c: FFF, FFT, ...,
+TTT). Each line shows the 8 values and the 8 choices the if made, as T or F.
+The variables keep the compiler from working the answer out in advance, as
+it can with the literal true and false of Expressions/BoolParens.
+*/
+class Main
+    action Main
+        Show("a and (b and c)", 0)
+        Show("a or (b and c)", 1)
+        Show("a and (b or c)", 2)
+        Show("a or (b or c)", 3)
+        Show("(a and b) and c", 4)
+        Show("(a and b) or c", 5)
+        Show("(a or b) and c", 6)
+        Show("(a or b) or c", 7)
+    end
+
+    /* One line: the expression, then its value and the if's choice for each combination, a, b, c first. */
+    action Show(text expression, integer which)
+        text values = ""
+        text choices = ""
+        integer i = 0
+        repeat while i < 8
+            values = values + Letter(Value(which, Bit(i, 0), Bit(i, 1), Bit(i, 2)))
+            choices = choices + Letter(Choice(which, Bit(i, 0), Bit(i, 1), Bit(i, 2)))
+            i = i + 1
+        end
+        output expression + ": value " + values + ", if " + choices
+    end
+
+    action Value(integer which, boolean a, boolean b, boolean c) returns boolean
+        if which = 0
+            boolean result = a and (b and c)
+            return result
+        elseif which = 1
+            boolean result = a or (b and c)
+            return result
+        elseif which = 2
+            boolean result = a and (b or c)
+            return result
+        elseif which = 3
+            boolean result = a or (b or c)
+            return result
+        elseif which = 4
+            boolean result = (a and b) and c
+            return result
+        elseif which = 5
+            boolean result = (a and b) or c
+            return result
+        elseif which = 6
+            boolean result = (a or b) and c
+            return result
+        elseif which = 7
+            boolean result = (a or b) or c
+            return result
+        end
+        return false
+    end
+
+    action Choice(integer which, boolean a, boolean b, boolean c) returns boolean
+        if which = 0
+            if a and (b and c)
+                return true
+            else
+                return false
+            end
+        elseif which = 1
+            if a or (b and c)
+                return true
+            else
+                return false
+            end
+        elseif which = 2
+            if a and (b or c)
+                return true
+            else
+                return false
+            end
+        elseif which = 3
+            if a or (b or c)
+                return true
+            else
+                return false
+            end
+        elseif which = 4
+            if (a and b) and c
+                return true
+            else
+                return false
+            end
+        elseif which = 5
+            if (a and b) or c
+                return true
+            else
+                return false
+            end
+        elseif which = 6
+            if (a or b) and c
+                return true
+            else
+                return false
+            end
+        elseif which = 7
+            if (a or b) or c
+                return true
+            else
+                return false
+            end
+        end
+        return false
+    end
+
+    /* Combination i's value for one variable: the first variable is the highest bit. */
+    action Bit(integer i, integer place) returns boolean
+        integer shift = 2 - place
+        integer step = 1
+        integer k = 0
+        repeat while k < shift
+            step = step * 2
+            k = k + 1
+        end
+        return i mod (step * 2) >= step
+    end
+
+    action Letter(boolean value) returns text
+        if value
+            return "T"
+        end
+        return "F"
+    end
+end

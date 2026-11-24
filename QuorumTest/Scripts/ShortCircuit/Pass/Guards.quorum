@@ -1,0 +1,151 @@
+use Libraries.Containers.Array
+
+/*
+And/or where short-circuiting matters for more than speed: a right side
+that would fail if it ran (an undefined object, a position past the end of
+an array, a division by zero), and/or results passed to actions and
+compared with each other, elseif chains whose conditions are the shapes
+that went wrong on bytecode, loops, fields, not of not, and long chains.
+Every line is worked out by hand from the rule that the right side of and
+runs only when its left side is true, and the right side of or only when
+its left side is false.
+*/
+class Main
+    boolean fieldNo = false
+    boolean fieldYes = true
+    text log = ""
+
+    action Main
+        boolean no = false
+        boolean yes = true
+
+        // Guards: the right side would fail if it ran.
+        Array<integer> numbers
+        numbers:Add(5)
+        Array<integer> missing = undefined
+        check
+            boolean safe = (missing = undefined or (missing:GetSize() > 0 and yes)) and yes
+            output "(missing = undefined or (missing:GetSize() > 0 and yes)) and yes = " + safe
+        detect e
+            output "undefined guard unexpected error: " + e:GetErrorMessage()
+        end
+        integer position = 3
+        check
+            boolean inside = (position < numbers:GetSize() and (numbers:Get(position) > 0 or no)) or no
+            output "(3 < size and (Get(3) > 0 or no)) or no = " + inside
+        detect e
+            output "position guard unexpected error: " + e:GetErrorMessage()
+        end
+        integer zero = 0
+        check
+            boolean divided = (zero = 0 or (10 / zero > 1 and yes)) and (no or zero = 0)
+            output "(zero = 0 or (10 / zero > 1 and yes)) and (no or zero = 0) = " + divided
+        detect e
+            output "division guard unexpected error: " + e:GetErrorMessage()
+        end
+        check
+            boolean skipped = (no and (10 / zero > 1 or yes)) or (yes and (no or yes))
+            output "(no and (10 / zero > 1 or yes)) or (yes and (no or yes)) = " + skipped
+        detect e
+            output "skipped division unexpected error: " + e:GetErrorMessage()
+        end
+
+        // And/or results as arguments, inside comparisons, and stored.
+        output "Echo(no or (no and yes)) and yes = " + (Echo(no or (no and yes)) and yes)
+        output "Echo((no or (no and no)) and yes) or yes = " + (Echo((no or (no and no)) and yes) or yes)
+        output "Both((no or (no and no)) and yes, (yes and (no or no)) or no) = " + Both((no or (no and no)) and yes, (yes and (no or no)) or no)
+        output "((no or (no and no)) and yes) = ((yes and (no or no)) or no) = " + (((no or (no and no)) and yes) = ((yes and (no or no)) or no))
+        output "((no or (no and no)) and yes) not= (yes or no) = " + (((no or (no and no)) and yes) not= (yes or no))
+        boolean stored = (no or (no and no)) and yes
+        output "stored, then stored or (no or (yes and yes)) and yes = " + (stored or (no or (yes and yes)) and yes)
+
+        // elseif chains: the first true condition is taken.
+        output "elseif chain 1 takes " + Branch(no, no, yes, yes)
+        output "elseif chain 2 takes " + Branch(no, yes, yes, yes)
+        output "elseif chain 3 takes " + Branch(yes, no, no, no)
+        output "elseif chain 4 takes " + Branch(no, no, no, no)
+
+        // Loops.
+        integer count = 0
+        repeat while (count < 5 and (no or (count < 2 and yes))) or (count = 2 and no)
+            count = count + 1
+        end
+        output "repeat while ((count < 5 and (no or (count < 2 and yes))) or (count = 2 and no)) ran " + count + " times"
+        count = 0
+        repeat until (count >= 3 and (no or (yes and yes))) or (no and (no or yes))
+            count = count + 1
+        end
+        output "repeat until (count >= 3 and (no or (yes and yes))) or (no and (no or yes)) ran " + count + " times"
+
+        // Fields and me.
+        output "(me:fieldNo or (fieldNo and me:fieldYes)) and fieldYes = " + ((me:fieldNo or (fieldNo and me:fieldYes)) and fieldYes)
+        output "(fieldYes and (fieldNo or me:fieldNo)) or fieldNo = " + ((fieldYes and (fieldNo or me:fieldNo)) or fieldNo)
+
+        // not of not, and not around the shapes.
+        output "not not ((no or (no and no)) and yes) = " + (not (not ((no or (no and no)) and yes)))
+        output "not (no or (no and no)) and yes = " + (not (no or (no and no)) and yes)
+        output "(not no or (no and no)) and not yes = " + ((not no or (no and no)) and not yes)
+
+        // Long chains: only the last part decides.
+        output "12 ors, only the last true = " + (no or no or no or no or no or no or no or no or no or no or no or yes)
+        output "12 ands, only the last false = " + (yes and yes and yes and yes and yes and yes and yes and yes and yes and yes and yes and no)
+        output "6 grouped ors of ands, only the last true = " + ((no and yes) or (yes and no) or (no and no) or (no and yes) or (yes and no) or (yes and yes))
+        output "6 grouped ands of ors, one false group = " + ((no or yes) and (yes or no) and (yes or yes) and (no or no) and (yes or no) and (no or yes))
+
+        // Calls in a long chain: where the evaluation stops.
+        log = ""
+        boolean chained = (A(no) or (B(no) and C(yes))) and (D(yes) or E(yes))
+        output "(A(no) or (B(no) and C(yes))) and (D(yes) or E(yes)) = " + chained + ", called " + log
+        log = ""
+        chained = (A(no) or (B(yes) and C(yes))) and (D(no) or E(yes))
+        output "(A(no) or (B(yes) and C(yes))) and (D(no) or E(yes)) = " + chained + ", called " + log
+        log = ""
+        chained = ((A(yes) and B(no)) or (C(no) and D(yes))) or E(no)
+        output "((A(yes) and B(no)) or (C(no) and D(yes))) or E(no) = " + chained + ", called " + log
+    end
+
+    action Branch(boolean a, boolean b, boolean c, boolean d) returns text
+        if (a or (b and c)) and not d
+            return "if"
+        elseif (a or (b and c)) and d
+            return "first elseif"
+        elseif (b or (a and c)) or d
+            return "second elseif"
+        else
+            return "else"
+        end
+    end
+
+    action Echo(boolean value) returns boolean
+        return value
+    end
+
+    action Both(boolean left, boolean right) returns text
+        return left + " and " + right
+    end
+
+    action A(boolean value) returns boolean
+        log = log + "A"
+        return value
+    end
+
+    action B(boolean value) returns boolean
+        log = log + "B"
+        return value
+    end
+
+    action C(boolean value) returns boolean
+        log = log + "C"
+        return value
+    end
+
+    action D(boolean value) returns boolean
+        log = log + "D"
+        return value
+    end
+
+    action E(boolean value) returns boolean
+        log = log + "E"
+        return value
+    end
+end

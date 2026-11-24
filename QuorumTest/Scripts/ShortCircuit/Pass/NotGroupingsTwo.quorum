@@ -1,0 +1,1313 @@
+/*
+Every grouping of three and/or operators on four boolean variables, with
+not around one or more of its groups (the whole expression or a grouped
+part), each as a value and as an if condition, for all 16 combinations of
+true and false (a first). A not starts a separate true/false test inside
+the expression, so its group's short-circuit jumps must stay inside it.
+This file holds 140 of the 280 expressions; the rest are in
+NotGroupingsOne. Expected output worked out separately.
+*/
+class Main
+    action Main
+        Show("not ((a or b) and (c and d))", 0)
+        Show("not (a or b) and (c and d)", 1)
+        Show("(a or b) and not (c and d)", 2)
+        Show("not (not (a or b) and (c and d))", 3)
+        Show("not ((a or b) and not (c and d))", 4)
+        Show("not (a or b) and not (c and d)", 5)
+        Show("not (not (a or b) and not (c and d))", 6)
+        Show("not ((a or b) or (c and d))", 7)
+        Show("not (a or b) or (c and d)", 8)
+        Show("(a or b) or not (c and d)", 9)
+        Show("not (not (a or b) or (c and d))", 10)
+        Show("not ((a or b) or not (c and d))", 11)
+        Show("not (a or b) or not (c and d)", 12)
+        Show("not (not (a or b) or not (c and d))", 13)
+        Show("not ((a or b) and (c or d))", 14)
+        Show("not (a or b) and (c or d)", 15)
+        Show("(a or b) and not (c or d)", 16)
+        Show("not (not (a or b) and (c or d))", 17)
+        Show("not ((a or b) and not (c or d))", 18)
+        Show("not (a or b) and not (c or d)", 19)
+        Show("not (not (a or b) and not (c or d))", 20)
+        Show("not ((a or b) or (c or d))", 21)
+        Show("not (a or b) or (c or d)", 22)
+        Show("(a or b) or not (c or d)", 23)
+        Show("not (not (a or b) or (c or d))", 24)
+        Show("not ((a or b) or not (c or d))", 25)
+        Show("not (a or b) or not (c or d)", 26)
+        Show("not (not (a or b) or not (c or d))", 27)
+        Show("not ((a and (b and c)) and d)", 28)
+        Show("not (a and (b and c)) and d", 29)
+        Show("(a and not (b and c)) and d", 30)
+        Show("not (not (a and (b and c)) and d)", 31)
+        Show("not ((a and not (b and c)) and d)", 32)
+        Show("not (a and not (b and c)) and d", 33)
+        Show("not (not (a and not (b and c)) and d)", 34)
+        Show("not ((a and (b and c)) or d)", 35)
+        Show("not (a and (b and c)) or d", 36)
+        Show("(a and not (b and c)) or d", 37)
+        Show("not (not (a and (b and c)) or d)", 38)
+        Show("not ((a and not (b and c)) or d)", 39)
+        Show("not (a and not (b and c)) or d", 40)
+        Show("not (not (a and not (b and c)) or d)", 41)
+        Show("not ((a or (b and c)) and d)", 42)
+        Show("not (a or (b and c)) and d", 43)
+        Show("(a or not (b and c)) and d", 44)
+        Show("not (not (a or (b and c)) and d)", 45)
+        Show("not ((a or not (b and c)) and d)", 46)
+        Show("not (a or not (b and c)) and d", 47)
+        Show("not (not (a or not (b and c)) and d)", 48)
+        Show("not ((a or (b and c)) or d)", 49)
+        Show("not (a or (b and c)) or d", 50)
+        Show("(a or not (b and c)) or d", 51)
+        Show("not (not (a or (b and c)) or d)", 52)
+        Show("not ((a or not (b and c)) or d)", 53)
+        Show("not (a or not (b and c)) or d", 54)
+        Show("not (not (a or not (b and c)) or d)", 55)
+        Show("not ((a and (b or c)) and d)", 56)
+        Show("not (a and (b or c)) and d", 57)
+        Show("(a and not (b or c)) and d", 58)
+        Show("not (not (a and (b or c)) and d)", 59)
+        Show("not ((a and not (b or c)) and d)", 60)
+        Show("not (a and not (b or c)) and d", 61)
+        Show("not (not (a and not (b or c)) and d)", 62)
+        Show("not ((a and (b or c)) or d)", 63)
+        Show("not (a and (b or c)) or d", 64)
+        Show("(a and not (b or c)) or d", 65)
+        Show("not (not (a and (b or c)) or d)", 66)
+        Show("not ((a and not (b or c)) or d)", 67)
+        Show("not (a and not (b or c)) or d", 68)
+        Show("not (not (a and not (b or c)) or d)", 69)
+        Show("not ((a or (b or c)) and d)", 70)
+        Show("not (a or (b or c)) and d", 71)
+        Show("(a or not (b or c)) and d", 72)
+        Show("not (not (a or (b or c)) and d)", 73)
+        Show("not ((a or not (b or c)) and d)", 74)
+        Show("not (a or not (b or c)) and d", 75)
+        Show("not (not (a or not (b or c)) and d)", 76)
+        Show("not ((a or (b or c)) or d)", 77)
+        Show("not (a or (b or c)) or d", 78)
+        Show("(a or not (b or c)) or d", 79)
+        Show("not (not (a or (b or c)) or d)", 80)
+        Show("not ((a or not (b or c)) or d)", 81)
+        Show("not (a or not (b or c)) or d", 82)
+        Show("not (not (a or not (b or c)) or d)", 83)
+        Show("not (((a and b) and c) and d)", 84)
+        Show("not ((a and b) and c) and d", 85)
+        Show("(not (a and b) and c) and d", 86)
+        Show("not (not ((a and b) and c) and d)", 87)
+        Show("not ((not (a and b) and c) and d)", 88)
+        Show("not (not (a and b) and c) and d", 89)
+        Show("not (not (not (a and b) and c) and d)", 90)
+        Show("not (((a and b) and c) or d)", 91)
+        Show("not ((a and b) and c) or d", 92)
+        Show("(not (a and b) and c) or d", 93)
+        Show("not (not ((a and b) and c) or d)", 94)
+        Show("not ((not (a and b) and c) or d)", 95)
+        Show("not (not (a and b) and c) or d", 96)
+        Show("not (not (not (a and b) and c) or d)", 97)
+        Show("not (((a and b) or c) and d)", 98)
+        Show("not ((a and b) or c) and d", 99)
+        Show("(not (a and b) or c) and d", 100)
+        Show("not (not ((a and b) or c) and d)", 101)
+        Show("not ((not (a and b) or c) and d)", 102)
+        Show("not (not (a and b) or c) and d", 103)
+        Show("not (not (not (a and b) or c) and d)", 104)
+        Show("not (((a and b) or c) or d)", 105)
+        Show("not ((a and b) or c) or d", 106)
+        Show("(not (a and b) or c) or d", 107)
+        Show("not (not ((a and b) or c) or d)", 108)
+        Show("not ((not (a and b) or c) or d)", 109)
+        Show("not (not (a and b) or c) or d", 110)
+        Show("not (not (not (a and b) or c) or d)", 111)
+        Show("not (((a or b) and c) and d)", 112)
+        Show("not ((a or b) and c) and d", 113)
+        Show("(not (a or b) and c) and d", 114)
+        Show("not (not ((a or b) and c) and d)", 115)
+        Show("not ((not (a or b) and c) and d)", 116)
+        Show("not (not (a or b) and c) and d", 117)
+        Show("not (not (not (a or b) and c) and d)", 118)
+        Show("not (((a or b) and c) or d)", 119)
+        Show("not ((a or b) and c) or d", 120)
+        Show("(not (a or b) and c) or d", 121)
+        Show("not (not ((a or b) and c) or d)", 122)
+        Show("not ((not (a or b) and c) or d)", 123)
+        Show("not (not (a or b) and c) or d", 124)
+        Show("not (not (not (a or b) and c) or d)", 125)
+        Show("not (((a or b) or c) and d)", 126)
+        Show("not ((a or b) or c) and d", 127)
+        Show("(not (a or b) or c) and d", 128)
+        Show("not (not ((a or b) or c) and d)", 129)
+        Show("not ((not (a or b) or c) and d)", 130)
+        Show("not (not (a or b) or c) and d", 131)
+        Show("not (not (not (a or b) or c) and d)", 132)
+        Show("not (((a or b) or c) or d)", 133)
+        Show("not ((a or b) or c) or d", 134)
+        Show("(not (a or b) or c) or d", 135)
+        Show("not (not ((a or b) or c) or d)", 136)
+        Show("not ((not (a or b) or c) or d)", 137)
+        Show("not (not (a or b) or c) or d", 138)
+        Show("not (not (not (a or b) or c) or d)", 139)
+    end
+
+    action Show(text expression, integer which)
+        text values = ""
+        text choices = ""
+        integer i = 0
+        repeat while i < 16
+            values = values + Letter(Value(which, Bit(i, 0), Bit(i, 1), Bit(i, 2), Bit(i, 3)))
+            choices = choices + Letter(Choice(which, Bit(i, 0), Bit(i, 1), Bit(i, 2), Bit(i, 3)))
+            i = i + 1
+        end
+        output expression + ": value " + values + ", if " + choices
+    end
+
+    action Value(integer which, boolean a, boolean b, boolean c, boolean d) returns boolean
+        if which = 0
+            boolean result = not ((a or b) and (c and d))
+            return result
+        elseif which = 1
+            boolean result = not (a or b) and (c and d)
+            return result
+        elseif which = 2
+            boolean result = (a or b) and not (c and d)
+            return result
+        elseif which = 3
+            boolean result = not (not (a or b) and (c and d))
+            return result
+        elseif which = 4
+            boolean result = not ((a or b) and not (c and d))
+            return result
+        elseif which = 5
+            boolean result = not (a or b) and not (c and d)
+            return result
+        elseif which = 6
+            boolean result = not (not (a or b) and not (c and d))
+            return result
+        elseif which = 7
+            boolean result = not ((a or b) or (c and d))
+            return result
+        elseif which = 8
+            boolean result = not (a or b) or (c and d)
+            return result
+        elseif which = 9
+            boolean result = (a or b) or not (c and d)
+            return result
+        elseif which = 10
+            boolean result = not (not (a or b) or (c and d))
+            return result
+        elseif which = 11
+            boolean result = not ((a or b) or not (c and d))
+            return result
+        elseif which = 12
+            boolean result = not (a or b) or not (c and d)
+            return result
+        elseif which = 13
+            boolean result = not (not (a or b) or not (c and d))
+            return result
+        elseif which = 14
+            boolean result = not ((a or b) and (c or d))
+            return result
+        elseif which = 15
+            boolean result = not (a or b) and (c or d)
+            return result
+        elseif which = 16
+            boolean result = (a or b) and not (c or d)
+            return result
+        elseif which = 17
+            boolean result = not (not (a or b) and (c or d))
+            return result
+        elseif which = 18
+            boolean result = not ((a or b) and not (c or d))
+            return result
+        elseif which = 19
+            boolean result = not (a or b) and not (c or d)
+            return result
+        elseif which = 20
+            boolean result = not (not (a or b) and not (c or d))
+            return result
+        elseif which = 21
+            boolean result = not ((a or b) or (c or d))
+            return result
+        elseif which = 22
+            boolean result = not (a or b) or (c or d)
+            return result
+        elseif which = 23
+            boolean result = (a or b) or not (c or d)
+            return result
+        elseif which = 24
+            boolean result = not (not (a or b) or (c or d))
+            return result
+        elseif which = 25
+            boolean result = not ((a or b) or not (c or d))
+            return result
+        elseif which = 26
+            boolean result = not (a or b) or not (c or d)
+            return result
+        elseif which = 27
+            boolean result = not (not (a or b) or not (c or d))
+            return result
+        elseif which = 28
+            boolean result = not ((a and (b and c)) and d)
+            return result
+        elseif which = 29
+            boolean result = not (a and (b and c)) and d
+            return result
+        elseif which = 30
+            boolean result = (a and not (b and c)) and d
+            return result
+        elseif which = 31
+            boolean result = not (not (a and (b and c)) and d)
+            return result
+        elseif which = 32
+            boolean result = not ((a and not (b and c)) and d)
+            return result
+        elseif which = 33
+            boolean result = not (a and not (b and c)) and d
+            return result
+        elseif which = 34
+            boolean result = not (not (a and not (b and c)) and d)
+            return result
+        elseif which = 35
+            boolean result = not ((a and (b and c)) or d)
+            return result
+        elseif which = 36
+            boolean result = not (a and (b and c)) or d
+            return result
+        elseif which = 37
+            boolean result = (a and not (b and c)) or d
+            return result
+        elseif which = 38
+            boolean result = not (not (a and (b and c)) or d)
+            return result
+        elseif which = 39
+            boolean result = not ((a and not (b and c)) or d)
+            return result
+        elseif which = 40
+            boolean result = not (a and not (b and c)) or d
+            return result
+        elseif which = 41
+            boolean result = not (not (a and not (b and c)) or d)
+            return result
+        elseif which = 42
+            boolean result = not ((a or (b and c)) and d)
+            return result
+        elseif which = 43
+            boolean result = not (a or (b and c)) and d
+            return result
+        elseif which = 44
+            boolean result = (a or not (b and c)) and d
+            return result
+        elseif which = 45
+            boolean result = not (not (a or (b and c)) and d)
+            return result
+        elseif which = 46
+            boolean result = not ((a or not (b and c)) and d)
+            return result
+        elseif which = 47
+            boolean result = not (a or not (b and c)) and d
+            return result
+        elseif which = 48
+            boolean result = not (not (a or not (b and c)) and d)
+            return result
+        elseif which = 49
+            boolean result = not ((a or (b and c)) or d)
+            return result
+        elseif which = 50
+            boolean result = not (a or (b and c)) or d
+            return result
+        elseif which = 51
+            boolean result = (a or not (b and c)) or d
+            return result
+        elseif which = 52
+            boolean result = not (not (a or (b and c)) or d)
+            return result
+        elseif which = 53
+            boolean result = not ((a or not (b and c)) or d)
+            return result
+        elseif which = 54
+            boolean result = not (a or not (b and c)) or d
+            return result
+        elseif which = 55
+            boolean result = not (not (a or not (b and c)) or d)
+            return result
+        elseif which = 56
+            boolean result = not ((a and (b or c)) and d)
+            return result
+        elseif which = 57
+            boolean result = not (a and (b or c)) and d
+            return result
+        elseif which = 58
+            boolean result = (a and not (b or c)) and d
+            return result
+        elseif which = 59
+            boolean result = not (not (a and (b or c)) and d)
+            return result
+        elseif which = 60
+            boolean result = not ((a and not (b or c)) and d)
+            return result
+        elseif which = 61
+            boolean result = not (a and not (b or c)) and d
+            return result
+        elseif which = 62
+            boolean result = not (not (a and not (b or c)) and d)
+            return result
+        elseif which = 63
+            boolean result = not ((a and (b or c)) or d)
+            return result
+        elseif which = 64
+            boolean result = not (a and (b or c)) or d
+            return result
+        elseif which = 65
+            boolean result = (a and not (b or c)) or d
+            return result
+        elseif which = 66
+            boolean result = not (not (a and (b or c)) or d)
+            return result
+        elseif which = 67
+            boolean result = not ((a and not (b or c)) or d)
+            return result
+        elseif which = 68
+            boolean result = not (a and not (b or c)) or d
+            return result
+        elseif which = 69
+            boolean result = not (not (a and not (b or c)) or d)
+            return result
+        elseif which = 70
+            boolean result = not ((a or (b or c)) and d)
+            return result
+        elseif which = 71
+            boolean result = not (a or (b or c)) and d
+            return result
+        elseif which = 72
+            boolean result = (a or not (b or c)) and d
+            return result
+        elseif which = 73
+            boolean result = not (not (a or (b or c)) and d)
+            return result
+        elseif which = 74
+            boolean result = not ((a or not (b or c)) and d)
+            return result
+        elseif which = 75
+            boolean result = not (a or not (b or c)) and d
+            return result
+        elseif which = 76
+            boolean result = not (not (a or not (b or c)) and d)
+            return result
+        elseif which = 77
+            boolean result = not ((a or (b or c)) or d)
+            return result
+        elseif which = 78
+            boolean result = not (a or (b or c)) or d
+            return result
+        elseif which = 79
+            boolean result = (a or not (b or c)) or d
+            return result
+        elseif which = 80
+            boolean result = not (not (a or (b or c)) or d)
+            return result
+        elseif which = 81
+            boolean result = not ((a or not (b or c)) or d)
+            return result
+        elseif which = 82
+            boolean result = not (a or not (b or c)) or d
+            return result
+        elseif which = 83
+            boolean result = not (not (a or not (b or c)) or d)
+            return result
+        elseif which = 84
+            boolean result = not (((a and b) and c) and d)
+            return result
+        elseif which = 85
+            boolean result = not ((a and b) and c) and d
+            return result
+        elseif which = 86
+            boolean result = (not (a and b) and c) and d
+            return result
+        elseif which = 87
+            boolean result = not (not ((a and b) and c) and d)
+            return result
+        elseif which = 88
+            boolean result = not ((not (a and b) and c) and d)
+            return result
+        elseif which = 89
+            boolean result = not (not (a and b) and c) and d
+            return result
+        elseif which = 90
+            boolean result = not (not (not (a and b) and c) and d)
+            return result
+        elseif which = 91
+            boolean result = not (((a and b) and c) or d)
+            return result
+        elseif which = 92
+            boolean result = not ((a and b) and c) or d
+            return result
+        elseif which = 93
+            boolean result = (not (a and b) and c) or d
+            return result
+        elseif which = 94
+            boolean result = not (not ((a and b) and c) or d)
+            return result
+        elseif which = 95
+            boolean result = not ((not (a and b) and c) or d)
+            return result
+        elseif which = 96
+            boolean result = not (not (a and b) and c) or d
+            return result
+        elseif which = 97
+            boolean result = not (not (not (a and b) and c) or d)
+            return result
+        elseif which = 98
+            boolean result = not (((a and b) or c) and d)
+            return result
+        elseif which = 99
+            boolean result = not ((a and b) or c) and d
+            return result
+        elseif which = 100
+            boolean result = (not (a and b) or c) and d
+            return result
+        elseif which = 101
+            boolean result = not (not ((a and b) or c) and d)
+            return result
+        elseif which = 102
+            boolean result = not ((not (a and b) or c) and d)
+            return result
+        elseif which = 103
+            boolean result = not (not (a and b) or c) and d
+            return result
+        elseif which = 104
+            boolean result = not (not (not (a and b) or c) and d)
+            return result
+        elseif which = 105
+            boolean result = not (((a and b) or c) or d)
+            return result
+        elseif which = 106
+            boolean result = not ((a and b) or c) or d
+            return result
+        elseif which = 107
+            boolean result = (not (a and b) or c) or d
+            return result
+        elseif which = 108
+            boolean result = not (not ((a and b) or c) or d)
+            return result
+        elseif which = 109
+            boolean result = not ((not (a and b) or c) or d)
+            return result
+        elseif which = 110
+            boolean result = not (not (a and b) or c) or d
+            return result
+        elseif which = 111
+            boolean result = not (not (not (a and b) or c) or d)
+            return result
+        elseif which = 112
+            boolean result = not (((a or b) and c) and d)
+            return result
+        elseif which = 113
+            boolean result = not ((a or b) and c) and d
+            return result
+        elseif which = 114
+            boolean result = (not (a or b) and c) and d
+            return result
+        elseif which = 115
+            boolean result = not (not ((a or b) and c) and d)
+            return result
+        elseif which = 116
+            boolean result = not ((not (a or b) and c) and d)
+            return result
+        elseif which = 117
+            boolean result = not (not (a or b) and c) and d
+            return result
+        elseif which = 118
+            boolean result = not (not (not (a or b) and c) and d)
+            return result
+        elseif which = 119
+            boolean result = not (((a or b) and c) or d)
+            return result
+        elseif which = 120
+            boolean result = not ((a or b) and c) or d
+            return result
+        elseif which = 121
+            boolean result = (not (a or b) and c) or d
+            return result
+        elseif which = 122
+            boolean result = not (not ((a or b) and c) or d)
+            return result
+        elseif which = 123
+            boolean result = not ((not (a or b) and c) or d)
+            return result
+        elseif which = 124
+            boolean result = not (not (a or b) and c) or d
+            return result
+        elseif which = 125
+            boolean result = not (not (not (a or b) and c) or d)
+            return result
+        elseif which = 126
+            boolean result = not (((a or b) or c) and d)
+            return result
+        elseif which = 127
+            boolean result = not ((a or b) or c) and d
+            return result
+        elseif which = 128
+            boolean result = (not (a or b) or c) and d
+            return result
+        elseif which = 129
+            boolean result = not (not ((a or b) or c) and d)
+            return result
+        elseif which = 130
+            boolean result = not ((not (a or b) or c) and d)
+            return result
+        elseif which = 131
+            boolean result = not (not (a or b) or c) and d
+            return result
+        elseif which = 132
+            boolean result = not (not (not (a or b) or c) and d)
+            return result
+        elseif which = 133
+            boolean result = not (((a or b) or c) or d)
+            return result
+        elseif which = 134
+            boolean result = not ((a or b) or c) or d
+            return result
+        elseif which = 135
+            boolean result = (not (a or b) or c) or d
+            return result
+        elseif which = 136
+            boolean result = not (not ((a or b) or c) or d)
+            return result
+        elseif which = 137
+            boolean result = not ((not (a or b) or c) or d)
+            return result
+        elseif which = 138
+            boolean result = not (not (a or b) or c) or d
+            return result
+        elseif which = 139
+            boolean result = not (not (not (a or b) or c) or d)
+            return result
+        end
+        return false
+    end
+
+    action Choice(integer which, boolean a, boolean b, boolean c, boolean d) returns boolean
+        if which = 0
+            if not ((a or b) and (c and d))
+                return true
+            end
+            return false
+        elseif which = 1
+            if not (a or b) and (c and d)
+                return true
+            end
+            return false
+        elseif which = 2
+            if (a or b) and not (c and d)
+                return true
+            end
+            return false
+        elseif which = 3
+            if not (not (a or b) and (c and d))
+                return true
+            end
+            return false
+        elseif which = 4
+            if not ((a or b) and not (c and d))
+                return true
+            end
+            return false
+        elseif which = 5
+            if not (a or b) and not (c and d)
+                return true
+            end
+            return false
+        elseif which = 6
+            if not (not (a or b) and not (c and d))
+                return true
+            end
+            return false
+        elseif which = 7
+            if not ((a or b) or (c and d))
+                return true
+            end
+            return false
+        elseif which = 8
+            if not (a or b) or (c and d)
+                return true
+            end
+            return false
+        elseif which = 9
+            if (a or b) or not (c and d)
+                return true
+            end
+            return false
+        elseif which = 10
+            if not (not (a or b) or (c and d))
+                return true
+            end
+            return false
+        elseif which = 11
+            if not ((a or b) or not (c and d))
+                return true
+            end
+            return false
+        elseif which = 12
+            if not (a or b) or not (c and d)
+                return true
+            end
+            return false
+        elseif which = 13
+            if not (not (a or b) or not (c and d))
+                return true
+            end
+            return false
+        elseif which = 14
+            if not ((a or b) and (c or d))
+                return true
+            end
+            return false
+        elseif which = 15
+            if not (a or b) and (c or d)
+                return true
+            end
+            return false
+        elseif which = 16
+            if (a or b) and not (c or d)
+                return true
+            end
+            return false
+        elseif which = 17
+            if not (not (a or b) and (c or d))
+                return true
+            end
+            return false
+        elseif which = 18
+            if not ((a or b) and not (c or d))
+                return true
+            end
+            return false
+        elseif which = 19
+            if not (a or b) and not (c or d)
+                return true
+            end
+            return false
+        elseif which = 20
+            if not (not (a or b) and not (c or d))
+                return true
+            end
+            return false
+        elseif which = 21
+            if not ((a or b) or (c or d))
+                return true
+            end
+            return false
+        elseif which = 22
+            if not (a or b) or (c or d)
+                return true
+            end
+            return false
+        elseif which = 23
+            if (a or b) or not (c or d)
+                return true
+            end
+            return false
+        elseif which = 24
+            if not (not (a or b) or (c or d))
+                return true
+            end
+            return false
+        elseif which = 25
+            if not ((a or b) or not (c or d))
+                return true
+            end
+            return false
+        elseif which = 26
+            if not (a or b) or not (c or d)
+                return true
+            end
+            return false
+        elseif which = 27
+            if not (not (a or b) or not (c or d))
+                return true
+            end
+            return false
+        elseif which = 28
+            if not ((a and (b and c)) and d)
+                return true
+            end
+            return false
+        elseif which = 29
+            if not (a and (b and c)) and d
+                return true
+            end
+            return false
+        elseif which = 30
+            if (a and not (b and c)) and d
+                return true
+            end
+            return false
+        elseif which = 31
+            if not (not (a and (b and c)) and d)
+                return true
+            end
+            return false
+        elseif which = 32
+            if not ((a and not (b and c)) and d)
+                return true
+            end
+            return false
+        elseif which = 33
+            if not (a and not (b and c)) and d
+                return true
+            end
+            return false
+        elseif which = 34
+            if not (not (a and not (b and c)) and d)
+                return true
+            end
+            return false
+        elseif which = 35
+            if not ((a and (b and c)) or d)
+                return true
+            end
+            return false
+        elseif which = 36
+            if not (a and (b and c)) or d
+                return true
+            end
+            return false
+        elseif which = 37
+            if (a and not (b and c)) or d
+                return true
+            end
+            return false
+        elseif which = 38
+            if not (not (a and (b and c)) or d)
+                return true
+            end
+            return false
+        elseif which = 39
+            if not ((a and not (b and c)) or d)
+                return true
+            end
+            return false
+        elseif which = 40
+            if not (a and not (b and c)) or d
+                return true
+            end
+            return false
+        elseif which = 41
+            if not (not (a and not (b and c)) or d)
+                return true
+            end
+            return false
+        elseif which = 42
+            if not ((a or (b and c)) and d)
+                return true
+            end
+            return false
+        elseif which = 43
+            if not (a or (b and c)) and d
+                return true
+            end
+            return false
+        elseif which = 44
+            if (a or not (b and c)) and d
+                return true
+            end
+            return false
+        elseif which = 45
+            if not (not (a or (b and c)) and d)
+                return true
+            end
+            return false
+        elseif which = 46
+            if not ((a or not (b and c)) and d)
+                return true
+            end
+            return false
+        elseif which = 47
+            if not (a or not (b and c)) and d
+                return true
+            end
+            return false
+        elseif which = 48
+            if not (not (a or not (b and c)) and d)
+                return true
+            end
+            return false
+        elseif which = 49
+            if not ((a or (b and c)) or d)
+                return true
+            end
+            return false
+        elseif which = 50
+            if not (a or (b and c)) or d
+                return true
+            end
+            return false
+        elseif which = 51
+            if (a or not (b and c)) or d
+                return true
+            end
+            return false
+        elseif which = 52
+            if not (not (a or (b and c)) or d)
+                return true
+            end
+            return false
+        elseif which = 53
+            if not ((a or not (b and c)) or d)
+                return true
+            end
+            return false
+        elseif which = 54
+            if not (a or not (b and c)) or d
+                return true
+            end
+            return false
+        elseif which = 55
+            if not (not (a or not (b and c)) or d)
+                return true
+            end
+            return false
+        elseif which = 56
+            if not ((a and (b or c)) and d)
+                return true
+            end
+            return false
+        elseif which = 57
+            if not (a and (b or c)) and d
+                return true
+            end
+            return false
+        elseif which = 58
+            if (a and not (b or c)) and d
+                return true
+            end
+            return false
+        elseif which = 59
+            if not (not (a and (b or c)) and d)
+                return true
+            end
+            return false
+        elseif which = 60
+            if not ((a and not (b or c)) and d)
+                return true
+            end
+            return false
+        elseif which = 61
+            if not (a and not (b or c)) and d
+                return true
+            end
+            return false
+        elseif which = 62
+            if not (not (a and not (b or c)) and d)
+                return true
+            end
+            return false
+        elseif which = 63
+            if not ((a and (b or c)) or d)
+                return true
+            end
+            return false
+        elseif which = 64
+            if not (a and (b or c)) or d
+                return true
+            end
+            return false
+        elseif which = 65
+            if (a and not (b or c)) or d
+                return true
+            end
+            return false
+        elseif which = 66
+            if not (not (a and (b or c)) or d)
+                return true
+            end
+            return false
+        elseif which = 67
+            if not ((a and not (b or c)) or d)
+                return true
+            end
+            return false
+        elseif which = 68
+            if not (a and not (b or c)) or d
+                return true
+            end
+            return false
+        elseif which = 69
+            if not (not (a and not (b or c)) or d)
+                return true
+            end
+            return false
+        elseif which = 70
+            if not ((a or (b or c)) and d)
+                return true
+            end
+            return false
+        elseif which = 71
+            if not (a or (b or c)) and d
+                return true
+            end
+            return false
+        elseif which = 72
+            if (a or not (b or c)) and d
+                return true
+            end
+            return false
+        elseif which = 73
+            if not (not (a or (b or c)) and d)
+                return true
+            end
+            return false
+        elseif which = 74
+            if not ((a or not (b or c)) and d)
+                return true
+            end
+            return false
+        elseif which = 75
+            if not (a or not (b or c)) and d
+                return true
+            end
+            return false
+        elseif which = 76
+            if not (not (a or not (b or c)) and d)
+                return true
+            end
+            return false
+        elseif which = 77
+            if not ((a or (b or c)) or d)
+                return true
+            end
+            return false
+        elseif which = 78
+            if not (a or (b or c)) or d
+                return true
+            end
+            return false
+        elseif which = 79
+            if (a or not (b or c)) or d
+                return true
+            end
+            return false
+        elseif which = 80
+            if not (not (a or (b or c)) or d)
+                return true
+            end
+            return false
+        elseif which = 81
+            if not ((a or not (b or c)) or d)
+                return true
+            end
+            return false
+        elseif which = 82
+            if not (a or not (b or c)) or d
+                return true
+            end
+            return false
+        elseif which = 83
+            if not (not (a or not (b or c)) or d)
+                return true
+            end
+            return false
+        elseif which = 84
+            if not (((a and b) and c) and d)
+                return true
+            end
+            return false
+        elseif which = 85
+            if not ((a and b) and c) and d
+                return true
+            end
+            return false
+        elseif which = 86
+            if (not (a and b) and c) and d
+                return true
+            end
+            return false
+        elseif which = 87
+            if not (not ((a and b) and c) and d)
+                return true
+            end
+            return false
+        elseif which = 88
+            if not ((not (a and b) and c) and d)
+                return true
+            end
+            return false
+        elseif which = 89
+            if not (not (a and b) and c) and d
+                return true
+            end
+            return false
+        elseif which = 90
+            if not (not (not (a and b) and c) and d)
+                return true
+            end
+            return false
+        elseif which = 91
+            if not (((a and b) and c) or d)
+                return true
+            end
+            return false
+        elseif which = 92
+            if not ((a and b) and c) or d
+                return true
+            end
+            return false
+        elseif which = 93
+            if (not (a and b) and c) or d
+                return true
+            end
+            return false
+        elseif which = 94
+            if not (not ((a and b) and c) or d)
+                return true
+            end
+            return false
+        elseif which = 95
+            if not ((not (a and b) and c) or d)
+                return true
+            end
+            return false
+        elseif which = 96
+            if not (not (a and b) and c) or d
+                return true
+            end
+            return false
+        elseif which = 97
+            if not (not (not (a and b) and c) or d)
+                return true
+            end
+            return false
+        elseif which = 98
+            if not (((a and b) or c) and d)
+                return true
+            end
+            return false
+        elseif which = 99
+            if not ((a and b) or c) and d
+                return true
+            end
+            return false
+        elseif which = 100
+            if (not (a and b) or c) and d
+                return true
+            end
+            return false
+        elseif which = 101
+            if not (not ((a and b) or c) and d)
+                return true
+            end
+            return false
+        elseif which = 102
+            if not ((not (a and b) or c) and d)
+                return true
+            end
+            return false
+        elseif which = 103
+            if not (not (a and b) or c) and d
+                return true
+            end
+            return false
+        elseif which = 104
+            if not (not (not (a and b) or c) and d)
+                return true
+            end
+            return false
+        elseif which = 105
+            if not (((a and b) or c) or d)
+                return true
+            end
+            return false
+        elseif which = 106
+            if not ((a and b) or c) or d
+                return true
+            end
+            return false
+        elseif which = 107
+            if (not (a and b) or c) or d
+                return true
+            end
+            return false
+        elseif which = 108
+            if not (not ((a and b) or c) or d)
+                return true
+            end
+            return false
+        elseif which = 109
+            if not ((not (a and b) or c) or d)
+                return true
+            end
+            return false
+        elseif which = 110
+            if not (not (a and b) or c) or d
+                return true
+            end
+            return false
+        elseif which = 111
+            if not (not (not (a and b) or c) or d)
+                return true
+            end
+            return false
+        elseif which = 112
+            if not (((a or b) and c) and d)
+                return true
+            end
+            return false
+        elseif which = 113
+            if not ((a or b) and c) and d
+                return true
+            end
+            return false
+        elseif which = 114
+            if (not (a or b) and c) and d
+                return true
+            end
+            return false
+        elseif which = 115
+            if not (not ((a or b) and c) and d)
+                return true
+            end
+            return false
+        elseif which = 116
+            if not ((not (a or b) and c) and d)
+                return true
+            end
+            return false
+        elseif which = 117
+            if not (not (a or b) and c) and d
+                return true
+            end
+            return false
+        elseif which = 118
+            if not (not (not (a or b) and c) and d)
+                return true
+            end
+            return false
+        elseif which = 119
+            if not (((a or b) and c) or d)
+                return true
+            end
+            return false
+        elseif which = 120
+            if not ((a or b) and c) or d
+                return true
+            end
+            return false
+        elseif which = 121
+            if (not (a or b) and c) or d
+                return true
+            end
+            return false
+        elseif which = 122
+            if not (not ((a or b) and c) or d)
+                return true
+            end
+            return false
+        elseif which = 123
+            if not ((not (a or b) and c) or d)
+                return true
+            end
+            return false
+        elseif which = 124
+            if not (not (a or b) and c) or d
+                return true
+            end
+            return false
+        elseif which = 125
+            if not (not (not (a or b) and c) or d)
+                return true
+            end
+            return false
+        elseif which = 126
+            if not (((a or b) or c) and d)
+                return true
+            end
+            return false
+        elseif which = 127
+            if not ((a or b) or c) and d
+                return true
+            end
+            return false
+        elseif which = 128
+            if (not (a or b) or c) and d
+                return true
+            end
+            return false
+        elseif which = 129
+            if not (not ((a or b) or c) and d)
+                return true
+            end
+            return false
+        elseif which = 130
+            if not ((not (a or b) or c) and d)
+                return true
+            end
+            return false
+        elseif which = 131
+            if not (not (a or b) or c) and d
+                return true
+            end
+            return false
+        elseif which = 132
+            if not (not (not (a or b) or c) and d)
+                return true
+            end
+            return false
+        elseif which = 133
+            if not (((a or b) or c) or d)
+                return true
+            end
+            return false
+        elseif which = 134
+            if not ((a or b) or c) or d
+                return true
+            end
+            return false
+        elseif which = 135
+            if (not (a or b) or c) or d
+                return true
+            end
+            return false
+        elseif which = 136
+            if not (not ((a or b) or c) or d)
+                return true
+            end
+            return false
+        elseif which = 137
+            if not ((not (a or b) or c) or d)
+                return true
+            end
+            return false
+        elseif which = 138
+            if not (not (a or b) or c) or d
+                return true
+            end
+            return false
+        elseif which = 139
+            if not (not (not (a or b) or c) or d)
+                return true
+            end
+            return false
+        end
+        return false
+    end
+
+
+    /* Whether bit place of the combination is set: place 0 is the first variable, the highest bit. */
+    action Bit(integer combination, integer place) returns boolean
+        integer shift = 3 - place
+        integer value = combination
+        repeat shift times
+            value = value / 2
+        end
+        return value mod 2 = 1
+    end
+
+    action Letter(boolean value) returns text
+        if value
+            return "T"
+        end
+        return "F"
+    end
+end

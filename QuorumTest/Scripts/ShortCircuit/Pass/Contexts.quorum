@@ -1,0 +1,133 @@
+/*
+The and/or groupings that went wrong on bytecode on 2026-11-23, and the
+ones around them, in each place a condition can be: an if with elseif and
+else, repeat while and repeat until, not, comparisons, fields, a parameter,
+a returned value and text. Calls that log their names show which parts are
+worked out and in what order: the right side of and is skipped when the
+left is false, and of or when the left is true, as the Quorum reference
+says, so the logs must match exactly.
+*/
+class Main
+    text log = ""
+    boolean fieldNo = false
+    boolean fieldYes = true
+
+    action Main
+        boolean no = false
+        boolean yes = true
+
+        // The shape that went wrong: (a or (b and c)) and d, with a and b false.
+        if (no or (no and no)) and yes
+            output "if (no or (no and no)) and yes: if"
+        elseif (no or (yes and yes)) and yes
+            output "if (no or (no and no)) and yes: elseif"
+        else
+            output "if (no or (no and no)) and yes: else"
+        end
+        if (no or (no and yes)) and yes
+            output "if (no or (no and yes)) and yes: if"
+        else
+            output "if (no or (no and yes)) and yes: else"
+        end
+        if not ((no or (no and no)) and yes)
+            output "not ((no or (no and no)) and yes): true"
+        else
+            output "not ((no or (no and no)) and yes): false"
+        end
+
+        integer count = 0
+        repeat while (no or (no and yes)) and count < 3
+            count = count + 1
+        end
+        output "repeat while (no or (no and yes)) and count < 3: ran " + count + " times"
+        count = 0
+        repeat until ((no or (no and yes)) and yes) or count = 4
+            count = count + 1
+        end
+        output "repeat until ((no or (no and yes)) and yes) or count = 4: ran " + count + " times"
+
+        integer x = 1
+        integer y = 0
+        integer z = 0
+        integer w = 5
+        boolean compared = (x = 2 or (y = 2 and z = 3)) and w > 0
+        output "(x = 2 or (y = 2 and z = 3)) and w > 0 = " + compared
+        boolean fields = (fieldNo or (fieldNo and fieldYes)) and fieldYes
+        output "fields (no or (no and yes)) and yes = " + fields
+        output "parameter (no or (no and yes)) and yes = " + Echo((no or (no and yes)) and yes)
+        output "returned (no or (no and yes)) and yes = " + Returned(no, no, yes, yes)
+        output "in text: " + ((no or (no and yes)) and yes)
+
+        // The calls made, in order, and the result.
+        log = ""
+        boolean result = (A(no) or (B(no) and C(yes))) and D(yes)
+        output "(A(no) or (B(no) and C(yes))) and D(yes) = " + result + ", called " + log
+        log = ""
+        result = (A(no) or (B(yes) and C(yes))) and D(yes)
+        output "(A(no) or (B(yes) and C(yes))) and D(yes) = " + result + ", called " + log
+        log = ""
+        result = (A(yes) or (B(no) and C(yes))) and D(no)
+        output "(A(yes) or (B(no) and C(yes))) and D(no) = " + result + ", called " + log
+        log = ""
+        result = (A(no) or (B(no) and C(yes))) or D(no)
+        output "(A(no) or (B(no) and C(yes))) or D(no) = " + result + ", called " + log
+        log = ""
+        if (A(no) or (B(no) and C(yes))) and D(yes)
+            output "if (A(no) or (B(no) and C(yes))) and D(yes): if, called " + log
+        else
+            output "if (A(no) or (B(no) and C(yes))) and D(yes): else, called " + log
+        end
+
+        // The mirror shape: (a and (b or c)) or d, with a true and b, c and d false.
+        log = ""
+        result = (A(yes) and (B(no) or C(no))) or D(no)
+        output "(A(yes) and (B(no) or C(no))) or D(no) = " + result + ", called " + log
+        log = ""
+        result = (A(yes) and (B(yes) or C(no))) or D(no)
+        output "(A(yes) and (B(yes) or C(no))) or D(no) = " + result + ", called " + log
+        if (yes and (no or no)) or no
+            output "if (yes and (no or no)) or no: if"
+        else
+            output "if (yes and (no or no)) or no: else"
+        end
+
+        // Deeper: the shape inside more and/or, on either side.
+        output "((no or (no and no)) and yes) or no = " + (((no or (no and no)) and yes) or no)
+        output "yes and ((no or (no and no)) and yes) = " + (yes and ((no or (no and no)) and yes))
+        output "((no or (no and no)) and yes) and yes = " + (((no or (no and no)) and yes) and yes)
+        output "(no or (no or (no and no))) and yes = " + ((no or (no or (no and no))) and yes)
+        output "(no or ((no and no) and no)) and yes = " + ((no or ((no and no) and no)) and yes)
+        output "(no or (no and (no or no))) and yes = " + ((no or (no and (no or no))) and yes)
+        output "((no and no) or (no and no)) and yes = " + (((no and no) or (no and no)) and yes)
+        output "(yes and (no or (yes and no))) or no = " + ((yes and (no or (yes and no))) or no)
+        output "(no or (no and yes)) and (yes or no) = " + ((no or (no and yes)) and (yes or no))
+    end
+
+    action A(boolean value) returns boolean
+        log = log + "A"
+        return value
+    end
+
+    action B(boolean value) returns boolean
+        log = log + "B"
+        return value
+    end
+
+    action C(boolean value) returns boolean
+        log = log + "C"
+        return value
+    end
+
+    action D(boolean value) returns boolean
+        log = log + "D"
+        return value
+    end
+
+    action Echo(boolean value) returns boolean
+        return value
+    end
+
+    action Returned(boolean a, boolean b, boolean c, boolean d) returns boolean
+        return (a or (b and c)) and d
+    end
+end

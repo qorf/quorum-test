@@ -1,0 +1,140 @@
+not ((a or b) and (c and d)): value TTTTTTTFTTTFTTTF, if TTTTTTTFTTTFTTTF
+not (a or b) and (c and d): value FFFTFFFFFFFFFFFF, if FFFTFFFFFFFFFFFF
+(a or b) and not (c and d): value FFFFTTTFTTTFTTTF, if FFFFTTTFTTTFTTTF
+not (not (a or b) and (c and d)): value TTTFTTTTTTTTTTTT, if TTTFTTTTTTTTTTTT
+not ((a or b) and not (c and d)): value TTTTFFFTFFFTFFFT, if TTTTFFFTFFFTFFFT
+not (a or b) and not (c and d): value TTTFFFFFFFFFFFFF, if TTTFFFFFFFFFFFFF
+not (not (a or b) and not (c and d)): value FFFTTTTTTTTTTTTT, if FFFTTTTTTTTTTTTT
+not ((a or b) or (c and d)): value TTTFFFFFFFFFFFFF, if TTTFFFFFFFFFFFFF
+not (a or b) or (c and d): value TTTTFFFTFFFTFFFT, if TTTTFFFTFFFTFFFT
+(a or b) or not (c and d): value TTTFTTTTTTTTTTTT, if TTTFTTTTTTTTTTTT
+not (not (a or b) or (c and d)): value FFFFTTTFTTTFTTTF, if FFFFTTTFTTTFTTTF
+not ((a or b) or not (c and d)): value FFFTFFFFFFFFFFFF, if FFFTFFFFFFFFFFFF
+not (a or b) or not (c and d): value TTTTTTTFTTTFTTTF, if TTTTTTTFTTTFTTTF
+not (not (a or b) or not (c and d)): value FFFFFFFTFFFTFFFT, if FFFFFFFTFFFTFFFT
+not ((a or b) and (c or d)): value TTTTTFFFTFFFTFFF, if TTTTTFFFTFFFTFFF
+not (a or b) and (c or d): value FTTTFFFFFFFFFFFF, if FTTTFFFFFFFFFFFF
+(a or b) and not (c or d): value FFFFTFFFTFFFTFFF, if FFFFTFFFTFFFTFFF
+not (not (a or b) and (c or d)): value TFFFTTTTTTTTTTTT, if TFFFTTTTTTTTTTTT
+not ((a or b) and not (c or d)): value TTTTFTTTFTTTFTTT, if TTTTFTTTFTTTFTTT
+not (a or b) and not (c or d): value TFFFFFFFFFFFFFFF, if TFFFFFFFFFFFFFFF
+not (not (a or b) and not (c or d)): value FTTTTTTTTTTTTTTT, if FTTTTTTTTTTTTTTT
+not ((a or b) or (c or d)): value TFFFFFFFFFFFFFFF, if TFFFFFFFFFFFFFFF
+not (a or b) or (c or d): value TTTTFTTTFTTTFTTT, if TTTTFTTTFTTTFTTT
+(a or b) or not (c or d): value TFFFTTTTTTTTTTTT, if TFFFTTTTTTTTTTTT
+not (not (a or b) or (c or d)): value FFFFTFFFTFFFTFFF, if FFFFTFFFTFFFTFFF
+not ((a or b) or not (c or d)): value FTTTFFFFFFFFFFFF, if FTTTFFFFFFFFFFFF
+not (a or b) or not (c or d): value TTTTTFFFTFFFTFFF, if TTTTTFFFTFFFTFFF
+not (not (a or b) or not (c or d)): value FFFFFTTTFTTTFTTT, if FFFFFTTTFTTTFTTT
+not ((a and (b and c)) and d): value TTTTTTTTTTTTTTTF, if TTTTTTTTTTTTTTTF
+not (a and (b and c)) and d: value FTFTFTFTFTFTFTFF, if FTFTFTFTFTFTFTFF
+(a and not (b and c)) and d: value FFFFFFFFFTFTFTFF, if FFFFFFFFFTFTFTFF
+not (not (a and (b and c)) and d): value TFTFTFTFTFTFTFTT, if TFTFTFTFTFTFTFTT
+not ((a and not (b and c)) and d): value TTTTTTTTTFTFTFTT, if TTTTTTTTTFTFTFTT
+not (a and not (b and c)) and d: value FTFTFTFTFFFFFFFT, if FTFTFTFTFFFFFFFT
+not (not (a and not (b and c)) and d): value TFTFTFTFTTTTTTTF, if TFTFTFTFTTTTTTTF
+not ((a and (b and c)) or d): value TFTFTFTFTFTFTFFF, if TFTFTFTFTFTFTFFF
+not (a and (b and c)) or d: value TTTTTTTTTTTTTTFT, if TTTTTTTTTTTTTTFT
+(a and not (b and c)) or d: value FTFTFTFTTTTTTTFT, if FTFTFTFTTTTTTTFT
+not (not (a and (b and c)) or d): value FFFFFFFFFFFFFFTF, if FFFFFFFFFFFFFFTF
+not ((a and not (b and c)) or d): value TFTFTFTFFFFFFFTF, if TFTFTFTFFFFFFFTF
+not (a and not (b and c)) or d: value TTTTTTTTFTFTFTTT, if TTTTTTTTFTFTFTTT
+not (not (a and not (b and c)) or d): value FFFFFFFFTFTFTFFF, if FFFFFFFFTFTFTFFF
+not ((a or (b and c)) and d): value TTTTTTTFTFTFTFTF, if TTTTTTTFTFTFTFTF
+not (a or (b and c)) and d: value FTFTFTFFFFFFFFFF, if FTFTFTFFFFFFFFFF
+(a or not (b and c)) and d: value FTFTFTFFFTFTFTFT, if FTFTFTFFFTFTFTFT
+not (not (a or (b and c)) and d): value TFTFTFTTTTTTTTTT, if TFTFTFTTTTTTTTTT
+not ((a or not (b and c)) and d): value TFTFTFTTTFTFTFTF, if TFTFTFTTTFTFTFTF
+not (a or not (b and c)) and d: value FFFFFFFTFFFFFFFF, if FFFFFFFTFFFFFFFF
+not (not (a or not (b and c)) and d): value TTTTTTTFTTTTTTTT, if TTTTTTTFTTTTTTTT
+not ((a or (b and c)) or d): value TFTFTFFFFFFFFFFF, if TFTFTFFFFFFFFFFF
+not (a or (b and c)) or d: value TTTTTTFTFTFTFTFT, if TTTTTTFTFTFTFTFT
+(a or not (b and c)) or d: value TTTTTTFTTTTTTTTT, if TTTTTTFTTTTTTTTT
+not (not (a or (b and c)) or d): value FFFFFFTFTFTFTFTF, if FFFFFFTFTFTFTFTF
+not ((a or not (b and c)) or d): value FFFFFFTFFFFFFFFF, if FFFFFFTFFFFFFFFF
+not (a or not (b and c)) or d: value FTFTFTTTFTFTFTFT, if FTFTFTTTFTFTFTFT
+not (not (a or not (b and c)) or d): value TFTFTFFFTFTFTFTF, if TFTFTFFFTFTFTFTF
+not ((a and (b or c)) and d): value TTTTTTTTTTTFTFTF, if TTTTTTTTTTTFTFTF
+not (a and (b or c)) and d: value FTFTFTFTFTFFFFFF, if FTFTFTFTFTFFFFFF
+(a and not (b or c)) and d: value FFFFFFFFFTFFFFFF, if FFFFFFFFFTFFFFFF
+not (not (a and (b or c)) and d): value TFTFTFTFTFTTTTTT, if TFTFTFTFTFTTTTTT
+not ((a and not (b or c)) and d): value TTTTTTTTTFTTTTTT, if TTTTTTTTTFTTTTTT
+not (a and not (b or c)) and d: value FTFTFTFTFFFTFTFT, if FTFTFTFTFFFTFTFT
+not (not (a and not (b or c)) and d): value TFTFTFTFTTTFTFTF, if TFTFTFTFTTTFTFTF
+not ((a and (b or c)) or d): value TFTFTFTFTFFFFFFF, if TFTFTFTFTFFFFFFF
+not (a and (b or c)) or d: value TTTTTTTTTTFTFTFT, if TTTTTTTTTTFTFTFT
+(a and not (b or c)) or d: value FTFTFTFTTTFTFTFT, if FTFTFTFTTTFTFTFT
+not (not (a and (b or c)) or d): value FFFFFFFFFFTFTFTF, if FFFFFFFFFFTFTFTF
+not ((a and not (b or c)) or d): value TFTFTFTFFFTFTFTF, if TFTFTFTFFFTFTFTF
+not (a and not (b or c)) or d: value TTTTTTTTFTTTTTTT, if TTTTTTTTFTTTTTTT
+not (not (a and not (b or c)) or d): value FFFFFFFFTFFFFFFF, if FFFFFFFFTFFFFFFF
+not ((a or (b or c)) and d): value TTTFTFTFTFTFTFTF, if TTTFTFTFTFTFTFTF
+not (a or (b or c)) and d: value FTFFFFFFFFFFFFFF, if FTFFFFFFFFFFFFFF
+(a or not (b or c)) and d: value FTFFFFFFFTFTFTFT, if FTFFFFFFFTFTFTFT
+not (not (a or (b or c)) and d): value TFTTTTTTTTTTTTTT, if TFTTTTTTTTTTTTTT
+not ((a or not (b or c)) and d): value TFTTTTTTTFTFTFTF, if TFTTTTTTTFTFTFTF
+not (a or not (b or c)) and d: value FFFTFTFTFFFFFFFF, if FFFTFTFTFFFFFFFF
+not (not (a or not (b or c)) and d): value TTTFTFTFTTTTTTTT, if TTTFTFTFTTTTTTTT
+not ((a or (b or c)) or d): value TFFFFFFFFFFFFFFF, if TFFFFFFFFFFFFFFF
+not (a or (b or c)) or d: value TTFTFTFTFTFTFTFT, if TTFTFTFTFTFTFTFT
+(a or not (b or c)) or d: value TTFTFTFTTTTTTTTT, if TTFTFTFTTTTTTTTT
+not (not (a or (b or c)) or d): value FFTFTFTFTFTFTFTF, if FFTFTFTFTFTFTFTF
+not ((a or not (b or c)) or d): value FFTFTFTFFFFFFFFF, if FFTFTFTFFFFFFFFF
+not (a or not (b or c)) or d: value FTTTTTTTFTFTFTFT, if FTTTTTTTFTFTFTFT
+not (not (a or not (b or c)) or d): value TFFFFFFFTFTFTFTF, if TFFFFFFFTFTFTFTF
+not (((a and b) and c) and d): value TTTTTTTTTTTTTTTF, if TTTTTTTTTTTTTTTF
+not ((a and b) and c) and d: value FTFTFTFTFTFTFTFF, if FTFTFTFTFTFTFTFF
+(not (a and b) and c) and d: value FFFTFFFTFFFTFFFF, if FFFTFFFTFFFTFFFF
+not (not ((a and b) and c) and d): value TFTFTFTFTFTFTFTT, if TFTFTFTFTFTFTFTT
+not ((not (a and b) and c) and d): value TTTFTTTFTTTFTTTT, if TTTFTTTFTTTFTTTT
+not (not (a and b) and c) and d: value FTFFFTFFFTFFFTFT, if FTFFFTFFFTFFFTFT
+not (not (not (a and b) and c) and d): value TFTTTFTTTFTTTFTF, if TFTTTFTTTFTTTFTF
+not (((a and b) and c) or d): value TFTFTFTFTFTFTFFF, if TFTFTFTFTFTFTFFF
+not ((a and b) and c) or d: value TTTTTTTTTTTTTTFT, if TTTTTTTTTTTTTTFT
+(not (a and b) and c) or d: value FTTTFTTTFTTTFTFT, if FTTTFTTTFTTTFTFT
+not (not ((a and b) and c) or d): value FFFFFFFFFFFFFFTF, if FFFFFFFFFFFFFFTF
+not ((not (a and b) and c) or d): value TFFFTFFFTFFFTFTF, if TFFFTFFFTFFFTFTF
+not (not (a and b) and c) or d: value TTFTTTFTTTFTTTTT, if TTFTTTFTTTFTTTTT
+not (not (not (a and b) and c) or d): value FFTFFFTFFFTFFFFF, if FFTFFFTFFFTFFFFF
+not (((a and b) or c) and d): value TTTFTTTFTTTFTFTF, if TTTFTTTFTTTFTFTF
+not ((a and b) or c) and d: value FTFFFTFFFTFFFFFF, if FTFFFTFFFTFFFFFF
+(not (a and b) or c) and d: value FTFTFTFTFTFTFFFT, if FTFTFTFTFTFTFFFT
+not (not ((a and b) or c) and d): value TFTTTFTTTFTTTTTT, if TFTTTFTTTFTTTTTT
+not ((not (a and b) or c) and d): value TFTFTFTFTFTFTTTF, if TFTFTFTFTFTFTTTF
+not (not (a and b) or c) and d: value FFFFFFFFFFFFFTFF, if FFFFFFFFFFFFFTFF
+not (not (not (a and b) or c) and d): value TTTTTTTTTTTTTFTT, if TTTTTTTTTTTTTFTT
+not (((a and b) or c) or d): value TFFFTFFFTFFFFFFF, if TFFFTFFFTFFFFFFF
+not ((a and b) or c) or d: value TTFTTTFTTTFTFTFT, if TTFTTTFTTTFTFTFT
+(not (a and b) or c) or d: value TTTTTTTTTTTTFTTT, if TTTTTTTTTTTTFTTT
+not (not ((a and b) or c) or d): value FFTFFFTFFFTFTFTF, if FFTFFFTFFFTFTFTF
+not ((not (a and b) or c) or d): value FFFFFFFFFFFFTFFF, if FFFFFFFFFFFFTFFF
+not (not (a and b) or c) or d: value FTFTFTFTFTFTTTFT, if FTFTFTFTFTFTTTFT
+not (not (not (a and b) or c) or d): value TFTFTFTFTFTFFFTF, if TFTFTFTFTFTFFFTF
+not (((a or b) and c) and d): value TTTTTTTFTTTFTTTF, if TTTTTTTFTTTFTTTF
+not ((a or b) and c) and d: value FTFTFTFFFTFFFTFF, if FTFTFTFFFTFFFTFF
+(not (a or b) and c) and d: value FFFTFFFFFFFFFFFF, if FFFTFFFFFFFFFFFF
+not (not ((a or b) and c) and d): value TFTFTFTTTFTTTFTT, if TFTFTFTTTFTTTFTT
+not ((not (a or b) and c) and d): value TTTFTTTTTTTTTTTT, if TTTFTTTTTTTTTTTT
+not (not (a or b) and c) and d: value FTFFFTFTFTFTFTFT, if FTFFFTFTFTFTFTFT
+not (not (not (a or b) and c) and d): value TFTTTFTFTFTFTFTF, if TFTTTFTFTFTFTFTF
+not (((a or b) and c) or d): value TFTFTFFFTFFFTFFF, if TFTFTFFFTFFFTFFF
+not ((a or b) and c) or d: value TTTTTTFTTTFTTTFT, if TTTTTTFTTTFTTTFT
+(not (a or b) and c) or d: value FTTTFTFTFTFTFTFT, if FTTTFTFTFTFTFTFT
+not (not ((a or b) and c) or d): value FFFFFFTFFFTFFFTF, if FFFFFFTFFFTFFFTF
+not ((not (a or b) and c) or d): value TFFFTFTFTFTFTFTF, if TFFFTFTFTFTFTFTF
+not (not (a or b) and c) or d: value TTFTTTTTTTTTTTTT, if TTFTTTTTTTTTTTTT
+not (not (not (a or b) and c) or d): value FFTFFFFFFFFFFFFF, if FFTFFFFFFFFFFFFF
+not (((a or b) or c) and d): value TTTFTFTFTFTFTFTF, if TTTFTFTFTFTFTFTF
+not ((a or b) or c) and d: value FTFFFFFFFFFFFFFF, if FTFFFFFFFFFFFFFF
+(not (a or b) or c) and d: value FTFTFFFTFFFTFFFT, if FTFTFFFTFFFTFFFT
+not (not ((a or b) or c) and d): value TFTTTTTTTTTTTTTT, if TFTTTTTTTTTTTTTT
+not ((not (a or b) or c) and d): value TFTFTTTFTTTFTTTF, if TFTFTTTFTTTFTTTF
+not (not (a or b) or c) and d: value FFFFFTFFFTFFFTFF, if FFFFFTFFFTFFFTFF
+not (not (not (a or b) or c) and d): value TTTTTFTTTFTTTFTT, if TTTTTFTTTFTTTFTT
+not (((a or b) or c) or d): value TFFFFFFFFFFFFFFF, if TFFFFFFFFFFFFFFF
+not ((a or b) or c) or d: value TTFTFTFTFTFTFTFT, if TTFTFTFTFTFTFTFT
+(not (a or b) or c) or d: value TTTTFTTTFTTTFTTT, if TTTTFTTTFTTTFTTT
+not (not ((a or b) or c) or d): value FFTFTFTFTFTFTFTF, if FFTFTFTFTFTFTFTF
+not ((not (a or b) or c) or d): value FFFFTFFFTFFFTFFF, if FFFFTFFFTFFFTFFF
+not (not (a or b) or c) or d: value FTFTTTFTTTFTTTFT, if FTFTTTFTTTFTTTFT
+not (not (not (a or b) or c) or d): value TFTFFFTFFFTFFFTF, if TFTFFFTFFFTFFFTF

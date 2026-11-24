@@ -1,0 +1,974 @@
+/*
+Every grouping of 4 and/or operators on 5 calls (A, B, C, D, E), each call
+logging its letter and returning its value, for all 32 combinations of true and
+false (a first). Each entry is the result, a slash and the calls made, in
+order: the right side of and is skipped when its left side is false, and
+the right side of or when its left side is true, so every call that's
+made, and only those, must appear, in order. Expected output worked out
+separately.
+*/
+class Main
+    text log = ""
+
+    action Main
+        Show("A(a) and (B(b) and (C(c) and (D(d) and E(e))))", 0)
+        Show("A(a) or (B(b) and (C(c) and (D(d) and E(e))))", 1)
+        Show("A(a) and (B(b) or (C(c) and (D(d) and E(e))))", 2)
+        Show("A(a) or (B(b) or (C(c) and (D(d) and E(e))))", 3)
+        Show("A(a) and (B(b) and (C(c) or (D(d) and E(e))))", 4)
+        Show("A(a) or (B(b) and (C(c) or (D(d) and E(e))))", 5)
+        Show("A(a) and (B(b) or (C(c) or (D(d) and E(e))))", 6)
+        Show("A(a) or (B(b) or (C(c) or (D(d) and E(e))))", 7)
+        Show("A(a) and (B(b) and (C(c) and (D(d) or E(e))))", 8)
+        Show("A(a) or (B(b) and (C(c) and (D(d) or E(e))))", 9)
+        Show("A(a) and (B(b) or (C(c) and (D(d) or E(e))))", 10)
+        Show("A(a) or (B(b) or (C(c) and (D(d) or E(e))))", 11)
+        Show("A(a) and (B(b) and (C(c) or (D(d) or E(e))))", 12)
+        Show("A(a) or (B(b) and (C(c) or (D(d) or E(e))))", 13)
+        Show("A(a) and (B(b) or (C(c) or (D(d) or E(e))))", 14)
+        Show("A(a) or (B(b) or (C(c) or (D(d) or E(e))))", 15)
+        Show("A(a) and (B(b) and ((C(c) and D(d)) and E(e)))", 16)
+        Show("A(a) or (B(b) and ((C(c) and D(d)) and E(e)))", 17)
+        Show("A(a) and (B(b) or ((C(c) and D(d)) and E(e)))", 18)
+        Show("A(a) or (B(b) or ((C(c) and D(d)) and E(e)))", 19)
+        Show("A(a) and (B(b) and ((C(c) and D(d)) or E(e)))", 20)
+        Show("A(a) or (B(b) and ((C(c) and D(d)) or E(e)))", 21)
+        Show("A(a) and (B(b) or ((C(c) and D(d)) or E(e)))", 22)
+        Show("A(a) or (B(b) or ((C(c) and D(d)) or E(e)))", 23)
+        Show("A(a) and (B(b) and ((C(c) or D(d)) and E(e)))", 24)
+        Show("A(a) or (B(b) and ((C(c) or D(d)) and E(e)))", 25)
+        Show("A(a) and (B(b) or ((C(c) or D(d)) and E(e)))", 26)
+        Show("A(a) or (B(b) or ((C(c) or D(d)) and E(e)))", 27)
+        Show("A(a) and (B(b) and ((C(c) or D(d)) or E(e)))", 28)
+        Show("A(a) or (B(b) and ((C(c) or D(d)) or E(e)))", 29)
+        Show("A(a) and (B(b) or ((C(c) or D(d)) or E(e)))", 30)
+        Show("A(a) or (B(b) or ((C(c) or D(d)) or E(e)))", 31)
+        Show("A(a) and ((B(b) and C(c)) and (D(d) and E(e)))", 32)
+        Show("A(a) or ((B(b) and C(c)) and (D(d) and E(e)))", 33)
+        Show("A(a) and ((B(b) and C(c)) or (D(d) and E(e)))", 34)
+        Show("A(a) or ((B(b) and C(c)) or (D(d) and E(e)))", 35)
+        Show("A(a) and ((B(b) and C(c)) and (D(d) or E(e)))", 36)
+        Show("A(a) or ((B(b) and C(c)) and (D(d) or E(e)))", 37)
+        Show("A(a) and ((B(b) and C(c)) or (D(d) or E(e)))", 38)
+        Show("A(a) or ((B(b) and C(c)) or (D(d) or E(e)))", 39)
+        Show("A(a) and ((B(b) or C(c)) and (D(d) and E(e)))", 40)
+        Show("A(a) or ((B(b) or C(c)) and (D(d) and E(e)))", 41)
+        Show("A(a) and ((B(b) or C(c)) or (D(d) and E(e)))", 42)
+        Show("A(a) or ((B(b) or C(c)) or (D(d) and E(e)))", 43)
+        Show("A(a) and ((B(b) or C(c)) and (D(d) or E(e)))", 44)
+        Show("A(a) or ((B(b) or C(c)) and (D(d) or E(e)))", 45)
+        Show("A(a) and ((B(b) or C(c)) or (D(d) or E(e)))", 46)
+        Show("A(a) or ((B(b) or C(c)) or (D(d) or E(e)))", 47)
+        Show("A(a) and ((B(b) and (C(c) and D(d))) and E(e))", 48)
+        Show("A(a) or ((B(b) and (C(c) and D(d))) and E(e))", 49)
+        Show("A(a) and ((B(b) and (C(c) and D(d))) or E(e))", 50)
+        Show("A(a) or ((B(b) and (C(c) and D(d))) or E(e))", 51)
+        Show("A(a) and ((B(b) or (C(c) and D(d))) and E(e))", 52)
+        Show("A(a) or ((B(b) or (C(c) and D(d))) and E(e))", 53)
+        Show("A(a) and ((B(b) or (C(c) and D(d))) or E(e))", 54)
+        Show("A(a) or ((B(b) or (C(c) and D(d))) or E(e))", 55)
+        Show("A(a) and ((B(b) and (C(c) or D(d))) and E(e))", 56)
+        Show("A(a) or ((B(b) and (C(c) or D(d))) and E(e))", 57)
+        Show("A(a) and ((B(b) and (C(c) or D(d))) or E(e))", 58)
+        Show("A(a) or ((B(b) and (C(c) or D(d))) or E(e))", 59)
+        Show("A(a) and ((B(b) or (C(c) or D(d))) and E(e))", 60)
+        Show("A(a) or ((B(b) or (C(c) or D(d))) and E(e))", 61)
+        Show("A(a) and ((B(b) or (C(c) or D(d))) or E(e))", 62)
+        Show("A(a) or ((B(b) or (C(c) or D(d))) or E(e))", 63)
+        Show("A(a) and (((B(b) and C(c)) and D(d)) and E(e))", 64)
+        Show("A(a) or (((B(b) and C(c)) and D(d)) and E(e))", 65)
+        Show("A(a) and (((B(b) and C(c)) and D(d)) or E(e))", 66)
+        Show("A(a) or (((B(b) and C(c)) and D(d)) or E(e))", 67)
+        Show("A(a) and (((B(b) and C(c)) or D(d)) and E(e))", 68)
+        Show("A(a) or (((B(b) and C(c)) or D(d)) and E(e))", 69)
+        Show("A(a) and (((B(b) and C(c)) or D(d)) or E(e))", 70)
+        Show("A(a) or (((B(b) and C(c)) or D(d)) or E(e))", 71)
+        Show("A(a) and (((B(b) or C(c)) and D(d)) and E(e))", 72)
+        Show("A(a) or (((B(b) or C(c)) and D(d)) and E(e))", 73)
+        Show("A(a) and (((B(b) or C(c)) and D(d)) or E(e))", 74)
+        Show("A(a) or (((B(b) or C(c)) and D(d)) or E(e))", 75)
+        Show("A(a) and (((B(b) or C(c)) or D(d)) and E(e))", 76)
+        Show("A(a) or (((B(b) or C(c)) or D(d)) and E(e))", 77)
+        Show("A(a) and (((B(b) or C(c)) or D(d)) or E(e))", 78)
+        Show("A(a) or (((B(b) or C(c)) or D(d)) or E(e))", 79)
+        Show("(A(a) and B(b)) and (C(c) and (D(d) and E(e)))", 80)
+        Show("(A(a) and B(b)) or (C(c) and (D(d) and E(e)))", 81)
+        Show("(A(a) and B(b)) and (C(c) or (D(d) and E(e)))", 82)
+        Show("(A(a) and B(b)) or (C(c) or (D(d) and E(e)))", 83)
+        Show("(A(a) and B(b)) and (C(c) and (D(d) or E(e)))", 84)
+        Show("(A(a) and B(b)) or (C(c) and (D(d) or E(e)))", 85)
+        Show("(A(a) and B(b)) and (C(c) or (D(d) or E(e)))", 86)
+        Show("(A(a) and B(b)) or (C(c) or (D(d) or E(e)))", 87)
+        Show("(A(a) and B(b)) and ((C(c) and D(d)) and E(e))", 88)
+        Show("(A(a) and B(b)) or ((C(c) and D(d)) and E(e))", 89)
+        Show("(A(a) and B(b)) and ((C(c) and D(d)) or E(e))", 90)
+        Show("(A(a) and B(b)) or ((C(c) and D(d)) or E(e))", 91)
+        Show("(A(a) and B(b)) and ((C(c) or D(d)) and E(e))", 92)
+        Show("(A(a) and B(b)) or ((C(c) or D(d)) and E(e))", 93)
+        Show("(A(a) and B(b)) and ((C(c) or D(d)) or E(e))", 94)
+        Show("(A(a) and B(b)) or ((C(c) or D(d)) or E(e))", 95)
+        Show("(A(a) or B(b)) and (C(c) and (D(d) and E(e)))", 96)
+        Show("(A(a) or B(b)) or (C(c) and (D(d) and E(e)))", 97)
+        Show("(A(a) or B(b)) and (C(c) or (D(d) and E(e)))", 98)
+        Show("(A(a) or B(b)) or (C(c) or (D(d) and E(e)))", 99)
+        Show("(A(a) or B(b)) and (C(c) and (D(d) or E(e)))", 100)
+        Show("(A(a) or B(b)) or (C(c) and (D(d) or E(e)))", 101)
+        Show("(A(a) or B(b)) and (C(c) or (D(d) or E(e)))", 102)
+        Show("(A(a) or B(b)) or (C(c) or (D(d) or E(e)))", 103)
+        Show("(A(a) or B(b)) and ((C(c) and D(d)) and E(e))", 104)
+        Show("(A(a) or B(b)) or ((C(c) and D(d)) and E(e))", 105)
+        Show("(A(a) or B(b)) and ((C(c) and D(d)) or E(e))", 106)
+        Show("(A(a) or B(b)) or ((C(c) and D(d)) or E(e))", 107)
+        Show("(A(a) or B(b)) and ((C(c) or D(d)) and E(e))", 108)
+        Show("(A(a) or B(b)) or ((C(c) or D(d)) and E(e))", 109)
+        Show("(A(a) or B(b)) and ((C(c) or D(d)) or E(e))", 110)
+        Show("(A(a) or B(b)) or ((C(c) or D(d)) or E(e))", 111)
+        Show("(A(a) and (B(b) and C(c))) and (D(d) and E(e))", 112)
+        Show("(A(a) and (B(b) and C(c))) or (D(d) and E(e))", 113)
+        Show("(A(a) and (B(b) and C(c))) and (D(d) or E(e))", 114)
+        Show("(A(a) and (B(b) and C(c))) or (D(d) or E(e))", 115)
+        Show("(A(a) or (B(b) and C(c))) and (D(d) and E(e))", 116)
+        Show("(A(a) or (B(b) and C(c))) or (D(d) and E(e))", 117)
+        Show("(A(a) or (B(b) and C(c))) and (D(d) or E(e))", 118)
+        Show("(A(a) or (B(b) and C(c))) or (D(d) or E(e))", 119)
+        Show("(A(a) and (B(b) or C(c))) and (D(d) and E(e))", 120)
+        Show("(A(a) and (B(b) or C(c))) or (D(d) and E(e))", 121)
+        Show("(A(a) and (B(b) or C(c))) and (D(d) or E(e))", 122)
+        Show("(A(a) and (B(b) or C(c))) or (D(d) or E(e))", 123)
+        Show("(A(a) or (B(b) or C(c))) and (D(d) and E(e))", 124)
+        Show("(A(a) or (B(b) or C(c))) or (D(d) and E(e))", 125)
+        Show("(A(a) or (B(b) or C(c))) and (D(d) or E(e))", 126)
+        Show("(A(a) or (B(b) or C(c))) or (D(d) or E(e))", 127)
+        Show("((A(a) and B(b)) and C(c)) and (D(d) and E(e))", 128)
+        Show("((A(a) and B(b)) and C(c)) or (D(d) and E(e))", 129)
+        Show("((A(a) and B(b)) and C(c)) and (D(d) or E(e))", 130)
+        Show("((A(a) and B(b)) and C(c)) or (D(d) or E(e))", 131)
+        Show("((A(a) and B(b)) or C(c)) and (D(d) and E(e))", 132)
+        Show("((A(a) and B(b)) or C(c)) or (D(d) and E(e))", 133)
+        Show("((A(a) and B(b)) or C(c)) and (D(d) or E(e))", 134)
+        Show("((A(a) and B(b)) or C(c)) or (D(d) or E(e))", 135)
+        Show("((A(a) or B(b)) and C(c)) and (D(d) and E(e))", 136)
+        Show("((A(a) or B(b)) and C(c)) or (D(d) and E(e))", 137)
+        Show("((A(a) or B(b)) and C(c)) and (D(d) or E(e))", 138)
+        Show("((A(a) or B(b)) and C(c)) or (D(d) or E(e))", 139)
+        Show("((A(a) or B(b)) or C(c)) and (D(d) and E(e))", 140)
+        Show("((A(a) or B(b)) or C(c)) or (D(d) and E(e))", 141)
+        Show("((A(a) or B(b)) or C(c)) and (D(d) or E(e))", 142)
+        Show("((A(a) or B(b)) or C(c)) or (D(d) or E(e))", 143)
+        Show("(A(a) and (B(b) and (C(c) and D(d)))) and E(e)", 144)
+        Show("(A(a) and (B(b) and (C(c) and D(d)))) or E(e)", 145)
+        Show("(A(a) or (B(b) and (C(c) and D(d)))) and E(e)", 146)
+        Show("(A(a) or (B(b) and (C(c) and D(d)))) or E(e)", 147)
+        Show("(A(a) and (B(b) or (C(c) and D(d)))) and E(e)", 148)
+        Show("(A(a) and (B(b) or (C(c) and D(d)))) or E(e)", 149)
+        Show("(A(a) or (B(b) or (C(c) and D(d)))) and E(e)", 150)
+        Show("(A(a) or (B(b) or (C(c) and D(d)))) or E(e)", 151)
+        Show("(A(a) and (B(b) and (C(c) or D(d)))) and E(e)", 152)
+        Show("(A(a) and (B(b) and (C(c) or D(d)))) or E(e)", 153)
+        Show("(A(a) or (B(b) and (C(c) or D(d)))) and E(e)", 154)
+        Show("(A(a) or (B(b) and (C(c) or D(d)))) or E(e)", 155)
+        Show("(A(a) and (B(b) or (C(c) or D(d)))) and E(e)", 156)
+        Show("(A(a) and (B(b) or (C(c) or D(d)))) or E(e)", 157)
+        Show("(A(a) or (B(b) or (C(c) or D(d)))) and E(e)", 158)
+        Show("(A(a) or (B(b) or (C(c) or D(d)))) or E(e)", 159)
+        Show("(A(a) and ((B(b) and C(c)) and D(d))) and E(e)", 160)
+        Show("(A(a) and ((B(b) and C(c)) and D(d))) or E(e)", 161)
+        Show("(A(a) or ((B(b) and C(c)) and D(d))) and E(e)", 162)
+        Show("(A(a) or ((B(b) and C(c)) and D(d))) or E(e)", 163)
+        Show("(A(a) and ((B(b) and C(c)) or D(d))) and E(e)", 164)
+        Show("(A(a) and ((B(b) and C(c)) or D(d))) or E(e)", 165)
+        Show("(A(a) or ((B(b) and C(c)) or D(d))) and E(e)", 166)
+        Show("(A(a) or ((B(b) and C(c)) or D(d))) or E(e)", 167)
+        Show("(A(a) and ((B(b) or C(c)) and D(d))) and E(e)", 168)
+        Show("(A(a) and ((B(b) or C(c)) and D(d))) or E(e)", 169)
+        Show("(A(a) or ((B(b) or C(c)) and D(d))) and E(e)", 170)
+        Show("(A(a) or ((B(b) or C(c)) and D(d))) or E(e)", 171)
+        Show("(A(a) and ((B(b) or C(c)) or D(d))) and E(e)", 172)
+        Show("(A(a) and ((B(b) or C(c)) or D(d))) or E(e)", 173)
+        Show("(A(a) or ((B(b) or C(c)) or D(d))) and E(e)", 174)
+        Show("(A(a) or ((B(b) or C(c)) or D(d))) or E(e)", 175)
+        Show("((A(a) and B(b)) and (C(c) and D(d))) and E(e)", 176)
+        Show("((A(a) and B(b)) and (C(c) and D(d))) or E(e)", 177)
+        Show("((A(a) and B(b)) or (C(c) and D(d))) and E(e)", 178)
+        Show("((A(a) and B(b)) or (C(c) and D(d))) or E(e)", 179)
+        Show("((A(a) and B(b)) and (C(c) or D(d))) and E(e)", 180)
+        Show("((A(a) and B(b)) and (C(c) or D(d))) or E(e)", 181)
+        Show("((A(a) and B(b)) or (C(c) or D(d))) and E(e)", 182)
+        Show("((A(a) and B(b)) or (C(c) or D(d))) or E(e)", 183)
+        Show("((A(a) or B(b)) and (C(c) and D(d))) and E(e)", 184)
+        Show("((A(a) or B(b)) and (C(c) and D(d))) or E(e)", 185)
+        Show("((A(a) or B(b)) or (C(c) and D(d))) and E(e)", 186)
+        Show("((A(a) or B(b)) or (C(c) and D(d))) or E(e)", 187)
+        Show("((A(a) or B(b)) and (C(c) or D(d))) and E(e)", 188)
+        Show("((A(a) or B(b)) and (C(c) or D(d))) or E(e)", 189)
+        Show("((A(a) or B(b)) or (C(c) or D(d))) and E(e)", 190)
+        Show("((A(a) or B(b)) or (C(c) or D(d))) or E(e)", 191)
+        Show("((A(a) and (B(b) and C(c))) and D(d)) and E(e)", 192)
+        Show("((A(a) and (B(b) and C(c))) and D(d)) or E(e)", 193)
+        Show("((A(a) and (B(b) and C(c))) or D(d)) and E(e)", 194)
+        Show("((A(a) and (B(b) and C(c))) or D(d)) or E(e)", 195)
+        Show("((A(a) or (B(b) and C(c))) and D(d)) and E(e)", 196)
+        Show("((A(a) or (B(b) and C(c))) and D(d)) or E(e)", 197)
+        Show("((A(a) or (B(b) and C(c))) or D(d)) and E(e)", 198)
+        Show("((A(a) or (B(b) and C(c))) or D(d)) or E(e)", 199)
+        Show("((A(a) and (B(b) or C(c))) and D(d)) and E(e)", 200)
+        Show("((A(a) and (B(b) or C(c))) and D(d)) or E(e)", 201)
+        Show("((A(a) and (B(b) or C(c))) or D(d)) and E(e)", 202)
+        Show("((A(a) and (B(b) or C(c))) or D(d)) or E(e)", 203)
+        Show("((A(a) or (B(b) or C(c))) and D(d)) and E(e)", 204)
+        Show("((A(a) or (B(b) or C(c))) and D(d)) or E(e)", 205)
+        Show("((A(a) or (B(b) or C(c))) or D(d)) and E(e)", 206)
+        Show("((A(a) or (B(b) or C(c))) or D(d)) or E(e)", 207)
+        Show("(((A(a) and B(b)) and C(c)) and D(d)) and E(e)", 208)
+        Show("(((A(a) and B(b)) and C(c)) and D(d)) or E(e)", 209)
+        Show("(((A(a) and B(b)) and C(c)) or D(d)) and E(e)", 210)
+        Show("(((A(a) and B(b)) and C(c)) or D(d)) or E(e)", 211)
+        Show("(((A(a) and B(b)) or C(c)) and D(d)) and E(e)", 212)
+        Show("(((A(a) and B(b)) or C(c)) and D(d)) or E(e)", 213)
+        Show("(((A(a) and B(b)) or C(c)) or D(d)) and E(e)", 214)
+        Show("(((A(a) and B(b)) or C(c)) or D(d)) or E(e)", 215)
+        Show("(((A(a) or B(b)) and C(c)) and D(d)) and E(e)", 216)
+        Show("(((A(a) or B(b)) and C(c)) and D(d)) or E(e)", 217)
+        Show("(((A(a) or B(b)) and C(c)) or D(d)) and E(e)", 218)
+        Show("(((A(a) or B(b)) and C(c)) or D(d)) or E(e)", 219)
+        Show("(((A(a) or B(b)) or C(c)) and D(d)) and E(e)", 220)
+        Show("(((A(a) or B(b)) or C(c)) and D(d)) or E(e)", 221)
+        Show("(((A(a) or B(b)) or C(c)) or D(d)) and E(e)", 222)
+        Show("(((A(a) or B(b)) or C(c)) or D(d)) or E(e)", 223)
+    end
+
+    action Show(text expression, integer which)
+        text entries = ""
+        integer i = 0
+        repeat while i < 32
+            log = ""
+            boolean result = Value(which, Bit(i, 0), Bit(i, 1), Bit(i, 2), Bit(i, 3), Bit(i, 4))
+            if i > 0
+                entries = entries + " "
+            end
+            entries = entries + Letter(result) + "/" + log
+            i = i + 1
+        end
+        output expression + ": " + entries
+    end
+
+    action Value(integer which, boolean a, boolean b, boolean c, boolean d, boolean e) returns boolean
+        if which = 0
+            boolean result = A(a) and (B(b) and (C(c) and (D(d) and E(e))))
+            return result
+        elseif which = 1
+            boolean result = A(a) or (B(b) and (C(c) and (D(d) and E(e))))
+            return result
+        elseif which = 2
+            boolean result = A(a) and (B(b) or (C(c) and (D(d) and E(e))))
+            return result
+        elseif which = 3
+            boolean result = A(a) or (B(b) or (C(c) and (D(d) and E(e))))
+            return result
+        elseif which = 4
+            boolean result = A(a) and (B(b) and (C(c) or (D(d) and E(e))))
+            return result
+        elseif which = 5
+            boolean result = A(a) or (B(b) and (C(c) or (D(d) and E(e))))
+            return result
+        elseif which = 6
+            boolean result = A(a) and (B(b) or (C(c) or (D(d) and E(e))))
+            return result
+        elseif which = 7
+            boolean result = A(a) or (B(b) or (C(c) or (D(d) and E(e))))
+            return result
+        elseif which = 8
+            boolean result = A(a) and (B(b) and (C(c) and (D(d) or E(e))))
+            return result
+        elseif which = 9
+            boolean result = A(a) or (B(b) and (C(c) and (D(d) or E(e))))
+            return result
+        elseif which = 10
+            boolean result = A(a) and (B(b) or (C(c) and (D(d) or E(e))))
+            return result
+        elseif which = 11
+            boolean result = A(a) or (B(b) or (C(c) and (D(d) or E(e))))
+            return result
+        elseif which = 12
+            boolean result = A(a) and (B(b) and (C(c) or (D(d) or E(e))))
+            return result
+        elseif which = 13
+            boolean result = A(a) or (B(b) and (C(c) or (D(d) or E(e))))
+            return result
+        elseif which = 14
+            boolean result = A(a) and (B(b) or (C(c) or (D(d) or E(e))))
+            return result
+        elseif which = 15
+            boolean result = A(a) or (B(b) or (C(c) or (D(d) or E(e))))
+            return result
+        elseif which = 16
+            boolean result = A(a) and (B(b) and ((C(c) and D(d)) and E(e)))
+            return result
+        elseif which = 17
+            boolean result = A(a) or (B(b) and ((C(c) and D(d)) and E(e)))
+            return result
+        elseif which = 18
+            boolean result = A(a) and (B(b) or ((C(c) and D(d)) and E(e)))
+            return result
+        elseif which = 19
+            boolean result = A(a) or (B(b) or ((C(c) and D(d)) and E(e)))
+            return result
+        elseif which = 20
+            boolean result = A(a) and (B(b) and ((C(c) and D(d)) or E(e)))
+            return result
+        elseif which = 21
+            boolean result = A(a) or (B(b) and ((C(c) and D(d)) or E(e)))
+            return result
+        elseif which = 22
+            boolean result = A(a) and (B(b) or ((C(c) and D(d)) or E(e)))
+            return result
+        elseif which = 23
+            boolean result = A(a) or (B(b) or ((C(c) and D(d)) or E(e)))
+            return result
+        elseif which = 24
+            boolean result = A(a) and (B(b) and ((C(c) or D(d)) and E(e)))
+            return result
+        elseif which = 25
+            boolean result = A(a) or (B(b) and ((C(c) or D(d)) and E(e)))
+            return result
+        elseif which = 26
+            boolean result = A(a) and (B(b) or ((C(c) or D(d)) and E(e)))
+            return result
+        elseif which = 27
+            boolean result = A(a) or (B(b) or ((C(c) or D(d)) and E(e)))
+            return result
+        elseif which = 28
+            boolean result = A(a) and (B(b) and ((C(c) or D(d)) or E(e)))
+            return result
+        elseif which = 29
+            boolean result = A(a) or (B(b) and ((C(c) or D(d)) or E(e)))
+            return result
+        elseif which = 30
+            boolean result = A(a) and (B(b) or ((C(c) or D(d)) or E(e)))
+            return result
+        elseif which = 31
+            boolean result = A(a) or (B(b) or ((C(c) or D(d)) or E(e)))
+            return result
+        elseif which = 32
+            boolean result = A(a) and ((B(b) and C(c)) and (D(d) and E(e)))
+            return result
+        elseif which = 33
+            boolean result = A(a) or ((B(b) and C(c)) and (D(d) and E(e)))
+            return result
+        elseif which = 34
+            boolean result = A(a) and ((B(b) and C(c)) or (D(d) and E(e)))
+            return result
+        elseif which = 35
+            boolean result = A(a) or ((B(b) and C(c)) or (D(d) and E(e)))
+            return result
+        elseif which = 36
+            boolean result = A(a) and ((B(b) and C(c)) and (D(d) or E(e)))
+            return result
+        elseif which = 37
+            boolean result = A(a) or ((B(b) and C(c)) and (D(d) or E(e)))
+            return result
+        elseif which = 38
+            boolean result = A(a) and ((B(b) and C(c)) or (D(d) or E(e)))
+            return result
+        elseif which = 39
+            boolean result = A(a) or ((B(b) and C(c)) or (D(d) or E(e)))
+            return result
+        elseif which = 40
+            boolean result = A(a) and ((B(b) or C(c)) and (D(d) and E(e)))
+            return result
+        elseif which = 41
+            boolean result = A(a) or ((B(b) or C(c)) and (D(d) and E(e)))
+            return result
+        elseif which = 42
+            boolean result = A(a) and ((B(b) or C(c)) or (D(d) and E(e)))
+            return result
+        elseif which = 43
+            boolean result = A(a) or ((B(b) or C(c)) or (D(d) and E(e)))
+            return result
+        elseif which = 44
+            boolean result = A(a) and ((B(b) or C(c)) and (D(d) or E(e)))
+            return result
+        elseif which = 45
+            boolean result = A(a) or ((B(b) or C(c)) and (D(d) or E(e)))
+            return result
+        elseif which = 46
+            boolean result = A(a) and ((B(b) or C(c)) or (D(d) or E(e)))
+            return result
+        elseif which = 47
+            boolean result = A(a) or ((B(b) or C(c)) or (D(d) or E(e)))
+            return result
+        elseif which = 48
+            boolean result = A(a) and ((B(b) and (C(c) and D(d))) and E(e))
+            return result
+        elseif which = 49
+            boolean result = A(a) or ((B(b) and (C(c) and D(d))) and E(e))
+            return result
+        elseif which = 50
+            boolean result = A(a) and ((B(b) and (C(c) and D(d))) or E(e))
+            return result
+        elseif which = 51
+            boolean result = A(a) or ((B(b) and (C(c) and D(d))) or E(e))
+            return result
+        elseif which = 52
+            boolean result = A(a) and ((B(b) or (C(c) and D(d))) and E(e))
+            return result
+        elseif which = 53
+            boolean result = A(a) or ((B(b) or (C(c) and D(d))) and E(e))
+            return result
+        elseif which = 54
+            boolean result = A(a) and ((B(b) or (C(c) and D(d))) or E(e))
+            return result
+        elseif which = 55
+            boolean result = A(a) or ((B(b) or (C(c) and D(d))) or E(e))
+            return result
+        elseif which = 56
+            boolean result = A(a) and ((B(b) and (C(c) or D(d))) and E(e))
+            return result
+        elseif which = 57
+            boolean result = A(a) or ((B(b) and (C(c) or D(d))) and E(e))
+            return result
+        elseif which = 58
+            boolean result = A(a) and ((B(b) and (C(c) or D(d))) or E(e))
+            return result
+        elseif which = 59
+            boolean result = A(a) or ((B(b) and (C(c) or D(d))) or E(e))
+            return result
+        elseif which = 60
+            boolean result = A(a) and ((B(b) or (C(c) or D(d))) and E(e))
+            return result
+        elseif which = 61
+            boolean result = A(a) or ((B(b) or (C(c) or D(d))) and E(e))
+            return result
+        elseif which = 62
+            boolean result = A(a) and ((B(b) or (C(c) or D(d))) or E(e))
+            return result
+        elseif which = 63
+            boolean result = A(a) or ((B(b) or (C(c) or D(d))) or E(e))
+            return result
+        elseif which = 64
+            boolean result = A(a) and (((B(b) and C(c)) and D(d)) and E(e))
+            return result
+        elseif which = 65
+            boolean result = A(a) or (((B(b) and C(c)) and D(d)) and E(e))
+            return result
+        elseif which = 66
+            boolean result = A(a) and (((B(b) and C(c)) and D(d)) or E(e))
+            return result
+        elseif which = 67
+            boolean result = A(a) or (((B(b) and C(c)) and D(d)) or E(e))
+            return result
+        elseif which = 68
+            boolean result = A(a) and (((B(b) and C(c)) or D(d)) and E(e))
+            return result
+        elseif which = 69
+            boolean result = A(a) or (((B(b) and C(c)) or D(d)) and E(e))
+            return result
+        elseif which = 70
+            boolean result = A(a) and (((B(b) and C(c)) or D(d)) or E(e))
+            return result
+        elseif which = 71
+            boolean result = A(a) or (((B(b) and C(c)) or D(d)) or E(e))
+            return result
+        elseif which = 72
+            boolean result = A(a) and (((B(b) or C(c)) and D(d)) and E(e))
+            return result
+        elseif which = 73
+            boolean result = A(a) or (((B(b) or C(c)) and D(d)) and E(e))
+            return result
+        elseif which = 74
+            boolean result = A(a) and (((B(b) or C(c)) and D(d)) or E(e))
+            return result
+        elseif which = 75
+            boolean result = A(a) or (((B(b) or C(c)) and D(d)) or E(e))
+            return result
+        elseif which = 76
+            boolean result = A(a) and (((B(b) or C(c)) or D(d)) and E(e))
+            return result
+        elseif which = 77
+            boolean result = A(a) or (((B(b) or C(c)) or D(d)) and E(e))
+            return result
+        elseif which = 78
+            boolean result = A(a) and (((B(b) or C(c)) or D(d)) or E(e))
+            return result
+        elseif which = 79
+            boolean result = A(a) or (((B(b) or C(c)) or D(d)) or E(e))
+            return result
+        elseif which = 80
+            boolean result = (A(a) and B(b)) and (C(c) and (D(d) and E(e)))
+            return result
+        elseif which = 81
+            boolean result = (A(a) and B(b)) or (C(c) and (D(d) and E(e)))
+            return result
+        elseif which = 82
+            boolean result = (A(a) and B(b)) and (C(c) or (D(d) and E(e)))
+            return result
+        elseif which = 83
+            boolean result = (A(a) and B(b)) or (C(c) or (D(d) and E(e)))
+            return result
+        elseif which = 84
+            boolean result = (A(a) and B(b)) and (C(c) and (D(d) or E(e)))
+            return result
+        elseif which = 85
+            boolean result = (A(a) and B(b)) or (C(c) and (D(d) or E(e)))
+            return result
+        elseif which = 86
+            boolean result = (A(a) and B(b)) and (C(c) or (D(d) or E(e)))
+            return result
+        elseif which = 87
+            boolean result = (A(a) and B(b)) or (C(c) or (D(d) or E(e)))
+            return result
+        elseif which = 88
+            boolean result = (A(a) and B(b)) and ((C(c) and D(d)) and E(e))
+            return result
+        elseif which = 89
+            boolean result = (A(a) and B(b)) or ((C(c) and D(d)) and E(e))
+            return result
+        elseif which = 90
+            boolean result = (A(a) and B(b)) and ((C(c) and D(d)) or E(e))
+            return result
+        elseif which = 91
+            boolean result = (A(a) and B(b)) or ((C(c) and D(d)) or E(e))
+            return result
+        elseif which = 92
+            boolean result = (A(a) and B(b)) and ((C(c) or D(d)) and E(e))
+            return result
+        elseif which = 93
+            boolean result = (A(a) and B(b)) or ((C(c) or D(d)) and E(e))
+            return result
+        elseif which = 94
+            boolean result = (A(a) and B(b)) and ((C(c) or D(d)) or E(e))
+            return result
+        elseif which = 95
+            boolean result = (A(a) and B(b)) or ((C(c) or D(d)) or E(e))
+            return result
+        elseif which = 96
+            boolean result = (A(a) or B(b)) and (C(c) and (D(d) and E(e)))
+            return result
+        elseif which = 97
+            boolean result = (A(a) or B(b)) or (C(c) and (D(d) and E(e)))
+            return result
+        elseif which = 98
+            boolean result = (A(a) or B(b)) and (C(c) or (D(d) and E(e)))
+            return result
+        elseif which = 99
+            boolean result = (A(a) or B(b)) or (C(c) or (D(d) and E(e)))
+            return result
+        elseif which = 100
+            boolean result = (A(a) or B(b)) and (C(c) and (D(d) or E(e)))
+            return result
+        elseif which = 101
+            boolean result = (A(a) or B(b)) or (C(c) and (D(d) or E(e)))
+            return result
+        elseif which = 102
+            boolean result = (A(a) or B(b)) and (C(c) or (D(d) or E(e)))
+            return result
+        elseif which = 103
+            boolean result = (A(a) or B(b)) or (C(c) or (D(d) or E(e)))
+            return result
+        elseif which = 104
+            boolean result = (A(a) or B(b)) and ((C(c) and D(d)) and E(e))
+            return result
+        elseif which = 105
+            boolean result = (A(a) or B(b)) or ((C(c) and D(d)) and E(e))
+            return result
+        elseif which = 106
+            boolean result = (A(a) or B(b)) and ((C(c) and D(d)) or E(e))
+            return result
+        elseif which = 107
+            boolean result = (A(a) or B(b)) or ((C(c) and D(d)) or E(e))
+            return result
+        elseif which = 108
+            boolean result = (A(a) or B(b)) and ((C(c) or D(d)) and E(e))
+            return result
+        elseif which = 109
+            boolean result = (A(a) or B(b)) or ((C(c) or D(d)) and E(e))
+            return result
+        elseif which = 110
+            boolean result = (A(a) or B(b)) and ((C(c) or D(d)) or E(e))
+            return result
+        elseif which = 111
+            boolean result = (A(a) or B(b)) or ((C(c) or D(d)) or E(e))
+            return result
+        elseif which = 112
+            boolean result = (A(a) and (B(b) and C(c))) and (D(d) and E(e))
+            return result
+        elseif which = 113
+            boolean result = (A(a) and (B(b) and C(c))) or (D(d) and E(e))
+            return result
+        elseif which = 114
+            boolean result = (A(a) and (B(b) and C(c))) and (D(d) or E(e))
+            return result
+        elseif which = 115
+            boolean result = (A(a) and (B(b) and C(c))) or (D(d) or E(e))
+            return result
+        elseif which = 116
+            boolean result = (A(a) or (B(b) and C(c))) and (D(d) and E(e))
+            return result
+        elseif which = 117
+            boolean result = (A(a) or (B(b) and C(c))) or (D(d) and E(e))
+            return result
+        elseif which = 118
+            boolean result = (A(a) or (B(b) and C(c))) and (D(d) or E(e))
+            return result
+        elseif which = 119
+            boolean result = (A(a) or (B(b) and C(c))) or (D(d) or E(e))
+            return result
+        elseif which = 120
+            boolean result = (A(a) and (B(b) or C(c))) and (D(d) and E(e))
+            return result
+        elseif which = 121
+            boolean result = (A(a) and (B(b) or C(c))) or (D(d) and E(e))
+            return result
+        elseif which = 122
+            boolean result = (A(a) and (B(b) or C(c))) and (D(d) or E(e))
+            return result
+        elseif which = 123
+            boolean result = (A(a) and (B(b) or C(c))) or (D(d) or E(e))
+            return result
+        elseif which = 124
+            boolean result = (A(a) or (B(b) or C(c))) and (D(d) and E(e))
+            return result
+        elseif which = 125
+            boolean result = (A(a) or (B(b) or C(c))) or (D(d) and E(e))
+            return result
+        elseif which = 126
+            boolean result = (A(a) or (B(b) or C(c))) and (D(d) or E(e))
+            return result
+        elseif which = 127
+            boolean result = (A(a) or (B(b) or C(c))) or (D(d) or E(e))
+            return result
+        elseif which = 128
+            boolean result = ((A(a) and B(b)) and C(c)) and (D(d) and E(e))
+            return result
+        elseif which = 129
+            boolean result = ((A(a) and B(b)) and C(c)) or (D(d) and E(e))
+            return result
+        elseif which = 130
+            boolean result = ((A(a) and B(b)) and C(c)) and (D(d) or E(e))
+            return result
+        elseif which = 131
+            boolean result = ((A(a) and B(b)) and C(c)) or (D(d) or E(e))
+            return result
+        elseif which = 132
+            boolean result = ((A(a) and B(b)) or C(c)) and (D(d) and E(e))
+            return result
+        elseif which = 133
+            boolean result = ((A(a) and B(b)) or C(c)) or (D(d) and E(e))
+            return result
+        elseif which = 134
+            boolean result = ((A(a) and B(b)) or C(c)) and (D(d) or E(e))
+            return result
+        elseif which = 135
+            boolean result = ((A(a) and B(b)) or C(c)) or (D(d) or E(e))
+            return result
+        elseif which = 136
+            boolean result = ((A(a) or B(b)) and C(c)) and (D(d) and E(e))
+            return result
+        elseif which = 137
+            boolean result = ((A(a) or B(b)) and C(c)) or (D(d) and E(e))
+            return result
+        elseif which = 138
+            boolean result = ((A(a) or B(b)) and C(c)) and (D(d) or E(e))
+            return result
+        elseif which = 139
+            boolean result = ((A(a) or B(b)) and C(c)) or (D(d) or E(e))
+            return result
+        elseif which = 140
+            boolean result = ((A(a) or B(b)) or C(c)) and (D(d) and E(e))
+            return result
+        elseif which = 141
+            boolean result = ((A(a) or B(b)) or C(c)) or (D(d) and E(e))
+            return result
+        elseif which = 142
+            boolean result = ((A(a) or B(b)) or C(c)) and (D(d) or E(e))
+            return result
+        elseif which = 143
+            boolean result = ((A(a) or B(b)) or C(c)) or (D(d) or E(e))
+            return result
+        elseif which = 144
+            boolean result = (A(a) and (B(b) and (C(c) and D(d)))) and E(e)
+            return result
+        elseif which = 145
+            boolean result = (A(a) and (B(b) and (C(c) and D(d)))) or E(e)
+            return result
+        elseif which = 146
+            boolean result = (A(a) or (B(b) and (C(c) and D(d)))) and E(e)
+            return result
+        elseif which = 147
+            boolean result = (A(a) or (B(b) and (C(c) and D(d)))) or E(e)
+            return result
+        elseif which = 148
+            boolean result = (A(a) and (B(b) or (C(c) and D(d)))) and E(e)
+            return result
+        elseif which = 149
+            boolean result = (A(a) and (B(b) or (C(c) and D(d)))) or E(e)
+            return result
+        elseif which = 150
+            boolean result = (A(a) or (B(b) or (C(c) and D(d)))) and E(e)
+            return result
+        elseif which = 151
+            boolean result = (A(a) or (B(b) or (C(c) and D(d)))) or E(e)
+            return result
+        elseif which = 152
+            boolean result = (A(a) and (B(b) and (C(c) or D(d)))) and E(e)
+            return result
+        elseif which = 153
+            boolean result = (A(a) and (B(b) and (C(c) or D(d)))) or E(e)
+            return result
+        elseif which = 154
+            boolean result = (A(a) or (B(b) and (C(c) or D(d)))) and E(e)
+            return result
+        elseif which = 155
+            boolean result = (A(a) or (B(b) and (C(c) or D(d)))) or E(e)
+            return result
+        elseif which = 156
+            boolean result = (A(a) and (B(b) or (C(c) or D(d)))) and E(e)
+            return result
+        elseif which = 157
+            boolean result = (A(a) and (B(b) or (C(c) or D(d)))) or E(e)
+            return result
+        elseif which = 158
+            boolean result = (A(a) or (B(b) or (C(c) or D(d)))) and E(e)
+            return result
+        elseif which = 159
+            boolean result = (A(a) or (B(b) or (C(c) or D(d)))) or E(e)
+            return result
+        elseif which = 160
+            boolean result = (A(a) and ((B(b) and C(c)) and D(d))) and E(e)
+            return result
+        elseif which = 161
+            boolean result = (A(a) and ((B(b) and C(c)) and D(d))) or E(e)
+            return result
+        elseif which = 162
+            boolean result = (A(a) or ((B(b) and C(c)) and D(d))) and E(e)
+            return result
+        elseif which = 163
+            boolean result = (A(a) or ((B(b) and C(c)) and D(d))) or E(e)
+            return result
+        elseif which = 164
+            boolean result = (A(a) and ((B(b) and C(c)) or D(d))) and E(e)
+            return result
+        elseif which = 165
+            boolean result = (A(a) and ((B(b) and C(c)) or D(d))) or E(e)
+            return result
+        elseif which = 166
+            boolean result = (A(a) or ((B(b) and C(c)) or D(d))) and E(e)
+            return result
+        elseif which = 167
+            boolean result = (A(a) or ((B(b) and C(c)) or D(d))) or E(e)
+            return result
+        elseif which = 168
+            boolean result = (A(a) and ((B(b) or C(c)) and D(d))) and E(e)
+            return result
+        elseif which = 169
+            boolean result = (A(a) and ((B(b) or C(c)) and D(d))) or E(e)
+            return result
+        elseif which = 170
+            boolean result = (A(a) or ((B(b) or C(c)) and D(d))) and E(e)
+            return result
+        elseif which = 171
+            boolean result = (A(a) or ((B(b) or C(c)) and D(d))) or E(e)
+            return result
+        elseif which = 172
+            boolean result = (A(a) and ((B(b) or C(c)) or D(d))) and E(e)
+            return result
+        elseif which = 173
+            boolean result = (A(a) and ((B(b) or C(c)) or D(d))) or E(e)
+            return result
+        elseif which = 174
+            boolean result = (A(a) or ((B(b) or C(c)) or D(d))) and E(e)
+            return result
+        elseif which = 175
+            boolean result = (A(a) or ((B(b) or C(c)) or D(d))) or E(e)
+            return result
+        elseif which = 176
+            boolean result = ((A(a) and B(b)) and (C(c) and D(d))) and E(e)
+            return result
+        elseif which = 177
+            boolean result = ((A(a) and B(b)) and (C(c) and D(d))) or E(e)
+            return result
+        elseif which = 178
+            boolean result = ((A(a) and B(b)) or (C(c) and D(d))) and E(e)
+            return result
+        elseif which = 179
+            boolean result = ((A(a) and B(b)) or (C(c) and D(d))) or E(e)
+            return result
+        elseif which = 180
+            boolean result = ((A(a) and B(b)) and (C(c) or D(d))) and E(e)
+            return result
+        elseif which = 181
+            boolean result = ((A(a) and B(b)) and (C(c) or D(d))) or E(e)
+            return result
+        elseif which = 182
+            boolean result = ((A(a) and B(b)) or (C(c) or D(d))) and E(e)
+            return result
+        elseif which = 183
+            boolean result = ((A(a) and B(b)) or (C(c) or D(d))) or E(e)
+            return result
+        elseif which = 184
+            boolean result = ((A(a) or B(b)) and (C(c) and D(d))) and E(e)
+            return result
+        elseif which = 185
+            boolean result = ((A(a) or B(b)) and (C(c) and D(d))) or E(e)
+            return result
+        elseif which = 186
+            boolean result = ((A(a) or B(b)) or (C(c) and D(d))) and E(e)
+            return result
+        elseif which = 187
+            boolean result = ((A(a) or B(b)) or (C(c) and D(d))) or E(e)
+            return result
+        elseif which = 188
+            boolean result = ((A(a) or B(b)) and (C(c) or D(d))) and E(e)
+            return result
+        elseif which = 189
+            boolean result = ((A(a) or B(b)) and (C(c) or D(d))) or E(e)
+            return result
+        elseif which = 190
+            boolean result = ((A(a) or B(b)) or (C(c) or D(d))) and E(e)
+            return result
+        elseif which = 191
+            boolean result = ((A(a) or B(b)) or (C(c) or D(d))) or E(e)
+            return result
+        elseif which = 192
+            boolean result = ((A(a) and (B(b) and C(c))) and D(d)) and E(e)
+            return result
+        elseif which = 193
+            boolean result = ((A(a) and (B(b) and C(c))) and D(d)) or E(e)
+            return result
+        elseif which = 194
+            boolean result = ((A(a) and (B(b) and C(c))) or D(d)) and E(e)
+            return result
+        elseif which = 195
+            boolean result = ((A(a) and (B(b) and C(c))) or D(d)) or E(e)
+            return result
+        elseif which = 196
+            boolean result = ((A(a) or (B(b) and C(c))) and D(d)) and E(e)
+            return result
+        elseif which = 197
+            boolean result = ((A(a) or (B(b) and C(c))) and D(d)) or E(e)
+            return result
+        elseif which = 198
+            boolean result = ((A(a) or (B(b) and C(c))) or D(d)) and E(e)
+            return result
+        elseif which = 199
+            boolean result = ((A(a) or (B(b) and C(c))) or D(d)) or E(e)
+            return result
+        elseif which = 200
+            boolean result = ((A(a) and (B(b) or C(c))) and D(d)) and E(e)
+            return result
+        elseif which = 201
+            boolean result = ((A(a) and (B(b) or C(c))) and D(d)) or E(e)
+            return result
+        elseif which = 202
+            boolean result = ((A(a) and (B(b) or C(c))) or D(d)) and E(e)
+            return result
+        elseif which = 203
+            boolean result = ((A(a) and (B(b) or C(c))) or D(d)) or E(e)
+            return result
+        elseif which = 204
+            boolean result = ((A(a) or (B(b) or C(c))) and D(d)) and E(e)
+            return result
+        elseif which = 205
+            boolean result = ((A(a) or (B(b) or C(c))) and D(d)) or E(e)
+            return result
+        elseif which = 206
+            boolean result = ((A(a) or (B(b) or C(c))) or D(d)) and E(e)
+            return result
+        elseif which = 207
+            boolean result = ((A(a) or (B(b) or C(c))) or D(d)) or E(e)
+            return result
+        elseif which = 208
+            boolean result = (((A(a) and B(b)) and C(c)) and D(d)) and E(e)
+            return result
+        elseif which = 209
+            boolean result = (((A(a) and B(b)) and C(c)) and D(d)) or E(e)
+            return result
+        elseif which = 210
+            boolean result = (((A(a) and B(b)) and C(c)) or D(d)) and E(e)
+            return result
+        elseif which = 211
+            boolean result = (((A(a) and B(b)) and C(c)) or D(d)) or E(e)
+            return result
+        elseif which = 212
+            boolean result = (((A(a) and B(b)) or C(c)) and D(d)) and E(e)
+            return result
+        elseif which = 213
+            boolean result = (((A(a) and B(b)) or C(c)) and D(d)) or E(e)
+            return result
+        elseif which = 214
+            boolean result = (((A(a) and B(b)) or C(c)) or D(d)) and E(e)
+            return result
+        elseif which = 215
+            boolean result = (((A(a) and B(b)) or C(c)) or D(d)) or E(e)
+            return result
+        elseif which = 216
+            boolean result = (((A(a) or B(b)) and C(c)) and D(d)) and E(e)
+            return result
+        elseif which = 217
+            boolean result = (((A(a) or B(b)) and C(c)) and D(d)) or E(e)
+            return result
+        elseif which = 218
+            boolean result = (((A(a) or B(b)) and C(c)) or D(d)) and E(e)
+            return result
+        elseif which = 219
+            boolean result = (((A(a) or B(b)) and C(c)) or D(d)) or E(e)
+            return result
+        elseif which = 220
+            boolean result = (((A(a) or B(b)) or C(c)) and D(d)) and E(e)
+            return result
+        elseif which = 221
+            boolean result = (((A(a) or B(b)) or C(c)) and D(d)) or E(e)
+            return result
+        elseif which = 222
+            boolean result = (((A(a) or B(b)) or C(c)) or D(d)) and E(e)
+            return result
+        elseif which = 223
+            boolean result = (((A(a) or B(b)) or C(c)) or D(d)) or E(e)
+            return result
+        end
+        return false
+    end
+
+    action A(boolean value) returns boolean
+        log = log + "A"
+        return value
+    end
+
+    action B(boolean value) returns boolean
+        log = log + "B"
+        return value
+    end
+
+    action C(boolean value) returns boolean
+        log = log + "C"
+        return value
+    end
+
+    action D(boolean value) returns boolean
+        log = log + "D"
+        return value
+    end
+
+    action E(boolean value) returns boolean
+        log = log + "E"
+        return value
+    end
+
+
+    /* Whether bit place of the combination is set: place 0 is the first variable, the highest bit. */
+    action Bit(integer combination, integer place) returns boolean
+        integer shift = 4 - place
+        integer value = combination
+        repeat shift times
+            value = value / 2
+        end
+        return value mod 2 = 1
+    end
+
+    action Letter(boolean value) returns text
+        if value
+            return "T"
+        end
+        return "F"
+    end
+end

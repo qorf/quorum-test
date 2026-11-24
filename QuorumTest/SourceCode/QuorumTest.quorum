@@ -148,6 +148,7 @@ class QuorumTest is ProcessListener
     TextTester textChecks
     NumbersTester numbersChecks
     ContainerEdgesTester containerEdgesChecks
+    ShortCircuitTester shortCircuitChecks
     MathEdgesTester mathEdgesChecks
     GeometryTester geometryChecks
     TextSupportTester textSupportChecks
@@ -203,6 +204,7 @@ class QuorumTest is ProcessListener
         textChecks:SetCompilerTestSuite(me)
         numbersChecks:SetCompilerTestSuite(me)
         containerEdgesChecks:SetCompilerTestSuite(me)
+        shortCircuitChecks:SetCompilerTestSuite(me)
         mathEdgesChecks:SetCompilerTestSuite(me)
         geometryChecks:SetCompilerTestSuite(me)
         textSupportChecks:SetCompilerTestSuite(me)
@@ -567,6 +569,10 @@ class QuorumTest is ProcessListener
         if StartTester("ContainerEdges")
             containerEdgesChecks:Test()
             FinishTester(containerEdgesChecks:GetName())
+        end
+        if StartTester("ShortCircuit")
+            shortCircuitChecks:Test()
+            FinishTester(shortCircuitChecks:GetName())
         end
         if StartTester("MathEdges")
             mathEdgesChecks:Test()

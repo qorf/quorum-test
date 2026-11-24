@@ -1,0 +1,593 @@
+/*
+Chains of two to five and/or operators written without parentheses, every
+mix of and and or, on six boolean variables (a to f; a chain uses as many as
+it needs), each as a value and as an if condition, for all 64 combinations
+of true and false (a first: FFFFFF, FFFFFT, ..., TTTTTT). and binds more
+tightly than or, and each groups from the left, so a or b and c is
+a or (b and c), and a and b or c and d is (a and b) or (c and d). The
+expected output was worked out separately from those rules.
+*/
+class Main
+    action Main
+        Show("a and b and c", 0)
+        Show("a and b or c", 1)
+        Show("a or b and c", 2)
+        Show("a or b or c", 3)
+        Show("a and b and c and d", 4)
+        Show("a and b and c or d", 5)
+        Show("a and b or c and d", 6)
+        Show("a and b or c or d", 7)
+        Show("a or b and c and d", 8)
+        Show("a or b and c or d", 9)
+        Show("a or b or c and d", 10)
+        Show("a or b or c or d", 11)
+        Show("a and b and c and d and e", 12)
+        Show("a and b and c and d or e", 13)
+        Show("a and b and c or d and e", 14)
+        Show("a and b and c or d or e", 15)
+        Show("a and b or c and d and e", 16)
+        Show("a and b or c and d or e", 17)
+        Show("a and b or c or d and e", 18)
+        Show("a and b or c or d or e", 19)
+        Show("a or b and c and d and e", 20)
+        Show("a or b and c and d or e", 21)
+        Show("a or b and c or d and e", 22)
+        Show("a or b and c or d or e", 23)
+        Show("a or b or c and d and e", 24)
+        Show("a or b or c and d or e", 25)
+        Show("a or b or c or d and e", 26)
+        Show("a or b or c or d or e", 27)
+        Show("a and b and c and d and e and f", 28)
+        Show("a and b and c and d and e or f", 29)
+        Show("a and b and c and d or e and f", 30)
+        Show("a and b and c and d or e or f", 31)
+        Show("a and b and c or d and e and f", 32)
+        Show("a and b and c or d and e or f", 33)
+        Show("a and b and c or d or e and f", 34)
+        Show("a and b and c or d or e or f", 35)
+        Show("a and b or c and d and e and f", 36)
+        Show("a and b or c and d and e or f", 37)
+        Show("a and b or c and d or e and f", 38)
+        Show("a and b or c and d or e or f", 39)
+        Show("a and b or c or d and e and f", 40)
+        Show("a and b or c or d and e or f", 41)
+        Show("a and b or c or d or e and f", 42)
+        Show("a and b or c or d or e or f", 43)
+        Show("a or b and c and d and e and f", 44)
+        Show("a or b and c and d and e or f", 45)
+        Show("a or b and c and d or e and f", 46)
+        Show("a or b and c and d or e or f", 47)
+        Show("a or b and c or d and e and f", 48)
+        Show("a or b and c or d and e or f", 49)
+        Show("a or b and c or d or e and f", 50)
+        Show("a or b and c or d or e or f", 51)
+        Show("a or b or c and d and e and f", 52)
+        Show("a or b or c and d and e or f", 53)
+        Show("a or b or c and d or e and f", 54)
+        Show("a or b or c and d or e or f", 55)
+        Show("a or b or c or d and e and f", 56)
+        Show("a or b or c or d and e or f", 57)
+        Show("a or b or c or d or e and f", 58)
+        Show("a or b or c or d or e or f", 59)
+    end
+
+    action Show(text expression, integer which)
+        text values = ""
+        text choices = ""
+        integer i = 0
+        repeat while i < 64
+            values = values + Letter(Value(which, Bit(i, 0), Bit(i, 1), Bit(i, 2), Bit(i, 3), Bit(i, 4), Bit(i, 5)))
+            choices = choices + Letter(Choice(which, Bit(i, 0), Bit(i, 1), Bit(i, 2), Bit(i, 3), Bit(i, 4), Bit(i, 5)))
+            i = i + 1
+        end
+        output expression + ": value " + values + ", if " + choices
+    end
+
+    action Value(integer which, boolean a, boolean b, boolean c, boolean d, boolean e, boolean f) returns boolean
+        if which = 0
+            boolean result = a and b and c
+            return result
+        elseif which = 1
+            boolean result = a and b or c
+            return result
+        elseif which = 2
+            boolean result = a or b and c
+            return result
+        elseif which = 3
+            boolean result = a or b or c
+            return result
+        elseif which = 4
+            boolean result = a and b and c and d
+            return result
+        elseif which = 5
+            boolean result = a and b and c or d
+            return result
+        elseif which = 6
+            boolean result = a and b or c and d
+            return result
+        elseif which = 7
+            boolean result = a and b or c or d
+            return result
+        elseif which = 8
+            boolean result = a or b and c and d
+            return result
+        elseif which = 9
+            boolean result = a or b and c or d
+            return result
+        elseif which = 10
+            boolean result = a or b or c and d
+            return result
+        elseif which = 11
+            boolean result = a or b or c or d
+            return result
+        elseif which = 12
+            boolean result = a and b and c and d and e
+            return result
+        elseif which = 13
+            boolean result = a and b and c and d or e
+            return result
+        elseif which = 14
+            boolean result = a and b and c or d and e
+            return result
+        elseif which = 15
+            boolean result = a and b and c or d or e
+            return result
+        elseif which = 16
+            boolean result = a and b or c and d and e
+            return result
+        elseif which = 17
+            boolean result = a and b or c and d or e
+            return result
+        elseif which = 18
+            boolean result = a and b or c or d and e
+            return result
+        elseif which = 19
+            boolean result = a and b or c or d or e
+            return result
+        elseif which = 20
+            boolean result = a or b and c and d and e
+            return result
+        elseif which = 21
+            boolean result = a or b and c and d or e
+            return result
+        elseif which = 22
+            boolean result = a or b and c or d and e
+            return result
+        elseif which = 23
+            boolean result = a or b and c or d or e
+            return result
+        elseif which = 24
+            boolean result = a or b or c and d and e
+            return result
+        elseif which = 25
+            boolean result = a or b or c and d or e
+            return result
+        elseif which = 26
+            boolean result = a or b or c or d and e
+            return result
+        elseif which = 27
+            boolean result = a or b or c or d or e
+            return result
+        elseif which = 28
+            boolean result = a and b and c and d and e and f
+            return result
+        elseif which = 29
+            boolean result = a and b and c and d and e or f
+            return result
+        elseif which = 30
+            boolean result = a and b and c and d or e and f
+            return result
+        elseif which = 31
+            boolean result = a and b and c and d or e or f
+            return result
+        elseif which = 32
+            boolean result = a and b and c or d and e and f
+            return result
+        elseif which = 33
+            boolean result = a and b and c or d and e or f
+            return result
+        elseif which = 34
+            boolean result = a and b and c or d or e and f
+            return result
+        elseif which = 35
+            boolean result = a and b and c or d or e or f
+            return result
+        elseif which = 36
+            boolean result = a and b or c and d and e and f
+            return result
+        elseif which = 37
+            boolean result = a and b or c and d and e or f
+            return result
+        elseif which = 38
+            boolean result = a and b or c and d or e and f
+            return result
+        elseif which = 39
+            boolean result = a and b or c and d or e or f
+            return result
+        elseif which = 40
+            boolean result = a and b or c or d and e and f
+            return result
+        elseif which = 41
+            boolean result = a and b or c or d and e or f
+            return result
+        elseif which = 42
+            boolean result = a and b or c or d or e and f
+            return result
+        elseif which = 43
+            boolean result = a and b or c or d or e or f
+            return result
+        elseif which = 44
+            boolean result = a or b and c and d and e and f
+            return result
+        elseif which = 45
+            boolean result = a or b and c and d and e or f
+            return result
+        elseif which = 46
+            boolean result = a or b and c and d or e and f
+            return result
+        elseif which = 47
+            boolean result = a or b and c and d or e or f
+            return result
+        elseif which = 48
+            boolean result = a or b and c or d and e and f
+            return result
+        elseif which = 49
+            boolean result = a or b and c or d and e or f
+            return result
+        elseif which = 50
+            boolean result = a or b and c or d or e and f
+            return result
+        elseif which = 51
+            boolean result = a or b and c or d or e or f
+            return result
+        elseif which = 52
+            boolean result = a or b or c and d and e and f
+            return result
+        elseif which = 53
+            boolean result = a or b or c and d and e or f
+            return result
+        elseif which = 54
+            boolean result = a or b or c and d or e and f
+            return result
+        elseif which = 55
+            boolean result = a or b or c and d or e or f
+            return result
+        elseif which = 56
+            boolean result = a or b or c or d and e and f
+            return result
+        elseif which = 57
+            boolean result = a or b or c or d and e or f
+            return result
+        elseif which = 58
+            boolean result = a or b or c or d or e and f
+            return result
+        elseif which = 59
+            boolean result = a or b or c or d or e or f
+            return result
+        end
+        return false
+    end
+
+    action Choice(integer which, boolean a, boolean b, boolean c, boolean d, boolean e, boolean f) returns boolean
+        if which = 0
+            if a and b and c
+                return true
+            end
+            return false
+        elseif which = 1
+            if a and b or c
+                return true
+            end
+            return false
+        elseif which = 2
+            if a or b and c
+                return true
+            end
+            return false
+        elseif which = 3
+            if a or b or c
+                return true
+            end
+            return false
+        elseif which = 4
+            if a and b and c and d
+                return true
+            end
+            return false
+        elseif which = 5
+            if a and b and c or d
+                return true
+            end
+            return false
+        elseif which = 6
+            if a and b or c and d
+                return true
+            end
+            return false
+        elseif which = 7
+            if a and b or c or d
+                return true
+            end
+            return false
+        elseif which = 8
+            if a or b and c and d
+                return true
+            end
+            return false
+        elseif which = 9
+            if a or b and c or d
+                return true
+            end
+            return false
+        elseif which = 10
+            if a or b or c and d
+                return true
+            end
+            return false
+        elseif which = 11
+            if a or b or c or d
+                return true
+            end
+            return false
+        elseif which = 12
+            if a and b and c and d and e
+                return true
+            end
+            return false
+        elseif which = 13
+            if a and b and c and d or e
+                return true
+            end
+            return false
+        elseif which = 14
+            if a and b and c or d and e
+                return true
+            end
+            return false
+        elseif which = 15
+            if a and b and c or d or e
+                return true
+            end
+            return false
+        elseif which = 16
+            if a and b or c and d and e
+                return true
+            end
+            return false
+        elseif which = 17
+            if a and b or c and d or e
+                return true
+            end
+            return false
+        elseif which = 18
+            if a and b or c or d and e
+                return true
+            end
+            return false
+        elseif which = 19
+            if a and b or c or d or e
+                return true
+            end
+            return false
+        elseif which = 20
+            if a or b and c and d and e
+                return true
+            end
+            return false
+        elseif which = 21
+            if a or b and c and d or e
+                return true
+            end
+            return false
+        elseif which = 22
+            if a or b and c or d and e
+                return true
+            end
+            return false
+        elseif which = 23
+            if a or b and c or d or e
+                return true
+            end
+            return false
+        elseif which = 24
+            if a or b or c and d and e
+                return true
+            end
+            return false
+        elseif which = 25
+            if a or b or c and d or e
+                return true
+            end
+            return false
+        elseif which = 26
+            if a or b or c or d and e
+                return true
+            end
+            return false
+        elseif which = 27
+            if a or b or c or d or e
+                return true
+            end
+            return false
+        elseif which = 28
+            if a and b and c and d and e and f
+                return true
+            end
+            return false
+        elseif which = 29
+            if a and b and c and d and e or f
+                return true
+            end
+            return false
+        elseif which = 30
+            if a and b and c and d or e and f
+                return true
+            end
+            return false
+        elseif which = 31
+            if a and b and c and d or e or f
+                return true
+            end
+            return false
+        elseif which = 32
+            if a and b and c or d and e and f
+                return true
+            end
+            return false
+        elseif which = 33
+            if a and b and c or d and e or f
+                return true
+            end
+            return false
+        elseif which = 34
+            if a and b and c or d or e and f
+                return true
+            end
+            return false
+        elseif which = 35
+            if a and b and c or d or e or f
+                return true
+            end
+            return false
+        elseif which = 36
+            if a and b or c and d and e and f
+                return true
+            end
+            return false
+        elseif which = 37
+            if a and b or c and d and e or f
+                return true
+            end
+            return false
+        elseif which = 38
+            if a and b or c and d or e and f
+                return true
+            end
+            return false
+        elseif which = 39
+            if a and b or c and d or e or f
+                return true
+            end
+            return false
+        elseif which = 40
+            if a and b or c or d and e and f
+                return true
+            end
+            return false
+        elseif which = 41
+            if a and b or c or d and e or f
+                return true
+            end
+            return false
+        elseif which = 42
+            if a and b or c or d or e and f
+                return true
+            end
+            return false
+        elseif which = 43
+            if a and b or c or d or e or f
+                return true
+            end
+            return false
+        elseif which = 44
+            if a or b and c and d and e and f
+                return true
+            end
+            return false
+        elseif which = 45
+            if a or b and c and d and e or f
+                return true
+            end
+            return false
+        elseif which = 46
+            if a or b and c and d or e and f
+                return true
+            end
+            return false
+        elseif which = 47
+            if a or b and c and d or e or f
+                return true
+            end
+            return false
+        elseif which = 48
+            if a or b and c or d and e and f
+                return true
+            end
+            return false
+        elseif which = 49
+            if a or b and c or d and e or f
+                return true
+            end
+            return false
+        elseif which = 50
+            if a or b and c or d or e and f
+                return true
+            end
+            return false
+        elseif which = 51
+            if a or b and c or d or e or f
+                return true
+            end
+            return false
+        elseif which = 52
+            if a or b or c and d and e and f
+                return true
+            end
+            return false
+        elseif which = 53
+            if a or b or c and d and e or f
+                return true
+            end
+            return false
+        elseif which = 54
+            if a or b or c and d or e and f
+                return true
+            end
+            return false
+        elseif which = 55
+            if a or b or c and d or e or f
+                return true
+            end
+            return false
+        elseif which = 56
+            if a or b or c or d and e and f
+                return true
+            end
+            return false
+        elseif which = 57
+            if a or b or c or d and e or f
+                return true
+            end
+            return false
+        elseif which = 58
+            if a or b or c or d or e and f
+                return true
+            end
+            return false
+        elseif which = 59
+            if a or b or c or d or e or f
+                return true
+            end
+            return false
+        end
+        return false
+    end
+
+
+    /* Whether bit place of the combination is set: place 0 is the first variable, the highest bit. */
+    action Bit(integer combination, integer place) returns boolean
+        integer shift = 5 - place
+        integer value = combination
+        repeat shift times
+            value = value / 2
+        end
+        return value mod 2 = 1
+    end
+
+    action Letter(boolean value) returns text
+        if value
+            return "T"
+        end
+        return "F"
+    end
+end

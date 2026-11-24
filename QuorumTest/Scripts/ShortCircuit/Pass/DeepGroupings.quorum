@@ -1,0 +1,1852 @@
+/*
+200 deeper and/or expressions, five to eight operators each, on six boolean
+variables that may repeat, sometimes with not around a group. The shapes
+were picked at random once (Python's random with the seed 20261123) and
+are fixed here. Each is shown as a value and as an if condition for all 64
+combinations of true and false (a first). Expected output worked out
+separately.
+*/
+class Main
+    action Main
+        Show("(d or not (f and a)) and (c and (((a or d) and e) or (e or a)))", 0)
+        Show("((not (c and (f or f)) or (f or e)) or (f and f)) and not (f or a)", 1)
+        Show("not (not ((e or c) and (f or b)) and (d and a))", 2)
+        Show("not ((d and (d and (e or c))) or (c and d))", 3)
+        Show("(f or (b or (b or c))) and (f and (f and (f and a)))", 4)
+        Show("d or ((d or e) or (b or (f and c)))", 5)
+        Show("(f or c) or (((a and b) and f) and ((f and f) and e))", 6)
+        Show("(d and d) and (((e and (b or a)) or f) or (c or b))", 7)
+        Show("not (((b or e) and e) and ((f or c) or a))", 8)
+        Show("((d and e) and (c and a)) or (e or c)", 9)
+        Show("(((e and b) and c) and (c and e)) and not ((a and a) or (d or a))", 10)
+        Show("(b or (a or (c or e))) or (c and c)", 11)
+        Show("(((a and (d and f)) and c) or (e and b)) or b", 12)
+        Show("(d and c) or (((e and b) and d) or (not (a and (f or c)) and b))", 13)
+        Show("((e or a) and not ((d and (f and e)) or d)) and d", 14)
+        Show("((e and (a and e)) or ((f or a) or f)) or (a or (e or a))", 15)
+        Show("a and ((e and (((c and a) and b) and f)) or a)", 16)
+        Show("(((f and a) or (d or b)) and a) or ((a or f) or not (e or c))", 17)
+        Show("((d and (e and b)) and (a and (d or b))) and (c and b)", 18)
+        Show("not (b and b) and (a and ((e and b) or ((f and a) or b)))", 19)
+        Show("((b and not ((c or (b and d)) and (d or f))) or f) or (c and e)", 20)
+        Show("(a and c) or (a and (d or (b or a)))", 21)
+        Show("((a or (c or a)) or d) and (((d and e) and f) or b)", 22)
+        Show("((not ((f and a) and f) and b) and ((a and d) and c)) and (d or d)", 23)
+        Show("((b and d) or (d and ((f and d) and b))) or (e or e)", 24)
+        Show("(d and (f or b)) or (f or (((c and f) or (b and b)) and f))", 25)
+        Show("not (((a and ((f or (a and c)) and b)) and (b or c)) or not (f or d))", 26)
+        Show("not (c and a) or (not ((c and (b or e)) and f) or (d or a))", 27)
+        Show("not ((c or a) and not ((a and a) or ((f and (f or d)) or not (e and e))))", 28)
+        Show("((not (b and b) or f) or (d and d)) or a", 29)
+        Show("not ((b or d) and ((a or (d or b)) and not (a or f)))", 30)
+        Show("e or not ((d and f) and ((c or b) or b))", 31)
+        Show("not (((b and c) and c) or (e or (a and ((b and a) and c))))", 32)
+        Show("not (b or (b or (e and e))) and ((f and e) or b)", 33)
+        Show("(not (e and e) and ((e or f) or (c and not (f or not (d and c))))) or b", 34)
+        Show("not (((a or c) or f) or (d and ((f or b) and c)))", 35)
+        Show("d and ((not (e and ((c or d) or d)) or ((a or d) or b)) and e)", 36)
+        Show("not ((b and ((c or e) or (c or c))) and (c and d))", 37)
+        Show("not ((a and (a or f)) or ((f and e) or (c or (d and a))))", 38)
+        Show("(((c or e) or ((b or d) or e)) and ((c and e) and b)) and c", 39)
+        Show("b and ((a and c) or (c or ((f and f) and (b and d))))", 40)
+        Show("not (((e or b) or (((e or b) or f) and a)) or ((e and a) and b))", 41)
+        Show("(d and ((b or b) and c)) or ((e and (not (b and f) or f)) or a)", 42)
+        Show("not ((((f or f) or (d or d)) or ((c or c) or e)) and (b and b))", 43)
+        Show("(not (c and (c or f)) and ((f and b) or b)) or a", 44)
+        Show("(((b or a) and (d or b)) or not (b or b)) and (b or c)", 45)
+        Show("f and (d and (not (e and b) or (f and d)))", 46)
+        Show("not ((not (not ((c or e) or b) and c) or e) and (f and b)) and (c and b)", 47)
+        Show("not ((c or f) or ((((f and c) and d) and d) or f)) or b", 48)
+        Show("((a and ((a and f) and (f and f))) and (a or e)) and (a or e)", 49)
+        Show("c and (not (f and d) and ((c and e) and (a and b)))", 50)
+        Show("((d or b) and (not (f or e) or d)) and (b or not (c and b))", 51)
+        Show("((e or c) and b) or (d or (d and e))", 52)
+        Show("(a and (not (c and f) or c)) or ((b or a) or d)", 53)
+        Show("(b and not (e and d)) and (a and (f and c))", 54)
+        Show("(not (e and (c and f)) and d) or ((f and (d or e)) or (a or f))", 55)
+        Show("not (not ((b and f) and (not (f or d) and c)) and (f and (c or d)))", 56)
+        Show("b or not ((b or (b or ((f and a) or e))) or (a and (a and e)))", 57)
+        Show("(not ((b or d) or (c and c)) or e) and (c and f)", 58)
+        Show("not (not (f and d) or (((a or (a or a)) or d) or (d and (f and e))))", 59)
+        Show("b and ((((f and a) and d) or c) and f)", 60)
+        Show("(((b or e) and b) and c) or (e and a)", 61)
+        Show("(((d or a) or c) or b) or (c and (d and b))", 62)
+        Show("(c or (a and c)) or ((c and d) or b)", 63)
+        Show("((f or b) or (d and (c or c))) or f", 64)
+        Show("((f or e) and d) or (f or ((b and c) or f))", 65)
+        Show("not ((e and (c and b)) or (d or (c or e)))", 66)
+        Show("not ((b or (not (c and c) and ((d and b) or d))) or c)", 67)
+        Show("(c and d) or (a or ((e and e) and e))", 68)
+        Show("((d and e) and (f or c)) and ((d or (c and a)) and d)", 69)
+        Show("((not (f and f) and (((c or c) or b) and b)) or e) or not (b or f)", 70)
+        Show("((b or b) and f) and (((d and d) or f) or not (f or f))", 71)
+        Show("((d or a) and (a and (e and not (e and c)))) or (not (e and c) and a)", 72)
+        Show("not (b and ((f or ((f and b) or ((b or e) and d))) and d))", 73)
+        Show("((b and d) and a) or ((e or b) and f)", 74)
+        Show("(f and not ((d or d) and a)) and (c and (c and e))", 75)
+        Show("not (c or ((c or e) or (d or (a and e))))", 76)
+        Show("(a and (d and (not (b or f) and f))) or c", 77)
+        Show("not (a and d) or ((((e and e) or d) and ((c and f) and a)) and a)", 78)
+        Show("(((d or f) or f) and a) and ((b and c) and not (a or (e and b)))", 79)
+        Show("a or not (((d or a) and f) or (c and (c and d)))", 80)
+        Show("(f and f) and ((c or e) and (((a and d) and e) and c))", 81)
+        Show("not (b or ((((d and f) or d) or (e and (a and c))) or e))", 82)
+        Show("(not (b or e) or (b or (d and (c or f)))) or not (e and c)", 83)
+        Show("(c and ((c and a) or ((a or e) or (a or a)))) and (d and f)", 84)
+        Show("(((f or f) and c) or a) or ((a or f) or e)", 85)
+        Show("((d and (a and (a or d))) or d) and not (e and f)", 86)
+        Show("f or (b or (not ((b and e) or e) and not (d or f)))", 87)
+        Show("not (((c or f) or (c and not (d or d))) or (a or (b and (b and e))))", 88)
+        Show("((c and (b or b)) and d) or (f or d)", 89)
+        Show("(a or not ((d or b) or (e or f))) and c", 90)
+        Show("(((f and f) and e) or c) or (f or not (not (f or a) and (e or a)))", 91)
+        Show("(b and c) or (not (((e and e) and d) or (d and b)) or not (a or e))", 92)
+        Show("e or ((a and d) and not (not (b and (d and b)) or f))", 93)
+        Show("((b and (e and a)) and (((c and (d and b)) or d) and b)) or a", 94)
+        Show("a or ((e and (f and e)) or (b or b))", 95)
+        Show("((d and (e and a)) or (c and e)) or e", 96)
+        Show("f and (((e or b) and b) and (c and ((e and d) or b)))", 97)
+        Show("e and ((((e and d) and (b and a)) and b) or b)", 98)
+        Show("((e or e) and b) and ((e and (f and c)) or a)", 99)
+        Show("(f or (e or e)) and (b and (not (d and a) and b))", 100)
+        Show("(((c or b) and (c or e)) and ((d and a) and d)) and a", 101)
+        Show("(((c and a) or c) and (c and d)) or not (f and e)", 102)
+        Show("((f or (f or ((e or c) or c))) or e) or (not (e or a) or c)", 103)
+        Show("(((f or e) and d) or (f or a)) or (a and f)", 104)
+        Show("(b and not (c and b)) or ((c and (b and c)) or not (d or a))", 105)
+        Show("((f or e) and e) or ((b or c) or (a or c))", 106)
+        Show("not (not ((not (a and b) and b) and (d and a)) or (d and ((f or d) or d)))", 107)
+        Show("b or ((a and b) or ((c or c) or a))", 108)
+        Show("not (d and (c and c)) or ((a or ((a and d) or d)) and (a or a))", 109)
+        Show("((a and e) or (f and (e and (d and d)))) or (f or e)", 110)
+        Show("((e or (f and (a and (a and (c and a))))) and b) or (b or c)", 111)
+        Show("(b or (f or f)) or ((b or e) and f)", 112)
+        Show("((d and d) or not ((a or e) and d)) or (c or a)", 113)
+        Show("not (((b or (d or c)) or (b and e)) and d) or (e or (d and d))", 114)
+        Show("(not (not ((e or a) or b) and (e or not (c or d))) or d) or (e and d)", 115)
+        Show("(not (f or b) or (b and e)) and ((b or c) and e)", 116)
+        Show("(e and (b and e)) or ((c or f) and b)", 117)
+        Show("not (d or e) or ((b or (e and e)) and ((f and (f or e)) and b))", 118)
+        Show("(f and ((a and (b and c)) or a)) and (not (f and d) or b)", 119)
+        Show("e and ((d or (c and not (d and e))) and (d and (e and b)))", 120)
+        Show("not ((a and (b or (f and a))) and (not (e and (b or a)) and d))", 121)
+        Show("((f or c) and (not (not (e and (b and b)) or a) and f)) or (b or b)", 122)
+        Show("(e and (b or (a and e))) and (b and a)", 123)
+        Show("((b and (b or d)) and (a or a)) and ((d and d) or (f or d))", 124)
+        Show("not ((d and (b or ((e or c) and f))) and (e or d))", 125)
+        Show("not ((c and f) or ((e and b) and a)) or f", 126)
+        Show("(b or (f or e)) or ((e or f) or b)", 127)
+        Show("not ((((f or c) or ((f and e) and (d or d))) and c) or (f or b))", 128)
+        Show("(e and ((e and a) and (a or b))) or (d and f)", 129)
+        Show("not (not ((f and a) or (not (a and a) and (f and b))) and b)", 130)
+        Show("not ((e and (e or a)) and not ((d or e) or f))", 131)
+        Show("a and ((((f or f) and a) or a) and c)", 132)
+        Show("((b and b) and c) and (f or (d or (a or (f and a))))", 133)
+        Show("((a or e) or (c or a)) and ((c and e) and d)", 134)
+        Show("a and (c or ((e or (e or (d and b))) and a))", 135)
+        Show("((d and (f or b)) or not (a and not (c or d))) and ((c and a) and b)", 136)
+        Show("a or (((d or c) and not (b or d)) and ((e or d) and c))", 137)
+        Show("a and (e or (((e or b) or f) or (a or (a or a))))", 138)
+        Show("not ((((c or d) and b) or (e or a)) or (((c and e) and f) or b))", 139)
+        Show("not ((d and ((e and f) and d)) and ((f or a) and (b and e)))", 140)
+        Show("not (c or (d or f)) and ((f and (b and (c or c))) or (a or c))", 141)
+        Show("(e or not ((e and b) and not (c and e))) and d", 142)
+        Show("(((a or (c or c)) and c) and b) and (d or c)", 143)
+        Show("(((e and c) and (d or f)) or (f and b)) and (e and e)", 144)
+        Show("(a and not ((d and f) or e)) and ((b and e) or f)", 145)
+        Show("(e or a) or ((d and c) and ((f and d) or (a and b)))", 146)
+        Show("(e and ((not ((d and e) and f) and (d or c)) and c)) or c", 147)
+        Show("(d and ((c and f) and (e and b))) or ((d and e) or (d or c))", 148)
+        Show("((a and a) or b) or (b and ((d or (e or a)) or c))", 149)
+        Show("(not (e and f) and c) or (f or (b and a))", 150)
+        Show("(a and f) and (b or (d and (f and (b or d))))", 151)
+        Show("f and ((not ((f and b) and c) or a) or (b and (not (b and b) or d)))", 152)
+        Show("(a and ((f or f) and (d or (f or a)))) or c", 153)
+        Show("not ((f or (b or c)) and (d or c)) and (e and e)", 154)
+        Show("(((f and a) and a) or (c or (a and a))) and a", 155)
+        Show("((not (b or d) and (c and b)) or (f and (f or d))) and f", 156)
+        Show("((f and not (f and (c or e))) or e) and (f and d)", 157)
+        Show("not ((a or (d or c)) or ((c and b) or b))", 158)
+        Show("not (d and ((not (d and d) and e) and (not (d or b) or a)))", 159)
+        Show("not ((((f or e) or f) or f) or (f or (a and ((b and d) and a))))", 160)
+        Show("(((c or c) and (e or f)) or c) and a", 161)
+        Show("not ((b or e) or a) or ((b and (c and e)) and (b and e))", 162)
+        Show("((d or f) and c) or (c and (d and (e or b)))", 163)
+        Show("a and ((c or e) and (c or (a and c)))", 164)
+        Show("not (d or (a or not (f or (c or (f and e)))))", 165)
+        Show("(not (a and (d or a)) or ((b or d) and f)) and (a or (b and f))", 166)
+        Show("not (not (((c or b) and (a or c)) and not (d and b)) and (e or a))", 167)
+        Show("(b or d) and ((d or b) or ((b and d) and c))", 168)
+        Show("((a and a) or b) and ((b or f) and ((b or d) and (a and b)))", 169)
+        Show("(c and not (b and c)) and (a and (f or ((c and c) and (c or f))))", 170)
+        Show("f and (c or not (((f or a) and (b and (c or f))) or (e or b)))", 171)
+        Show("(((a or d) and e) or ((b and e) and e)) or (c and (b or e))", 172)
+        Show("a or (c or (a or (((e or d) and e) and f)))", 173)
+        Show("(e or f) and not (d or ((a or c) and d))", 174)
+        Show("(b and e) or ((f or (e or (b and (e and c)))) and (e or a))", 175)
+        Show("((f or f) and (d and c)) and not (d or ((e and f) and not (a or d)))", 176)
+        Show("(f or (not (not (a and e) or a) or c)) or c", 177)
+        Show("f or (((f or ((a and b) or d)) or a) or b)", 178)
+        Show("not ((a and (d and (not (e or d) and b))) or (c or ((f or c) or b)))", 179)
+        Show("(a and (d or c)) or not (not (not (c or not (f or d)) and (e or d)) and d)", 180)
+        Show("(f or e) or (c and (((e and f) or e) or a))", 181)
+        Show("c or (a or not (e and ((b and f) or not (f or c))))", 182)
+        Show("f or (f or (a and (e or (f and b))))", 183)
+        Show("(f or (c and a)) and not ((c and a) and (d and (c and c)))", 184)
+        Show("(f and ((not (f and b) or d) and d)) or (((f or e) or d) and b)", 185)
+        Show("e or ((d or (f or d)) and (b and f))", 186)
+        Show("f or ((not (((b and (c or d)) and b) or a) and b) or f)", 187)
+        Show("not (a and (d and d)) or ((d and (c or d)) or d)", 188)
+        Show("not (((e and (d or (f and f))) and a) or (a and c))", 189)
+        Show("f and (((f and f) and (b or e)) or not (f or c))", 190)
+        Show("(a or ((b or a) and not (e or e))) and not (a or ((a or a) or c))", 191)
+        Show("(d or e) or not (((d and e) or c) or b)", 192)
+        Show("((b and b) and ((c or f) or e)) and b", 193)
+        Show("not ((a or a) or (not (f and d) and f)) and a", 194)
+        Show("f or ((d and b) or ((f and d) or (f or ((a and f) or d))))", 195)
+        Show("a or (e and ((b or b) or (a or ((d or c) or a))))", 196)
+        Show("((f and a) or not (a or (e or e))) and (b and b)", 197)
+        Show("(d or ((b or (c and a)) and e)) and b", 198)
+        Show("e and ((not (e or c) or c) and (f and c))", 199)
+    end
+
+    action Show(text expression, integer which)
+        text values = ""
+        text choices = ""
+        integer i = 0
+        repeat while i < 64
+            values = values + Letter(Value(which, Bit(i, 0), Bit(i, 1), Bit(i, 2), Bit(i, 3), Bit(i, 4), Bit(i, 5)))
+            choices = choices + Letter(Choice(which, Bit(i, 0), Bit(i, 1), Bit(i, 2), Bit(i, 3), Bit(i, 4), Bit(i, 5)))
+            i = i + 1
+        end
+        output expression + ": value " + values + ", if " + choices
+    end
+
+    action Value(integer which, boolean a, boolean b, boolean c, boolean d, boolean e, boolean f) returns boolean
+        if which = 0
+            boolean result = (d or not (f and a)) and (c and (((a or d) and e) or (e or a)))
+            return result
+        elseif which = 1
+            boolean result = ((not (c and (f or f)) or (f or e)) or (f and f)) and not (f or a)
+            return result
+        elseif which = 2
+            boolean result = not (not ((e or c) and (f or b)) and (d and a))
+            return result
+        elseif which = 3
+            boolean result = not ((d and (d and (e or c))) or (c and d))
+            return result
+        elseif which = 4
+            boolean result = (f or (b or (b or c))) and (f and (f and (f and a)))
+            return result
+        elseif which = 5
+            boolean result = d or ((d or e) or (b or (f and c)))
+            return result
+        elseif which = 6
+            boolean result = (f or c) or (((a and b) and f) and ((f and f) and e))
+            return result
+        elseif which = 7
+            boolean result = (d and d) and (((e and (b or a)) or f) or (c or b))
+            return result
+        elseif which = 8
+            boolean result = not (((b or e) and e) and ((f or c) or a))
+            return result
+        elseif which = 9
+            boolean result = ((d and e) and (c and a)) or (e or c)
+            return result
+        elseif which = 10
+            boolean result = (((e and b) and c) and (c and e)) and not ((a and a) or (d or a))
+            return result
+        elseif which = 11
+            boolean result = (b or (a or (c or e))) or (c and c)
+            return result
+        elseif which = 12
+            boolean result = (((a and (d and f)) and c) or (e and b)) or b
+            return result
+        elseif which = 13
+            boolean result = (d and c) or (((e and b) and d) or (not (a and (f or c)) and b))
+            return result
+        elseif which = 14
+            boolean result = ((e or a) and not ((d and (f and e)) or d)) and d
+            return result
+        elseif which = 15
+            boolean result = ((e and (a and e)) or ((f or a) or f)) or (a or (e or a))
+            return result
+        elseif which = 16
+            boolean result = a and ((e and (((c and a) and b) and f)) or a)
+            return result
+        elseif which = 17
+            boolean result = (((f and a) or (d or b)) and a) or ((a or f) or not (e or c))
+            return result
+        elseif which = 18
+            boolean result = ((d and (e and b)) and (a and (d or b))) and (c and b)
+            return result
+        elseif which = 19
+            boolean result = not (b and b) and (a and ((e and b) or ((f and a) or b)))
+            return result
+        elseif which = 20
+            boolean result = ((b and not ((c or (b and d)) and (d or f))) or f) or (c and e)
+            return result
+        elseif which = 21
+            boolean result = (a and c) or (a and (d or (b or a)))
+            return result
+        elseif which = 22
+            boolean result = ((a or (c or a)) or d) and (((d and e) and f) or b)
+            return result
+        elseif which = 23
+            boolean result = ((not ((f and a) and f) and b) and ((a and d) and c)) and (d or d)
+            return result
+        elseif which = 24
+            boolean result = ((b and d) or (d and ((f and d) and b))) or (e or e)
+            return result
+        elseif which = 25
+            boolean result = (d and (f or b)) or (f or (((c and f) or (b and b)) and f))
+            return result
+        elseif which = 26
+            boolean result = not (((a and ((f or (a and c)) and b)) and (b or c)) or not (f or d))
+            return result
+        elseif which = 27
+            boolean result = not (c and a) or (not ((c and (b or e)) and f) or (d or a))
+            return result
+        elseif which = 28
+            boolean result = not ((c or a) and not ((a and a) or ((f and (f or d)) or not (e and e))))
+            return result
+        elseif which = 29
+            boolean result = ((not (b and b) or f) or (d and d)) or a
+            return result
+        elseif which = 30
+            boolean result = not ((b or d) and ((a or (d or b)) and not (a or f)))
+            return result
+        elseif which = 31
+            boolean result = e or not ((d and f) and ((c or b) or b))
+            return result
+        elseif which = 32
+            boolean result = not (((b and c) and c) or (e or (a and ((b and a) and c))))
+            return result
+        elseif which = 33
+            boolean result = not (b or (b or (e and e))) and ((f and e) or b)
+            return result
+        elseif which = 34
+            boolean result = (not (e and e) and ((e or f) or (c and not (f or not (d and c))))) or b
+            return result
+        elseif which = 35
+            boolean result = not (((a or c) or f) or (d and ((f or b) and c)))
+            return result
+        elseif which = 36
+            boolean result = d and ((not (e and ((c or d) or d)) or ((a or d) or b)) and e)
+            return result
+        elseif which = 37
+            boolean result = not ((b and ((c or e) or (c or c))) and (c and d))
+            return result
+        elseif which = 38
+            boolean result = not ((a and (a or f)) or ((f and e) or (c or (d and a))))
+            return result
+        elseif which = 39
+            boolean result = (((c or e) or ((b or d) or e)) and ((c and e) and b)) and c
+            return result
+        elseif which = 40
+            boolean result = b and ((a and c) or (c or ((f and f) and (b and d))))
+            return result
+        elseif which = 41
+            boolean result = not (((e or b) or (((e or b) or f) and a)) or ((e and a) and b))
+            return result
+        elseif which = 42
+            boolean result = (d and ((b or b) and c)) or ((e and (not (b and f) or f)) or a)
+            return result
+        elseif which = 43
+            boolean result = not ((((f or f) or (d or d)) or ((c or c) or e)) and (b and b))
+            return result
+        elseif which = 44
+            boolean result = (not (c and (c or f)) and ((f and b) or b)) or a
+            return result
+        elseif which = 45
+            boolean result = (((b or a) and (d or b)) or not (b or b)) and (b or c)
+            return result
+        elseif which = 46
+            boolean result = f and (d and (not (e and b) or (f and d)))
+            return result
+        elseif which = 47
+            boolean result = not ((not (not ((c or e) or b) and c) or e) and (f and b)) and (c and b)
+            return result
+        elseif which = 48
+            boolean result = not ((c or f) or ((((f and c) and d) and d) or f)) or b
+            return result
+        elseif which = 49
+            boolean result = ((a and ((a and f) and (f and f))) and (a or e)) and (a or e)
+            return result
+        elseif which = 50
+            boolean result = c and (not (f and d) and ((c and e) and (a and b)))
+            return result
+        elseif which = 51
+            boolean result = ((d or b) and (not (f or e) or d)) and (b or not (c and b))
+            return result
+        elseif which = 52
+            boolean result = ((e or c) and b) or (d or (d and e))
+            return result
+        elseif which = 53
+            boolean result = (a and (not (c and f) or c)) or ((b or a) or d)
+            return result
+        elseif which = 54
+            boolean result = (b and not (e and d)) and (a and (f and c))
+            return result
+        elseif which = 55
+            boolean result = (not (e and (c and f)) and d) or ((f and (d or e)) or (a or f))
+            return result
+        elseif which = 56
+            boolean result = not (not ((b and f) and (not (f or d) and c)) and (f and (c or d)))
+            return result
+        elseif which = 57
+            boolean result = b or not ((b or (b or ((f and a) or e))) or (a and (a and e)))
+            return result
+        elseif which = 58
+            boolean result = (not ((b or d) or (c and c)) or e) and (c and f)
+            return result
+        elseif which = 59
+            boolean result = not (not (f and d) or (((a or (a or a)) or d) or (d and (f and e))))
+            return result
+        elseif which = 60
+            boolean result = b and ((((f and a) and d) or c) and f)
+            return result
+        elseif which = 61
+            boolean result = (((b or e) and b) and c) or (e and a)
+            return result
+        elseif which = 62
+            boolean result = (((d or a) or c) or b) or (c and (d and b))
+            return result
+        elseif which = 63
+            boolean result = (c or (a and c)) or ((c and d) or b)
+            return result
+        elseif which = 64
+            boolean result = ((f or b) or (d and (c or c))) or f
+            return result
+        elseif which = 65
+            boolean result = ((f or e) and d) or (f or ((b and c) or f))
+            return result
+        elseif which = 66
+            boolean result = not ((e and (c and b)) or (d or (c or e)))
+            return result
+        elseif which = 67
+            boolean result = not ((b or (not (c and c) and ((d and b) or d))) or c)
+            return result
+        elseif which = 68
+            boolean result = (c and d) or (a or ((e and e) and e))
+            return result
+        elseif which = 69
+            boolean result = ((d and e) and (f or c)) and ((d or (c and a)) and d)
+            return result
+        elseif which = 70
+            boolean result = ((not (f and f) and (((c or c) or b) and b)) or e) or not (b or f)
+            return result
+        elseif which = 71
+            boolean result = ((b or b) and f) and (((d and d) or f) or not (f or f))
+            return result
+        elseif which = 72
+            boolean result = ((d or a) and (a and (e and not (e and c)))) or (not (e and c) and a)
+            return result
+        elseif which = 73
+            boolean result = not (b and ((f or ((f and b) or ((b or e) and d))) and d))
+            return result
+        elseif which = 74
+            boolean result = ((b and d) and a) or ((e or b) and f)
+            return result
+        elseif which = 75
+            boolean result = (f and not ((d or d) and a)) and (c and (c and e))
+            return result
+        elseif which = 76
+            boolean result = not (c or ((c or e) or (d or (a and e))))
+            return result
+        elseif which = 77
+            boolean result = (a and (d and (not (b or f) and f))) or c
+            return result
+        elseif which = 78
+            boolean result = not (a and d) or ((((e and e) or d) and ((c and f) and a)) and a)
+            return result
+        elseif which = 79
+            boolean result = (((d or f) or f) and a) and ((b and c) and not (a or (e and b)))
+            return result
+        elseif which = 80
+            boolean result = a or not (((d or a) and f) or (c and (c and d)))
+            return result
+        elseif which = 81
+            boolean result = (f and f) and ((c or e) and (((a and d) and e) and c))
+            return result
+        elseif which = 82
+            boolean result = not (b or ((((d and f) or d) or (e and (a and c))) or e))
+            return result
+        elseif which = 83
+            boolean result = (not (b or e) or (b or (d and (c or f)))) or not (e and c)
+            return result
+        elseif which = 84
+            boolean result = (c and ((c and a) or ((a or e) or (a or a)))) and (d and f)
+            return result
+        elseif which = 85
+            boolean result = (((f or f) and c) or a) or ((a or f) or e)
+            return result
+        elseif which = 86
+            boolean result = ((d and (a and (a or d))) or d) and not (e and f)
+            return result
+        elseif which = 87
+            boolean result = f or (b or (not ((b and e) or e) and not (d or f)))
+            return result
+        elseif which = 88
+            boolean result = not (((c or f) or (c and not (d or d))) or (a or (b and (b and e))))
+            return result
+        elseif which = 89
+            boolean result = ((c and (b or b)) and d) or (f or d)
+            return result
+        elseif which = 90
+            boolean result = (a or not ((d or b) or (e or f))) and c
+            return result
+        elseif which = 91
+            boolean result = (((f and f) and e) or c) or (f or not (not (f or a) and (e or a)))
+            return result
+        elseif which = 92
+            boolean result = (b and c) or (not (((e and e) and d) or (d and b)) or not (a or e))
+            return result
+        elseif which = 93
+            boolean result = e or ((a and d) and not (not (b and (d and b)) or f))
+            return result
+        elseif which = 94
+            boolean result = ((b and (e and a)) and (((c and (d and b)) or d) and b)) or a
+            return result
+        elseif which = 95
+            boolean result = a or ((e and (f and e)) or (b or b))
+            return result
+        elseif which = 96
+            boolean result = ((d and (e and a)) or (c and e)) or e
+            return result
+        elseif which = 97
+            boolean result = f and (((e or b) and b) and (c and ((e and d) or b)))
+            return result
+        elseif which = 98
+            boolean result = e and ((((e and d) and (b and a)) and b) or b)
+            return result
+        elseif which = 99
+            boolean result = ((e or e) and b) and ((e and (f and c)) or a)
+            return result
+        elseif which = 100
+            boolean result = (f or (e or e)) and (b and (not (d and a) and b))
+            return result
+        elseif which = 101
+            boolean result = (((c or b) and (c or e)) and ((d and a) and d)) and a
+            return result
+        elseif which = 102
+            boolean result = (((c and a) or c) and (c and d)) or not (f and e)
+            return result
+        elseif which = 103
+            boolean result = ((f or (f or ((e or c) or c))) or e) or (not (e or a) or c)
+            return result
+        elseif which = 104
+            boolean result = (((f or e) and d) or (f or a)) or (a and f)
+            return result
+        elseif which = 105
+            boolean result = (b and not (c and b)) or ((c and (b and c)) or not (d or a))
+            return result
+        elseif which = 106
+            boolean result = ((f or e) and e) or ((b or c) or (a or c))
+            return result
+        elseif which = 107
+            boolean result = not (not ((not (a and b) and b) and (d and a)) or (d and ((f or d) or d)))
+            return result
+        elseif which = 108
+            boolean result = b or ((a and b) or ((c or c) or a))
+            return result
+        elseif which = 109
+            boolean result = not (d and (c and c)) or ((a or ((a and d) or d)) and (a or a))
+            return result
+        elseif which = 110
+            boolean result = ((a and e) or (f and (e and (d and d)))) or (f or e)
+            return result
+        elseif which = 111
+            boolean result = ((e or (f and (a and (a and (c and a))))) and b) or (b or c)
+            return result
+        elseif which = 112
+            boolean result = (b or (f or f)) or ((b or e) and f)
+            return result
+        elseif which = 113
+            boolean result = ((d and d) or not ((a or e) and d)) or (c or a)
+            return result
+        elseif which = 114
+            boolean result = not (((b or (d or c)) or (b and e)) and d) or (e or (d and d))
+            return result
+        elseif which = 115
+            boolean result = (not (not ((e or a) or b) and (e or not (c or d))) or d) or (e and d)
+            return result
+        elseif which = 116
+            boolean result = (not (f or b) or (b and e)) and ((b or c) and e)
+            return result
+        elseif which = 117
+            boolean result = (e and (b and e)) or ((c or f) and b)
+            return result
+        elseif which = 118
+            boolean result = not (d or e) or ((b or (e and e)) and ((f and (f or e)) and b))
+            return result
+        elseif which = 119
+            boolean result = (f and ((a and (b and c)) or a)) and (not (f and d) or b)
+            return result
+        elseif which = 120
+            boolean result = e and ((d or (c and not (d and e))) and (d and (e and b)))
+            return result
+        elseif which = 121
+            boolean result = not ((a and (b or (f and a))) and (not (e and (b or a)) and d))
+            return result
+        elseif which = 122
+            boolean result = ((f or c) and (not (not (e and (b and b)) or a) and f)) or (b or b)
+            return result
+        elseif which = 123
+            boolean result = (e and (b or (a and e))) and (b and a)
+            return result
+        elseif which = 124
+            boolean result = ((b and (b or d)) and (a or a)) and ((d and d) or (f or d))
+            return result
+        elseif which = 125
+            boolean result = not ((d and (b or ((e or c) and f))) and (e or d))
+            return result
+        elseif which = 126
+            boolean result = not ((c and f) or ((e and b) and a)) or f
+            return result
+        elseif which = 127
+            boolean result = (b or (f or e)) or ((e or f) or b)
+            return result
+        elseif which = 128
+            boolean result = not ((((f or c) or ((f and e) and (d or d))) and c) or (f or b))
+            return result
+        elseif which = 129
+            boolean result = (e and ((e and a) and (a or b))) or (d and f)
+            return result
+        elseif which = 130
+            boolean result = not (not ((f and a) or (not (a and a) and (f and b))) and b)
+            return result
+        elseif which = 131
+            boolean result = not ((e and (e or a)) and not ((d or e) or f))
+            return result
+        elseif which = 132
+            boolean result = a and ((((f or f) and a) or a) and c)
+            return result
+        elseif which = 133
+            boolean result = ((b and b) and c) and (f or (d or (a or (f and a))))
+            return result
+        elseif which = 134
+            boolean result = ((a or e) or (c or a)) and ((c and e) and d)
+            return result
+        elseif which = 135
+            boolean result = a and (c or ((e or (e or (d and b))) and a))
+            return result
+        elseif which = 136
+            boolean result = ((d and (f or b)) or not (a and not (c or d))) and ((c and a) and b)
+            return result
+        elseif which = 137
+            boolean result = a or (((d or c) and not (b or d)) and ((e or d) and c))
+            return result
+        elseif which = 138
+            boolean result = a and (e or (((e or b) or f) or (a or (a or a))))
+            return result
+        elseif which = 139
+            boolean result = not ((((c or d) and b) or (e or a)) or (((c and e) and f) or b))
+            return result
+        elseif which = 140
+            boolean result = not ((d and ((e and f) and d)) and ((f or a) and (b and e)))
+            return result
+        elseif which = 141
+            boolean result = not (c or (d or f)) and ((f and (b and (c or c))) or (a or c))
+            return result
+        elseif which = 142
+            boolean result = (e or not ((e and b) and not (c and e))) and d
+            return result
+        elseif which = 143
+            boolean result = (((a or (c or c)) and c) and b) and (d or c)
+            return result
+        elseif which = 144
+            boolean result = (((e and c) and (d or f)) or (f and b)) and (e and e)
+            return result
+        elseif which = 145
+            boolean result = (a and not ((d and f) or e)) and ((b and e) or f)
+            return result
+        elseif which = 146
+            boolean result = (e or a) or ((d and c) and ((f and d) or (a and b)))
+            return result
+        elseif which = 147
+            boolean result = (e and ((not ((d and e) and f) and (d or c)) and c)) or c
+            return result
+        elseif which = 148
+            boolean result = (d and ((c and f) and (e and b))) or ((d and e) or (d or c))
+            return result
+        elseif which = 149
+            boolean result = ((a and a) or b) or (b and ((d or (e or a)) or c))
+            return result
+        elseif which = 150
+            boolean result = (not (e and f) and c) or (f or (b and a))
+            return result
+        elseif which = 151
+            boolean result = (a and f) and (b or (d and (f and (b or d))))
+            return result
+        elseif which = 152
+            boolean result = f and ((not ((f and b) and c) or a) or (b and (not (b and b) or d)))
+            return result
+        elseif which = 153
+            boolean result = (a and ((f or f) and (d or (f or a)))) or c
+            return result
+        elseif which = 154
+            boolean result = not ((f or (b or c)) and (d or c)) and (e and e)
+            return result
+        elseif which = 155
+            boolean result = (((f and a) and a) or (c or (a and a))) and a
+            return result
+        elseif which = 156
+            boolean result = ((not (b or d) and (c and b)) or (f and (f or d))) and f
+            return result
+        elseif which = 157
+            boolean result = ((f and not (f and (c or e))) or e) and (f and d)
+            return result
+        elseif which = 158
+            boolean result = not ((a or (d or c)) or ((c and b) or b))
+            return result
+        elseif which = 159
+            boolean result = not (d and ((not (d and d) and e) and (not (d or b) or a)))
+            return result
+        elseif which = 160
+            boolean result = not ((((f or e) or f) or f) or (f or (a and ((b and d) and a))))
+            return result
+        elseif which = 161
+            boolean result = (((c or c) and (e or f)) or c) and a
+            return result
+        elseif which = 162
+            boolean result = not ((b or e) or a) or ((b and (c and e)) and (b and e))
+            return result
+        elseif which = 163
+            boolean result = ((d or f) and c) or (c and (d and (e or b)))
+            return result
+        elseif which = 164
+            boolean result = a and ((c or e) and (c or (a and c)))
+            return result
+        elseif which = 165
+            boolean result = not (d or (a or not (f or (c or (f and e)))))
+            return result
+        elseif which = 166
+            boolean result = (not (a and (d or a)) or ((b or d) and f)) and (a or (b and f))
+            return result
+        elseif which = 167
+            boolean result = not (not (((c or b) and (a or c)) and not (d and b)) and (e or a))
+            return result
+        elseif which = 168
+            boolean result = (b or d) and ((d or b) or ((b and d) and c))
+            return result
+        elseif which = 169
+            boolean result = ((a and a) or b) and ((b or f) and ((b or d) and (a and b)))
+            return result
+        elseif which = 170
+            boolean result = (c and not (b and c)) and (a and (f or ((c and c) and (c or f))))
+            return result
+        elseif which = 171
+            boolean result = f and (c or not (((f or a) and (b and (c or f))) or (e or b)))
+            return result
+        elseif which = 172
+            boolean result = (((a or d) and e) or ((b and e) and e)) or (c and (b or e))
+            return result
+        elseif which = 173
+            boolean result = a or (c or (a or (((e or d) and e) and f)))
+            return result
+        elseif which = 174
+            boolean result = (e or f) and not (d or ((a or c) and d))
+            return result
+        elseif which = 175
+            boolean result = (b and e) or ((f or (e or (b and (e and c)))) and (e or a))
+            return result
+        elseif which = 176
+            boolean result = ((f or f) and (d and c)) and not (d or ((e and f) and not (a or d)))
+            return result
+        elseif which = 177
+            boolean result = (f or (not (not (a and e) or a) or c)) or c
+            return result
+        elseif which = 178
+            boolean result = f or (((f or ((a and b) or d)) or a) or b)
+            return result
+        elseif which = 179
+            boolean result = not ((a and (d and (not (e or d) and b))) or (c or ((f or c) or b)))
+            return result
+        elseif which = 180
+            boolean result = (a and (d or c)) or not (not (not (c or not (f or d)) and (e or d)) and d)
+            return result
+        elseif which = 181
+            boolean result = (f or e) or (c and (((e and f) or e) or a))
+            return result
+        elseif which = 182
+            boolean result = c or (a or not (e and ((b and f) or not (f or c))))
+            return result
+        elseif which = 183
+            boolean result = f or (f or (a and (e or (f and b))))
+            return result
+        elseif which = 184
+            boolean result = (f or (c and a)) and not ((c and a) and (d and (c and c)))
+            return result
+        elseif which = 185
+            boolean result = (f and ((not (f and b) or d) and d)) or (((f or e) or d) and b)
+            return result
+        elseif which = 186
+            boolean result = e or ((d or (f or d)) and (b and f))
+            return result
+        elseif which = 187
+            boolean result = f or ((not (((b and (c or d)) and b) or a) and b) or f)
+            return result
+        elseif which = 188
+            boolean result = not (a and (d and d)) or ((d and (c or d)) or d)
+            return result
+        elseif which = 189
+            boolean result = not (((e and (d or (f and f))) and a) or (a and c))
+            return result
+        elseif which = 190
+            boolean result = f and (((f and f) and (b or e)) or not (f or c))
+            return result
+        elseif which = 191
+            boolean result = (a or ((b or a) and not (e or e))) and not (a or ((a or a) or c))
+            return result
+        elseif which = 192
+            boolean result = (d or e) or not (((d and e) or c) or b)
+            return result
+        elseif which = 193
+            boolean result = ((b and b) and ((c or f) or e)) and b
+            return result
+        elseif which = 194
+            boolean result = not ((a or a) or (not (f and d) and f)) and a
+            return result
+        elseif which = 195
+            boolean result = f or ((d and b) or ((f and d) or (f or ((a and f) or d))))
+            return result
+        elseif which = 196
+            boolean result = a or (e and ((b or b) or (a or ((d or c) or a))))
+            return result
+        elseif which = 197
+            boolean result = ((f and a) or not (a or (e or e))) and (b and b)
+            return result
+        elseif which = 198
+            boolean result = (d or ((b or (c and a)) and e)) and b
+            return result
+        elseif which = 199
+            boolean result = e and ((not (e or c) or c) and (f and c))
+            return result
+        end
+        return false
+    end
+
+    action Choice(integer which, boolean a, boolean b, boolean c, boolean d, boolean e, boolean f) returns boolean
+        if which = 0
+            if (d or not (f and a)) and (c and (((a or d) and e) or (e or a)))
+                return true
+            end
+            return false
+        elseif which = 1
+            if ((not (c and (f or f)) or (f or e)) or (f and f)) and not (f or a)
+                return true
+            end
+            return false
+        elseif which = 2
+            if not (not ((e or c) and (f or b)) and (d and a))
+                return true
+            end
+            return false
+        elseif which = 3
+            if not ((d and (d and (e or c))) or (c and d))
+                return true
+            end
+            return false
+        elseif which = 4
+            if (f or (b or (b or c))) and (f and (f and (f and a)))
+                return true
+            end
+            return false
+        elseif which = 5
+            if d or ((d or e) or (b or (f and c)))
+                return true
+            end
+            return false
+        elseif which = 6
+            if (f or c) or (((a and b) and f) and ((f and f) and e))
+                return true
+            end
+            return false
+        elseif which = 7
+            if (d and d) and (((e and (b or a)) or f) or (c or b))
+                return true
+            end
+            return false
+        elseif which = 8
+            if not (((b or e) and e) and ((f or c) or a))
+                return true
+            end
+            return false
+        elseif which = 9
+            if ((d and e) and (c and a)) or (e or c)
+                return true
+            end
+            return false
+        elseif which = 10
+            if (((e and b) and c) and (c and e)) and not ((a and a) or (d or a))
+                return true
+            end
+            return false
+        elseif which = 11
+            if (b or (a or (c or e))) or (c and c)
+                return true
+            end
+            return false
+        elseif which = 12
+            if (((a and (d and f)) and c) or (e and b)) or b
+                return true
+            end
+            return false
+        elseif which = 13
+            if (d and c) or (((e and b) and d) or (not (a and (f or c)) and b))
+                return true
+            end
+            return false
+        elseif which = 14
+            if ((e or a) and not ((d and (f and e)) or d)) and d
+                return true
+            end
+            return false
+        elseif which = 15
+            if ((e and (a and e)) or ((f or a) or f)) or (a or (e or a))
+                return true
+            end
+            return false
+        elseif which = 16
+            if a and ((e and (((c and a) and b) and f)) or a)
+                return true
+            end
+            return false
+        elseif which = 17
+            if (((f and a) or (d or b)) and a) or ((a or f) or not (e or c))
+                return true
+            end
+            return false
+        elseif which = 18
+            if ((d and (e and b)) and (a and (d or b))) and (c and b)
+                return true
+            end
+            return false
+        elseif which = 19
+            if not (b and b) and (a and ((e and b) or ((f and a) or b)))
+                return true
+            end
+            return false
+        elseif which = 20
+            if ((b and not ((c or (b and d)) and (d or f))) or f) or (c and e)
+                return true
+            end
+            return false
+        elseif which = 21
+            if (a and c) or (a and (d or (b or a)))
+                return true
+            end
+            return false
+        elseif which = 22
+            if ((a or (c or a)) or d) and (((d and e) and f) or b)
+                return true
+            end
+            return false
+        elseif which = 23
+            if ((not ((f and a) and f) and b) and ((a and d) and c)) and (d or d)
+                return true
+            end
+            return false
+        elseif which = 24
+            if ((b and d) or (d and ((f and d) and b))) or (e or e)
+                return true
+            end
+            return false
+        elseif which = 25
+            if (d and (f or b)) or (f or (((c and f) or (b and b)) and f))
+                return true
+            end
+            return false
+        elseif which = 26
+            if not (((a and ((f or (a and c)) and b)) and (b or c)) or not (f or d))
+                return true
+            end
+            return false
+        elseif which = 27
+            if not (c and a) or (not ((c and (b or e)) and f) or (d or a))
+                return true
+            end
+            return false
+        elseif which = 28
+            if not ((c or a) and not ((a and a) or ((f and (f or d)) or not (e and e))))
+                return true
+            end
+            return false
+        elseif which = 29
+            if ((not (b and b) or f) or (d and d)) or a
+                return true
+            end
+            return false
+        elseif which = 30
+            if not ((b or d) and ((a or (d or b)) and not (a or f)))
+                return true
+            end
+            return false
+        elseif which = 31
+            if e or not ((d and f) and ((c or b) or b))
+                return true
+            end
+            return false
+        elseif which = 32
+            if not (((b and c) and c) or (e or (a and ((b and a) and c))))
+                return true
+            end
+            return false
+        elseif which = 33
+            if not (b or (b or (e and e))) and ((f and e) or b)
+                return true
+            end
+            return false
+        elseif which = 34
+            if (not (e and e) and ((e or f) or (c and not (f or not (d and c))))) or b
+                return true
+            end
+            return false
+        elseif which = 35
+            if not (((a or c) or f) or (d and ((f or b) and c)))
+                return true
+            end
+            return false
+        elseif which = 36
+            if d and ((not (e and ((c or d) or d)) or ((a or d) or b)) and e)
+                return true
+            end
+            return false
+        elseif which = 37
+            if not ((b and ((c or e) or (c or c))) and (c and d))
+                return true
+            end
+            return false
+        elseif which = 38
+            if not ((a and (a or f)) or ((f and e) or (c or (d and a))))
+                return true
+            end
+            return false
+        elseif which = 39
+            if (((c or e) or ((b or d) or e)) and ((c and e) and b)) and c
+                return true
+            end
+            return false
+        elseif which = 40
+            if b and ((a and c) or (c or ((f and f) and (b and d))))
+                return true
+            end
+            return false
+        elseif which = 41
+            if not (((e or b) or (((e or b) or f) and a)) or ((e and a) and b))
+                return true
+            end
+            return false
+        elseif which = 42
+            if (d and ((b or b) and c)) or ((e and (not (b and f) or f)) or a)
+                return true
+            end
+            return false
+        elseif which = 43
+            if not ((((f or f) or (d or d)) or ((c or c) or e)) and (b and b))
+                return true
+            end
+            return false
+        elseif which = 44
+            if (not (c and (c or f)) and ((f and b) or b)) or a
+                return true
+            end
+            return false
+        elseif which = 45
+            if (((b or a) and (d or b)) or not (b or b)) and (b or c)
+                return true
+            end
+            return false
+        elseif which = 46
+            if f and (d and (not (e and b) or (f and d)))
+                return true
+            end
+            return false
+        elseif which = 47
+            if not ((not (not ((c or e) or b) and c) or e) and (f and b)) and (c and b)
+                return true
+            end
+            return false
+        elseif which = 48
+            if not ((c or f) or ((((f and c) and d) and d) or f)) or b
+                return true
+            end
+            return false
+        elseif which = 49
+            if ((a and ((a and f) and (f and f))) and (a or e)) and (a or e)
+                return true
+            end
+            return false
+        elseif which = 50
+            if c and (not (f and d) and ((c and e) and (a and b)))
+                return true
+            end
+            return false
+        elseif which = 51
+            if ((d or b) and (not (f or e) or d)) and (b or not (c and b))
+                return true
+            end
+            return false
+        elseif which = 52
+            if ((e or c) and b) or (d or (d and e))
+                return true
+            end
+            return false
+        elseif which = 53
+            if (a and (not (c and f) or c)) or ((b or a) or d)
+                return true
+            end
+            return false
+        elseif which = 54
+            if (b and not (e and d)) and (a and (f and c))
+                return true
+            end
+            return false
+        elseif which = 55
+            if (not (e and (c and f)) and d) or ((f and (d or e)) or (a or f))
+                return true
+            end
+            return false
+        elseif which = 56
+            if not (not ((b and f) and (not (f or d) and c)) and (f and (c or d)))
+                return true
+            end
+            return false
+        elseif which = 57
+            if b or not ((b or (b or ((f and a) or e))) or (a and (a and e)))
+                return true
+            end
+            return false
+        elseif which = 58
+            if (not ((b or d) or (c and c)) or e) and (c and f)
+                return true
+            end
+            return false
+        elseif which = 59
+            if not (not (f and d) or (((a or (a or a)) or d) or (d and (f and e))))
+                return true
+            end
+            return false
+        elseif which = 60
+            if b and ((((f and a) and d) or c) and f)
+                return true
+            end
+            return false
+        elseif which = 61
+            if (((b or e) and b) and c) or (e and a)
+                return true
+            end
+            return false
+        elseif which = 62
+            if (((d or a) or c) or b) or (c and (d and b))
+                return true
+            end
+            return false
+        elseif which = 63
+            if (c or (a and c)) or ((c and d) or b)
+                return true
+            end
+            return false
+        elseif which = 64
+            if ((f or b) or (d and (c or c))) or f
+                return true
+            end
+            return false
+        elseif which = 65
+            if ((f or e) and d) or (f or ((b and c) or f))
+                return true
+            end
+            return false
+        elseif which = 66
+            if not ((e and (c and b)) or (d or (c or e)))
+                return true
+            end
+            return false
+        elseif which = 67
+            if not ((b or (not (c and c) and ((d and b) or d))) or c)
+                return true
+            end
+            return false
+        elseif which = 68
+            if (c and d) or (a or ((e and e) and e))
+                return true
+            end
+            return false
+        elseif which = 69
+            if ((d and e) and (f or c)) and ((d or (c and a)) and d)
+                return true
+            end
+            return false
+        elseif which = 70
+            if ((not (f and f) and (((c or c) or b) and b)) or e) or not (b or f)
+                return true
+            end
+            return false
+        elseif which = 71
+            if ((b or b) and f) and (((d and d) or f) or not (f or f))
+                return true
+            end
+            return false
+        elseif which = 72
+            if ((d or a) and (a and (e and not (e and c)))) or (not (e and c) and a)
+                return true
+            end
+            return false
+        elseif which = 73
+            if not (b and ((f or ((f and b) or ((b or e) and d))) and d))
+                return true
+            end
+            return false
+        elseif which = 74
+            if ((b and d) and a) or ((e or b) and f)
+                return true
+            end
+            return false
+        elseif which = 75
+            if (f and not ((d or d) and a)) and (c and (c and e))
+                return true
+            end
+            return false
+        elseif which = 76
+            if not (c or ((c or e) or (d or (a and e))))
+                return true
+            end
+            return false
+        elseif which = 77
+            if (a and (d and (not (b or f) and f))) or c
+                return true
+            end
+            return false
+        elseif which = 78
+            if not (a and d) or ((((e and e) or d) and ((c and f) and a)) and a)
+                return true
+            end
+            return false
+        elseif which = 79
+            if (((d or f) or f) and a) and ((b and c) and not (a or (e and b)))
+                return true
+            end
+            return false
+        elseif which = 80
+            if a or not (((d or a) and f) or (c and (c and d)))
+                return true
+            end
+            return false
+        elseif which = 81
+            if (f and f) and ((c or e) and (((a and d) and e) and c))
+                return true
+            end
+            return false
+        elseif which = 82
+            if not (b or ((((d and f) or d) or (e and (a and c))) or e))
+                return true
+            end
+            return false
+        elseif which = 83
+            if (not (b or e) or (b or (d and (c or f)))) or not (e and c)
+                return true
+            end
+            return false
+        elseif which = 84
+            if (c and ((c and a) or ((a or e) or (a or a)))) and (d and f)
+                return true
+            end
+            return false
+        elseif which = 85
+            if (((f or f) and c) or a) or ((a or f) or e)
+                return true
+            end
+            return false
+        elseif which = 86
+            if ((d and (a and (a or d))) or d) and not (e and f)
+                return true
+            end
+            return false
+        elseif which = 87
+            if f or (b or (not ((b and e) or e) and not (d or f)))
+                return true
+            end
+            return false
+        elseif which = 88
+            if not (((c or f) or (c and not (d or d))) or (a or (b and (b and e))))
+                return true
+            end
+            return false
+        elseif which = 89
+            if ((c and (b or b)) and d) or (f or d)
+                return true
+            end
+            return false
+        elseif which = 90
+            if (a or not ((d or b) or (e or f))) and c
+                return true
+            end
+            return false
+        elseif which = 91
+            if (((f and f) and e) or c) or (f or not (not (f or a) and (e or a)))
+                return true
+            end
+            return false
+        elseif which = 92
+            if (b and c) or (not (((e and e) and d) or (d and b)) or not (a or e))
+                return true
+            end
+            return false
+        elseif which = 93
+            if e or ((a and d) and not (not (b and (d and b)) or f))
+                return true
+            end
+            return false
+        elseif which = 94
+            if ((b and (e and a)) and (((c and (d and b)) or d) and b)) or a
+                return true
+            end
+            return false
+        elseif which = 95
+            if a or ((e and (f and e)) or (b or b))
+                return true
+            end
+            return false
+        elseif which = 96
+            if ((d and (e and a)) or (c and e)) or e
+                return true
+            end
+            return false
+        elseif which = 97
+            if f and (((e or b) and b) and (c and ((e and d) or b)))
+                return true
+            end
+            return false
+        elseif which = 98
+            if e and ((((e and d) and (b and a)) and b) or b)
+                return true
+            end
+            return false
+        elseif which = 99
+            if ((e or e) and b) and ((e and (f and c)) or a)
+                return true
+            end
+            return false
+        elseif which = 100
+            if (f or (e or e)) and (b and (not (d and a) and b))
+                return true
+            end
+            return false
+        elseif which = 101
+            if (((c or b) and (c or e)) and ((d and a) and d)) and a
+                return true
+            end
+            return false
+        elseif which = 102
+            if (((c and a) or c) and (c and d)) or not (f and e)
+                return true
+            end
+            return false
+        elseif which = 103
+            if ((f or (f or ((e or c) or c))) or e) or (not (e or a) or c)
+                return true
+            end
+            return false
+        elseif which = 104
+            if (((f or e) and d) or (f or a)) or (a and f)
+                return true
+            end
+            return false
+        elseif which = 105
+            if (b and not (c and b)) or ((c and (b and c)) or not (d or a))
+                return true
+            end
+            return false
+        elseif which = 106
+            if ((f or e) and e) or ((b or c) or (a or c))
+                return true
+            end
+            return false
+        elseif which = 107
+            if not (not ((not (a and b) and b) and (d and a)) or (d and ((f or d) or d)))
+                return true
+            end
+            return false
+        elseif which = 108
+            if b or ((a and b) or ((c or c) or a))
+                return true
+            end
+            return false
+        elseif which = 109
+            if not (d and (c and c)) or ((a or ((a and d) or d)) and (a or a))
+                return true
+            end
+            return false
+        elseif which = 110
+            if ((a and e) or (f and (e and (d and d)))) or (f or e)
+                return true
+            end
+            return false
+        elseif which = 111
+            if ((e or (f and (a and (a and (c and a))))) and b) or (b or c)
+                return true
+            end
+            return false
+        elseif which = 112
+            if (b or (f or f)) or ((b or e) and f)
+                return true
+            end
+            return false
+        elseif which = 113
+            if ((d and d) or not ((a or e) and d)) or (c or a)
+                return true
+            end
+            return false
+        elseif which = 114
+            if not (((b or (d or c)) or (b and e)) and d) or (e or (d and d))
+                return true
+            end
+            return false
+        elseif which = 115
+            if (not (not ((e or a) or b) and (e or not (c or d))) or d) or (e and d)
+                return true
+            end
+            return false
+        elseif which = 116
+            if (not (f or b) or (b and e)) and ((b or c) and e)
+                return true
+            end
+            return false
+        elseif which = 117
+            if (e and (b and e)) or ((c or f) and b)
+                return true
+            end
+            return false
+        elseif which = 118
+            if not (d or e) or ((b or (e and e)) and ((f and (f or e)) and b))
+                return true
+            end
+            return false
+        elseif which = 119
+            if (f and ((a and (b and c)) or a)) and (not (f and d) or b)
+                return true
+            end
+            return false
+        elseif which = 120
+            if e and ((d or (c and not (d and e))) and (d and (e and b)))
+                return true
+            end
+            return false
+        elseif which = 121
+            if not ((a and (b or (f and a))) and (not (e and (b or a)) and d))
+                return true
+            end
+            return false
+        elseif which = 122
+            if ((f or c) and (not (not (e and (b and b)) or a) and f)) or (b or b)
+                return true
+            end
+            return false
+        elseif which = 123
+            if (e and (b or (a and e))) and (b and a)
+                return true
+            end
+            return false
+        elseif which = 124
+            if ((b and (b or d)) and (a or a)) and ((d and d) or (f or d))
+                return true
+            end
+            return false
+        elseif which = 125
+            if not ((d and (b or ((e or c) and f))) and (e or d))
+                return true
+            end
+            return false
+        elseif which = 126
+            if not ((c and f) or ((e and b) and a)) or f
+                return true
+            end
+            return false
+        elseif which = 127
+            if (b or (f or e)) or ((e or f) or b)
+                return true
+            end
+            return false
+        elseif which = 128
+            if not ((((f or c) or ((f and e) and (d or d))) and c) or (f or b))
+                return true
+            end
+            return false
+        elseif which = 129
+            if (e and ((e and a) and (a or b))) or (d and f)
+                return true
+            end
+            return false
+        elseif which = 130
+            if not (not ((f and a) or (not (a and a) and (f and b))) and b)
+                return true
+            end
+            return false
+        elseif which = 131
+            if not ((e and (e or a)) and not ((d or e) or f))
+                return true
+            end
+            return false
+        elseif which = 132
+            if a and ((((f or f) and a) or a) and c)
+                return true
+            end
+            return false
+        elseif which = 133
+            if ((b and b) and c) and (f or (d or (a or (f and a))))
+                return true
+            end
+            return false
+        elseif which = 134
+            if ((a or e) or (c or a)) and ((c and e) and d)
+                return true
+            end
+            return false
+        elseif which = 135
+            if a and (c or ((e or (e or (d and b))) and a))
+                return true
+            end
+            return false
+        elseif which = 136
+            if ((d and (f or b)) or not (a and not (c or d))) and ((c and a) and b)
+                return true
+            end
+            return false
+        elseif which = 137
+            if a or (((d or c) and not (b or d)) and ((e or d) and c))
+                return true
+            end
+            return false
+        elseif which = 138
+            if a and (e or (((e or b) or f) or (a or (a or a))))
+                return true
+            end
+            return false
+        elseif which = 139
+            if not ((((c or d) and b) or (e or a)) or (((c and e) and f) or b))
+                return true
+            end
+            return false
+        elseif which = 140
+            if not ((d and ((e and f) and d)) and ((f or a) and (b and e)))
+                return true
+            end
+            return false
+        elseif which = 141
+            if not (c or (d or f)) and ((f and (b and (c or c))) or (a or c))
+                return true
+            end
+            return false
+        elseif which = 142
+            if (e or not ((e and b) and not (c and e))) and d
+                return true
+            end
+            return false
+        elseif which = 143
+            if (((a or (c or c)) and c) and b) and (d or c)
+                return true
+            end
+            return false
+        elseif which = 144
+            if (((e and c) and (d or f)) or (f and b)) and (e and e)
+                return true
+            end
+            return false
+        elseif which = 145
+            if (a and not ((d and f) or e)) and ((b and e) or f)
+                return true
+            end
+            return false
+        elseif which = 146
+            if (e or a) or ((d and c) and ((f and d) or (a and b)))
+                return true
+            end
+            return false
+        elseif which = 147
+            if (e and ((not ((d and e) and f) and (d or c)) and c)) or c
+                return true
+            end
+            return false
+        elseif which = 148
+            if (d and ((c and f) and (e and b))) or ((d and e) or (d or c))
+                return true
+            end
+            return false
+        elseif which = 149
+            if ((a and a) or b) or (b and ((d or (e or a)) or c))
+                return true
+            end
+            return false
+        elseif which = 150
+            if (not (e and f) and c) or (f or (b and a))
+                return true
+            end
+            return false
+        elseif which = 151
+            if (a and f) and (b or (d and (f and (b or d))))
+                return true
+            end
+            return false
+        elseif which = 152
+            if f and ((not ((f and b) and c) or a) or (b and (not (b and b) or d)))
+                return true
+            end
+            return false
+        elseif which = 153
+            if (a and ((f or f) and (d or (f or a)))) or c
+                return true
+            end
+            return false
+        elseif which = 154
+            if not ((f or (b or c)) and (d or c)) and (e and e)
+                return true
+            end
+            return false
+        elseif which = 155
+            if (((f and a) and a) or (c or (a and a))) and a
+                return true
+            end
+            return false
+        elseif which = 156
+            if ((not (b or d) and (c and b)) or (f and (f or d))) and f
+                return true
+            end
+            return false
+        elseif which = 157
+            if ((f and not (f and (c or e))) or e) and (f and d)
+                return true
+            end
+            return false
+        elseif which = 158
+            if not ((a or (d or c)) or ((c and b) or b))
+                return true
+            end
+            return false
+        elseif which = 159
+            if not (d and ((not (d and d) and e) and (not (d or b) or a)))
+                return true
+            end
+            return false
+        elseif which = 160
+            if not ((((f or e) or f) or f) or (f or (a and ((b and d) and a))))
+                return true
+            end
+            return false
+        elseif which = 161
+            if (((c or c) and (e or f)) or c) and a
+                return true
+            end
+            return false
+        elseif which = 162
+            if not ((b or e) or a) or ((b and (c and e)) and (b and e))
+                return true
+            end
+            return false
+        elseif which = 163
+            if ((d or f) and c) or (c and (d and (e or b)))
+                return true
+            end
+            return false
+        elseif which = 164
+            if a and ((c or e) and (c or (a and c)))
+                return true
+            end
+            return false
+        elseif which = 165
+            if not (d or (a or not (f or (c or (f and e)))))
+                return true
+            end
+            return false
+        elseif which = 166
+            if (not (a and (d or a)) or ((b or d) and f)) and (a or (b and f))
+                return true
+            end
+            return false
+        elseif which = 167
+            if not (not (((c or b) and (a or c)) and not (d and b)) and (e or a))
+                return true
+            end
+            return false
+        elseif which = 168
+            if (b or d) and ((d or b) or ((b and d) and c))
+                return true
+            end
+            return false
+        elseif which = 169
+            if ((a and a) or b) and ((b or f) and ((b or d) and (a and b)))
+                return true
+            end
+            return false
+        elseif which = 170
+            if (c and not (b and c)) and (a and (f or ((c and c) and (c or f))))
+                return true
+            end
+            return false
+        elseif which = 171
+            if f and (c or not (((f or a) and (b and (c or f))) or (e or b)))
+                return true
+            end
+            return false
+        elseif which = 172
+            if (((a or d) and e) or ((b and e) and e)) or (c and (b or e))
+                return true
+            end
+            return false
+        elseif which = 173
+            if a or (c or (a or (((e or d) and e) and f)))
+                return true
+            end
+            return false
+        elseif which = 174
+            if (e or f) and not (d or ((a or c) and d))
+                return true
+            end
+            return false
+        elseif which = 175
+            if (b and e) or ((f or (e or (b and (e and c)))) and (e or a))
+                return true
+            end
+            return false
+        elseif which = 176
+            if ((f or f) and (d and c)) and not (d or ((e and f) and not (a or d)))
+                return true
+            end
+            return false
+        elseif which = 177
+            if (f or (not (not (a and e) or a) or c)) or c
+                return true
+            end
+            return false
+        elseif which = 178
+            if f or (((f or ((a and b) or d)) or a) or b)
+                return true
+            end
+            return false
+        elseif which = 179
+            if not ((a and (d and (not (e or d) and b))) or (c or ((f or c) or b)))
+                return true
+            end
+            return false
+        elseif which = 180
+            if (a and (d or c)) or not (not (not (c or not (f or d)) and (e or d)) and d)
+                return true
+            end
+            return false
+        elseif which = 181
+            if (f or e) or (c and (((e and f) or e) or a))
+                return true
+            end
+            return false
+        elseif which = 182
+            if c or (a or not (e and ((b and f) or not (f or c))))
+                return true
+            end
+            return false
+        elseif which = 183
+            if f or (f or (a and (e or (f and b))))
+                return true
+            end
+            return false
+        elseif which = 184
+            if (f or (c and a)) and not ((c and a) and (d and (c and c)))
+                return true
+            end
+            return false
+        elseif which = 185
+            if (f and ((not (f and b) or d) and d)) or (((f or e) or d) and b)
+                return true
+            end
+            return false
+        elseif which = 186
+            if e or ((d or (f or d)) and (b and f))
+                return true
+            end
+            return false
+        elseif which = 187
+            if f or ((not (((b and (c or d)) and b) or a) and b) or f)
+                return true
+            end
+            return false
+        elseif which = 188
+            if not (a and (d and d)) or ((d and (c or d)) or d)
+                return true
+            end
+            return false
+        elseif which = 189
+            if not (((e and (d or (f and f))) and a) or (a and c))
+                return true
+            end
+            return false
+        elseif which = 190
+            if f and (((f and f) and (b or e)) or not (f or c))
+                return true
+            end
+            return false
+        elseif which = 191
+            if (a or ((b or a) and not (e or e))) and not (a or ((a or a) or c))
+                return true
+            end
+            return false
+        elseif which = 192
+            if (d or e) or not (((d and e) or c) or b)
+                return true
+            end
+            return false
+        elseif which = 193
+            if ((b and b) and ((c or f) or e)) and b
+                return true
+            end
+            return false
+        elseif which = 194
+            if not ((a or a) or (not (f and d) and f)) and a
+                return true
+            end
+            return false
+        elseif which = 195
+            if f or ((d and b) or ((f and d) or (f or ((a and f) or d))))
+                return true
+            end
+            return false
+        elseif which = 196
+            if a or (e and ((b or b) or (a or ((d or c) or a))))
+                return true
+            end
+            return false
+        elseif which = 197
+            if ((f and a) or not (a or (e or e))) and (b and b)
+                return true
+            end
+            return false
+        elseif which = 198
+            if (d or ((b or (c and a)) and e)) and b
+                return true
+            end
+            return false
+        elseif which = 199
+            if e and ((not (e or c) or c) and (f and c))
+                return true
+            end
+            return false
+        end
+        return false
+    end
+
+
+    /* Whether bit place of the combination is set: place 0 is the first variable, the highest bit. */
+    action Bit(integer combination, integer place) returns boolean
+        integer shift = 5 - place
+        integer value = combination
+        repeat shift times
+            value = value / 2
+        end
+        return value mod 2 = 1
+    end
+
+    action Letter(boolean value) returns text
+        if value
+            return "T"
+        end
+        return "F"
+    end
+end

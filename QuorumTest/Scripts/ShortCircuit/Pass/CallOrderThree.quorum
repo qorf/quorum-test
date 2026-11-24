@@ -1,0 +1,233 @@
+/*
+Every grouping of 3 and/or operators on 4 calls (A, B, C, D), each call
+logging its letter and returning its value, for all 16 combinations of true and
+false (a first). Each entry is the result, a slash and the calls made, in
+order: the right side of and is skipped when its left side is false, and
+the right side of or when its left side is true, so every call that's
+made, and only those, must appear, in order. Expected output worked out
+separately.
+*/
+class Main
+    text log = ""
+
+    action Main
+        Show("A(a) and (B(b) and (C(c) and D(d)))", 0)
+        Show("A(a) or (B(b) and (C(c) and D(d)))", 1)
+        Show("A(a) and (B(b) or (C(c) and D(d)))", 2)
+        Show("A(a) or (B(b) or (C(c) and D(d)))", 3)
+        Show("A(a) and (B(b) and (C(c) or D(d)))", 4)
+        Show("A(a) or (B(b) and (C(c) or D(d)))", 5)
+        Show("A(a) and (B(b) or (C(c) or D(d)))", 6)
+        Show("A(a) or (B(b) or (C(c) or D(d)))", 7)
+        Show("A(a) and ((B(b) and C(c)) and D(d))", 8)
+        Show("A(a) or ((B(b) and C(c)) and D(d))", 9)
+        Show("A(a) and ((B(b) and C(c)) or D(d))", 10)
+        Show("A(a) or ((B(b) and C(c)) or D(d))", 11)
+        Show("A(a) and ((B(b) or C(c)) and D(d))", 12)
+        Show("A(a) or ((B(b) or C(c)) and D(d))", 13)
+        Show("A(a) and ((B(b) or C(c)) or D(d))", 14)
+        Show("A(a) or ((B(b) or C(c)) or D(d))", 15)
+        Show("(A(a) and B(b)) and (C(c) and D(d))", 16)
+        Show("(A(a) and B(b)) or (C(c) and D(d))", 17)
+        Show("(A(a) and B(b)) and (C(c) or D(d))", 18)
+        Show("(A(a) and B(b)) or (C(c) or D(d))", 19)
+        Show("(A(a) or B(b)) and (C(c) and D(d))", 20)
+        Show("(A(a) or B(b)) or (C(c) and D(d))", 21)
+        Show("(A(a) or B(b)) and (C(c) or D(d))", 22)
+        Show("(A(a) or B(b)) or (C(c) or D(d))", 23)
+        Show("(A(a) and (B(b) and C(c))) and D(d)", 24)
+        Show("(A(a) and (B(b) and C(c))) or D(d)", 25)
+        Show("(A(a) or (B(b) and C(c))) and D(d)", 26)
+        Show("(A(a) or (B(b) and C(c))) or D(d)", 27)
+        Show("(A(a) and (B(b) or C(c))) and D(d)", 28)
+        Show("(A(a) and (B(b) or C(c))) or D(d)", 29)
+        Show("(A(a) or (B(b) or C(c))) and D(d)", 30)
+        Show("(A(a) or (B(b) or C(c))) or D(d)", 31)
+        Show("((A(a) and B(b)) and C(c)) and D(d)", 32)
+        Show("((A(a) and B(b)) and C(c)) or D(d)", 33)
+        Show("((A(a) and B(b)) or C(c)) and D(d)", 34)
+        Show("((A(a) and B(b)) or C(c)) or D(d)", 35)
+        Show("((A(a) or B(b)) and C(c)) and D(d)", 36)
+        Show("((A(a) or B(b)) and C(c)) or D(d)", 37)
+        Show("((A(a) or B(b)) or C(c)) and D(d)", 38)
+        Show("((A(a) or B(b)) or C(c)) or D(d)", 39)
+    end
+
+    action Show(text expression, integer which)
+        text entries = ""
+        integer i = 0
+        repeat while i < 16
+            log = ""
+            boolean result = Value(which, Bit(i, 0), Bit(i, 1), Bit(i, 2), Bit(i, 3))
+            if i > 0
+                entries = entries + " "
+            end
+            entries = entries + Letter(result) + "/" + log
+            i = i + 1
+        end
+        output expression + ": " + entries
+    end
+
+    action Value(integer which, boolean a, boolean b, boolean c, boolean d) returns boolean
+        if which = 0
+            boolean result = A(a) and (B(b) and (C(c) and D(d)))
+            return result
+        elseif which = 1
+            boolean result = A(a) or (B(b) and (C(c) and D(d)))
+            return result
+        elseif which = 2
+            boolean result = A(a) and (B(b) or (C(c) and D(d)))
+            return result
+        elseif which = 3
+            boolean result = A(a) or (B(b) or (C(c) and D(d)))
+            return result
+        elseif which = 4
+            boolean result = A(a) and (B(b) and (C(c) or D(d)))
+            return result
+        elseif which = 5
+            boolean result = A(a) or (B(b) and (C(c) or D(d)))
+            return result
+        elseif which = 6
+            boolean result = A(a) and (B(b) or (C(c) or D(d)))
+            return result
+        elseif which = 7
+            boolean result = A(a) or (B(b) or (C(c) or D(d)))
+            return result
+        elseif which = 8
+            boolean result = A(a) and ((B(b) and C(c)) and D(d))
+            return result
+        elseif which = 9
+            boolean result = A(a) or ((B(b) and C(c)) and D(d))
+            return result
+        elseif which = 10
+            boolean result = A(a) and ((B(b) and C(c)) or D(d))
+            return result
+        elseif which = 11
+            boolean result = A(a) or ((B(b) and C(c)) or D(d))
+            return result
+        elseif which = 12
+            boolean result = A(a) and ((B(b) or C(c)) and D(d))
+            return result
+        elseif which = 13
+            boolean result = A(a) or ((B(b) or C(c)) and D(d))
+            return result
+        elseif which = 14
+            boolean result = A(a) and ((B(b) or C(c)) or D(d))
+            return result
+        elseif which = 15
+            boolean result = A(a) or ((B(b) or C(c)) or D(d))
+            return result
+        elseif which = 16
+            boolean result = (A(a) and B(b)) and (C(c) and D(d))
+            return result
+        elseif which = 17
+            boolean result = (A(a) and B(b)) or (C(c) and D(d))
+            return result
+        elseif which = 18
+            boolean result = (A(a) and B(b)) and (C(c) or D(d))
+            return result
+        elseif which = 19
+            boolean result = (A(a) and B(b)) or (C(c) or D(d))
+            return result
+        elseif which = 20
+            boolean result = (A(a) or B(b)) and (C(c) and D(d))
+            return result
+        elseif which = 21
+            boolean result = (A(a) or B(b)) or (C(c) and D(d))
+            return result
+        elseif which = 22
+            boolean result = (A(a) or B(b)) and (C(c) or D(d))
+            return result
+        elseif which = 23
+            boolean result = (A(a) or B(b)) or (C(c) or D(d))
+            return result
+        elseif which = 24
+            boolean result = (A(a) and (B(b) and C(c))) and D(d)
+            return result
+        elseif which = 25
+            boolean result = (A(a) and (B(b) and C(c))) or D(d)
+            return result
+        elseif which = 26
+            boolean result = (A(a) or (B(b) and C(c))) and D(d)
+            return result
+        elseif which = 27
+            boolean result = (A(a) or (B(b) and C(c))) or D(d)
+            return result
+        elseif which = 28
+            boolean result = (A(a) and (B(b) or C(c))) and D(d)
+            return result
+        elseif which = 29
+            boolean result = (A(a) and (B(b) or C(c))) or D(d)
+            return result
+        elseif which = 30
+            boolean result = (A(a) or (B(b) or C(c))) and D(d)
+            return result
+        elseif which = 31
+            boolean result = (A(a) or (B(b) or C(c))) or D(d)
+            return result
+        elseif which = 32
+            boolean result = ((A(a) and B(b)) and C(c)) and D(d)
+            return result
+        elseif which = 33
+            boolean result = ((A(a) and B(b)) and C(c)) or D(d)
+            return result
+        elseif which = 34
+            boolean result = ((A(a) and B(b)) or C(c)) and D(d)
+            return result
+        elseif which = 35
+            boolean result = ((A(a) and B(b)) or C(c)) or D(d)
+            return result
+        elseif which = 36
+            boolean result = ((A(a) or B(b)) and C(c)) and D(d)
+            return result
+        elseif which = 37
+            boolean result = ((A(a) or B(b)) and C(c)) or D(d)
+            return result
+        elseif which = 38
+            boolean result = ((A(a) or B(b)) or C(c)) and D(d)
+            return result
+        elseif which = 39
+            boolean result = ((A(a) or B(b)) or C(c)) or D(d)
+            return result
+        end
+        return false
+    end
+
+    action A(boolean value) returns boolean
+        log = log + "A"
+        return value
+    end
+
+    action B(boolean value) returns boolean
+        log = log + "B"
+        return value
+    end
+
+    action C(boolean value) returns boolean
+        log = log + "C"
+        return value
+    end
+
+    action D(boolean value) returns boolean
+        log = log + "D"
+        return value
+    end
+
+
+    /* Whether bit place of the combination is set: place 0 is the first variable, the highest bit. */
+    action Bit(integer combination, integer place) returns boolean
+        integer shift = 3 - place
+        integer value = combination
+        repeat shift times
+            value = value / 2
+        end
+        return value mod 2 = 1
+    end
+
+    action Letter(boolean value) returns text
+        if value
+            return "T"
+        end
+        return "F"
+    end
+end

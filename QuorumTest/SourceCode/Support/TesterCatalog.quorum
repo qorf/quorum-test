@@ -81,6 +81,8 @@ class TesterCatalog
         Add("Text", "Text", LIBRARY_EDGES, 60)
         Add("Numbers", "Numbers", LIBRARY_EDGES, 60)
         Add("ContainerEdges", "Container edges", LIBRARY_EDGES, 120)
+        // Added 2026-11-23: and/or groupings (4 scripts on 3 back ends).
+        Add("ShortCircuit", "Short circuit", LANGUAGE, 36)
         Add("MathEdges", "Math edges", LIBRARY_EDGES, 91)
         Add("Geometry", "Geometry", LIBRARY_EDGES, 9)
         Add("TextSupport", "Text support", LIBRARY_EDGES, 8)

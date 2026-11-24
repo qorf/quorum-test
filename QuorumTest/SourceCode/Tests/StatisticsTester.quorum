@@ -27,6 +27,7 @@ class StatisticsTester
         scripts:Check(path + "ClusterByMeans", true, false)
         scripts:Check(path + "ColumnSplitter", true, false)
         scripts:Check(path + "ColumnTypes", true, false)
+        scripts:Check(path + "CompareCountsPairwiseFlow", true, false)
         scripts:Check(path + "CombineFilterRound", true, false)
         scripts:Check(path + "CommaSeparatedFiles", false, false)
         scripts:Check(path + "CovarianceCorrelation", true, false)

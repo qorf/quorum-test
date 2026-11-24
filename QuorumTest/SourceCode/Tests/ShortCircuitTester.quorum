@@ -1,0 +1,60 @@
+package Libraries.Language.Compile.Test
+
+use Libraries.Testing.QuorumTest
+use Libraries.Testing.ScriptCheck
+
+/*
+    How and/or are worked out when they're grouped inside each other, on
+    variables (Expressions' BoolParens uses the literals true and false, one
+    level deep). On 2026-11-23 the bytecode back end was found to get some
+    groupings wrong: an and/or whose left side is a grouped and/or with
+    another grouped and/or on its own right, such as
+    (a or (b and c)) and d, can come out true when it should be false
+    (Plans/Compiler/AndOrShortCircuitBug.md). These scripts try every
+    grouping of two, three and four operators on every combination of
+    true and false, as a value and as an if condition, and the shapes
+    around the bug in the other places a condition can be, with calls
+    that log which parts are worked out. More scripts widen it: chains
+    without parentheses (and before or, left to right), not around groups,
+    comparisons as the parts, 200 deeper expressions of five to eight
+    operators, the exact order of calls for every grouping of three and
+    four operators, and guards whose right side would fail if it ran
+    (Guards, written by hand). The expected output is the
+    correct answer, worked out separately, so these fail until the
+    compiler is fixed. JavaScript and Python write the operators
+    themselves (&& and ||, and and or), so they should pass there; they're
+    run everywhere so a change to any back end is caught.
+*/
+class ShortCircuitTester
+    QuorumTest suite = undefined
+    ScriptCheck scripts
+    text path = "Scripts/ShortCircuit/Pass/"
+
+    action Test
+        scripts:SetSuite(suite)
+        scripts:CheckEverywhere(path + "AllGroupingsTwo")
+        scripts:CheckEverywhere(path + "AllGroupingsThree")
+        scripts:CheckEverywhere(path + "AllGroupingsFour")
+        scripts:CheckEverywhere(path + "Contexts")
+        scripts:CheckEverywhere(path + "NoParentheses")
+        scripts:CheckEverywhere(path + "NotGroupingsOne")
+        scripts:CheckEverywhere(path + "NotGroupingsTwo")
+        scripts:CheckEverywhere(path + "Comparisons")
+        scripts:CheckEverywhere(path + "DeepGroupings")
+        scripts:CheckEverywhere(path + "CallOrderThree")
+        scripts:CheckEverywhere(path + "CallOrderFour")
+        scripts:CheckEverywhere(path + "Guards")
+    end
+
+    action GetName returns text
+        return "Short circuit Tests"
+    end
+
+    action GetCompilerTestSuite returns QuorumTest
+        return suite
+    end
+
+    action SetCompilerTestSuite(QuorumTest suite)
+        me:suite = suite
+    end
+end

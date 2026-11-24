@@ -1,0 +1,18 @@
+independent, significant, default: statistic 6.666667, df 2.0, p 0.035674
+independent, significant, default: pairwise 3, 1.714286 (p 0.571291), 6.666667 (p 0.02947), 1.714286 (p 0.571291)
+independent, not significant, default: statistic 0.266667, df 2.0, p 0.875173
+independent, not significant, default: pairwise none
+independent, not significant, TestPairwise(): statistic 0.266667, df 2.0, p 0.875173
+independent, not significant, TestPairwise(): pairwise 3, 0.066741 (p 1.0), 0.266667 (p 1.0), 0.066741 (p 1.0)
+independent, significant, TestPairwise(false): statistic 6.666667, df 2.0, p 0.035674
+independent, significant, TestPairwise(false): pairwise none
+independent, two groups, significant: statistic 6.666667, df 1.0, p 0.009823
+independent, two groups, significant: pairwise none
+repeated, significant, default: statistic 12.0, df 2.0, p 0.002479
+repeated, significant, default: pairwise 3, 4.0 (p 0.136501), 8.0 (p 0.014033), 4.0 (p 0.136501)
+repeated, not significant, default: statistic 0.0, df 2.0, p 1.0
+repeated, not significant, default: pairwise none
+repeated, not significant, TestPairwise(): statistic 0.0, df 2.0, p 1.0
+repeated, not significant, TestPairwise(): pairwise 3, 0.0 (p 1.0), 0.0 (p 1.0), 0.0 (p 1.0)
+repeated, significant, TestPairwise(false): statistic 12.0, df 2.0, p 0.002479
+repeated, significant, TestPairwise(false): pairwise none

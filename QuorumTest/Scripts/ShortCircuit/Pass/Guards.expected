@@ -1,0 +1,28 @@
+(missing = undefined or (missing:GetSize() > 0 and yes)) and yes = true
+(3 < size and (Get(3) > 0 or no)) or no = false
+(zero = 0 or (10 / zero > 1 and yes)) and (no or zero = 0) = true
+(no and (10 / zero > 1 or yes)) or (yes and (no or yes)) = true
+Echo(no or (no and yes)) and yes = false
+Echo((no or (no and no)) and yes) or yes = true
+Both((no or (no and no)) and yes, (yes and (no or no)) or no) = false and false
+((no or (no and no)) and yes) = ((yes and (no or no)) or no) = true
+((no or (no and no)) and yes) not= (yes or no) = true
+stored, then stored or (no or (yes and yes)) and yes = true
+elseif chain 1 takes second elseif
+elseif chain 2 takes first elseif
+elseif chain 3 takes if
+elseif chain 4 takes else
+repeat while ((count < 5 and (no or (count < 2 and yes))) or (count = 2 and no)) ran 2 times
+repeat until (count >= 3 and (no or (yes and yes))) or (no and (no or yes)) ran 3 times
+(me:fieldNo or (fieldNo and me:fieldYes)) and fieldYes = false
+(fieldYes and (fieldNo or me:fieldNo)) or fieldNo = false
+not not ((no or (no and no)) and yes) = false
+not (no or (no and no)) and yes = true
+(not no or (no and no)) and not yes = false
+12 ors, only the last true = true
+12 ands, only the last false = false
+6 grouped ors of ands, only the last true = true
+6 grouped ands of ors, one false group = false
+(A(no) or (B(no) and C(yes))) and (D(yes) or E(yes)) = false, called AB
+(A(no) or (B(yes) and C(yes))) and (D(no) or E(yes)) = true, called ABCDE
+((A(yes) and B(no)) or (C(no) and D(yes))) or E(no) = false, called ABCE

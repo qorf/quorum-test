@@ -1,0 +1,8 @@
+a and (b and c): value FFFFFFFT, if FFFFFFFT
+a or (b and c): value FFFTTTTT, if FFFTTTTT
+a and (b or c): value FFFFFTTT, if FFFFFTTT
+a or (b or c): value FTTTTTTT, if FTTTTTTT
+(a and b) and c: value FFFFFFFT, if FFFFFFFT
+(a and b) or c: value FTFTFTTT, if FTFTFTTT
+(a or b) and c: value FFFTFTFT, if FFFTFTFT
+(a or b) or c: value FTTTTTTT, if FTTTTTTT
