@@ -1,0 +1,11 @@
+/*
+    A program calls a task's Run itself, and its Run waits. A call to Run
+    may reach a version that waits, so it is awaited in JavaScript.
+*/
+class Main
+    action Main
+        DirectRunTask task
+        task:Run()
+        output "after Run: " + task:GetResult()
+    end
+end

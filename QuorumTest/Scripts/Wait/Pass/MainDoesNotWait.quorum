@@ -1,0 +1,13 @@
+/*
+    A program that never waits. Main stays a plain action, and nothing
+    changes from today.
+*/
+class Main
+    action Main
+        output "sum: " + Add(2, 3)
+    end
+
+    action Add(integer a, integer b) returns integer
+        return a + b
+    end
+end

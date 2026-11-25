@@ -1,0 +1,12 @@
+use Libraries.Interface.Behaviors.Behavior
+use Libraries.Interface.Events.BehaviorEvent
+
+/*
+    A Behavior whose Run waits: not allowed (see WaitInBehaviorRun).
+*/
+class WaitingBehavior is Behavior
+    action Run(BehaviorEvent event)
+        Waiter waiter
+        integer value = waiter:Get(1)
+    end
+end

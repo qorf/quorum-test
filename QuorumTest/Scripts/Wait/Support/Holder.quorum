@@ -1,0 +1,15 @@
+/*
+    A plain object holding a number, for chains such as
+    waiter:GetHolder(5):GetValue().
+*/
+class Holder
+    integer value = 0
+
+    action SetValue(integer value)
+        me:value = value
+    end
+
+    action GetValue returns integer
+        return value
+    end
+end

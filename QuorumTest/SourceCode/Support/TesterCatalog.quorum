@@ -53,6 +53,7 @@ class TesterCatalog
         Add("Templating", "Templating", LANGUAGE, 135)
         Add("TemplatingGenerated", "Templating generated", LANGUAGE, 684)
         Add("Exception", "Exception", LANGUAGE, 269)
+        Add("Wait", "Wait (async in JavaScript)", LANGUAGE, 62)
         Add("Array", "Array", LIBRARY, 189)
         Add("Stack", "Stack", LIBRARY, 72)
         Add("Queue", "Queue", LIBRARY, 36)

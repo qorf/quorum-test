@@ -1,0 +1,9 @@
+/*
+    Inherits Base's waiting Fetch, and adds an action that calls it through
+    parent.
+*/
+class Derived is Base
+    action FetchTwice(integer value) returns integer
+        return parent:Base:Fetch(value) + Fetch(value)
+    end
+end

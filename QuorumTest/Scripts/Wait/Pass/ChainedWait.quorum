@@ -1,0 +1,13 @@
+/*
+    A chain whose first call waits: waiter:GetHolder(5):GetValue(). The
+    object GetHolder returns must be waited for before GetValue is called
+    on it, so the await goes around the first call, not the whole chain.
+*/
+class Main
+    action Main
+        Waiter waiter
+        output "chain: " + waiter:GetHolder(5):GetValue()
+        Holder holder = waiter:GetHolder(6)
+        output "in two steps: " + holder:GetValue()
+    end
+end

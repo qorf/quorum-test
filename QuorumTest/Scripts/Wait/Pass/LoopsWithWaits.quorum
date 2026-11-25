@@ -1,0 +1,23 @@
+/*
+    Waits inside each kind of loop keep the loop's order.
+*/
+class Main
+    action Main
+        Waiter waiter
+        text order = ""
+        repeat 3 times
+            order = order + waiter:Get(1)
+        end
+        integer i = 0
+        repeat until i = 3
+            order = order + waiter:Get(2)
+            i = i + 1
+        end
+        i = 0
+        repeat while i < 3
+            order = order + waiter:Get(3)
+            i = i + 1
+        end
+        output "order: " + order
+    end
+end

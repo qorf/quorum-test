@@ -1,0 +1,11 @@
+/*
+    Should not compile: an object's on create waits. In JavaScript an
+    object is made without waiting (a constructor can't be async), so
+    nothing that runs while an object is made may wait.
+*/
+class Main
+    action Main
+        WaitsWhenMade made
+        output "made"
+    end
+end

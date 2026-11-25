@@ -1,0 +1,29 @@
+use Libraries.Multitasking.Task
+
+/*
+    A task that hands back a number, or stops with an error instead.
+*/
+class ValueTask is Task
+    integer value = 0
+    integer result = 0
+    boolean fail = false
+
+    action Setup(integer value)
+        me:value = value
+    end
+
+    action SetFail(boolean fail)
+        me:fail = fail
+    end
+
+    action Run
+        if fail
+            alert("ValueTask failed on purpose")
+        end
+        result = value
+    end
+
+    action GetResult returns integer
+        return result
+    end
+end

@@ -1,0 +1,34 @@
+/*
+    Calls that wait, used inside larger expressions: arithmetic, text, a
+    condition, a loop's condition, a return, another call's parameter, and
+    a call's parameter that is itself such a call.
+*/
+class Main
+    Waiter waiter
+
+    action Main
+        output "arithmetic: " + (1 + waiter:Get(2) * 3)
+        output "text: " + "[" + waiter:GetText("abc") + "]"
+        if waiter:Get(5) > 4
+            output "condition: true"
+        else
+            output "condition: false"
+        end
+        integer count = 0
+        repeat while waiter:Get(count) < 3
+            count = count + 1
+        end
+        output "loop ran: " + count
+        output "returned: " + Doubled(6)
+        output "parameter: " + Plain(waiter:Get(8))
+        output "nested: " + waiter:Get(waiter:Get(9) + 1)
+    end
+
+    action Doubled(integer value) returns integer
+        return waiter:Get(value) * 2
+    end
+
+    action Plain(integer value) returns integer
+        return value + 100
+    end
+end

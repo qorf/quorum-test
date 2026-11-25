@@ -1,0 +1,23 @@
+use Libraries.Multitasking.Task
+
+/*
+    A task whose Then waits, here for another task.
+*/
+class ThenWaitTask is Task
+    integer fromThen = 0
+    boolean thenFinished = false
+
+    action Then
+        Waiter waiter
+        fromThen = waiter:Get(12)
+        thenFinished = true
+    end
+
+    action GetFromThen returns integer
+        return fromThen
+    end
+
+    action ThenFinished returns boolean
+        return thenFinished
+    end
+end

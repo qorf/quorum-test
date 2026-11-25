@@ -1,0 +1,17 @@
+use Libraries.Multitasking.Lines
+
+/*
+    A task's Then may wait, as its Run may: the multitasking library waits
+    for Then as it waits for Run. So a wait for the task returns only once
+    Then's own wait is over.
+*/
+class Main
+    action Main
+        ThenWaitTask task
+        Lines lines
+        lines:LineUp(task)
+        task:Wait()
+        output "Then finished before Wait returned: " + task:ThenFinished()
+        output "Then waited for: " + task:GetFromThen()
+    end
+end

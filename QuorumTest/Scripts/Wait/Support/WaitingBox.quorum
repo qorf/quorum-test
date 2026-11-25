@@ -1,0 +1,18 @@
+/*
+    Holds one value of any type, and waits before handing it back, so a
+    waiting result is unboxed (Box<integer>'s Get gives an object, which
+    becomes an integer where it is used).
+*/
+class WaitingBox<Type>
+    Type value = undefined
+
+    action Set(Type value)
+        me:value = value
+    end
+
+    action Get returns Type
+        Waiter waiter
+        integer ignored = waiter:Get(0)
+        return value
+    end
+end

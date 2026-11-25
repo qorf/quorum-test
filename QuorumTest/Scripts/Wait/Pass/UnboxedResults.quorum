@@ -1,0 +1,19 @@
+/*
+    Waiting calls whose results are unboxed: a WaitingBox<integer> hands back
+    its value as an object, which becomes an integer here. The wait must
+    finish before the value is unboxed. Also number and boolean results.
+*/
+class Main
+    action Main
+        WaitingBox<integer> box
+        box:Set(11)
+        integer first = box:Get()
+        output "unboxed: " + first
+        output "unboxed in an expression: " + (box:Get() + 2)
+
+        Waiter waiter
+        number half = waiter:GetNumber(0.5)
+        output "number: " + half
+        output "boolean: " + waiter:GetBoolean(true)
+    end
+end

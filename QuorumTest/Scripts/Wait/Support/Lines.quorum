@@ -1,0 +1,27 @@
+package Libraries.Multitasking
+
+use Libraries.Containers.Array
+
+/*
+    A stand-in for multitasking's Lines (see Task): LineUp keeps the task,
+    and Wait runs every task kept, in order.
+*/
+class Lines
+    Array<Task> waiting
+
+    action LineUp(Task task)
+        waiting:Add(task)
+    end
+
+    action Wait
+        repeat while not waiting:IsEmpty()
+            Task first = waiting:RemoveFromFront()
+            first:Wait()
+        end
+    end
+
+    action Wait(number milliseconds) returns boolean
+        Wait()
+        return true
+    end
+end

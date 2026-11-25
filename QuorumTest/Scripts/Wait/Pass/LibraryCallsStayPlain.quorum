@@ -1,0 +1,30 @@
+use Libraries.Containers.Array
+
+/*
+    Actions the library calls (here Compare, while sorting) don't wait, so
+    they must stay plain actions in JavaScript and Python mode, even in a
+    program that waits elsewhere.
+*/
+class Main
+    action Main
+        Waiter waiter
+        output "waited first: " + waiter:Get(1)
+        Array<Ranked> items
+        integer i = 0
+        repeat while i < 4
+            Ranked item
+            item:SetRank(4 - i)
+            items:Add(item)
+            i = i + 1
+        end
+        items:Sort()
+        text order = ""
+        i = 0
+        repeat while i < items:GetSize()
+            order = order + items:Get(i):GetRank()
+            i = i + 1
+        end
+        output "sorted: " + order
+        output "waited after: " + waiter:Get(2)
+    end
+end

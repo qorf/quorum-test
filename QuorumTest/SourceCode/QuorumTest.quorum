@@ -123,6 +123,7 @@ class QuorumTest is ProcessListener
     TemplatingTester templatingChecks
     TemplatingTesterGenerated templatingChecksGenerated
     ExceptionTester exceptionChecks
+    WaitTester waitChecks
     ArrayTester arrayChecks
     StackTester stackChecks
     QueueTester queueChecks
@@ -180,6 +181,7 @@ class QuorumTest is ProcessListener
         templatingChecks:SetCompilerTestSuite(me)
         templatingChecksGenerated:SetCompilerTestSuite(me)
         exceptionChecks:SetCompilerTestSuite(me)
+        waitChecks:SetCompilerTestSuite(me)
         arrayChecks:SetCompilerTestSuite(me)
         stackChecks:SetCompilerTestSuite(me)
         queueChecks:SetCompilerTestSuite(me)
@@ -472,6 +474,10 @@ class QuorumTest is ProcessListener
         if StartTester("Exception")
             exceptionChecks:Test()
             FinishTester(exceptionChecks:GetName())
+        end
+        if StartTester("Wait")
+            waitChecks:Test()
+            FinishTester(waitChecks:GetName())
         end
         if StartTester("Array")
             arrayChecks:Test()
@@ -1416,6 +1422,74 @@ Start();
         else
             result:SetPassed(true)
             result:passed = true
+        end
+        Add(result)
+        tester:Add(result)
+    end
+
+    /*
+        Compiles a program to JavaScript without running it, and checks the
+        code it makes: each text in present must appear in it, and each text
+        in absent must not. For checking how the compiler writes something
+        (for example which actions are async), where running the program
+        can't tell. A failure says which text was missing or there.
+    */
+    action TestJavaScriptCode(Array<File> files, Array<text> present, Array<text> absent)
+        if IsStopRequested()
+            return now
+        end
+        if testJavaScript = false
+            return now
+        end
+        Compiler compiler = GetDefaultCompiler()
+        CompilerRequest request
+        request:main = files:Get(0)
+        request:isWebRequest = false
+        request:library = library
+        request:SetOutputType(request:JAVASCRIPT)
+        request:files = files
+
+        CompilerResult compilerResult = compiler:Compile(request)
+        CompilerErrorManager manager = compilerResult:compilerErrorManager
+
+        CompilerTestResult result
+        File testFile
+        testFile = files:Get(0)
+        result:SetName(testFile:GetPath())
+        result:isJavaScriptTest = true
+        CompilerProfiler profiler = compiler:GetCompilerProfiler()
+        summaryProfiler:Add(profiler)
+
+        text problems = ""
+        if not manager:IsCompilationErrorFree()
+            problems = "Compilation had errors:" + JAVASCRIPT_DELIMITER:GetLineFeed() + manager:GetCompilerErrorsAsText()
+        else
+            text code = compilerResult:convertedJavaScript
+            integer i = 0
+            repeat while i < present:GetSize()
+                text wanted = present:Get(i)
+                if not code:Contains(wanted)
+                    problems = problems + "missing: [" + wanted + "] "
+                end
+                i = i + 1
+            end
+            i = 0
+            repeat while i < absent:GetSize()
+                text unwanted = absent:Get(i)
+                if code:Contains(unwanted)
+                    problems = problems + "should not be there: [" + unwanted + "] "
+                end
+                i = i + 1
+            end
+        end
+
+        if problems = ""
+            result:SetPassed(true)
+            result:passed = true
+        else
+            result:passed = false
+            result:SetPassed(false)
+            result:errorMessage = problems
         end
         Add(result)
         tester:Add(result)

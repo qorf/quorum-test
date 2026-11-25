@@ -1,0 +1,18 @@
+/*
+    An action that waits on only one of its paths is still waited for on
+    every path.
+*/
+class Main
+    action Main
+        output "waiting path: " + Maybe(true)
+        output "plain path: " + Maybe(false)
+    end
+
+    action Maybe(boolean wait) returns integer
+        if wait
+            Waiter waiter
+            return waiter:Get(5)
+        end
+        return 6
+    end
+end

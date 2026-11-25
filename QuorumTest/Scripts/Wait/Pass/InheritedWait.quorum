@@ -1,0 +1,11 @@
+/*
+    Derived inherits Base's Fetch, which waits, and calls it both directly
+    and through parent:Base:Fetch.
+*/
+class Main
+    action Main
+        Derived derived
+        output "inherited: " + derived:Fetch(4)
+        output "through parent: " + derived:FetchTwice(5)
+    end
+end

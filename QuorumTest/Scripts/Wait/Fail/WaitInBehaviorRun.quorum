@@ -1,0 +1,14 @@
+use Libraries.Interface.Events.BehaviorEvent
+
+/*
+    Should not compile: a Behavior's Run waits, but the library calls
+    Behavior:Run without waiting (for example from a game's frame).
+*/
+class Main
+    action Main
+        WaitingBehavior behavior
+        BehaviorEvent event
+        behavior:Run(event)
+        output "ran"
+    end
+end

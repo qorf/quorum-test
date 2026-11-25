@@ -1,0 +1,12 @@
+/*
+    Should not compile: a field's starting value comes from a call that
+    waits. Fields are set while the object is made, which can't wait.
+*/
+class Main
+    Waiter waiter
+    integer start = waiter:Get(1)
+
+    action Main
+        output "start: " + start
+    end
+end

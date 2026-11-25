@@ -1,0 +1,26 @@
+/*
+    An object the library compares when sorting. Its Compare doesn't wait,
+    so the library can call it as it always has, even in a program that
+    waits elsewhere.
+*/
+class Ranked
+    integer rank = 0
+
+    action SetRank(integer rank)
+        me:rank = rank
+    end
+
+    action GetRank returns integer
+        return rank
+    end
+
+    action Compare(Object object) returns integer
+        Ranked other = cast(Ranked, object)
+        if rank < other:GetRank()
+            return -1
+        elseif rank > other:GetRank()
+            return 1
+        end
+        return 0
+    end
+end

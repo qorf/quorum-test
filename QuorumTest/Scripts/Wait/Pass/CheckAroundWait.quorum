@@ -1,0 +1,51 @@
+use Libraries.Multitasking.Lines
+use Libraries.Language.Errors.Error
+
+/*
+    Waiting inside check, detect and always: an error from a task comes back
+    through the wait to detect; always runs after a wait; and a return
+    after a wait inside check still runs always first. (The detect blocks
+    are there only so this doesn't also need the fix for check and always
+    without detect.)
+*/
+class Main
+    integer alwaysRan = 0
+
+    action Main
+        Lines lines
+        ValueTask failing
+        failing:Setup(1)
+        failing:SetFail(true)
+        lines:LineUp(failing)
+        check
+            failing:Wait()
+            output "not reached"
+        detect problem
+            output "detected: " + problem:GetErrorMessage()
+        end
+
+        Waiter waiter
+        check
+            output "in check: " + waiter:Get(2)
+        detect unexpected
+            output "unexpected error: " + unexpected:GetErrorMessage()
+        always
+            output "always after a wait"
+        end
+
+        output "returned: " + ReturnInsideCheck()
+        output "always ran before the return: " + alwaysRan
+    end
+
+    action ReturnInsideCheck returns integer
+        Waiter waiter
+        check
+            return waiter:Get(3)
+        detect unexpected
+            output "unexpected error: " + unexpected:GetErrorMessage()
+        always
+            alwaysRan = alwaysRan + 1
+        end
+        return 0
+    end
+end

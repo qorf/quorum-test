@@ -1,0 +1,9 @@
+/*
+    A parent class with an action that waits, which Derived inherits.
+*/
+class Base
+    action Fetch(integer value) returns integer
+        Waiter waiter
+        return waiter:Get(value)
+    end
+end

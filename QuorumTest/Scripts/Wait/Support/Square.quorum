@@ -1,0 +1,15 @@
+/*
+    Replaces Shape's Area with an action that waits.
+*/
+class Square is Shape
+    integer side = 0
+
+    action SetSide(integer side)
+        me:side = side
+    end
+
+    action Area returns integer
+        Waiter waiter
+        return waiter:Get(side * side)
+    end
+end

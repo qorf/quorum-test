@@ -1,0 +1,13 @@
+/*
+    A parent class whose action doesn't wait. Square replaces it with one
+    that does, to test a call made through the parent's type.
+*/
+class Shape
+    action Area returns integer
+        return 0
+    end
+
+    action Describe returns text
+        return "area " + Area()
+    end
+end

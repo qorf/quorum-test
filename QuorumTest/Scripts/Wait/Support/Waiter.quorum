@@ -1,0 +1,45 @@
+use Libraries.Multitasking.Lines
+
+/*
+    Actions that wait, each returning a different kind of value. Each lines
+    up a ValueTask and waits for it, so it can only be correct if the call
+    waits too. GetCalls counts the calls, to check which calls were made.
+*/
+class Waiter
+    integer calls = 0
+
+    action Get(integer value) returns integer
+        calls = calls + 1
+        ValueTask task
+        task:Setup(value)
+        Lines lines
+        lines:LineUp(task)
+        task:Wait()
+        return task:GetResult()
+    end
+
+    action GetNumber(number value) returns number
+        integer whole = Get(1)
+        return value * whole
+    end
+
+    action GetText(text value) returns text
+        integer whole = Get(1)
+        return value
+    end
+
+    action GetBoolean(boolean value) returns boolean
+        integer whole = Get(1)
+        return value
+    end
+
+    action GetHolder(integer value) returns Holder
+        Holder holder
+        holder:SetValue(Get(value))
+        return holder
+    end
+
+    action GetCalls returns integer
+        return calls
+    end
+end

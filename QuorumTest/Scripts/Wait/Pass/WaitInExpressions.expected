@@ -1,0 +1,7 @@
+arithmetic: 7
+text: [abc]
+condition: true
+loop ran: 3
+returned: 12
+parameter: 108
+nested: 10

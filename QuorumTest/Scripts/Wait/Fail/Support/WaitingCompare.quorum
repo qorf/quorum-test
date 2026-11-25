@@ -1,0 +1,9 @@
+/*
+    A Compare that waits: not allowed (see WaitInCompare).
+*/
+class WaitingCompare
+    action Compare(Object object) returns integer
+        Waiter waiter
+        return waiter:Get(0)
+    end
+end

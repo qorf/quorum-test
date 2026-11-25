@@ -1,0 +1,20 @@
+/*
+    Main calls an action that calls an action that waits. Every action on
+    that chain must wait for the one it calls, so all three become async in
+    JavaScript and Python mode, and each call is awaited.
+*/
+class Main
+    action Main
+        output "three levels down: " + Outer(4)
+        output "after the call: done"
+    end
+
+    action Outer(integer value) returns integer
+        return Middle(value) + 1
+    end
+
+    action Middle(integer value) returns integer
+        Waiter waiter
+        return waiter:Get(value) * 10
+    end
+end

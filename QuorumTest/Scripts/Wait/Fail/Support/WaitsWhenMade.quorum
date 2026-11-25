@@ -1,0 +1,11 @@
+/*
+    Waits in on create: not allowed (see WaitWhileCreating).
+*/
+class WaitsWhenMade
+    integer value = 0
+
+    on create
+        Waiter waiter
+        value = waiter:Get(1)
+    end
+end

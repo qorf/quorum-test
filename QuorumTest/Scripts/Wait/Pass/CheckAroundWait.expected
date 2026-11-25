@@ -1,0 +1,5 @@
+detected: ValueTask failed on purpose
+in check: 2
+always after a wait
+returned: 3
+always ran before the return: 1

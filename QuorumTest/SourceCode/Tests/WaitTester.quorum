@@ -1,0 +1,229 @@
+package Libraries.Language.Compile.Test
+
+use Libraries.Testing.QuorumTest
+use Libraries.Testing.ScriptCheck
+use Libraries.Containers.Array
+use Libraries.System.File
+
+/*
+    Tests how the compiler handles actions that wait, which in JavaScript
+    are written async with every call to them awaited (WaitAnalysis in the
+    compiler). In Scripts/Wait:
+
+    - Pass: programs whose actions wait in many ways (chains, expressions,
+      unboxing, a call through a parent's type reaching an override, a
+      task's Run and Then, check and always, recursion, loops). Each gives
+      the same lines on every back end; on JavaScript that shows the await
+      went everywhere it had to.
+    - Fail: programs that wait where JavaScript can't (while an object is
+      made, in a field's starting value, in overrides of actions the
+      library calls without waiting, such as Compare). They must not
+      compile to JavaScript.
+    - The code checks compile a Pass program to JavaScript without running
+      it and check what was written: which actions are async, which calls
+      are awaited, and that a program that never waits is unchanged.
+
+    The programs use stand-ins for multitasking (Support/Task.quorum and
+    Lines.quorum, in package Libraries.Multitasking), which the compiler
+    treats as the real ones. Their Wait runs the task right there, so the
+    tests need no multitasking library and no plugins. Once multitasking
+    joins the standard library, the stand-ins must go (the classes would be
+    defined twice), and the programs use the real ones.
+*/
+class WaitTester
+    QuorumTest suite = undefined
+    ScriptCheck scripts
+    text path = "Scripts/Wait/"
+    text passPath = path + "Pass/"
+    text failPath = path + "Fail/"
+    Array<text> helpers
+    Array<text> failHelpers
+
+    action Test
+        scripts:SetSuite(suite)
+        SetUpHelpers()
+
+        Pass("MainWaits")
+        Pass("HelperChain")
+        Pass("WaitInExpressions")
+        Pass("ShortCircuit")
+        Pass("ChainedWait")
+        Pass("UnboxedResults")
+        Pass("OverrideWaits")
+        Pass("InheritedWait")
+        Pass("RunWaits")
+        Pass("ThenWaits")
+        Pass("CallRunDirectly")
+        Pass("CheckAroundWait")
+        Pass("RecursiveWait")
+        Pass("LoopsWithWaits")
+        Pass("ConditionalWait")
+        Pass("LibraryCallsStayPlain")
+        Pass("MainDoesNotWait")
+
+        Fail("WaitWhileCreating")
+        Fail("WaitInFieldValue")
+        Fail("WaitInCompare")
+        Fail("WaitInBehaviorRun")
+
+        CodeHelperChain()
+        CodeMainDoesNotWait()
+        CodeChainedWait()
+        CodeUnboxedResults()
+        CodeOverrideWaits()
+        CodeCallRunDirectly()
+        CodeLibraryCallsStayPlain()
+    end
+
+    action GetName returns text
+        return "Wait Tests"
+    end
+
+    action GetCompilerTestSuite returns QuorumTest
+        return suite
+    end
+
+    action SetCompilerTestSuite(QuorumTest suite)
+        me:suite = suite
+    end
+
+    private action SetUpHelpers
+        if not helpers:IsEmpty()
+            return now
+        end
+        text support = path + "Support/"
+        helpers:Add(support + "Task.quorum")
+        helpers:Add(support + "Lines.quorum")
+        helpers:Add(support + "ValueTask.quorum")
+        helpers:Add(support + "Waiter.quorum")
+        helpers:Add(support + "Holder.quorum")
+        helpers:Add(support + "Shape.quorum")
+        helpers:Add(support + "Square.quorum")
+        helpers:Add(support + "Base.quorum")
+        helpers:Add(support + "Derived.quorum")
+        helpers:Add(support + "Ranked.quorum")
+        helpers:Add(support + "WaitingRunTask.quorum")
+        helpers:Add(support + "WaitingBox.quorum")
+        helpers:Add(support + "DirectRunTask.quorum")
+        helpers:Add(support + "ThenWaitTask.quorum")
+
+        text failSupport = failPath + "Support/"
+        failHelpers:Add(failSupport + "WaitsWhenMade.quorum")
+        failHelpers:Add(failSupport + "WaitingCompare.quorum")
+        failHelpers:Add(failSupport + "WaitingBehavior.quorum")
+    end
+
+    // Runs a Pass program on every back end.
+    private action Pass(text name)
+        scripts:Check(passPath + name, helpers, true, true)
+    end
+
+    // A Fail program must not compile to JavaScript.
+    private action Fail(text name)
+        Array<File> files = Files(failPath + name + ".quorum")
+        integer i = 0
+        repeat while i < failHelpers:GetSize()
+            File helper
+            helper:SetPath(failHelpers:Get(i))
+            files:Add(helper)
+            i = i + 1
+        end
+        suite:TestJavaScriptFail(files)
+    end
+
+    // The program and the shared helpers, as files.
+    private action Files(text script) returns Array<File>
+        Array<File> files
+        File main
+        main:SetPath(script)
+        files:Add(main)
+        integer i = 0
+        repeat while i < helpers:GetSize()
+            File helper
+            helper:SetPath(helpers:Get(i))
+            files:Add(helper)
+            i = i + 1
+        end
+        return files
+    end
+
+    // Compiles a Pass program to JavaScript and checks the code.
+    private action Code(text name, Array<text> present, Array<text> absent)
+        suite:TestJavaScriptCode(Files(passPath + name + ".quorum"), present, absent)
+    end
+
+    // Main, Outer and Middle all reach a wait, so all are async, and the
+    // call to Outer is awaited.
+    action CodeHelperChain
+        Array<text> present
+        present:Add("async Main(")
+        present:Add("async Outer$quorum_integer(")
+        present:Add("async Middle$quorum_integer(")
+        present:Add("(await this.prototype.Outer$quorum_integer(4))")
+        Array<text> absent
+        Code("HelperChain", present, absent)
+    end
+
+    // A program whose Main never waits: Main and Add are plain, the call to
+    // Add isn't awaited, and Start hands back what Main returns. (The shared
+    // helpers compiled with every program do wait, so the code as a whole
+    // has awaits; these checks look only at Main's class.)
+    action CodeMainDoesNotWait
+        Array<text> present
+        present:Add("var $finished = $starter.Main();")
+        present:Add("return $finished;")
+        present:Add("this.prototype.Add$quorum_integer$quorum_integer(2, 3)")
+        Array<text> absent
+        absent:Add("async Main(")
+        absent:Add("async Add$quorum_integer$quorum_integer(")
+        absent:Add("(await this.prototype.Add$quorum_integer$quorum_integer(")
+        Code("MainDoesNotWait", present, absent)
+    end
+
+    // The first call in the chain is awaited before the second is made on
+    // its result.
+    action CodeChainedWait
+        Array<text> present
+        present:Add("(await waiter.GetHolder$quorum_integer(5)).GetValue()")
+        Array<text> absent
+        Code("ChainedWait", present, absent)
+    end
+
+    // The wait finishes before the value is unboxed.
+    action CodeUnboxedResults
+        Array<text> present
+        present:Add("global_GetValue_((await box.Get()), ")
+        Array<text> absent
+        absent:Add("(await global_GetValue_(")
+        Code("UnboxedResults", present, absent)
+    end
+
+    // Square's Area waits, so Shape's Area, which a call through Shape may
+    // reach, is async too, and so is Describe, which calls it.
+    action CodeOverrideWaits
+        Array<text> present
+        present:Add("async Area(")
+        present:Add("async Describe(")
+        present:Add("(await shape.Area())")
+        Array<text> absent
+        Code("OverrideWaits", present, absent)
+    end
+
+    // A call to a task's Run is awaited: the program's Run may wait.
+    action CodeCallRunDirectly
+        Array<text> present
+        present:Add("(await task.Run())")
+        Array<text> absent
+        Code("CallRunDirectly", present, absent)
+    end
+
+    // Compare, which the library calls without waiting, stays plain in a
+    // program that waits elsewhere.
+    action CodeLibraryCallsStayPlain
+        Array<text> present
+        present:Add("async Main(")
+        Array<text> absent
+        absent:Add("async Compare$quorum_Libraries_Language_Object(")
+        Code("LibraryCallsStayPlain", present, absent)
+    end
+end

@@ -1,0 +1,16 @@
+/*
+    The right side of and and or is used only when needed, also when it is
+    a call that waits: a waiting call on the right must not run when the
+    left side already decides.
+*/
+class Main
+    action Main
+        Waiter waiter
+        boolean first = false and waiter:GetBoolean(true)
+        output "false and ...: " + first + ", calls: " + waiter:GetCalls()
+        boolean second = true or waiter:GetBoolean(false)
+        output "true or ...: " + second + ", calls: " + waiter:GetCalls()
+        boolean third = true and waiter:GetBoolean(true)
+        output "true and ...: " + third + ", calls: " + waiter:GetCalls()
+    end
+end

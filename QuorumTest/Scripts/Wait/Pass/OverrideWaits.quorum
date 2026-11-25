@@ -1,0 +1,17 @@
+/*
+    Square replaces Shape's Area with an action that waits. Calls made
+    through the parent's type (Shape) reach Square's Area, so they must wait
+    too, even though Shape's own Area doesn't. So must Describe, which
+    calls Area.
+*/
+class Main
+    action Main
+        Square square
+        square:SetSide(3)
+        Shape shape = square
+        output "through the parent's type: " + shape:Area()
+        output "through an inherited action: " + shape:Describe()
+        Shape plain
+        output "the parent itself: " + plain:Area()
+    end
+end

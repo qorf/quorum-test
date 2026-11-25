@@ -1,0 +1,17 @@
+use Libraries.Containers.Array
+
+/*
+    Should not compile: Compare waits, but the library (Array's Sort) calls
+    Compare without waiting.
+*/
+class Main
+    action Main
+        Array<WaitingCompare> items
+        WaitingCompare a
+        WaitingCompare b
+        items:Add(a)
+        items:Add(b)
+        items:Sort()
+        output "sorted"
+    end
+end

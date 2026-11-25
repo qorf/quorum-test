@@ -1,0 +1,31 @@
+use Libraries.Multitasking.Task
+use Libraries.Multitasking.Lines
+
+/*
+    A task whose Run waits for another task.
+*/
+class WaitingRunTask is Task
+    integer result = 0
+    boolean thenSawResult = false
+
+    action Run
+        ValueTask inner
+        inner:Setup(21)
+        Lines lines
+        lines:LineUp(inner)
+        inner:Wait()
+        result = inner:GetResult()
+    end
+
+    action Then
+        thenSawResult = (result = 21)
+    end
+
+    action GetResult returns integer
+        return result
+    end
+
+    action ThenSawResult returns boolean
+        return thenSawResult
+    end
+end

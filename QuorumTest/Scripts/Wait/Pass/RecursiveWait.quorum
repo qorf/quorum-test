@@ -1,0 +1,16 @@
+/*
+    An action that waits and calls itself.
+*/
+class Main
+    action Main
+        output "sum: " + Sum(4)
+    end
+
+    action Sum(integer value) returns integer
+        if value = 0
+            return 0
+        end
+        Waiter waiter
+        return waiter:Get(value) + Sum(value - 1)
+    end
+end

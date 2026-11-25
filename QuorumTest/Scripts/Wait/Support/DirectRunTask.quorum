@@ -1,0 +1,17 @@
+use Libraries.Multitasking.Task
+
+/*
+    A task whose Run waits, for a program that calls Run itself.
+*/
+class DirectRunTask is Task
+    integer result = 0
+
+    action Run
+        Waiter waiter
+        result = waiter:Get(31)
+    end
+
+    action GetResult returns integer
+        return result
+    end
+end

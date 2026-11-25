@@ -1,0 +1,17 @@
+use Libraries.Multitasking.Lines
+use Libraries.Multitasking.Task
+
+/*
+    A task's Run may wait: here for another task. In JavaScript and Python
+    mode, Run becomes async, and the library waits for it before Then.
+*/
+class Main
+    action Main
+        Lines lines
+        WaitingRunTask outer
+        lines:LineUp(outer)
+        outer:Wait()
+        output "Run waited for: " + outer:GetResult()
+        output "Then ran after Run: " + outer:ThenSawResult()
+    end
+end

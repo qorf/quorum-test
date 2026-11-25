@@ -1,0 +1,18 @@
+use Libraries.Multitasking.Lines
+
+/*
+    Main waits for a task directly. In JavaScript and Python mode, Main
+    becomes async and the call to Wait is awaited.
+*/
+class Main
+    action Main
+        ValueTask task
+        task:Setup(7)
+        Lines lines
+        lines:LineUp(task)
+        output "finished before waiting: " + task:IsFinished()
+        task:Wait()
+        output "finished after waiting: " + task:IsFinished()
+        output "result: " + task:GetResult()
+    end
+end

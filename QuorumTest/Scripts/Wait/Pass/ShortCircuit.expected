@@ -1,0 +1,3 @@
+false and ...: false, calls: 0
+true or ...: true, calls: 0
+true and ...: true, calls: 1
