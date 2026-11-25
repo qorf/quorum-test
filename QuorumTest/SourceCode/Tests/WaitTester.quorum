@@ -6,29 +6,26 @@ use Libraries.Containers.Array
 use Libraries.System.File
 
 /*
-    Tests how the compiler handles actions that wait, which in JavaScript
-    are written async with every call to them awaited (WaitAnalysis in the
-    compiler). In Scripts/Wait:
+    Tests how the compiler handles actions that wait, with the multitasking
+    library (Libraries.Multitasking). The compiler works out which actions
+    can wait (Libraries.Language.Compile.Translate.WaitAnalysis): in
+    JavaScript those are written async and every call to them is awaited,
+    and on every target it reports actions that wait where their callers
+    can't wait for them. In Scripts/Wait:
 
     - Pass: programs whose actions wait in many ways (chains, expressions,
       unboxing, a call through a parent's type reaching an override, a
       task's Run and Then, check and always, recursion, loops). Each gives
-      the same lines on every back end; on JavaScript that shows the await
-      went everywhere it had to.
-    - Fail: programs that wait where JavaScript can't (while an object is
-      made, in a field's starting value, in overrides of actions the
-      library calls without waiting, such as Compare). They must not
-      compile to JavaScript.
+      the same lines on bytecode and JavaScript; on JavaScript that shows
+      the await went everywhere it had to. Not on Python yet: the library
+      doesn't have multitasking's Python plugins.
+    - Fail: programs that wait where their callers can't wait for them
+      (while an object is made, in a field's starting value, in overrides
+      of actions the library calls without waiting, such as Compare). They
+      must not compile, on bytecode or JavaScript.
     - The code checks compile a Pass program to JavaScript without running
       it and check what was written: which actions are async, which calls
       are awaited, and that a program that never waits is unchanged.
-
-    The programs use stand-ins for multitasking (Support/Task.quorum and
-    Lines.quorum, in package Libraries.Multitasking), which the compiler
-    treats as the real ones. Their Wait runs the task right there, so the
-    tests need no multitasking library and no plugins. Once multitasking
-    joins the standard library, the stand-ins must go (the classes would be
-    defined twice), and the programs use the real ones.
 */
 class WaitTester
     QuorumTest suite = undefined
@@ -92,8 +89,6 @@ class WaitTester
             return now
         end
         text support = path + "Support/"
-        helpers:Add(support + "Task.quorum")
-        helpers:Add(support + "Lines.quorum")
         helpers:Add(support + "ValueTask.quorum")
         helpers:Add(support + "Waiter.quorum")
         helpers:Add(support + "Holder.quorum")
@@ -113,12 +108,13 @@ class WaitTester
         failHelpers:Add(failSupport + "WaitingBehavior.quorum")
     end
 
-    // Runs a Pass program on every back end.
+    // Runs a Pass program on bytecode and JavaScript (not Python yet: the
+    // library doesn't have multitasking's Python plugins).
     private action Pass(text name)
-        scripts:Check(passPath + name, helpers, true, true)
+        scripts:Check(passPath + name, helpers, true, false)
     end
 
-    // A Fail program must not compile to JavaScript.
+    // A Fail program must not compile, to bytecode or to JavaScript.
     private action Fail(text name)
         Array<File> files = Files(failPath + name + ".quorum")
         integer i = 0
@@ -128,6 +124,7 @@ class WaitTester
             files:Add(helper)
             i = i + 1
         end
+        suite:TestFail(files)
         suite:TestJavaScriptFail(files)
     end
 
