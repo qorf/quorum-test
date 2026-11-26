@@ -1,0 +1,10 @@
+/*
+    A LEGO SPIKE program whose Main waits: the motor turns for two seconds,
+    and RunForTime waits until it stops. Only compiled to Python and
+    checked, not run: the SPIKE modules exist only on a hub.
+*/
+use Libraries.Robots.Spike.Motor
+
+Motor motor
+motor:SetPort(0)
+motor:RunForTime(2000, 1000)

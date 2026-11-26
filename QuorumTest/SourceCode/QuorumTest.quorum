@@ -1192,7 +1192,13 @@ class QuorumTest is ProcessListener
 
         process:SetDirectory(GetProgramDirectory(outFile:GetParentDirectory()))
 
+        //Python's SyntaxWarnings are left out of the error stream: they are
+        //warnings, not errors, and the program still runs as written. Python
+        //3.14 warns about a return inside a finally block, which is how an
+        //always block that returns is written.
         Array<text> flags
+        flags:Add("-W")
+        flags:Add("ignore::SyntaxWarning")
         flags:Add(outFile:GetAbsolutePath())
 
         process:SetParameters(flags)
@@ -1435,10 +1441,28 @@ Start();
         can't tell. A failure says which text was missing or there.
     */
     action TestJavaScriptCode(Array<File> files, Array<text> present, Array<text> absent)
-        if IsStopRequested()
+        if testJavaScript = false
             return now
         end
-        if testJavaScript = false
+        TestCode(files, present, absent, false)
+    end
+
+    /*
+        The same as TestJavaScriptCode, for the Python the compiler makes.
+    */
+    action TestPythonCode(Array<File> files, Array<text> present, Array<text> absent)
+        if testPython = false
+            return now
+        end
+        TestCode(files, present, absent, true)
+    end
+
+    /*
+        Compiles a program to JavaScript, or to Python, without running it,
+        and checks the code it makes (see TestJavaScriptCode).
+    */
+    private action TestCode(Array<File> files, Array<text> present, Array<text> absent, boolean python)
+        if IsStopRequested()
             return now
         end
         Compiler compiler = GetDefaultCompiler()
@@ -1446,7 +1470,11 @@ Start();
         request:main = files:Get(0)
         request:isWebRequest = false
         request:library = library
-        request:SetOutputType(request:JAVASCRIPT)
+        if python
+            request:SetOutputType(request:PYTHON)
+        else
+            request:SetOutputType(request:JAVASCRIPT)
+        end
         request:files = files
 
         CompilerResult compilerResult = compiler:Compile(request)
@@ -1456,7 +1484,11 @@ Start();
         File testFile
         testFile = files:Get(0)
         result:SetName(testFile:GetPath())
-        result:isJavaScriptTest = true
+        if python
+            result:isPythonTest = true
+        else
+            result:isJavaScriptTest = true
+        end
         CompilerProfiler profiler = compiler:GetCompilerProfiler()
         summaryProfiler:Add(profiler)
 
@@ -1465,6 +1497,9 @@ Start();
             problems = "Compilation had errors:" + JAVASCRIPT_DELIMITER:GetLineFeed() + manager:GetCompilerErrorsAsText()
         else
             text code = compilerResult:convertedJavaScript
+            if python
+                code = compilerResult:convertedPython
+            end
             integer i = 0
             repeat while i < present:GetSize()
                 text wanted = present:Get(i)

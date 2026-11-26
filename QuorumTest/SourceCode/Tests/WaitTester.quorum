@@ -9,23 +9,26 @@ use Libraries.System.File
     Tests how the compiler handles actions that wait, with the multitasking
     library (Libraries.Multitasking). The compiler works out which actions
     can wait (Libraries.Language.Compile.Translate.WaitAnalysis): in
-    JavaScript those are written async and every call to them is awaited,
-    and on every target it reports actions that wait where their callers
-    can't wait for them. In Scripts/Wait:
+    JavaScript and Python those are written async and every call to them is
+    awaited, and on every target it reports actions that wait where their
+    callers can't wait for them. In Scripts/Wait:
 
     - Pass: programs whose actions wait in many ways (chains, expressions,
       unboxing, a call through a parent's type reaching an override, a
       task's Run and Then, check and always, recursion, loops). Each gives
-      the same lines on bytecode and JavaScript; on JavaScript that shows
-      the await went everywhere it had to. Not on Python yet: the library
-      doesn't have multitasking's Python plugins.
+      the same lines on bytecode, JavaScript and Python; on JavaScript and
+      Python that shows the await went everywhere it had to.
     - Fail: programs that wait where their callers can't wait for them
       (while an object is made, in a field's starting value, in overrides
       of actions the library calls without waiting, such as Compare). They
-      must not compile, on bytecode or JavaScript.
-    - The code checks compile a Pass program to JavaScript without running
-      it and check what was written: which actions are async, which calls
-      are awaited, and that a program that never waits is unchanged.
+      must not compile, on bytecode, JavaScript or Python.
+    - The code checks compile a Pass program to JavaScript or Python without
+      running it and check what was written: which actions are async, which
+      calls are awaited, and that a program that never waits is unchanged.
+    - Spike: LEGO SPIKE programs, compiled to Python and checked the same
+      way (the SPIKE modules exist only on a hub, so they can't run here).
+      The SPIKE library waits through multitasking, so a program that turns
+      a motor waits with no special handling in the compiler.
 */
 class WaitTester
     QuorumTest suite = undefined
@@ -70,6 +73,15 @@ class WaitTester
         CodeOverrideWaits()
         CodeCallRunDirectly()
         CodeLibraryCallsStayPlain()
+
+        PythonCodeHelperChain()
+        PythonCodeMainDoesNotWait()
+        PythonCodeChainedWait()
+        PythonCodeUnboxedResults()
+        PythonCodeOverrideWaits()
+
+        SpikeMotorWaits()
+        SpikeMotorDoesNotWait()
     end
 
     action GetName returns text
@@ -108,13 +120,12 @@ class WaitTester
         failHelpers:Add(failSupport + "WaitingBehavior.quorum")
     end
 
-    // Runs a Pass program on bytecode and JavaScript (not Python yet: the
-    // library doesn't have multitasking's Python plugins).
+    // Runs a Pass program on bytecode, JavaScript and Python.
     private action Pass(text name)
-        scripts:Check(passPath + name, helpers, true, false)
+        scripts:Check(passPath + name, helpers, true, true)
     end
 
-    // A Fail program must not compile, to bytecode or to JavaScript.
+    // A Fail program must not compile, to bytecode, JavaScript or Python.
     private action Fail(text name)
         Array<File> files = Files(failPath + name + ".quorum")
         integer i = 0
@@ -126,6 +137,7 @@ class WaitTester
         end
         suite:TestFail(files)
         suite:TestJavaScriptFail(files)
+        suite:TestPythonFail(files)
     end
 
     // The program and the shared helpers, as files.
@@ -147,6 +159,20 @@ class WaitTester
     // Compiles a Pass program to JavaScript and checks the code.
     private action Code(text name, Array<text> present, Array<text> absent)
         suite:TestJavaScriptCode(Files(passPath + name + ".quorum"), present, absent)
+    end
+
+    // Compiles a Pass program to Python and checks the code.
+    private action PythonCode(text name, Array<text> present, Array<text> absent)
+        suite:TestPythonCode(Files(passPath + name + ".quorum"), present, absent)
+    end
+
+    // Compiles a SPIKE program, by itself, to Python and checks the code.
+    private action SpikeCode(text name, Array<text> present, Array<text> absent)
+        Array<File> files
+        File main
+        main:SetPath(path + "Spike/" + name + ".quorum")
+        files:Add(main)
+        suite:TestPythonCode(files, present, absent)
     end
 
     // Main, Outer and Middle all reach a wait, so all are async, and the
@@ -222,5 +248,99 @@ class WaitTester
         Array<text> absent
         absent:Add("async Compare$quorum_Libraries_Language_Object(")
         Code("LibraryCallsStayPlain", present, absent)
+    end
+
+    // In Python too, Main, Outer and Middle all reach a wait, so all are
+    // async, and the call to Outer is awaited.
+    action PythonCodeHelperChain
+        Array<text> present
+        present:Add("async def Main(self)")
+        present:Add("async def Outer__quorum_integer(self")
+        present:Add("async def Middle__quorum_integer(self")
+        present:Add("(await self.me_.Outer__quorum_integer(4))")
+        present:Add("_MT_Run(SuperMain())")
+        Array<text> absent
+        PythonCode("HelperChain", present, absent)
+    end
+
+    // A program whose Main never waits: in Python, Main and Add are plain,
+    // the call to Add isn't awaited, and the program starts by calling
+    // SuperMain, without the scheduler. (The shared helpers wait, but none
+    // of them is the program's Main.)
+    action PythonCodeMainDoesNotWait
+        Array<text> present
+        present:Add("def Main(self)")
+        present:Add("self.me_.Add__quorum_integer__quorum_integer(2, 3)")
+        present:Add("def SuperMain():")
+        Array<text> absent
+        absent:Add("async def Main(self)")
+        absent:Add("async def Add__quorum_integer__quorum_integer(")
+        absent:Add("(await self.me_.Add__quorum_integer__quorum_integer(")
+        absent:Add("_MT_Run(SuperMain())")
+        absent:Add("runloop.run(SuperMain())")
+        PythonCode("MainDoesNotWait", present, absent)
+    end
+
+    // In Python, the first call in the chain is awaited before the second
+    // is made on its result.
+    action PythonCodeChainedWait
+        Array<text> present
+        present:Add("(await waiter.GetHolder__quorum_integer(5)).GetValue()")
+        Array<text> absent
+        PythonCode("ChainedWait", present, absent)
+    end
+
+    // In Python, the wait finishes before the value is unboxed.
+    action PythonCodeUnboxedResults
+        Array<text> present
+        present:Add("Global_GetValue_((await box.Get()), ")
+        Array<text> absent
+        absent:Add("(await Global_GetValue_(")
+        absent:Add("await Global_GetValue_(")
+        PythonCode("UnboxedResults", present, absent)
+    end
+
+    // In Python, Square's Area waits, so Shape's Area is async, and so is
+    // Describe, which calls it; the call through Shape is awaited.
+    action PythonCodeOverrideWaits
+        Array<text> present
+        present:Add("async def Area(self)")
+        present:Add("async def Describe(self)")
+        present:Add("(await shape.Area())")
+        Array<text> absent
+        PythonCode("OverrideWaits", present, absent)
+    end
+
+    // A SPIKE program that turns a motor: RunForTime waits (through
+    // multitasking, in the SPIKE library), so Main is async, the call is
+    // awaited, and the program starts through multitasking's scheduler.
+    // The SPIKE library's RunForTime is async too, and its plugin hands the
+    // motor's work to multitasking.
+    action SpikeMotorWaits
+        Array<text> present
+        present:Add("async def Main(self)")
+        present:Add("(await motor.RunForTime__quorum_integer__quorum_integer(2000, 1000))")
+        present:Add("async def RunForTime__quorum_integer__quorum_integer(self")
+        present:Add("def RunForTimeNative__quorum_integer__quorum_integer__quorum_Libraries_Multitasking_Task(")
+        present:Add("_MT_WaitFor(motor.run_for_time(")
+        present:Add("_MT_Run(SuperMain())")
+        Array<text> absent
+        absent:Add("runloop.run(SuperMain())")
+        SpikeCode("MotorWaits", present, absent)
+    end
+
+    // A SPIKE program that never waits: Main is plain, nothing is awaited,
+    // and the program starts by calling SuperMain, without the scheduler.
+    action SpikeMotorDoesNotWait
+        Array<text> present
+        present:Add("def Main(self)")
+        present:Add("def SuperMain():")
+        Array<text> absent
+        absent:Add("async def Main(self)")
+        absent:Add("async def SuperMain()")
+        absent:Add("_MT_Run(SuperMain())")
+        absent:Add("runloop.run(SuperMain())")
+        absent:Add("(await motor.")
+        SpikeCode("MotorDoesNotWait", present, absent)
     end
 end

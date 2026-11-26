@@ -163,12 +163,18 @@ class Shard
         //ends between the two reads isn't taken for one that died
         boolean alive = process:IsAlive()
 
+        //The process rewrites its files while this reads them, so a file can
+        //be empty or half written for a moment. Such a read is skipped and
+        //tried again on the next poll, while the process is alive; once it
+        //has ended, its files are final.
         File resultFile
         resultFile:SetPath(GetResultsFolder() + "/result.json")
         if resultFile:Exists()
-            JavaScriptObjectNotation json
-            json:Read(resultFile)
-            if json:GetValue("run") = runID
+            JavaScriptObjectNotation json = ReadWhole(resultFile)
+            if json = undefined and alive
+                return now
+            end
+            if json not= undefined and json:GetValue("run") = runID
                 Apply(json)
                 result = json
                 done = true
@@ -185,9 +191,11 @@ class Shard
         File progressFile
         progressFile:SetPath(GetResultsFolder() + "/progress.json")
         if progressFile:Exists()
-            JavaScriptObjectNotation progress
-            progress:Read(progressFile)
-            if progress:GetValue("run") = runID
+            JavaScriptObjectNotation progress = ReadWhole(progressFile)
+            if progress = undefined and alive
+                return now
+            end
+            if progress not= undefined and progress:GetValue("run") = runID
                 Apply(progress)
                 current = progress:GetValue("current")
                 currentPassed = progress:GetInteger("currentPassed")
@@ -200,6 +208,30 @@ class Shard
             done = true
             status = "Stopped without finishing, exit code " + process:GetExitCode()
         end
+    end
+
+    /*
+        Reads a file the process writes, as JSON, or returns undefined if it
+        can't be read whole right now: it is empty, or only part of it has
+        been written, so it doesn't parse.
+    */
+    private action ReadWhole(File file) returns JavaScriptObjectNotation
+        text content = ""
+        check
+            content = file:Read()
+        detect e
+            return undefined
+        end
+        if content = undefined or content:IsEmpty()
+            return undefined
+        end
+        JavaScriptObjectNotation json
+        check
+            json:Read(content)
+        detect e
+            return undefined
+        end
+        return json
     end
 
     private action Apply(JavaScriptObjectNotation json)

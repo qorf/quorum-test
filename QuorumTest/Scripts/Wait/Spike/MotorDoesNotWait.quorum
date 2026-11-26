@@ -1,0 +1,11 @@
+/*
+    A LEGO SPIKE program that never waits: it sets the motor's port and
+    reads it back. Main stays a plain action and starts plainly. Only
+    compiled to Python and checked, not run: the SPIKE modules exist only on
+    a hub.
+*/
+use Libraries.Robots.Spike.Motor
+
+Motor motor
+motor:SetPort(0)
+output motor:GetPort()
