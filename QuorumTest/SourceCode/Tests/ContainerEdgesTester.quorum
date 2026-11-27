@@ -60,6 +60,7 @@ class ContainerEdgesTester
         scripts:CheckEverywhere(path + "MultipleLineTextLines")
         scripts:CheckEverywhere(path + "MultipleLineTextManyEdits")
         scripts:CheckEverywhere(path + "MultipleLineTextConcatenate")
+        scripts:CheckEverywhere(path + "MultipleLineTextInitialize")
         scripts:CheckEverywhere(path + "Number32BitArrayEdges")
         scripts:CheckEverywhere(path + "Number64BitArrayEdges")
         scripts:CheckEverywhere(path + "StackQueueEdges")

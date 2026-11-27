@@ -1,0 +1,114 @@
+use Libraries.Containers.MultipleLineText
+
+/*
+    How Initialize splits a text into lines. In the output each line
+    separator is shown as "/" and a carriage return that isn't part of one as
+    <CR>. A line includes its separator, so a text that ends with a separator
+    has an empty last line, as does each further separator at the end. Then a
+    long text of 1000 lines: every line comes back, lines start where the line
+    before them ends, each line's start is found from its characters, and the
+    tree needs no balancing. Character positions aren't shown, since a line
+    separator is one character on some systems and two on others.
+*/
+class Main
+    text separator = ""
+    text carriageReturn = ""
+
+    action Show(text value) returns text
+        text shown = value:Replace(separator, "/")
+        return "[" + shown:Replace(carriageReturn, "<CR>") + "]"
+    end
+
+    action ShowLines(MultipleLineText tree) returns text
+        text result = ""
+        integer i = 0
+        repeat while i < tree:GetLineCount()
+            MultipleLineText line = tree:GetLine(i)
+            result = result + Show(line:GetText())
+            i = i + 1
+        end
+        return result
+    end
+
+    // One case: the text, given with "/" for each separator.
+    action Case(text shown)
+        text value = shown:Replace("/", separator)
+        value = value:Replace("<CR>", carriageReturn)
+        check
+            MultipleLineText tree
+            tree:Initialize(value)
+            output "MultipleLineText(" + shown + ") GetText() = " + Show(tree:GetText()) + ", same as given = " + (tree:GetText() = value) + ", GetLineCount() = " + tree:GetLineCount() + ", lines " + ShowLines(tree)
+        detect e
+            output "MultipleLineText(" + shown + ") Initialize unexpected error: " + e:GetErrorMessage()
+        end
+    end
+
+    action Main
+        MultipleLineText probe
+        separator = probe:GetLineSeparator()
+        carriageReturn = carriageReturn:GetCarriageReturn()
+
+        Case("")
+        Case("ab")
+        Case("ab/")
+        Case("/")
+        Case("//")
+        Case("ab//")
+        Case("ab///")
+        Case("/ab")
+        Case("ab/cd")
+        Case("ab/cd/")
+        Case("ab//cd")
+        Case("x<CR>y/z")
+
+        text long = ""
+        integer i = 0
+        repeat while i < 1000
+            if i > 0
+                long = long + separator
+            end
+            long = long + "line " + i
+            i = i + 1
+        end
+        check
+            MultipleLineText tree
+            tree:Initialize(long)
+            output "MultipleLineText, 1000 lines: GetLineCount() = " + tree:GetLineCount() + ", same text = " + (tree:GetText() = long) + ", NeedsBalancing() = " + tree:NeedsBalancing()
+            output "MultipleLineText, 1000 lines: GetLine(0) = " + Show(tree:GetLine(0):GetText()) + ", GetLine(500) = " + Show(tree:GetLine(500):GetText()) + ", GetLine(999) = " + Show(tree:GetLine(999):GetText())
+
+            boolean everyLine = true
+            boolean starts = true
+            boolean found = true
+            i = 0
+            repeat while i < 1000
+                text expected = "line " + i
+                if i < 999
+                    expected = expected + separator
+                end
+                MultipleLineText line = tree:GetLine(i)
+                if line:GetText() not= expected
+                    everyLine = false
+                end
+                integer start = tree:CharacterIndexFromLineIndex(i)
+                if i < 999 and tree:CharacterIndexFromLineIndex(i + 1) not= start + expected:GetSize()
+                    starts = false
+                end
+                if tree:LineIndexFromCharacterIndex(start) not= i or tree:LineIndexFromCharacterIndex(start + expected:GetSize() - 1) not= i
+                    found = false
+                end
+                i = i + 1
+            end
+            output "MultipleLineText, 1000 lines: every line as given = " + everyLine + ", each line starts where the one before ends = " + starts + ", each line's first and last characters are on that line = " + found
+        detect e
+            output "MultipleLineText, 1000 lines unexpected error: " + e:GetErrorMessage()
+        end
+
+        check
+            MultipleLineText tree
+            tree:Initialize(long + separator)
+            output "MultipleLineText, 1000 lines and a separator at the end: GetLineCount() = " + tree:GetLineCount() + ", GetLine(999) = " + Show(tree:GetLine(999):GetText()) + ", GetLine(1000) = " + Show(tree:GetLine(1000):GetText()) + ", NeedsBalancing() = " + tree:NeedsBalancing()
+        detect e
+            output "MultipleLineText, 1000 lines and a separator unexpected error: " + e:GetErrorMessage()
+        end
+    end
+end

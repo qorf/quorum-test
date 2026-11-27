@@ -1,0 +1,16 @@
+MultipleLineText() GetText() = [], same as given = true, GetLineCount() = 1, lines []
+MultipleLineText(ab) GetText() = [ab], same as given = true, GetLineCount() = 1, lines [ab]
+MultipleLineText(ab/) GetText() = [ab/], same as given = true, GetLineCount() = 2, lines [ab/][]
+MultipleLineText(/) GetText() = [/], same as given = true, GetLineCount() = 2, lines [/][]
+MultipleLineText(//) GetText() = [//], same as given = true, GetLineCount() = 3, lines [/][/][]
+MultipleLineText(ab//) GetText() = [ab//], same as given = true, GetLineCount() = 3, lines [ab/][/][]
+MultipleLineText(ab///) GetText() = [ab///], same as given = true, GetLineCount() = 4, lines [ab/][/][/][]
+MultipleLineText(/ab) GetText() = [/ab], same as given = true, GetLineCount() = 2, lines [/][ab]
+MultipleLineText(ab/cd) GetText() = [ab/cd], same as given = true, GetLineCount() = 2, lines [ab/][cd]
+MultipleLineText(ab/cd/) GetText() = [ab/cd/], same as given = true, GetLineCount() = 3, lines [ab/][cd/][]
+MultipleLineText(ab//cd) GetText() = [ab//cd], same as given = true, GetLineCount() = 3, lines [ab/][/][cd]
+MultipleLineText(x<CR>y/z) GetText() = [x<CR>y/z], same as given = true, GetLineCount() = 2, lines [x<CR>y/][z]
+MultipleLineText, 1000 lines: GetLineCount() = 1000, same text = true, NeedsBalancing() = false
+MultipleLineText, 1000 lines: GetLine(0) = [line 0/], GetLine(500) = [line 500/], GetLine(999) = [line 999]
+MultipleLineText, 1000 lines: every line as given = true, each line starts where the one before ends = true, each line's first and last characters are on that line = true
+MultipleLineText, 1000 lines and a separator at the end: GetLineCount() = 1001, GetLine(999) = [line 999/], GetLine(1000) = [], NeedsBalancing() = false
